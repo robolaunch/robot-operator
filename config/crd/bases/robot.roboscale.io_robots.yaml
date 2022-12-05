@@ -35,13 +35,42 @@ spec:
           spec:
             description: RobotSpec defines the desired state of Robot
             properties:
-              foo:
-                description: Foo is an example field of Robot. Edit robot_types.go
-                  to remove/update
+              distro:
+                description: ROS distro to be used.
+                enum:
+                - foxy
+                - galactic
                 type: string
+              storage:
+                description: Resource limitations of robot containers.
+                properties:
+                  amount:
+                    default: 10000
+                    description: Specifies how much storage will be allocated in total.
+                    type: integer
+                  storageClassConfig:
+                    description: Storage class selection for robot's volumes.
+                    properties:
+                      accessMode:
+                        description: PVC access mode
+                        type: string
+                      name:
+                        description: Storage class name
+                        type: string
+                    type: object
+                type: object
+            required:
+            - distro
             type: object
           status:
             description: RobotStatus defines the observed state of Robot
+            properties:
+              image:
+                description: Image of robot
+                type: string
+              nodeName:
+                description: Node name
+                type: string
             type: object
         type: object
     served: true

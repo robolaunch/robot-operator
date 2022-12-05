@@ -22,6 +22,7 @@ type RobotReconciler struct {
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=robots,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=robots/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=robots/finalizers,verbs=update
+//+kubebuilder:rbac:groups=core,resources=nodes,verbs=get;list;watch;create;update;patch;delete
 
 var logger logr.Logger
 
