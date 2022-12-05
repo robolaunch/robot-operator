@@ -33,6 +33,7 @@ import (
 
 	robotv1alpha1 "github.com/robolaunch/robot-operator/api/v1alpha1"
 	robot "github.com/robolaunch/robot-operator/pkg/controllers/robot"
+	discoveryServer "github.com/robolaunch/robot-operator/pkg/controllers/robot/discovery_server"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -98,6 +99,13 @@ func main() {
 	}
 	if err = (&robotv1alpha1.Robot{}).SetupWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "Robot")
+		os.Exit(1)
+	}
+	if err = (&discoveryServer.DiscoveryServerReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "DiscoveryServer")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder

@@ -60,8 +60,9 @@ type VolumeStatus struct {
 type RobotPhase string
 
 const (
-	RobotPhaseCreatingEnvironment RobotPhase = "CreatingEnvironment"
-	RobotPhaseConfiguringVolumes  RobotPhase = "ConfiguringEnvironment"
+	RobotPhaseCreatingEnvironment     RobotPhase = "CreatingEnvironment"
+	RobotPhaseCreatingDiscoveryServer RobotPhase = "CreatingDiscoveryServer"
+	RobotPhaseConfiguringVolumes      RobotPhase = "ConfiguringEnvironment"
 )
 
 // RobotStatus defines the observed state of Robot
