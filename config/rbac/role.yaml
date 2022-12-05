@@ -1,0 +1,33 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: manager-role
+rules:
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - robots
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - robots/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - robots/status
+  verbs:
+  - get
+  - patch
+  - update
