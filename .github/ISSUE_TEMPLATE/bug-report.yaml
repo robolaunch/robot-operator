@@ -1,7 +1,6 @@
 name: Bug Report
 description: Report a bug encountered while operating Kubernetes
-labels:
-  - kind/bug
+labels: ["bug"]
 body:
   - type: textarea
     id: problem
@@ -28,11 +27,6 @@ body:
       required: true
 
   - type: textarea
-    id: additional
-    attributes:
-      label: Anything else we need to know?
-
-  - type: textarea
     id: kubeVersion
     attributes:
       label: Kubernetes version
@@ -49,59 +43,9 @@ body:
       required: true
 
   - type: textarea
-    id: cloudProvider
+    id: network
     attributes:
-      label: Cloud provider
-      value: |
-        <details>
-
-        </details>
-    validations:
-      required: true
-
-  - type: textarea
-    id: osVersion
-    attributes:
-      label: OS version
-      value: |
-        <details>
-
-        ```console
-        # On Linux:
-        $ cat /etc/os-release
-        # paste output here
-        $ uname -a
-        # paste output here
-
-        # On Windows:
-        C:\> wmic os get Caption, Version, BuildNumber, OSArchitecture
-        # paste output here
-        ```
-
-        </details>
-
-  - type: textarea
-    id: installer
-    attributes:
-      label: Install tools
-      value: |
-        <details>
-
-        </details>
-
-  - type: textarea
-    id: runtime
-    attributes:
-      label: Container runtime (CRI) and version (if applicable)
-      value: |
-        <details>
-
-        </details>
-
-  - type: textarea
-    id: plugins
-    attributes:
-      label: Related plugins (CNI, CSI, ...) and versions (if applicable)
+      label: Container network interface (CNI) and version
       value: |
         <details>
 

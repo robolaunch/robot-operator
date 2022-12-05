@@ -1,71 +1,148 @@
-# <img src="https://raw.githubusercontent.com/robolaunch/trademark/main/logos/svg/rocket.svg" width="40" height="40" align="top"> robolaunch Project Template
-
-[EDIT THIS: You can put badges to the README using [shields.io](https://shields.io/). Explain the repository's purpose shortly.]
+# <img src="https://raw.githubusercontent.com/robolaunch/trademark/main/logos/svg/rocket.svg" width="40" height="40" align="top"> robolaunch Kubernetes Robot Operator
 
 <div align="center">
   <p align="center">
-    <a href="https://github.com/robolaunch/template/releases">
-      <img src="https://img.shields.io/badge/python-3.7-blue" alt="release">
+    <a href="https://bitbucket.org/kaesystems/robot-operator/releases">
+      <img src="https://img.shields.io/github/go-mod/go-version/robolaunch/robot-operator" alt="release">
     </a>
-    <a href="https://github.com/robolaunch/template/releases">
-      <img src="https://img.shields.io/badge/release-v2.0.7-green" alt="release">
+    <a href="https://bitbucket.org/kaesystems/robot-operator/releases">
+      <img src="https://img.shields.io/github/v/release/robolaunch/robot-operator" alt="release">
     </a>
-    <a href="https://github.com/robolaunch/template/blob/main/LICENSE">
-      <img src="https://img.shields.io/github/license/robolaunch/template" alt="license">
+    <a href="https://bitbucket.org/kaesystems/robot-operator/blob/main/LICENSE">
+      <img src="https://img.shields.io/github/license/robolaunch/robot-operator" alt="license">
     </a>
-    <a href="https://github.com/robolaunch/template/issues">
-      <img src="https://img.shields.io/github/issues/robolaunch/template" alt="issues">
+    <a href="https://hub.docker.com/u/robolaunchio/robot-op-dev">
+      <img src="https://img.shields.io/docker/pulls/robolaunchio/robot-controller-manager" alt="pulls">
     </a>
-    <a href="https://github.com/robolaunch/template/actions">
-      <img src="https://img.shields.io/badge/build-passing-dgreen" alt="build">
+    <a href="https://bitbucket.org/kaesystems/robot-operator/issues">
+      <img src="https://img.shields.io/github/issues/robolaunch/robot-operator" alt="issues">
+    </a>
+    <a href="https://bitbucket.org/kaesystems/robot-operator/actions">
+      <img src="https://bitbucket.org/kaesystems/robot-operator/actions/workflows/docker-build-for-push.yml/badge.svg" alt="build">
     </a>
   </p>
 </div>
 
-robolaunch Template helps organization members to have a generic project template before opening a repository. [Use this repository as a template](https://github.com/robolaunch/template/generate) for the new [robolaunch Organization](https://github.com/robolaunch) repository and specialize it according to project's needs.
+robolaunch Kubernetes Robot Operator manages lifecycle of ROS 2 based robots and enables defining, deploying and distributing robots declaratively.
 
-## Table of Contents
+<img src="https://raw.githubusercontent.com/robolaunch/trademark/main/repository-media/robot-operator/kubectl-get-robots.gif" alt="kubectl-get-robots" width="100%"/>
 
-[EDIT THIS: Add your headers to table of contents.]
+<img src="https://raw.githubusercontent.com/robolaunch/trademark/main/repository-media/robot-operator/kubectl-describe-robot.gif" alt="kubectl-describe-robot" width="100%"/>
 
-- [Overview](#overview)
+## Table of Contents  
+- [Idea](#idea)
 - [Quick Start](#quick-start)
   - [Installation](#installation)
   - [Deploy Your First Robot](#deploy-your-first-robot)
-- [Aims & Roadmap](#aims--roadmap)
 - [Contributing](#contributing)
 
 
-## Overview
+## Idea
 
-[EDIT THIS: Give more insight about the project. Provide a feature list.]
+The main idea of this project is to manage robots as Kubernetes custom resources. As a custom resource, a robot's lifecycle contains following operations and benefits.
 
-The aim of this project is to maintain a generic template for robolaunch projects. Members of robolaunch organization can fork this repository and start developing their projects following conventions such as:
+- **Robot Lifecycle Management**
+  - Deployment
+  - Update
+  - Upgrade
+  - Vertical Scaling
+    - Adjusting robot's resources
+- **Robot Observability**
+  - ROS observability tools (eg. rViz, Foxglove, ROS Tracker)
+  - Exporting ROS nodes, topics, services, actions and bandwidth
+- **GPU Acceleration**
+  - Simulation (Gazebo, Ignition)
+  - VDI
+- **Geoghraphic Distribution**
+  - Cloud-powered robot
+  - Cloud-connected robot
+- **Software development lifecycle**
+  - Cloud IDE
+- **Connectivity**
+  - Robot-to-Robot Discovery
+  - Node-to-Node Discovery
 
-- Following a code of conduct
-- Having a contributing guide
-- Having a style guide
-- Applying Apache 2.0 license
-- Having a README template
-- Having issue & pull request templates
-- Using worklows for testing & build
+Refer [robolaunch.io](robolaunch.io) and [project wiki](https://bitbucket.org/kaesystems/robot-operator/wiki) for more architectural details and documentations.
 
 ## Quick Start
 
-[EDIT THIS: Explain how starters can try the project's functionality.]
+### Installation
 
-After [using this project as template](https://github.com/robolaunch/template/generate), you can:
-- Update generic fields at README, specialize it to the project
-- Create first release to stage new features
-- Add custom workflows for CI/CD
-- Specialize issue & PR templates if needed
+Installation steps will be instructed here.
 
-## Aims & Roadmap
+<!-- Make sure your Kubernetes cluster meets [prerequisites here](./docs/installation/installation.md#prerequisites).
 
-[EDIT THIS: Add roadmap items for the project.]
+Label one of your Kubernetes nodes.
 
-- Extending the open source conventions
-- Enforcing conventional commit messages
+```bash
+kubectl label node <NODE> robolaunch.io/platform=true
+```
+
+Apply release YAML. -->
+
+### Deploy Your First Robot
+
+Robot deployment steps will be instructed here.
+
+<!-- You can try example robots under [`config/samples/`](./config/samples/). For example, to deploy Linorobot 2, apply the YAML below.
+
+```yaml
+# linorobot2.yaml
+apiVersion: robot.roboscale.io/v1alpha1
+kind: Robot
+metadata:
+  name: linorobot2
+spec:
+  robot:
+    nodeSelector:
+      robolaunch.io/platform: "true"
+    distro: foxy
+    state: Launched
+    tools:
+      tracker:
+        enabled: true
+      cloudIDE:
+        enabled: true
+      bridge:
+        enabled: false
+      foxglove:
+        enabled: false
+      vdi:
+        enabled: false
+    mode: Single
+    resources:
+      storage: 15000
+      cpuPerContainer: 800m
+      memoryPerContainer: 512Mi
+    namespacing: false
+    workspaces:
+    - name: linorobot-ws
+      repositories:
+      - name: master_br
+        url: https://github.com/tunahanertekin/linorobot2
+        branch: tuna
+        launch:
+          launchFilePath: linorobot2_gazebo/launch/gazebo.launch.py
+          env:
+          - name: LINOROBOT2_BASE
+            value: 2wd
+      build: Standard
+```
+
+```bash
+kubectl apply -f linorobot2.yaml
+```
+
+After applying YAML, check robot's status by using:
+```bash
+watch "kubectl get robot linorobot2"
+```
+
+To see events and other robot-specific configurations, run:
+```bash
+kubectl describe robot linorobot2
+``` -->
+
 
 ## Contributing
 
