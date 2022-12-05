@@ -1,0 +1,6 @@
+domain: roboscale.io
+layout:
+- go.kubebuilder.io/v3
+projectName: robot-operator
+repo: github.com/robolaunch/robot-operator
+version: "3"
