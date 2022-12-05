@@ -8,3 +8,8 @@ const (
 	CLOUD_INSTANCE_LABEL_KEY    = "robolaunch.io/cloud-instance"
 	PHYSICAL_INSTANCE_LABEL_KEY = "robolaunch.io/physical-instance"
 )
+
+// Ready robot properties
+const (
+	ROBOT_IMAGE = "robolaunch.io/robot-image"
+)
