@@ -1,8 +1,10 @@
 package v1alpha1
 
 import (
+	"github.com/robolaunch/robot-operator/internal"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 )
 
 // ROS distro selection. Allowed distros are Foxy and Galactic. It is aimed to support Humble, Melodic and Noetic in further versions.
@@ -46,12 +48,32 @@ type RobotSpec struct {
 	Storage Storage `json:"storage,omitempty"`
 }
 
+type VolumeStatus struct {
+	Var       bool `json:"var,omitempty"`
+	Etc       bool `json:"etc,omitempty"`
+	Usr       bool `json:"usr,omitempty"`
+	Opt       bool `json:"opt,omitempty"`
+	Display   bool `json:"display,omitempty"`
+	Workspace bool `json:"workspace,omitempty"`
+}
+
+type RobotPhase string
+
+const (
+	RobotPhaseCreatingEnvironment RobotPhase = "CreatingEnvironment"
+	RobotPhaseConfiguringVolumes  RobotPhase = "ConfiguringEnvironment"
+)
+
 // RobotStatus defines the observed state of Robot
 type RobotStatus struct {
+	// Phase of robot
+	Phase RobotPhase `json:"phase,omitempty"`
 	// Image of robot
 	Image string `json:"image,omitempty"`
 	// Node name
 	NodeName string `json:"nodeName,omitempty"`
+	// Volume status
+	VolumeStatus VolumeStatus `json:"volumeStatus,omitempty"`
 }
 
 //+kubebuilder:object:root=true
@@ -77,4 +99,46 @@ type RobotList struct {
 
 func init() {
 	SchemeBuilder.Register(&Robot{}, &RobotList{})
+}
+
+func (robot *Robot) GetPVCVarMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Name:      robot.Name + internal.PVC_VAR_POSTFIX,
+		Namespace: robot.Namespace,
+	}
+}
+
+func (robot *Robot) GetPVCOptMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Name:      robot.Name + internal.PVC_OPT_POSTFIX,
+		Namespace: robot.Namespace,
+	}
+}
+
+func (robot *Robot) GetPVCUsrMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Name:      robot.Name + internal.PVC_USR_POSTFIX,
+		Namespace: robot.Namespace,
+	}
+}
+
+func (robot *Robot) GetPVCEtcMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Name:      robot.Name + internal.PVC_ETC_POSTFIX,
+		Namespace: robot.Namespace,
+	}
+}
+
+func (robot *Robot) GetPVCDisplayMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Name:      robot.Name + internal.PVC_DISPLAY_POSTFIX,
+		Namespace: robot.Namespace,
+	}
+}
+
+func (robot *Robot) GetPVCWorkspaceMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Name:      robot.Name + internal.PVC_WORKSPACE_POSTFIX,
+		Namespace: robot.Namespace,
+	}
 }
