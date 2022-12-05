@@ -57,8 +57,17 @@ type VolumeStatus struct {
 	Workspace bool `json:"workspace,omitempty"`
 }
 
+type RobotPhase string
+
+const (
+	RobotPhaseCreatingEnvironment RobotPhase = "CreatingEnvironment"
+	RobotPhaseConfiguringVolumes  RobotPhase = "ConfiguringEnvironment"
+)
+
 // RobotStatus defines the observed state of Robot
 type RobotStatus struct {
+	// Phase of robot
+	Phase RobotPhase `json:"phase,omitempty"`
 	// Image of robot
 	Image string `json:"image,omitempty"`
 	// Node name
@@ -108,7 +117,7 @@ func (robot *Robot) GetPVCOptMetadata() *types.NamespacedName {
 
 func (robot *Robot) GetPVCUsrMetadata() *types.NamespacedName {
 	return &types.NamespacedName{
-		Name:      robot.Name + internal.PVC_OPT_POSTFIX,
+		Name:      robot.Name + internal.PVC_USR_POSTFIX,
 		Namespace: robot.Namespace,
 	}
 }

@@ -13,3 +13,13 @@ const (
 const (
 	ROBOT_IMAGE = "robolaunch.io/robot-image"
 )
+
+// PVC postfixes
+const (
+	PVC_VAR_POSTFIX       = "-pvc-var"
+	PVC_ETC_POSTFIX       = "-pvc-etc"
+	PVC_OPT_POSTFIX       = "-pvc-opt"
+	PVC_USR_POSTFIX       = "-pvc-usr"
+	PVC_DISPLAY_POSTFIX   = "-pvc-display"
+	PVC_WORKSPACE_POSTFIX = "-pvc-workspace"
+)
