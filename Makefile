@@ -115,6 +115,24 @@ deploy: manifests kustomize ## Deploy controller to the K8s cluster specified in
 	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
 	$(KUSTOMIZE) build config/default | kubectl apply -f -
 
+.PHONY: extract
+extract: manifests kustomize ## Extract controller YAMLs, not deploy
+	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
+	$(KUSTOMIZE) build config/default > hack/deploy.local/robot_operator.yaml
+
+.PHONY: select-node
+select-node: 
+	yq -i e '(select(.kind == "Deployment") | .spec.template.spec.nodeSelector."${LABEL_KEY}") = "${LABEL_VAL}"' hack/deploy.local/robot_operator.yaml
+	yq -i e '(select(.kind == "Deployment") | .spec.template.spec.nodeSelector."${LABEL_KEY}") = "${LABEL_VAL}"' hack/deploy.local/cert_manager_1.8.0.yaml
+
+.PHONY: get-cert-manager
+get-cert-manager: 
+	kubectl apply -f hack/deploy.local/cert_manager_1.8.0.yaml
+
+.PHONY: apply
+apply: 
+	kubectl apply -f hack/deploy.local/robot_operator.yaml
+
 .PHONY: undeploy
 undeploy: ## Undeploy controller from the K8s cluster specified in ~/.kube/config. Call with ignore-not-found=true to ignore resource not found errors during deletion.
 	$(KUSTOMIZE) build config/default | kubectl delete --ignore-not-found=$(ignore-not-found) -f -
