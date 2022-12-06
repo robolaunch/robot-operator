@@ -35,6 +35,18 @@ spec:
           spec:
             description: RobotSpec defines the desired state of Robot
             properties:
+              discoveryServerTemplate:
+                description: Discovery server template
+                properties:
+                  attached:
+                    type: boolean
+                  cluster:
+                    type: string
+                  hostname:
+                    type: string
+                  subdomain:
+                    type: string
+                type: object
               distro:
                 description: ROS distro to be used.
                 enum:
@@ -65,6 +77,40 @@ spec:
           status:
             description: RobotStatus defines the observed state of Robot
             properties:
+              discoveryServerStatus:
+                description: Discovery server instance status
+                properties:
+                  created:
+                    type: boolean
+                  status:
+                    description: DiscoveryServerStatus defines the observed state
+                      of DiscoveryServer
+                    properties:
+                      configMapStatus:
+                        properties:
+                          created:
+                            type: boolean
+                        type: object
+                      phase:
+                        type: string
+                      podStatus:
+                        properties:
+                          created:
+                            type: boolean
+                          ip:
+                            type: string
+                          phase:
+                            description: PodPhase is a label for the condition of
+                              a pod at the current time.
+                            type: string
+                        type: object
+                      serviceStatus:
+                        properties:
+                          created:
+                            type: boolean
+                        type: object
+                    type: object
+                type: object
               image:
                 description: Image of robot
                 type: string

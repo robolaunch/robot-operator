@@ -35,13 +35,41 @@ spec:
           spec:
             description: DiscoveryServerSpec defines the desired state of DiscoveryServer
             properties:
-              foo:
-                description: Foo is an example field of DiscoveryServer. Edit discoveryserver_types.go
-                  to remove/update
+              attached:
+                type: boolean
+              cluster:
+                type: string
+              hostname:
+                type: string
+              subdomain:
                 type: string
             type: object
           status:
             description: DiscoveryServerStatus defines the observed state of DiscoveryServer
+            properties:
+              configMapStatus:
+                properties:
+                  created:
+                    type: boolean
+                type: object
+              phase:
+                type: string
+              podStatus:
+                properties:
+                  created:
+                    type: boolean
+                  ip:
+                    type: string
+                  phase:
+                    description: PodPhase is a label for the condition of a pod at
+                      the current time.
+                    type: string
+                type: object
+              serviceStatus:
+                properties:
+                  created:
+                    type: boolean
+                type: object
             type: object
         type: object
     served: true
