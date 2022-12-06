@@ -19,6 +19,7 @@ package v1alpha1
 import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 )
 
 // DiscoveryServerSpec defines the desired state of DiscoveryServer
@@ -39,19 +40,25 @@ type DiscoveryServerPodStatus struct {
 	IP      string          `json:"ip,omitempty"`
 }
 
+type DiscoveryServerConfigMapStatus struct {
+	Created bool `json:"created,omitempty"`
+}
+
 type DiscoveryServerPhase string
 
 const (
-	DiscoveryServerPhaseCreatingService DiscoveryServerPhase = "CreatingService"
-	DiscoveryServerPhaseCreatingPod     DiscoveryServerPhase = "CreatingPod"
-	DiscoveryServerPhaseReady           DiscoveryServerPhase = "Ready"
+	DiscoveryServerPhaseCreatingService   DiscoveryServerPhase = "CreatingService"
+	DiscoveryServerPhaseCreatingPod       DiscoveryServerPhase = "CreatingPod"
+	DiscoveryServerPhaseCreatingConfigMap DiscoveryServerPhase = "CreatingConfigMap"
+	DiscoveryServerPhaseReady             DiscoveryServerPhase = "Ready"
 )
 
 // DiscoveryServerStatus defines the observed state of DiscoveryServer
 type DiscoveryServerStatus struct {
-	Phase                        DiscoveryServerPhase         `json:"phase,omitempty"`
-	DiscoveryServerServiceStatus DiscoveryServerServiceStatus `json:"discoveryServerServiceStatus,omitempty"`
-	DiscoveryServerPodStatus     DiscoveryServerPodStatus     `json:"discoveryServerPodStatus,omitempty"`
+	Phase           DiscoveryServerPhase           `json:"phase,omitempty"`
+	ServiceStatus   DiscoveryServerServiceStatus   `json:"serviceStatus,omitempty"`
+	PodStatus       DiscoveryServerPodStatus       `json:"podStatus,omitempty"`
+	ConfigMapStatus DiscoveryServerConfigMapStatus `json:"configMapStatus,omitempty"`
 }
 
 //+kubebuilder:object:root=true
@@ -77,4 +84,25 @@ type DiscoveryServerList struct {
 
 func init() {
 	SchemeBuilder.Register(&DiscoveryServer{}, &DiscoveryServerList{})
+}
+
+func (discoveryServer *DiscoveryServer) GetDiscoveryServerPodMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Name:      discoveryServer.Name,
+		Namespace: discoveryServer.Namespace,
+	}
+}
+
+func (discoveryServer *DiscoveryServer) GetDiscoveryServerServiceMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Name:      discoveryServer.Name + "-" + discoveryServer.Spec.Subdomain,
+		Namespace: discoveryServer.Namespace,
+	}
+}
+
+func (discoveryServer *DiscoveryServer) GetDiscoveryServerConfigMapMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Name:      discoveryServer.Name,
+		Namespace: discoveryServer.Namespace,
+	}
 }
