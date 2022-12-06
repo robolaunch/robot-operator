@@ -64,12 +64,28 @@ type DiscoveryServerInstanceStatus struct {
 	Status  DiscoveryServerStatus `json:"status,omitempty"`
 }
 
+type JobPhase string
+
+const (
+	JobActive    JobPhase = "Active"
+	JobSucceeded JobPhase = "Succeeded"
+	JobFailed    JobPhase = "Failed"
+)
+
+type LoaderJobStatus struct {
+	Created bool     `json:"created,omitempty"`
+	Phase   JobPhase `json:"phase,omitempty"`
+}
+
 type RobotPhase string
 
 const (
 	RobotPhaseCreatingEnvironment     RobotPhase = "CreatingEnvironment"
 	RobotPhaseCreatingDiscoveryServer RobotPhase = "CreatingDiscoveryServer"
 	RobotPhaseConfiguringEnvironment  RobotPhase = "ConfiguringEnvironment"
+	RobotPhaseConfiguringWorkspaces   RobotPhase = "ConfiguringWorkspaces"
+
+	RobotPhaseFailed RobotPhase = "Failed"
 )
 
 // RobotStatus defines the observed state of Robot
@@ -84,6 +100,8 @@ type RobotStatus struct {
 	VolumeStatus VolumeStatus `json:"volumeStatus,omitempty"`
 	// Discovery server instance status
 	DiscoveryServerStatus DiscoveryServerInstanceStatus `json:"discoveryServerStatus,omitempty"`
+	// Loader job status that configures environment
+	LoaderJobStatus LoaderJobStatus `json:"loaderJobStatus,omitempty"`
 }
 
 //+kubebuilder:object:root=true
