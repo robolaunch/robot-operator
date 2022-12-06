@@ -81,3 +81,11 @@ func GetInstanceType(obj metav1.Object) InstanceType {
 	}
 	return InstanceTypePhysicalInstance
 }
+
+func GetClusterName(obj metav1.Object) string {
+	tenancy := GetTenancy(obj)
+	if tenancy.PhysicalInstance == "" {
+		return tenancy.CloudInstance
+	}
+	return tenancy.PhysicalInstance
+}

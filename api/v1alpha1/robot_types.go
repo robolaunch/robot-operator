@@ -46,6 +46,8 @@ type RobotSpec struct {
 	Distro ROSDistro `json:"distro"`
 	// Resource limitations of robot containers.
 	Storage Storage `json:"storage,omitempty"`
+	// Discovery server template
+	DiscoveryServerTemplate DiscoveryServerSpec `json:"discoveryServerTemplate,omitempty"`
 }
 
 type VolumeStatus struct {
@@ -57,11 +59,17 @@ type VolumeStatus struct {
 	Workspace bool `json:"workspace,omitempty"`
 }
 
+type DiscoveryServerInstanceStatus struct {
+	Created bool                  `json:"created,omitempty"`
+	Status  DiscoveryServerStatus `json:"status,omitempty"`
+}
+
 type RobotPhase string
 
 const (
-	RobotPhaseCreatingEnvironment RobotPhase = "CreatingEnvironment"
-	RobotPhaseConfiguringVolumes  RobotPhase = "ConfiguringEnvironment"
+	RobotPhaseCreatingEnvironment     RobotPhase = "CreatingEnvironment"
+	RobotPhaseCreatingDiscoveryServer RobotPhase = "CreatingDiscoveryServer"
+	RobotPhaseConfiguringEnvironment  RobotPhase = "ConfiguringEnvironment"
 )
 
 // RobotStatus defines the observed state of Robot
@@ -74,6 +82,8 @@ type RobotStatus struct {
 	NodeName string `json:"nodeName,omitempty"`
 	// Volume status
 	VolumeStatus VolumeStatus `json:"volumeStatus,omitempty"`
+	// Discovery server instance status
+	DiscoveryServerStatus DiscoveryServerInstanceStatus `json:"discoveryServerStatus,omitempty"`
 }
 
 //+kubebuilder:object:root=true
@@ -139,6 +149,13 @@ func (robot *Robot) GetPVCDisplayMetadata() *types.NamespacedName {
 func (robot *Robot) GetPVCWorkspaceMetadata() *types.NamespacedName {
 	return &types.NamespacedName{
 		Name:      robot.Name + internal.PVC_WORKSPACE_POSTFIX,
+		Namespace: robot.Namespace,
+	}
+}
+
+func (robot *Robot) GetDiscoveryServerMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Name:      robot.Name + internal.DISCOVERY_SERVER_POSTFIX,
 		Namespace: robot.Namespace,
 	}
 }

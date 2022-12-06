@@ -3,6 +3,7 @@ package robot
 import (
 	"context"
 
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -22,8 +23,10 @@ type RobotReconciler struct {
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=robots,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=robots/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=robots/finalizers,verbs=update
+
 //+kubebuilder:rbac:groups=core,resources=nodes,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=core,resources=persistentvolumeclaims,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=robot.roboscale.io,resources=discoveryservers,verbs=get;list;watch;create;update;patch;delete
 
 var logger logr.Logger
 
@@ -80,7 +83,37 @@ func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *ro
 		instance.Status.VolumeStatus.Workspace {
 	case true:
 
-		instance.Status.Phase = robotv1alpha1.RobotPhaseConfiguringVolumes
+		switch instance.Spec.DiscoveryServerTemplate.Attached {
+		case true:
+
+			switch instance.Status.DiscoveryServerStatus.Created {
+			case true:
+
+				switch instance.Status.DiscoveryServerStatus.Status.Phase {
+				case robotv1alpha1.DiscoveryServerPhaseReady:
+
+					instance.Status.Phase = robotv1alpha1.RobotPhaseConfiguringEnvironment
+
+				}
+
+			case false:
+
+				// create discovery server
+
+				instance.Status.Phase = robotv1alpha1.RobotPhaseCreatingDiscoveryServer
+				err := r.createDiscoveryServer(ctx, instance, instance.GetDiscoveryServerMetadata())
+				if err != nil {
+					return err
+				}
+				instance.Status.DiscoveryServerStatus.Created = true
+
+			}
+
+		case false:
+
+			instance.Status.Phase = robotv1alpha1.RobotPhaseConfiguringEnvironment
+
+		}
 
 	case false:
 
@@ -152,5 +185,7 @@ func (r *RobotReconciler) reconcileCheckResources(ctx context.Context, instance 
 func (r *RobotReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&robotv1alpha1.Robot{}).
+		Owns(&corev1.PersistentVolumeClaim{}).
+		Owns(&robotv1alpha1.DiscoveryServer{}).
 		Complete(r)
 }

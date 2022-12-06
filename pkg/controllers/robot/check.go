@@ -60,3 +60,19 @@ func (r *RobotReconciler) reconcileCheckPVCs(ctx context.Context, instance *robo
 
 	return nil
 }
+
+func (r *RobotReconciler) reconcileCheckDiscoveryServer(ctx context.Context, instance *robotv1alpha1.Robot) error {
+
+	discoverServerQuery := &robotv1alpha1.DiscoveryServer{}
+	err := r.Get(ctx, *instance.GetPVCWorkspaceMetadata(), discoverServerQuery)
+	if err != nil && errors.IsNotFound(err) {
+		instance.Status.DiscoveryServerStatus = robotv1alpha1.DiscoveryServerInstanceStatus{}
+	} else if err != nil {
+		return err
+	} else {
+		instance.Status.DiscoveryServerStatus.Created = true
+		instance.Status.DiscoveryServerStatus.Status = discoverServerQuery.Status
+	}
+
+	return nil
+}
