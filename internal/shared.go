@@ -1,5 +1,7 @@
 package internal
 
+import corev1 "k8s.io/api/core/v1"
+
 // Tenancy labels
 const (
 	ORGANIZATION_LABEL_KEY      = "robolaunch.io/organization"
@@ -23,6 +25,7 @@ const (
 	PVC_DISPLAY_POSTFIX      = "-pvc-display"
 	PVC_WORKSPACE_POSTFIX    = "-pvc-workspace"
 	DISCOVERY_SERVER_POSTFIX = "-discovery"
+	JOB_LOADER_POSTFIX       = "-loader"
 )
 
 // Super client configuration
@@ -54,3 +57,18 @@ const (
 		"</profiles>" +
 		"</dds>"
 )
+
+func Bash(command string) []string {
+	return []string{
+		"/bin/bash",
+		"-c",
+		command,
+	}
+}
+
+func Env(key string, value string) corev1.EnvVar {
+	return corev1.EnvVar{
+		Name:  key,
+		Value: value,
+	}
+}
