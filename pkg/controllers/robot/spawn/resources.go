@@ -1,15 +1,21 @@
 package spawn
 
 import (
+	"path/filepath"
 	"strconv"
 	"strings"
 
+	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
 	robotv1alpha1 "github.com/robolaunch/robot-operator/api/v1alpha1"
+	"github.com/robolaunch/robot-operator/internal"
+	"github.com/robolaunch/robot-operator/internal/configure"
+	"github.com/robolaunch/robot-operator/internal/label"
+	"github.com/robolaunch/robot-operator/internal/node"
 )
 
 func GetPersistentVolumeClaim(robot *robotv1alpha1.Robot, pvcNamespacedName *types.NamespacedName) *corev1.PersistentVolumeClaim {
@@ -73,4 +79,107 @@ func GetDiscoveryServer(robot *robotv1alpha1.Robot, dsNamespacedName *types.Name
 
 	return &discoveryServer
 
+}
+
+func GetLoaderJob(robot *robotv1alpha1.Robot, jobNamespacedName *types.NamespacedName, hasGPU bool) *batchv1.Job {
+
+	var copierCmdBuilder strings.Builder
+	copierCmdBuilder.WriteString("yes | cp -rf /var /ros/;")
+	copierCmdBuilder.WriteString(" yes | cp -rf /usr /ros/;")
+	copierCmdBuilder.WriteString(" yes | cp -rf /opt /ros/;")
+	copierCmdBuilder.WriteString(" yes | cp -rf /etc /ros/;")
+	copierCmdBuilder.WriteString(" echo \"DONE\"")
+
+	readyRobotProp := node.GetReadyRobotProperties(*robot)
+
+	var preparerCmdBuilder strings.Builder
+	preparerCmdBuilder.WriteString("mv " + filepath.Join("/etc", "apt", "sources.list.d", "ros2.list") + " temp1")
+	preparerCmdBuilder.WriteString(" && mv " + filepath.Join("/etc", "apt", "sources.list") + " temp2")
+	preparerCmdBuilder.WriteString(" && apt-get update")
+	preparerCmdBuilder.WriteString(" && mv temp1 " + filepath.Join("/etc", "apt", "sources.list.d", "ros2.list"))
+	preparerCmdBuilder.WriteString(" && mv temp2 " + filepath.Join("/etc", "apt", "sources.list"))
+	preparerCmdBuilder.WriteString(" && apt-get dist-upgrade -y")
+	preparerCmdBuilder.WriteString(" && apt-get update")
+	if !readyRobotProp.Enabled { // do no run rosdep init if ready robot
+		preparerCmdBuilder.WriteString(" && rosdep init")
+	}
+
+	copierContainer := corev1.Container{
+		Name:    "copier",
+		Image:   robot.Status.Image,
+		Command: internal.Bash(copierCmdBuilder.String()),
+		VolumeMounts: []corev1.VolumeMount{
+			configure.GetVolumeMount("/ros/", configure.GetVolumeVar(robot)),
+			configure.GetVolumeMount("/ros/", configure.GetVolumeUsr(robot)),
+			configure.GetVolumeMount("/ros/", configure.GetVolumeOpt(robot)),
+			configure.GetVolumeMount("/ros/", configure.GetVolumeEtc(robot)),
+		},
+	}
+
+	preparerContainer := corev1.Container{
+		Name:    "preparer",
+		Image:   "ubuntu:focal",
+		Command: internal.Bash(preparerCmdBuilder.String()),
+		VolumeMounts: []corev1.VolumeMount{
+			configure.GetVolumeMount("", configure.GetVolumeVar(robot)),
+			configure.GetVolumeMount("", configure.GetVolumeUsr(robot)),
+			configure.GetVolumeMount("", configure.GetVolumeOpt(robot)),
+			configure.GetVolumeMount("", configure.GetVolumeEtc(robot)),
+		},
+	}
+
+	podSpec := &corev1.PodSpec{
+		InitContainers: []corev1.Container{
+			copierContainer,
+		},
+		Containers: []corev1.Container{
+			preparerContainer,
+		},
+		Volumes: []corev1.Volume{
+			configure.GetVolumeVar(robot),
+			configure.GetVolumeUsr(robot),
+			configure.GetVolumeOpt(robot),
+			configure.GetVolumeEtc(robot),
+		},
+	}
+
+	if hasGPU {
+
+		var driverInstallerCmdBuilder strings.Builder
+
+		// run /etc/vdi/install-driver.sh
+		driverInstallerCmdBuilder.WriteString(filepath.Join("/etc", "vdi", "install-driver.sh"))
+
+		driverInstaller := corev1.Container{
+			Name:    "driver-installer",
+			Image:   robot.Status.Image,
+			Command: internal.Bash(driverInstallerCmdBuilder.String()),
+			VolumeMounts: []corev1.VolumeMount{
+				configure.GetVolumeMount("", configure.GetVolumeVar(robot)),
+				configure.GetVolumeMount("", configure.GetVolumeUsr(robot)),
+				configure.GetVolumeMount("", configure.GetVolumeOpt(robot)),
+				configure.GetVolumeMount("", configure.GetVolumeEtc(robot)),
+			},
+		}
+
+		podSpec.InitContainers = append(podSpec.InitContainers, driverInstaller)
+
+	}
+
+	podSpec.RestartPolicy = corev1.RestartPolicyNever
+	podSpec.NodeSelector = label.GetTenancyMap(robot)
+
+	job := batchv1.Job{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      robot.GetLoaderJobMetadata().Name,
+			Namespace: robot.GetLoaderJobMetadata().Namespace,
+		},
+		Spec: batchv1.JobSpec{
+			Template: corev1.PodTemplateSpec{
+				Spec: *podSpec,
+			},
+		},
+	}
+
+	return &job
 }

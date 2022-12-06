@@ -84,6 +84,7 @@ const (
 	RobotPhaseCreatingDiscoveryServer RobotPhase = "CreatingDiscoveryServer"
 	RobotPhaseConfiguringEnvironment  RobotPhase = "ConfiguringEnvironment"
 	RobotPhaseConfiguringWorkspaces   RobotPhase = "ConfiguringWorkspaces"
+	RobotPhaseReady                   RobotPhase = "Ready"
 
 	RobotPhaseFailed RobotPhase = "Failed"
 )
@@ -174,6 +175,13 @@ func (robot *Robot) GetPVCWorkspaceMetadata() *types.NamespacedName {
 func (robot *Robot) GetDiscoveryServerMetadata() *types.NamespacedName {
 	return &types.NamespacedName{
 		Name:      robot.Name + internal.DISCOVERY_SERVER_POSTFIX,
+		Namespace: robot.Namespace,
+	}
+}
+
+func (robot *Robot) GetLoaderJobMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Name:      robot.Name + internal.JOB_LOADER_POSTFIX,
 		Namespace: robot.Namespace,
 	}
 }
