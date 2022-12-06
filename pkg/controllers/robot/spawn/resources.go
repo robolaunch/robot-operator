@@ -12,10 +12,7 @@ import (
 	robotv1alpha1 "github.com/robolaunch/robot-operator/api/v1alpha1"
 )
 
-func GetPersistentVolumeClaim(
-	robot *robotv1alpha1.Robot,
-	pvcNamespacedName *types.NamespacedName,
-) *corev1.PersistentVolumeClaim {
+func GetPersistentVolumeClaim(robot *robotv1alpha1.Robot, pvcNamespacedName *types.NamespacedName) *corev1.PersistentVolumeClaim {
 
 	pvc := corev1.PersistentVolumeClaim{
 		ObjectMeta: metav1.ObjectMeta{
@@ -60,5 +57,20 @@ func getClaimStorage(pvc *types.NamespacedName, totalStorage int) string {
 		storageInt = 0
 	}
 	return strconv.Itoa(storageInt) + "M"
+
+}
+
+func GetDiscoveryServer(robot *robotv1alpha1.Robot, dsNamespacedName *types.NamespacedName) *robotv1alpha1.DiscoveryServer {
+
+	discoveryServer := robotv1alpha1.DiscoveryServer{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      dsNamespacedName.Name,
+			Namespace: dsNamespacedName.Namespace,
+			Labels:    robot.Labels,
+		},
+		Spec: robot.Spec.DiscoveryServerTemplate,
+	}
+
+	return &discoveryServer
 
 }
