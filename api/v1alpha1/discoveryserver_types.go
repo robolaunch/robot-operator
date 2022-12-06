@@ -17,15 +17,41 @@ limitations under the License.
 package v1alpha1
 
 import (
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // DiscoveryServerSpec defines the desired state of DiscoveryServer
 type DiscoveryServerSpec struct {
+	Attached  bool   `json:"attached,omitempty"`
+	Cluster   string `json:"cluster,omitempty"`
+	Hostname  string `json:"hostname,omitempty"`
+	Subdomain string `json:"subdomain,omitempty"`
 }
+
+type DiscoveryServerServiceStatus struct {
+	Created bool `json:"created,omitempty"`
+}
+
+type DiscoveryServerPodStatus struct {
+	Created bool            `json:"created,omitempty"`
+	Phase   corev1.PodPhase `json:"phase,omitempty"`
+	IP      string          `json:"ip,omitempty"`
+}
+
+type DiscoveryServerPhase string
+
+const (
+	DiscoveryServerPhaseCreatingService DiscoveryServerPhase = "CreatingService"
+	DiscoveryServerPhaseCreatingPod     DiscoveryServerPhase = "CreatingPod"
+	DiscoveryServerPhaseReady           DiscoveryServerPhase = "Ready"
+)
 
 // DiscoveryServerStatus defines the observed state of DiscoveryServer
 type DiscoveryServerStatus struct {
+	Phase                        DiscoveryServerPhase         `json:"phase,omitempty"`
+	DiscoveryServerServiceStatus DiscoveryServerServiceStatus `json:"discoveryServerServiceStatus,omitempty"`
+	DiscoveryServerPodStatus     DiscoveryServerPodStatus     `json:"discoveryServerPodStatus,omitempty"`
 }
 
 //+kubebuilder:object:root=true
