@@ -114,6 +114,14 @@ spec:
               image:
                 description: Image of robot
                 type: string
+              loaderJobStatus:
+                description: Loader job status that configures environment
+                properties:
+                  created:
+                    type: boolean
+                  phase:
+                    type: string
+                type: object
               nodeName:
                 description: Node name
                 type: string
