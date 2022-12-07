@@ -57,6 +57,11 @@ func (r *DiscoveryServerReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 		return ctrl.Result{}, err
 	}
 
+	err = r.reconcileUpdateConnectionInfo(ctx, instance)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
 	err = r.reconcileCheckStatus(ctx, instance)
 	if err != nil {
 		return ctrl.Result{}, err
