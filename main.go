@@ -34,6 +34,7 @@ import (
 	robotv1alpha1 "github.com/robolaunch/robot-operator/api/v1alpha1"
 	robot "github.com/robolaunch/robot-operator/pkg/controllers/robot"
 	discoveryServer "github.com/robolaunch/robot-operator/pkg/controllers/robot/discovery_server"
+	rosBridge "github.com/robolaunch/robot-operator/pkg/controllers/robot/ros_bridge"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -106,6 +107,13 @@ func main() {
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "DiscoveryServer")
+		os.Exit(1)
+	}
+	if err = (&rosBridge.ROSBridgeReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "ROSBridge")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder

@@ -1,0 +1,27 @@
+# permissions for end users to view rosbridges.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: rosbridge-viewer-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: robot-operator
+    app.kubernetes.io/part-of: robot-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: rosbridge-viewer-role
+rules:
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - rosbridges
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - rosbridges/status
+  verbs:
+  - get
