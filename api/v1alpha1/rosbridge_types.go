@@ -29,8 +29,9 @@ type BridgeDistro struct {
 
 // ROSBridgeSpec defines the desired state of ROSBridge
 type ROSBridgeSpec struct {
-	ROS  BridgeDistro `json:"ros,omitempty"`
-	ROS2 BridgeDistro `json:"ros2,omitempty"`
+	ROS   BridgeDistro `json:"ros,omitempty"`
+	ROS2  BridgeDistro `json:"ros2,omitempty"`
+	Image string       `json:"image,omitempty"`
 }
 
 type BridgePodStatus struct {
