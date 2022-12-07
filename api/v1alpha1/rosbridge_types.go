@@ -17,15 +17,43 @@ limitations under the License.
 package v1alpha1
 
 import (
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+type BridgeDistro struct {
+	Enabled bool      `json:"enabled,omitempty"`
+	Distro  ROSDistro `json:"distro,omitempty"`
+}
+
 // ROSBridgeSpec defines the desired state of ROSBridge
 type ROSBridgeSpec struct {
+	ROS  BridgeDistro `json:"ros,omitempty"`
+	ROS2 BridgeDistro `json:"ros2,omitempty"`
 }
+
+type BridgePodStatus struct {
+	Created bool            `json:"created,omitempty"`
+	Phase   corev1.PodPhase `json:"phase,omitempty"`
+}
+
+type BridgeServiceStatus struct {
+	Created bool `json:"created,omitempty"`
+}
+
+type BridgePhase string
+
+const (
+	BridgePhaseCreatingService BridgePhase = "CreatingService"
+	BridgePhaseCreatingPod     BridgePhase = "CreatingPod"
+	BridgePhaseReady           BridgePhase = "Ready"
+)
 
 // ROSBridgeStatus defines the observed state of ROSBridge
 type ROSBridgeStatus struct {
+	Phase         BridgePhase         `json:"phase,omitempty"`
+	PodStatus     BridgePodStatus     `json:"podStatus,omitempty"`
+	ServiceStatus BridgeServiceStatus `json:"serviceStatus,omitempty"`
 }
 
 //+kubebuilder:object:root=true
