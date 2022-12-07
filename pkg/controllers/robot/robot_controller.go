@@ -3,6 +3,7 @@ package robot
 import (
 	"context"
 
+	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -27,6 +28,7 @@ type RobotReconciler struct {
 //+kubebuilder:rbac:groups=core,resources=nodes,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=core,resources=persistentvolumeclaims,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=discoveryservers,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=batch,resources=jobs,verbs=get;list;watch;create;update;patch;delete
 
 var logger logr.Logger
 
@@ -83,35 +85,53 @@ func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *ro
 		instance.Status.VolumeStatus.Workspace {
 	case true:
 
-		switch instance.Spec.DiscoveryServerTemplate.Attached {
+		switch instance.Status.DiscoveryServerStatus.Created {
 		case true:
 
-			switch instance.Status.DiscoveryServerStatus.Created {
-			case true:
+			switch instance.Status.DiscoveryServerStatus.Status.Phase {
+			case robotv1alpha1.DiscoveryServerPhaseReady:
 
-				switch instance.Status.DiscoveryServerStatus.Status.Phase {
-				case robotv1alpha1.DiscoveryServerPhaseReady:
+				switch instance.Status.LoaderJobStatus.Created {
+				case true:
 
-					instance.Status.Phase = robotv1alpha1.RobotPhaseConfiguringEnvironment
+					switch instance.Status.LoaderJobStatus.Phase {
+					case robotv1alpha1.JobSucceeded:
 
+						instance.Status.Phase = robotv1alpha1.RobotPhaseReady
+
+					case robotv1alpha1.JobActive:
+
+						instance.Status.Phase = robotv1alpha1.RobotPhaseConfiguringWorkspaces
+
+					case robotv1alpha1.JobFailed:
+
+						// TODO: add reason
+						instance.Status.Phase = robotv1alpha1.RobotPhaseFailed
+
+					}
+
+				case false:
+
+					instance.Status.Phase = robotv1alpha1.RobotPhaseConfiguringWorkspaces
+					err := r.createJob(ctx, instance, instance.GetLoaderJobMetadata())
+					if err != nil {
+						return err
+					}
+					instance.Status.LoaderJobStatus.Created = true
 				}
-
-			case false:
-
-				// create discovery server
-
-				instance.Status.Phase = robotv1alpha1.RobotPhaseCreatingDiscoveryServer
-				err := r.createDiscoveryServer(ctx, instance, instance.GetDiscoveryServerMetadata())
-				if err != nil {
-					return err
-				}
-				instance.Status.DiscoveryServerStatus.Created = true
 
 			}
 
 		case false:
 
-			instance.Status.Phase = robotv1alpha1.RobotPhaseConfiguringEnvironment
+			// create discovery server
+
+			instance.Status.Phase = robotv1alpha1.RobotPhaseCreatingDiscoveryServer
+			err := r.createDiscoveryServer(ctx, instance, instance.GetDiscoveryServerMetadata())
+			if err != nil {
+				return err
+			}
+			instance.Status.DiscoveryServerStatus.Created = true
 
 		}
 
@@ -178,6 +198,16 @@ func (r *RobotReconciler) reconcileCheckResources(ctx context.Context, instance 
 		return err
 	}
 
+	err = r.reconcileCheckDiscoveryServer(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	err = r.reconcileCheckLoaderJob(ctx, instance)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -187,5 +217,6 @@ func (r *RobotReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		For(&robotv1alpha1.Robot{}).
 		Owns(&corev1.PersistentVolumeClaim{}).
 		Owns(&robotv1alpha1.DiscoveryServer{}).
+		Owns(&batchv1.Job{}).
 		Complete(r)
 }

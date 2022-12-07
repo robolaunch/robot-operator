@@ -4,6 +4,7 @@ import (
 	"context"
 
 	robotv1alpha1 "github.com/robolaunch/robot-operator/api/v1alpha1"
+	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 )
@@ -64,7 +65,7 @@ func (r *RobotReconciler) reconcileCheckPVCs(ctx context.Context, instance *robo
 func (r *RobotReconciler) reconcileCheckDiscoveryServer(ctx context.Context, instance *robotv1alpha1.Robot) error {
 
 	discoverServerQuery := &robotv1alpha1.DiscoveryServer{}
-	err := r.Get(ctx, *instance.GetPVCWorkspaceMetadata(), discoverServerQuery)
+	err := r.Get(ctx, *instance.GetDiscoveryServerMetadata(), discoverServerQuery)
 	if err != nil && errors.IsNotFound(err) {
 		instance.Status.DiscoveryServerStatus = robotv1alpha1.DiscoveryServerInstanceStatus{}
 	} else if err != nil {
@@ -72,6 +73,30 @@ func (r *RobotReconciler) reconcileCheckDiscoveryServer(ctx context.Context, ins
 	} else {
 		instance.Status.DiscoveryServerStatus.Created = true
 		instance.Status.DiscoveryServerStatus.Status = discoverServerQuery.Status
+	}
+
+	return nil
+}
+
+func (r *RobotReconciler) reconcileCheckLoaderJob(ctx context.Context, instance *robotv1alpha1.Robot) error {
+
+	if instance.Status.Phase != robotv1alpha1.RobotPhaseReady {
+		loaderJobQuery := &batchv1.Job{}
+		err := r.Get(ctx, *instance.GetLoaderJobMetadata(), loaderJobQuery)
+		if err != nil && errors.IsNotFound(err) {
+			instance.Status.LoaderJobStatus.Created = false
+		} else if err != nil {
+			return err
+		} else {
+			switch 1 {
+			case int(loaderJobQuery.Status.Succeeded):
+				instance.Status.LoaderJobStatus.Phase = robotv1alpha1.JobSucceeded
+			case int(loaderJobQuery.Status.Active):
+				instance.Status.LoaderJobStatus.Phase = robotv1alpha1.JobActive
+			case int(loaderJobQuery.Status.Failed):
+				instance.Status.LoaderJobStatus.Phase = robotv1alpha1.JobFailed
+			}
+		}
 	}
 
 	return nil

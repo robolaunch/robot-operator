@@ -39,6 +39,32 @@ type Storage struct {
 	StorageClassConfig StorageClassConfig `json:"storageClassConfig,omitempty"`
 }
 
+// Repository description.
+type Repository struct {
+	// Name of the repository.
+	// +kubebuilder:validation:Required
+	Name string `json:"name"`
+	// Base URL of the repository.
+	// +kubebuilder:validation:Required
+	URL string `json:"url"`
+	// Branch of the repository to clone.
+	// +kubebuilder:validation:Required
+	Branch string `json:"branch"`
+	// [Autofilled] Absolute path of repository
+	Path string `json:"path,omitempty"`
+}
+
+// Workspace description. Each robot should contain at least one workspace. A workspace should contain at least one
+// repository in it.
+type Workspace struct {
+	// Name of workspace. If a workspace's name is `my_ws`, it's absolute path is `/home/workspaces/my_ws`.
+	// +kubebuilder:validation:Required
+	Name string `json:"name"`
+	// Repositories to clone inside workspace's `src` directory.
+	// +kubebuilder:validation:MinItems=1
+	Repositories []Repository `json:"repositories"`
+}
+
 // RobotSpec defines the desired state of Robot
 type RobotSpec struct {
 	// ROS distro to be used.
@@ -48,6 +74,11 @@ type RobotSpec struct {
 	Storage Storage `json:"storage,omitempty"`
 	// Discovery server template
 	DiscoveryServerTemplate DiscoveryServerSpec `json:"discoveryServerTemplate,omitempty"`
+	// Global path of workspaces. It's fixed to `/home/workspaces` path.
+	WorkspacesPath string `json:"workspacesPath,omitempty"`
+	// Workspace definitions of robot.
+	// +kubebuilder:validation:MinItems=1
+	Workspaces []Workspace `json:"workspaces,omitempty"`
 }
 
 type VolumeStatus struct {
@@ -64,12 +95,28 @@ type DiscoveryServerInstanceStatus struct {
 	Status  DiscoveryServerStatus `json:"status,omitempty"`
 }
 
+type JobPhase string
+
+const (
+	JobActive    JobPhase = "Active"
+	JobSucceeded JobPhase = "Succeeded"
+	JobFailed    JobPhase = "Failed"
+)
+
+type LoaderJobStatus struct {
+	Created bool     `json:"created,omitempty"`
+	Phase   JobPhase `json:"phase,omitempty"`
+}
+
 type RobotPhase string
 
 const (
 	RobotPhaseCreatingEnvironment     RobotPhase = "CreatingEnvironment"
 	RobotPhaseCreatingDiscoveryServer RobotPhase = "CreatingDiscoveryServer"
-	RobotPhaseConfiguringEnvironment  RobotPhase = "ConfiguringEnvironment"
+	RobotPhaseConfiguringWorkspaces   RobotPhase = "ConfiguringWorkspaces"
+	RobotPhaseReady                   RobotPhase = "Ready"
+
+	RobotPhaseFailed RobotPhase = "Failed"
 )
 
 // RobotStatus defines the observed state of Robot
@@ -84,6 +131,8 @@ type RobotStatus struct {
 	VolumeStatus VolumeStatus `json:"volumeStatus,omitempty"`
 	// Discovery server instance status
 	DiscoveryServerStatus DiscoveryServerInstanceStatus `json:"discoveryServerStatus,omitempty"`
+	// Loader job status that configures environment
+	LoaderJobStatus LoaderJobStatus `json:"loaderJobStatus,omitempty"`
 }
 
 //+kubebuilder:object:root=true
@@ -156,6 +205,13 @@ func (robot *Robot) GetPVCWorkspaceMetadata() *types.NamespacedName {
 func (robot *Robot) GetDiscoveryServerMetadata() *types.NamespacedName {
 	return &types.NamespacedName{
 		Name:      robot.Name + internal.DISCOVERY_SERVER_POSTFIX,
+		Namespace: robot.Namespace,
+	}
+}
+
+func (robot *Robot) GetLoaderJobMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Name:      robot.Name + internal.JOB_LOADER_POSTFIX,
 		Namespace: robot.Namespace,
 	}
 }
