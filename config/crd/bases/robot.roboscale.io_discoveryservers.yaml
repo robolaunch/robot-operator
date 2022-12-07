@@ -52,6 +52,13 @@ spec:
                   created:
                     type: boolean
                 type: object
+              connectionInfo:
+                properties:
+                  configMapName:
+                    type: string
+                  ip:
+                    type: string
+                type: object
               phase:
                 type: string
               podStatus:

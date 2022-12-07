@@ -53,12 +53,18 @@ const (
 	DiscoveryServerPhaseReady             DiscoveryServerPhase = "Ready"
 )
 
+type ConnectionInfo struct {
+	IP            string `json:"ip,omitempty"`
+	ConfigMapName string `json:"configMapName,omitempty"`
+}
+
 // DiscoveryServerStatus defines the observed state of DiscoveryServer
 type DiscoveryServerStatus struct {
 	Phase           DiscoveryServerPhase           `json:"phase,omitempty"`
 	ServiceStatus   DiscoveryServerServiceStatus   `json:"serviceStatus,omitempty"`
 	PodStatus       DiscoveryServerPodStatus       `json:"podStatus,omitempty"`
 	ConfigMapStatus DiscoveryServerConfigMapStatus `json:"configMapStatus,omitempty"`
+	ConnectionInfo  ConnectionInfo                 `json:"connectionInfo,omitempty"`
 }
 
 //+kubebuilder:object:root=true

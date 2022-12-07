@@ -104,6 +104,20 @@ func GetLoaderJob(robot *robotv1alpha1.Robot, jobNamespacedName *types.Namespace
 		preparerCmdBuilder.WriteString(" && rosdep init")
 	}
 
+	var clonerCmdBuilder strings.Builder
+	for wsKey, ws := range robot.Spec.Workspaces {
+
+		var cmdBuilder strings.Builder
+		cmdBuilder.WriteString("mkdir -p " + filepath.Join(robot.Spec.WorkspacesPath, ws.Name, "src") + " && ")
+		cmdBuilder.WriteString("cd " + filepath.Join(robot.Spec.WorkspacesPath, ws.Name, "src") + " && ")
+		cmdBuilder.WriteString(GetCloneCommand(robot.Spec.Workspaces, wsKey))
+		cmdBuilder.WriteString(" && ")
+		clonerCmdBuilder.WriteString(cmdBuilder.String())
+
+	}
+
+	clonerCmdBuilder.WriteString("echo \"DONE\"")
+
 	copierContainer := corev1.Container{
 		Name:    "copier",
 		Image:   robot.Status.Image,
@@ -128,18 +142,33 @@ func GetLoaderJob(robot *robotv1alpha1.Robot, jobNamespacedName *types.Namespace
 		},
 	}
 
+	clonerContainer := corev1.Container{
+		Name:    "cloner",
+		Image:   "ubuntu:focal",
+		Command: internal.Bash(clonerCmdBuilder.String()),
+		VolumeMounts: []corev1.VolumeMount{
+			configure.GetVolumeMount("", configure.GetVolumeVar(robot)),
+			configure.GetVolumeMount("", configure.GetVolumeUsr(robot)),
+			configure.GetVolumeMount("", configure.GetVolumeOpt(robot)),
+			configure.GetVolumeMount("", configure.GetVolumeEtc(robot)),
+			configure.GetVolumeMount(robot.Spec.WorkspacesPath, configure.GetVolumeWorkspace(robot)),
+		},
+	}
+
 	podSpec := &corev1.PodSpec{
 		InitContainers: []corev1.Container{
 			copierContainer,
 		},
 		Containers: []corev1.Container{
 			preparerContainer,
+			clonerContainer,
 		},
 		Volumes: []corev1.Volume{
 			configure.GetVolumeVar(robot),
 			configure.GetVolumeUsr(robot),
 			configure.GetVolumeOpt(robot),
 			configure.GetVolumeEtc(robot),
+			configure.GetVolumeWorkspace(robot),
 		},
 	}
 
@@ -182,4 +211,16 @@ func GetLoaderJob(robot *robotv1alpha1.Robot, jobNamespacedName *types.Namespace
 	}
 
 	return &job
+}
+
+func GetCloneCommand(workspaces []robotv1alpha1.Workspace, wsKey int) string {
+
+	var cmdBuilder strings.Builder
+	for key, repo := range workspaces[wsKey].Repositories {
+		cmdBuilder.WriteString("git clone " + repo.URL + " -b " + repo.Branch + " " + repo.Name)
+		if key != len(workspaces[wsKey].Repositories)-1 {
+			cmdBuilder.WriteString("; ")
+		}
+	}
+	return cmdBuilder.String()
 }

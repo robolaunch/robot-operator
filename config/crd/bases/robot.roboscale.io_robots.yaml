@@ -71,6 +71,52 @@ spec:
                         type: string
                     type: object
                 type: object
+              workspaces:
+                description: Workspace definitions of robot.
+                items:
+                  description: Workspace description. Each robot should contain at
+                    least one workspace. A workspace should contain at least one repository
+                    in it.
+                  properties:
+                    name:
+                      description: Name of workspace. If a workspace's name is `my_ws`,
+                        it's absolute path is `/home/workspaces/my_ws`.
+                      type: string
+                    repositories:
+                      description: Repositories to clone inside workspace's `src`
+                        directory.
+                      items:
+                        description: Repository description.
+                        properties:
+                          branch:
+                            description: Branch of the repository to clone.
+                            type: string
+                          name:
+                            description: Name of the repository.
+                            type: string
+                          path:
+                            description: '[Autofilled] Absolute path of repository'
+                            type: string
+                          url:
+                            description: Base URL of the repository.
+                            type: string
+                        required:
+                        - branch
+                        - name
+                        - url
+                        type: object
+                      minItems: 1
+                      type: array
+                  required:
+                  - name
+                  - repositories
+                  type: object
+                minItems: 1
+                type: array
+              workspacesPath:
+                description: Global path of workspaces. It's fixed to `/home/workspaces`
+                  path.
+                type: string
             required:
             - distro
             type: object
@@ -90,6 +136,13 @@ spec:
                         properties:
                           created:
                             type: boolean
+                        type: object
+                      connectionInfo:
+                        properties:
+                          configMapName:
+                            type: string
+                          ip:
+                            type: string
                         type: object
                       phase:
                         type: string
