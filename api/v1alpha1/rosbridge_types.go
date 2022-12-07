@@ -19,6 +19,7 @@ package v1alpha1
 import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 )
 
 type BridgeDistro struct {
@@ -79,4 +80,18 @@ type ROSBridgeList struct {
 
 func init() {
 	SchemeBuilder.Register(&ROSBridge{}, &ROSBridgeList{})
+}
+
+func (rosbridge *ROSBridge) GetBridgePodMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Name:      rosbridge.Name,
+		Namespace: rosbridge.Namespace,
+	}
+}
+
+func (rosbridge *ROSBridge) GetBridgeServiceMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Name:      rosbridge.Name,
+		Namespace: rosbridge.Namespace,
+	}
 }

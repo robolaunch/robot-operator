@@ -19,6 +19,7 @@ package ros_bridge
 import (
 	"context"
 
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -38,6 +39,9 @@ type ROSBridgeReconciler struct {
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=rosbridges,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=rosbridges/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=rosbridges/finalizers,verbs=update
+
+//+kubebuilder:rbac:groups=core,resources=pods,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=core,resources=services,verbs=get;list;watch;create;update;patch;delete
 
 var logger logr.Logger
 
@@ -75,10 +79,54 @@ func (r *ROSBridgeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 }
 
 func (r *ROSBridgeReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.ROSBridge) error {
+
+	switch instance.Status.ServiceStatus.Created {
+	case true:
+
+		switch instance.Status.PodStatus.Created {
+		case true:
+
+			switch instance.Status.PodStatus.Phase {
+			case corev1.PodRunning:
+
+				// TODO: handle other pod phases
+
+				instance.Status.Phase = robotv1alpha1.BridgePhaseReady
+
+			}
+
+		case false:
+
+			instance.Status.Phase = robotv1alpha1.BridgePhaseCreatingPod
+			err := r.createPod(ctx, instance, instance.GetBridgePodMetadata())
+			if err != nil {
+				return err
+			}
+			instance.Status.PodStatus.Created = true
+
+		}
+
+	case false:
+
+		instance.Status.Phase = robotv1alpha1.BridgePhaseCreatingService
+		err := r.createService(ctx, instance, instance.GetBridgeServiceMetadata())
+		if err != nil {
+			return err
+		}
+		instance.Status.ServiceStatus.Created = true
+
+	}
+
 	return nil
 }
 
 func (r *ROSBridgeReconciler) reconcileCheckResources(ctx context.Context, instance *robotv1alpha1.ROSBridge) error {
+
+	err := r.reconcileCheckOwnedResources(ctx, instance)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -86,5 +134,7 @@ func (r *ROSBridgeReconciler) reconcileCheckResources(ctx context.Context, insta
 func (r *ROSBridgeReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&robotv1alpha1.ROSBridge{}).
+		Owns(&corev1.Pod{}).
+		Owns(&corev1.Service{}).
 		Complete(r)
 }
