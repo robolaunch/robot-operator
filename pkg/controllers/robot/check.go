@@ -101,3 +101,21 @@ func (r *RobotReconciler) reconcileCheckLoaderJob(ctx context.Context, instance 
 
 	return nil
 }
+
+func (r *RobotReconciler) reconcileCheckROSBridge(ctx context.Context, instance *robotv1alpha1.Robot) error {
+
+	if instance.Spec.ROSBridgeTemplate.ROS.Enabled || instance.Spec.ROSBridgeTemplate.ROS2.Enabled {
+		rosBridgeQuery := &robotv1alpha1.ROSBridge{}
+		err := r.Get(ctx, *instance.GetROSBridgeMetadata(), rosBridgeQuery)
+		if err != nil && errors.IsNotFound(err) {
+			instance.Status.ROSBridgeStatus = robotv1alpha1.ROSBridgeInstanceStatus{}
+		} else if err != nil {
+			return err
+		} else {
+			instance.Status.ROSBridgeStatus.Created = true
+			instance.Status.ROSBridgeStatus.Status = rosBridgeQuery.Status
+		}
+	}
+
+	return nil
+}

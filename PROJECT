@@ -26,4 +26,13 @@ resources:
   kind: DiscoveryServer
   path: github.com/robolaunch/robot-operator/api/v1alpha1
   version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: roboscale.io
+  group: robot
+  kind: ROSBridge
+  path: github.com/robolaunch/robot-operator/api/v1alpha1
+  version: v1alpha1
 version: "3"

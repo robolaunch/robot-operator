@@ -2,12 +2,10 @@ package spawn
 
 import (
 	"fmt"
-	"net"
 	"strings"
 
 	robotv1alpha1 "github.com/robolaunch/robot-operator/api/v1alpha1"
 	"github.com/robolaunch/robot-operator/internal"
-	robotErr "github.com/robolaunch/robot-operator/internal/error"
 	"github.com/robolaunch/robot-operator/internal/label"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -89,31 +87,35 @@ func GetDiscoveryServerService(discoveryServer *robotv1alpha1.DiscoveryServer, s
 
 func GetDiscoveryServerConfigMap(discoveryServer *robotv1alpha1.DiscoveryServer, cmNamespacedName *types.NamespacedName) (*corev1.ConfigMap, error) {
 
-	dnsName := GetDiscoveryServerDNS(*discoveryServer)
+	// dnsName := GetDiscoveryServerDNS(*discoveryServer)
 
-	ips, err := net.LookupIP(dnsName)
-	if err != nil {
-		return nil, &robotErr.CannotResolveDiscoveryServerError{
-			ResourceKind:      discoveryServer.Kind,
-			ResourceName:      discoveryServer.Name,
-			ResourceNamespace: discoveryServer.Namespace,
-		}
-	} else if len(ips) == 0 {
-		return nil, &robotErr.CannotResolveDiscoveryServerError{
-			ResourceKind:      discoveryServer.Kind,
-			ResourceName:      discoveryServer.Name,
-			ResourceNamespace: discoveryServer.Namespace,
-		}
-	}
+	// ips, err := net.LookupIP(dnsName)
+	// if err != nil {
+	// 	return nil, &robotErr.CannotResolveDiscoveryServerError{
+	// 		ResourceKind:      discoveryServer.Kind,
+	// 		ResourceName:      discoveryServer.Name,
+	// 		ResourceNamespace: discoveryServer.Namespace,
+	// 	}
+	// } else if len(ips) == 0 {
+	// 	return nil, &robotErr.CannotResolveDiscoveryServerError{
+	// 		ResourceKind:      discoveryServer.Kind,
+	// 		ResourceName:      discoveryServer.Name,
+	// 		ResourceNamespace: discoveryServer.Namespace,
+	// 	}
+	// }
 
-	superClientConfig := fmt.Sprintf(internal.SUPER_CLIENT_CONFIG, ips[0])
+	superClientConfig := fmt.Sprintf(internal.SUPER_CLIENT_CONFIG, discoveryServer.Status.PodStatus.IP)
 
 	discoveryServerConfigMap := corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      cmNamespacedName.Name,
 			Namespace: cmNamespacedName.Namespace,
 		},
-		Data: map[string]string{"super_client_configuration_file.xml": superClientConfig},
+		Data: map[string]string{
+			"DISCOVERY_SERVER_CONFIG":        superClientConfig,
+			"FASTRTPS_DEFAULT_PROFILES_FILE": "/etc/discovery-server/super_client_configuration_file.xml",
+			"ROS_DISCOVERY_SERVER":           discoveryServer.Status.ConnectionInfo.IP + ":11811",
+		},
 	}
 
 	return &discoveryServerConfigMap, nil

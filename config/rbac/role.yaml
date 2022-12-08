@@ -129,3 +129,29 @@ rules:
   - get
   - patch
   - update
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - rosbridges
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - rosbridges/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - rosbridges/status
+  verbs:
+  - get
+  - patch
+  - update

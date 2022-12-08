@@ -52,7 +52,45 @@ spec:
                 enum:
                 - foxy
                 - galactic
+                - noetic
+                - melodic
                 type: string
+              rosBridgeTemplate:
+                description: ROS bridge template
+                properties:
+                  image:
+                    type: string
+                  ros:
+                    properties:
+                      distro:
+                        description: ROS distro selection. Allowed distros are Foxy
+                          and Galactic. It is aimed to support Humble, Melodic and
+                          Noetic in further versions.
+                        enum:
+                        - foxy
+                        - galactic
+                        - noetic
+                        - melodic
+                        type: string
+                      enabled:
+                        type: boolean
+                    type: object
+                  ros2:
+                    properties:
+                      distro:
+                        description: ROS distro selection. Allowed distros are Foxy
+                          and Galactic. It is aimed to support Humble, Melodic and
+                          Noetic in further versions.
+                        enum:
+                        - foxy
+                        - galactic
+                        - noetic
+                        - melodic
+                        type: string
+                      enabled:
+                        type: boolean
+                    type: object
+                type: object
               storage:
                 description: Resource limitations of robot containers.
                 properties:
@@ -181,6 +219,32 @@ spec:
               phase:
                 description: Phase of robot
                 type: string
+              rosBridgeStatus:
+                description: ROS bridge instance status
+                properties:
+                  created:
+                    type: boolean
+                  status:
+                    description: ROSBridgeStatus defines the observed state of ROSBridge
+                    properties:
+                      phase:
+                        type: string
+                      podStatus:
+                        properties:
+                          created:
+                            type: boolean
+                          phase:
+                            description: PodPhase is a label for the condition of
+                              a pod at the current time.
+                            type: string
+                        type: object
+                      serviceStatus:
+                        properties:
+                          created:
+                            type: boolean
+                        type: object
+                    type: object
+                type: object
               volumeStatus:
                 description: Volume status
                 properties:

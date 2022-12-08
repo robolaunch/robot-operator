@@ -213,6 +213,21 @@ func GetLoaderJob(robot *robotv1alpha1.Robot, jobNamespacedName *types.Namespace
 	return &job
 }
 
+func GetROSBridge(robot *robotv1alpha1.Robot, bridgeNamespacedName *types.NamespacedName) *robotv1alpha1.ROSBridge {
+
+	rosBridge := robotv1alpha1.ROSBridge{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      bridgeNamespacedName.Name,
+			Namespace: bridgeNamespacedName.Namespace,
+			Labels:    robot.Labels,
+		},
+		Spec: robot.Spec.ROSBridgeTemplate,
+	}
+
+	return &rosBridge
+
+}
+
 func GetCloneCommand(workspaces []robotv1alpha1.Workspace, wsKey int) string {
 
 	var cmdBuilder strings.Builder
