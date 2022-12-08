@@ -72,7 +72,7 @@ func (r *DiscoveryServerReconciler) reconcileUpdateConnectionInfo(ctx context.Co
 			}
 		}
 
-		instance.Status.ConnectionInfo.IP = string(ips[0])
+		instance.Status.ConnectionInfo.IP = ips[0].String()
 		instance.Status.ConnectionInfo.ConfigMapName = instance.GetDiscoveryServerConfigMapMetadata().Name
 	} else {
 		instance.Status.ConnectionInfo = robotv1alpha1.ConnectionInfo{}
