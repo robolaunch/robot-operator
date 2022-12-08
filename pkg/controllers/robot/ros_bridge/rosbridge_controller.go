@@ -122,7 +122,12 @@ func (r *ROSBridgeReconciler) reconcileCheckStatus(ctx context.Context, instance
 
 func (r *ROSBridgeReconciler) reconcileCheckResources(ctx context.Context, instance *robotv1alpha1.ROSBridge) error {
 
-	err := r.reconcileCheckOwnedResources(ctx, instance)
+	err := r.reconcileCheckService(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	err = r.reconcileCheckPod(ctx, instance)
 	if err != nil {
 		return err
 	}
