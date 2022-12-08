@@ -8,7 +8,7 @@ import (
 )
 
 // ROS distro selection. Allowed distros are Foxy and Galactic. It is aimed to support Humble, Melodic and Noetic in further versions.
-// +kubebuilder:validation:Enum=foxy;galactic
+// +kubebuilder:validation:Enum=foxy;galactic;noetic;melodic
 type ROSDistro string
 
 const (
@@ -74,6 +74,8 @@ type RobotSpec struct {
 	Storage Storage `json:"storage,omitempty"`
 	// Discovery server template
 	DiscoveryServerTemplate DiscoveryServerSpec `json:"discoveryServerTemplate,omitempty"`
+	// ROS bridge template
+	ROSBridgeTemplate ROSBridgeSpec `json:"rosBridgeTemplate,omitempty"`
 	// Global path of workspaces. It's fixed to `/home/workspaces` path.
 	WorkspacesPath string `json:"workspacesPath,omitempty"`
 	// Workspace definitions of robot.
@@ -95,6 +97,11 @@ type DiscoveryServerInstanceStatus struct {
 	Status  DiscoveryServerStatus `json:"status,omitempty"`
 }
 
+type ROSBridgeInstanceStatus struct {
+	Created bool            `json:"created,omitempty"`
+	Status  ROSBridgeStatus `json:"status,omitempty"`
+}
+
 type JobPhase string
 
 const (
@@ -114,6 +121,7 @@ const (
 	RobotPhaseCreatingEnvironment     RobotPhase = "CreatingEnvironment"
 	RobotPhaseCreatingDiscoveryServer RobotPhase = "CreatingDiscoveryServer"
 	RobotPhaseConfiguringWorkspaces   RobotPhase = "ConfiguringWorkspaces"
+	RobotPhaseCreatingBridge          RobotPhase = "CreatingBridge"
 	RobotPhaseReady                   RobotPhase = "Ready"
 
 	RobotPhaseFailed RobotPhase = "Failed"
@@ -131,6 +139,8 @@ type RobotStatus struct {
 	VolumeStatus VolumeStatus `json:"volumeStatus,omitempty"`
 	// Discovery server instance status
 	DiscoveryServerStatus DiscoveryServerInstanceStatus `json:"discoveryServerStatus,omitempty"`
+	// ROS bridge instance status
+	ROSBridgeStatus ROSBridgeInstanceStatus `json:"rosBridgeStatus,omitempty"`
 	// Loader job status that configures environment
 	LoaderJobStatus LoaderJobStatus `json:"loaderJobStatus,omitempty"`
 }
@@ -212,6 +222,13 @@ func (robot *Robot) GetDiscoveryServerMetadata() *types.NamespacedName {
 func (robot *Robot) GetLoaderJobMetadata() *types.NamespacedName {
 	return &types.NamespacedName{
 		Name:      robot.Name + internal.JOB_LOADER_POSTFIX,
+		Namespace: robot.Namespace,
+	}
+}
+
+func (robot *Robot) GetROSBridgeMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Name:      robot.Name + internal.ROS_BRIDGE_POSTFIX,
 		Namespace: robot.Namespace,
 	}
 }

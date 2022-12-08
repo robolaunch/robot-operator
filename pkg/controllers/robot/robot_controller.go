@@ -97,7 +97,30 @@ func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *ro
 					switch instance.Status.LoaderJobStatus.Phase {
 					case robotv1alpha1.JobSucceeded:
 
-						instance.Status.Phase = robotv1alpha1.RobotPhaseReady
+						switch instance.Spec.ROSBridgeTemplate.ROS.Enabled || instance.Spec.ROSBridgeTemplate.ROS2.Enabled {
+						case true:
+
+							switch instance.Status.ROSBridgeStatus.Created {
+							case true:
+
+								instance.Status.Phase = robotv1alpha1.RobotPhaseReady
+
+							case false:
+
+								instance.Status.Phase = robotv1alpha1.RobotPhaseCreatingBridge
+								err := r.createROSBridge(ctx, instance, instance.GetROSBridgeMetadata())
+								if err != nil {
+									return err
+								}
+								instance.Status.ROSBridgeStatus.Created = true
+
+							}
+
+						case false:
+
+							instance.Status.Phase = robotv1alpha1.RobotPhaseReady
+
+						}
 
 					case robotv1alpha1.JobActive:
 
@@ -204,6 +227,11 @@ func (r *RobotReconciler) reconcileCheckResources(ctx context.Context, instance 
 	}
 
 	err = r.reconcileCheckLoaderJob(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	err = r.reconcileCheckROSBridge(ctx, instance)
 	if err != nil {
 		return err
 	}

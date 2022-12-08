@@ -26,6 +26,7 @@ const (
 	PVC_WORKSPACE_POSTFIX    = "-pvc-workspace"
 	DISCOVERY_SERVER_POSTFIX = "-discovery"
 	JOB_LOADER_POSTFIX       = "-loader"
+	ROS_BRIDGE_POSTFIX       = "-bridge"
 )
 
 // Super client configuration

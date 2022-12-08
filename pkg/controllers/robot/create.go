@@ -68,3 +68,21 @@ func (r *RobotReconciler) createJob(ctx context.Context, instance *robotv1alpha1
 	logger.Info("STATUS: Job " + job.Name + " is created.")
 	return nil
 }
+
+func (r *RobotReconciler) createROSBridge(ctx context.Context, instance *robotv1alpha1.Robot, bridgeNamespacedName *types.NamespacedName) error {
+
+	rosBridge := resources.GetROSBridge(instance, bridgeNamespacedName)
+
+	err := ctrl.SetControllerReference(instance, rosBridge, r.Scheme)
+	if err != nil {
+		return err
+	}
+
+	err = r.Create(ctx, rosBridge)
+	if err != nil {
+		return err
+	}
+
+	logger.Info("STATUS: ROS bridge " + rosBridge.Name + " is created.")
+	return nil
+}
