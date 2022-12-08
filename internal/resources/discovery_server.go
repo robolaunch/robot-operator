@@ -87,34 +87,20 @@ func GetDiscoveryServerService(discoveryServer *robotv1alpha1.DiscoveryServer, s
 
 func GetDiscoveryServerConfigMap(discoveryServer *robotv1alpha1.DiscoveryServer, cmNamespacedName *types.NamespacedName) (*corev1.ConfigMap, error) {
 
-	// dnsName := GetDiscoveryServerDNS(*discoveryServer)
-
-	// ips, err := net.LookupIP(dnsName)
-	// if err != nil {
-	// 	return nil, &robotErr.CannotResolveDiscoveryServerError{
-	// 		ResourceKind:      discoveryServer.Kind,
-	// 		ResourceName:      discoveryServer.Name,
-	// 		ResourceNamespace: discoveryServer.Namespace,
-	// 	}
-	// } else if len(ips) == 0 {
-	// 	return nil, &robotErr.CannotResolveDiscoveryServerError{
-	// 		ResourceKind:      discoveryServer.Kind,
-	// 		ResourceName:      discoveryServer.Name,
-	// 		ResourceNamespace: discoveryServer.Namespace,
-	// 	}
-	// }
-
 	superClientConfig := fmt.Sprintf(internal.SUPER_CLIENT_CONFIG, discoveryServer.Status.PodStatus.IP)
 
 	discoveryServerConfigMap := corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      cmNamespacedName.Name,
 			Namespace: cmNamespacedName.Namespace,
+			Labels: map[string]string{
+				"configuredIP": discoveryServer.Status.ConnectionInfo.IP,
+			},
 		},
 		Data: map[string]string{
 			"DISCOVERY_SERVER_CONFIG":        superClientConfig,
 			"FASTRTPS_DEFAULT_PROFILES_FILE": "/etc/discovery-server/super_client_configuration_file.xml",
-			"ROS_DISCOVERY_SERVER":           discoveryServer.Status.ConnectionInfo.IP + ":11811",
+			"ROS_DISCOVERY_SERVER":           discoveryServer.Status.PodStatus.IP + ":11811",
 		},
 	}
 
