@@ -49,8 +49,8 @@ func (r *ROSBridgeReconciler) reconcileCheckPod(ctx context.Context, instance *r
 			}
 		}
 
-		if (!rosBridgeFound && instance.Spec.ROS.Enabled) ||
-			(!ros2BridgeFound && instance.Spec.ROS2.Enabled) ||
+		if (instance.Spec.ROS.Enabled && !rosBridgeFound) ||
+			(instance.Spec.ROS2.Enabled && !ros2BridgeFound) ||
 			!rightImage {
 			err = r.Delete(ctx, bridgePodQuery)
 			if err != nil {
