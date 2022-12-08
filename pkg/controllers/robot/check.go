@@ -2,6 +2,7 @@ package robot
 
 import (
 	"context"
+	"reflect"
 
 	robotv1alpha1 "github.com/robolaunch/robot-operator/api/v1alpha1"
 	batchv1 "k8s.io/api/batch/v1"
@@ -71,6 +72,15 @@ func (r *RobotReconciler) reconcileCheckDiscoveryServer(ctx context.Context, ins
 	} else if err != nil {
 		return err
 	} else {
+
+		if !reflect.DeepEqual(instance.Spec.DiscoveryServerTemplate, discoverServerQuery.Spec) {
+			discoverServerQuery.Spec = instance.Spec.DiscoveryServerTemplate
+			err = r.Update(ctx, discoverServerQuery)
+			if err != nil {
+				return err
+			}
+		}
+
 		instance.Status.DiscoveryServerStatus.Created = true
 		instance.Status.DiscoveryServerStatus.Status = discoverServerQuery.Status
 	}
@@ -112,6 +122,15 @@ func (r *RobotReconciler) reconcileCheckROSBridge(ctx context.Context, instance 
 		} else if err != nil {
 			return err
 		} else {
+
+			if !reflect.DeepEqual(instance.Spec.ROSBridgeTemplate, rosBridgeQuery.Spec) {
+				rosBridgeQuery.Spec = instance.Spec.ROSBridgeTemplate
+				err = r.Update(ctx, rosBridgeQuery)
+				if err != nil {
+					return err
+				}
+			}
+
 			instance.Status.ROSBridgeStatus.Created = true
 			instance.Status.ROSBridgeStatus.Status = rosBridgeQuery.Status
 		}

@@ -57,11 +57,6 @@ func (r *DiscoveryServerReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 		return ctrl.Result{}, err
 	}
 
-	err = r.reconcileUpdateConnectionInfo(ctx, instance)
-	if err != nil {
-		return ctrl.Result{}, err
-	}
-
 	err = r.reconcileCheckStatus(ctx, instance)
 	if err != nil {
 		return ctrl.Result{}, err
@@ -73,6 +68,11 @@ func (r *DiscoveryServerReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 	}
 
 	err = r.reconcileCheckResources(ctx, instance)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	err = r.reconcileUpdateConnectionInfo(ctx, instance)
 	if err != nil {
 		return ctrl.Result{}, err
 	}
@@ -166,7 +166,17 @@ func (r *DiscoveryServerReconciler) reconcileCheckStatus(ctx context.Context, in
 
 func (r *DiscoveryServerReconciler) reconcileCheckResources(ctx context.Context, instance *robotv1alpha1.DiscoveryServer) error {
 
-	err := r.reconcileCheckOwnedResources(ctx, instance)
+	err := r.reconcileCheckService(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	err = r.reconcileCheckPod(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	err = r.reconcileCheckConfigMap(ctx, instance)
 	if err != nil {
 		return err
 	}
@@ -180,5 +190,6 @@ func (r *DiscoveryServerReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		For(&robotv1alpha1.DiscoveryServer{}).
 		Owns(&corev1.Pod{}).
 		Owns(&corev1.Service{}).
+		Owns(&corev1.ConfigMap{}).
 		Complete(r)
 }
