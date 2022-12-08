@@ -1,4 +1,4 @@
-package spawn
+package resources
 
 import (
 	robotv1alpha1 "github.com/robolaunch/robot-operator/api/v1alpha1"

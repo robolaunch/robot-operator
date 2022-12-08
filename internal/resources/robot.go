@@ -1,4 +1,4 @@
-package spawn
+package resources
 
 import (
 	"path/filepath"

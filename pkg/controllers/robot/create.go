@@ -5,7 +5,7 @@ import (
 
 	robotv1alpha1 "github.com/robolaunch/robot-operator/api/v1alpha1"
 	"github.com/robolaunch/robot-operator/internal/node"
-	resources "github.com/robolaunch/robot-operator/pkg/controllers/robot/spawn"
+	"github.com/robolaunch/robot-operator/internal/resources"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 )

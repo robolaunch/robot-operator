@@ -4,14 +4,14 @@ import (
 	"context"
 
 	robotv1alpha1 "github.com/robolaunch/robot-operator/api/v1alpha1"
-	"github.com/robolaunch/robot-operator/pkg/controllers/robot/ros_bridge/spawn"
+	"github.com/robolaunch/robot-operator/internal/resources"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
 func (r *ROSBridgeReconciler) createService(ctx context.Context, instance *robotv1alpha1.ROSBridge, svcNamespacedName *types.NamespacedName) error {
 
-	svc := spawn.GetBridgeService(instance, instance.GetBridgeServiceMetadata())
+	svc := resources.GetBridgeService(instance, instance.GetBridgeServiceMetadata())
 
 	err := ctrl.SetControllerReference(instance, svc, r.Scheme)
 	if err != nil {
@@ -34,7 +34,7 @@ func (r *ROSBridgeReconciler) createPod(ctx context.Context, instance *robotv1al
 		return err
 	}
 
-	pod := spawn.GetBridgePod(instance, instance.GetBridgePodMetadata(), *robot)
+	pod := resources.GetBridgePod(instance, instance.GetBridgePodMetadata(), *robot)
 
 	err = ctrl.SetControllerReference(instance, pod, r.Scheme)
 	if err != nil {

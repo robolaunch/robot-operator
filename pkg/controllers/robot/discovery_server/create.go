@@ -4,14 +4,14 @@ import (
 	"context"
 
 	robotv1alpha1 "github.com/robolaunch/robot-operator/api/v1alpha1"
-	spawn "github.com/robolaunch/robot-operator/pkg/controllers/robot/discovery_server/spawn"
+	"github.com/robolaunch/robot-operator/internal/resources"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
 func (r *DiscoveryServerReconciler) createService(ctx context.Context, instance *robotv1alpha1.DiscoveryServer, svcNamespacedName *types.NamespacedName) error {
 
-	svc := spawn.GetDiscoveryServerService(instance, instance.GetDiscoveryServerServiceMetadata())
+	svc := resources.GetDiscoveryServerService(instance, instance.GetDiscoveryServerServiceMetadata())
 
 	err := ctrl.SetControllerReference(instance, svc, r.Scheme)
 	if err != nil {
@@ -29,7 +29,7 @@ func (r *DiscoveryServerReconciler) createService(ctx context.Context, instance 
 
 func (r *DiscoveryServerReconciler) createPod(ctx context.Context, instance *robotv1alpha1.DiscoveryServer, podNamespacedName *types.NamespacedName) error {
 
-	pod := spawn.GetDiscoveryServerPod(instance, instance.GetDiscoveryServerPodMetadata())
+	pod := resources.GetDiscoveryServerPod(instance, instance.GetDiscoveryServerPodMetadata())
 
 	err := ctrl.SetControllerReference(instance, pod, r.Scheme)
 	if err != nil {
@@ -47,7 +47,7 @@ func (r *DiscoveryServerReconciler) createPod(ctx context.Context, instance *rob
 
 func (r *DiscoveryServerReconciler) createConfigMap(ctx context.Context, instance *robotv1alpha1.DiscoveryServer, cmNamespacedName *types.NamespacedName) error {
 
-	cm, err := spawn.GetDiscoveryServerConfigMap(instance, instance.GetDiscoveryServerConfigMapMetadata())
+	cm, err := resources.GetDiscoveryServerConfigMap(instance, instance.GetDiscoveryServerConfigMapMetadata())
 	if err != nil {
 		return err
 	}

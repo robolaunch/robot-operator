@@ -6,7 +6,7 @@ import (
 
 	robotv1alpha1 "github.com/robolaunch/robot-operator/api/v1alpha1"
 	robotErr "github.com/robolaunch/robot-operator/internal/error"
-	"github.com/robolaunch/robot-operator/pkg/controllers/robot/discovery_server/spawn"
+	"github.com/robolaunch/robot-operator/internal/resources"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 )
@@ -55,7 +55,7 @@ func (r *DiscoveryServerReconciler) reconcileCheckOwnedResources(ctx context.Con
 func (r *DiscoveryServerReconciler) reconcileUpdateConnectionInfo(ctx context.Context, instance *robotv1alpha1.DiscoveryServer) error {
 
 	if instance.Status.Phase == robotv1alpha1.DiscoveryServerPhaseReady {
-		dnsName := spawn.GetDiscoveryServerDNS(*instance)
+		dnsName := resources.GetDiscoveryServerDNS(*instance)
 
 		ips, err := net.LookupIP(dnsName)
 		if err != nil {
