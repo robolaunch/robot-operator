@@ -34,9 +34,59 @@ spec:
             type: object
           spec:
             description: ROSBridgeSpec defines the desired state of ROSBridge
+            properties:
+              image:
+                type: string
+              ros:
+                properties:
+                  distro:
+                    description: ROS distro selection. Allowed distros are Foxy and
+                      Galactic. It is aimed to support Humble, Melodic and Noetic
+                      in further versions.
+                    enum:
+                    - foxy
+                    - galactic
+                    - noetic
+                    - melodic
+                    type: string
+                  enabled:
+                    type: boolean
+                type: object
+              ros2:
+                properties:
+                  distro:
+                    description: ROS distro selection. Allowed distros are Foxy and
+                      Galactic. It is aimed to support Humble, Melodic and Noetic
+                      in further versions.
+                    enum:
+                    - foxy
+                    - galactic
+                    - noetic
+                    - melodic
+                    type: string
+                  enabled:
+                    type: boolean
+                type: object
             type: object
           status:
             description: ROSBridgeStatus defines the observed state of ROSBridge
+            properties:
+              phase:
+                type: string
+              podStatus:
+                properties:
+                  created:
+                    type: boolean
+                  phase:
+                    description: PodPhase is a label for the condition of a pod at
+                      the current time.
+                    type: string
+                type: object
+              serviceStatus:
+                properties:
+                  created:
+                    type: boolean
+                type: object
             type: object
         type: object
     served: true
