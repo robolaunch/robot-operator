@@ -3,6 +3,7 @@ package spawn
 import (
 	robotv1alpha1 "github.com/robolaunch/robot-operator/api/v1alpha1"
 	"github.com/robolaunch/robot-operator/internal"
+	"github.com/robolaunch/robot-operator/internal/configure"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -24,7 +25,7 @@ func getROSBridgeSelector(rosbridge robotv1alpha1.ROSBridge) map[string]string {
 	}
 }
 
-func GetBridgePod(rosbridge *robotv1alpha1.ROSBridge, podNamespacedName *types.NamespacedName) *corev1.Pod {
+func GetBridgePod(rosbridge *robotv1alpha1.ROSBridge, podNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot) *corev1.Pod {
 
 	bridgePod := corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
@@ -46,6 +47,8 @@ func GetBridgePod(rosbridge *robotv1alpha1.ROSBridge, podNamespacedName *types.N
 	if rosbridge.Spec.ROS2.Enabled {
 		bridgePod.Spec.Containers = append(bridgePod.Spec.Containers, getROS2BridgeContainer(rosbridge))
 	}
+
+	configure.InjectPodDiscoveryServerConnection(&bridgePod, robot)
 
 	return &bridgePod
 }

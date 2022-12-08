@@ -34,3 +34,13 @@ func (r *ROSBridgeReconciler) reconcileUpdateInstanceStatus(ctx context.Context,
 		return err1
 	})
 }
+
+func (r *ROSBridgeReconciler) reconcileGetOwner(ctx context.Context, instance *robotv1alpha1.ROSBridge) (*robotv1alpha1.Robot, error) {
+	robot := &robotv1alpha1.Robot{}
+	err := r.Get(ctx, *instance.GetOwnerMetadata(), robot)
+	if err != nil {
+		return nil, err
+	}
+
+	return robot, nil
+}

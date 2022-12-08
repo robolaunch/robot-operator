@@ -29,9 +29,14 @@ func (r *ROSBridgeReconciler) createService(ctx context.Context, instance *robot
 
 func (r *ROSBridgeReconciler) createPod(ctx context.Context, instance *robotv1alpha1.ROSBridge, podNamespacedName *types.NamespacedName) error {
 
-	pod := spawn.GetBridgePod(instance, instance.GetBridgePodMetadata())
+	robot, err := r.reconcileGetOwner(ctx, instance)
+	if err != nil {
+		return err
+	}
 
-	err := ctrl.SetControllerReference(instance, pod, r.Scheme)
+	pod := spawn.GetBridgePod(instance, instance.GetBridgePodMetadata(), *robot)
+
+	err = ctrl.SetControllerReference(instance, pod, r.Scheme)
 	if err != nil {
 		return err
 	}

@@ -1,19 +1,21 @@
 package configure
 
 import (
-	"github.com/robolaunch/robot-operator/api/v1alpha1"
+	robotv1alpha1 "github.com/robolaunch/robot-operator/api/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 )
 
-func InjectPodDiscoveryServerConnection(pod *corev1.Pod, discoveryServer v1alpha1.DiscoveryServer) *corev1.Pod {
+func InjectPodDiscoveryServerConnection(pod *corev1.Pod, robot robotv1alpha1.Robot) *corev1.Pod {
 
-	placeEnvironmentVariables(pod, discoveryServer)
-	placeConfigFile(pod, discoveryServer)
+	placeEnvironmentVariables(pod, robot)
+	placeConfigFile(pod, robot)
 
 	return pod
 }
 
-func placeEnvironmentVariables(pod *corev1.Pod, discoveryServer v1alpha1.DiscoveryServer) {
+func placeEnvironmentVariables(pod *corev1.Pod, robot robotv1alpha1.Robot) {
+
+	conn := robot.Status.DiscoveryServerStatus.Status.ConnectionInfo
 
 	environmentVariables := []corev1.EnvVar{
 		{
@@ -21,7 +23,7 @@ func placeEnvironmentVariables(pod *corev1.Pod, discoveryServer v1alpha1.Discove
 			ValueFrom: &corev1.EnvVarSource{
 				ConfigMapKeyRef: &corev1.ConfigMapKeySelector{
 					LocalObjectReference: corev1.LocalObjectReference{
-						Name: discoveryServer.Status.ConnectionInfo.ConfigMapName,
+						Name: conn.ConfigMapName,
 					},
 					Key: "FASTRTPS_DEFAULT_PROFILES_FILE",
 				},
@@ -32,7 +34,7 @@ func placeEnvironmentVariables(pod *corev1.Pod, discoveryServer v1alpha1.Discove
 			ValueFrom: &corev1.EnvVarSource{
 				ConfigMapKeyRef: &corev1.ConfigMapKeySelector{
 					LocalObjectReference: corev1.LocalObjectReference{
-						Name: discoveryServer.Status.ConnectionInfo.ConfigMapName,
+						Name: conn.ConfigMapName,
 					},
 					Key: "ROS_DISCOVERY_SERVER",
 				},
@@ -46,7 +48,9 @@ func placeEnvironmentVariables(pod *corev1.Pod, discoveryServer v1alpha1.Discove
 
 }
 
-func placeConfigFile(pod *corev1.Pod, discoveryServer v1alpha1.DiscoveryServer) {
+func placeConfigFile(pod *corev1.Pod, robot robotv1alpha1.Robot) {
+
+	conn := robot.Status.DiscoveryServerStatus.Status.ConnectionInfo
 
 	var mode int32 = 511
 
@@ -55,7 +59,7 @@ func placeConfigFile(pod *corev1.Pod, discoveryServer v1alpha1.DiscoveryServer) 
 		VolumeSource: corev1.VolumeSource{
 			ConfigMap: &corev1.ConfigMapVolumeSource{
 				LocalObjectReference: corev1.LocalObjectReference{
-					Name: discoveryServer.Status.ConnectionInfo.ConfigMapName,
+					Name: conn.ConfigMapName,
 				},
 				Items: []corev1.KeyToPath{
 					{
