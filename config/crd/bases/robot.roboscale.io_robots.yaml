@@ -1,0 +1,299 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.9.2
+  creationTimestamp: null
+  name: robots.robot.roboscale.io
+spec:
+  group: robot.roboscale.io
+  names:
+    kind: Robot
+    listKind: RobotList
+    plural: robots
+    singular: robot
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: Robot is the Schema for the robots API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: RobotSpec defines the desired state of Robot
+            properties:
+              discoveryServerTemplate:
+                description: Discovery server template
+                properties:
+                  attached:
+                    type: boolean
+                  cluster:
+                    type: string
+                  hostname:
+                    type: string
+                  subdomain:
+                    type: string
+                type: object
+              distro:
+                description: ROS distro to be used.
+                enum:
+                - foxy
+                - galactic
+                - noetic
+                - melodic
+                type: string
+              rosBridgeTemplate:
+                description: ROS bridge template
+                properties:
+                  image:
+                    type: string
+                  ros:
+                    properties:
+                      distro:
+                        description: ROS distro selection. Allowed distros are Foxy
+                          and Galactic. It is aimed to support Humble, Melodic and
+                          Noetic in further versions.
+                        enum:
+                        - foxy
+                        - galactic
+                        - noetic
+                        - melodic
+                        type: string
+                      enabled:
+                        type: boolean
+                    type: object
+                  ros2:
+                    properties:
+                      distro:
+                        description: ROS distro selection. Allowed distros are Foxy
+                          and Galactic. It is aimed to support Humble, Melodic and
+                          Noetic in further versions.
+                        enum:
+                        - foxy
+                        - galactic
+                        - noetic
+                        - melodic
+                        type: string
+                      enabled:
+                        type: boolean
+                    type: object
+                type: object
+              storage:
+                description: Resource limitations of robot containers.
+                properties:
+                  amount:
+                    default: 10000
+                    description: Specifies how much storage will be allocated in total.
+                    type: integer
+                  storageClassConfig:
+                    description: Storage class selection for robot's volumes.
+                    properties:
+                      accessMode:
+                        description: PVC access mode
+                        type: string
+                      name:
+                        description: Storage class name
+                        type: string
+                    type: object
+                type: object
+              workspaces:
+                description: Workspace definitions of robot.
+                items:
+                  description: Workspace description. Each robot should contain at
+                    least one workspace. A workspace should contain at least one repository
+                    in it.
+                  properties:
+                    name:
+                      description: Name of workspace. If a workspace's name is `my_ws`,
+                        it's absolute path is `/home/workspaces/my_ws`.
+                      type: string
+                    repositories:
+                      description: Repositories to clone inside workspace's `src`
+                        directory.
+                      items:
+                        description: Repository description.
+                        properties:
+                          branch:
+                            description: Branch of the repository to clone.
+                            type: string
+                          name:
+                            description: Name of the repository.
+                            type: string
+                          path:
+                            description: '[Autofilled] Absolute path of repository'
+                            type: string
+                          url:
+                            description: Base URL of the repository.
+                            type: string
+                        required:
+                        - branch
+                        - name
+                        - url
+                        type: object
+                      minItems: 1
+                      type: array
+                  required:
+                  - name
+                  - repositories
+                  type: object
+                minItems: 1
+                type: array
+              workspacesPath:
+                description: Global path of workspaces. It's fixed to `/home/workspaces`
+                  path.
+                type: string
+            required:
+            - distro
+            type: object
+          status:
+            description: RobotStatus defines the observed state of Robot
+            properties:
+              discoveryServerStatus:
+                description: Discovery server instance status
+                properties:
+                  created:
+                    type: boolean
+                  status:
+                    description: DiscoveryServerStatus defines the observed state
+                      of DiscoveryServer
+                    properties:
+                      configMapStatus:
+                        properties:
+                          created:
+                            type: boolean
+                        type: object
+                      connectionInfo:
+                        properties:
+                          configMapName:
+                            type: string
+                          ip:
+                            type: string
+                        type: object
+                      phase:
+                        type: string
+                      podStatus:
+                        properties:
+                          created:
+                            type: boolean
+                          ip:
+                            type: string
+                          phase:
+                            description: PodPhase is a label for the condition of
+                              a pod at the current time.
+                            type: string
+                        type: object
+                      serviceStatus:
+                        properties:
+                          created:
+                            type: boolean
+                        type: object
+                    type: object
+                type: object
+              image:
+                description: Image of robot
+                type: string
+              loaderJobStatus:
+                description: Loader job status that configures environment
+                properties:
+                  created:
+                    type: boolean
+                  phase:
+                    type: string
+                type: object
+              nodeName:
+                description: Node name
+                type: string
+              phase:
+                description: Phase of robot
+                type: string
+              rosBridgeStatus:
+                description: ROS bridge instance status
+                properties:
+                  created:
+                    type: boolean
+                  status:
+                    description: ROSBridgeStatus defines the observed state of ROSBridge
+                    properties:
+                      phase:
+                        type: string
+                      podStatus:
+                        properties:
+                          created:
+                            type: boolean
+                          phase:
+                            description: PodPhase is a label for the condition of
+                              a pod at the current time.
+                            type: string
+                        type: object
+                      serviceStatus:
+                        properties:
+                          created:
+                            type: boolean
+                        type: object
+                    type: object
+                type: object
+              volumeStatuses:
+                description: Volume status
+                properties:
+                  display:
+                    properties:
+                      created:
+                        type: boolean
+                      persistentVolumeClaimName:
+                        type: string
+                    type: object
+                  etc:
+                    properties:
+                      created:
+                        type: boolean
+                      persistentVolumeClaimName:
+                        type: string
+                    type: object
+                  opt:
+                    properties:
+                      created:
+                        type: boolean
+                      persistentVolumeClaimName:
+                        type: string
+                    type: object
+                  usr:
+                    properties:
+                      created:
+                        type: boolean
+                      persistentVolumeClaimName:
+                        type: string
+                    type: object
+                  var:
+                    properties:
+                      created:
+                        type: boolean
+                      persistentVolumeClaimName:
+                        type: string
+                    type: object
+                  workspace:
+                    properties:
+                      created:
+                        type: boolean
+                      persistentVolumeClaimName:
+                        type: string
+                    type: object
+                type: object
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

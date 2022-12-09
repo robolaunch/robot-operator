@@ -2,23 +2,23 @@
 
 <div align="center">
   <p align="center">
-    <a href="https://bitbucket.org/kaesystems/robot-operator/releases">
+    <a href="https://github.com/robolaunch/robot-operator/releases">
       <img src="https://img.shields.io/github/go-mod/go-version/robolaunch/robot-operator" alt="release">
     </a>
-    <a href="https://bitbucket.org/kaesystems/robot-operator/releases">
+    <a href="https://github.com/robolaunch/robot-operator/releases">
       <img src="https://img.shields.io/github/v/release/robolaunch/robot-operator" alt="release">
     </a>
-    <a href="https://bitbucket.org/kaesystems/robot-operator/blob/main/LICENSE">
+    <a href="https://github.com/robolaunch/robot-operator/blob/main/LICENSE">
       <img src="https://img.shields.io/github/license/robolaunch/robot-operator" alt="license">
     </a>
-    <a href="https://hub.docker.com/u/robolaunchio/robot-op-dev">
+    <a href="https://hub.docker.com/u/robolaunchio/robot-controller-manager">
       <img src="https://img.shields.io/docker/pulls/robolaunchio/robot-controller-manager" alt="pulls">
     </a>
-    <a href="https://bitbucket.org/kaesystems/robot-operator/issues">
+    <a href="https://github.com/robolaunch/robot-operator/issues">
       <img src="https://img.shields.io/github/issues/robolaunch/robot-operator" alt="issues">
     </a>
-    <a href="https://bitbucket.org/kaesystems/robot-operator/actions">
-      <img src="https://bitbucket.org/kaesystems/robot-operator/actions/workflows/docker-build-for-push.yml/badge.svg" alt="build">
+    <a href="https://github.com/robolaunch/robot-operator/actions">
+      <img src="https://github.com/robolaunch/robot-operator/actions/workflows/docker-build-for-push.yml/badge.svg" alt="build">
     </a>
   </p>
 </div>

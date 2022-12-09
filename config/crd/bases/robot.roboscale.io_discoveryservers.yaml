@@ -1,0 +1,85 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.9.2
+  creationTimestamp: null
+  name: discoveryservers.robot.roboscale.io
+spec:
+  group: robot.roboscale.io
+  names:
+    kind: DiscoveryServer
+    listKind: DiscoveryServerList
+    plural: discoveryservers
+    singular: discoveryserver
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: DiscoveryServer is the Schema for the discoveryservers API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: DiscoveryServerSpec defines the desired state of DiscoveryServer
+            properties:
+              attached:
+                type: boolean
+              cluster:
+                type: string
+              hostname:
+                type: string
+              subdomain:
+                type: string
+            type: object
+          status:
+            description: DiscoveryServerStatus defines the observed state of DiscoveryServer
+            properties:
+              configMapStatus:
+                properties:
+                  created:
+                    type: boolean
+                type: object
+              connectionInfo:
+                properties:
+                  configMapName:
+                    type: string
+                  ip:
+                    type: string
+                type: object
+              phase:
+                type: string
+              podStatus:
+                properties:
+                  created:
+                    type: boolean
+                  ip:
+                    type: string
+                  phase:
+                    description: PodPhase is a label for the condition of a pod at
+                      the current time.
+                    type: string
+                type: object
+              serviceStatus:
+                properties:
+                  created:
+                    type: boolean
+                type: object
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
