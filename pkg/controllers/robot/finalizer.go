@@ -11,6 +11,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/watch"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
 
@@ -203,24 +204,36 @@ func (r *RobotReconciler) waitForDiscoveryServerDeletion(ctx context.Context, in
 
 func (r *RobotReconciler) waitForLoaderJobDeletion(ctx context.Context, instance *robotv1alpha1.Robot) error {
 
+	instance.Status.Phase = robotv1alpha1.RobotPhaseDeletingLoaderJob
+	err := r.reconcileUpdateInstanceStatus(ctx, instance)
+	if err != nil {
+		return err
+	}
+
 	loaderJobQuery := &batchv1.Job{}
-	err := r.Get(ctx, *instance.GetLoaderJobMetadata(), loaderJobQuery)
+	err = r.Get(ctx, *instance.GetLoaderJobMetadata(), loaderJobQuery)
 	if err != nil && errors.IsNotFound(err) {
 		return nil
 	} else if err != nil {
 		return err
 	} else {
 		logger.Info("FINALIZER: Loader job is being deleted.")
-		err := r.Delete(ctx, loaderJobQuery)
+		propagationPolicy := metav1.DeletePropagationBackground
+		err := r.Delete(ctx, loaderJobQuery, &client.DeleteOptions{
+			PropagationPolicy: &propagationPolicy,
+		})
 		if err != nil {
 			return err
 		}
+	}
 
-		instance.Status.Phase = robotv1alpha1.RobotPhaseDeletingLoaderJob
-		err = r.reconcileUpdateInstanceStatus(ctx, instance)
-		if err != nil {
-			return err
-		}
+	loaderJobQuery = &batchv1.Job{}
+	err = r.Get(ctx, *instance.GetLoaderJobMetadata(), loaderJobQuery)
+	if err != nil && errors.IsNotFound(err) {
+		return nil
+	} else if err != nil {
+		return err
+	} else {
 
 		resourceInterface := r.DynamicClient.Resource(schema.GroupVersionResource{
 			Group:    loaderJobQuery.GroupVersionKind().Group,

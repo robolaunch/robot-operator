@@ -58,15 +58,15 @@ func (r *ROSBridgeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		return ctrl.Result{}, err
 	}
 
-	err = r.reconcileCheckDeletion(ctx, instance)
-	if err != nil {
+	// err = r.reconcileCheckDeletion(ctx, instance)
+	// if err != nil {
 
-		if errors.IsNotFound(err) {
-			return ctrl.Result{}, nil
-		}
+	// 	if errors.IsNotFound(err) {
+	// 		return ctrl.Result{}, nil
+	// 	}
 
-		return ctrl.Result{}, err
-	}
+	// 	return ctrl.Result{}, err
+	// }
 
 	err = r.reconcileCheckStatus(ctx, instance)
 	if err != nil {

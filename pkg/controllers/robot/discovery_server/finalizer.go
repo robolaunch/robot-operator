@@ -29,20 +29,20 @@ func (r *DiscoveryServerReconciler) reconcileCheckDeletion(ctx context.Context, 
 
 		if controllerutil.ContainsFinalizer(instance, discoveryServerFinalizer) {
 
-			err := r.waitForConfigMapDeletion(ctx, instance)
+			// err := r.waitForConfigMapDeletion(ctx, instance)
+			// if err != nil {
+			// 	return err
+			// }
+
+			err := r.waitForPodDeletion(ctx, instance)
 			if err != nil {
 				return err
 			}
 
-			err = r.waitForPodDeletion(ctx, instance)
-			if err != nil {
-				return err
-			}
-
-			err = r.waitForServiceDeletion(ctx, instance)
-			if err != nil {
-				return err
-			}
+			// err = r.waitForServiceDeletion(ctx, instance)
+			// if err != nil {
+			// 	return err
+			// }
 
 			controllerutil.RemoveFinalizer(instance, discoveryServerFinalizer)
 			if err := r.Update(ctx, instance); err != nil {
@@ -61,8 +61,14 @@ func (r *DiscoveryServerReconciler) reconcileCheckDeletion(ctx context.Context, 
 
 func (r *DiscoveryServerReconciler) waitForConfigMapDeletion(ctx context.Context, instance *robotv1alpha1.DiscoveryServer) error {
 
+	instance.Status.Phase = robotv1alpha1.DiscoveryServerPhaseDeletingConfigMap
+	err := r.reconcileUpdateInstanceStatus(ctx, instance)
+	if err != nil {
+		return err
+	}
+
 	discoveryServerConfigMapQuery := &corev1.ConfigMap{}
-	err := r.Get(ctx, *instance.GetDiscoveryServerConfigMapMetadata(), discoveryServerConfigMapQuery)
+	err = r.Get(ctx, *instance.GetDiscoveryServerConfigMapMetadata(), discoveryServerConfigMapQuery)
 	if err != nil && errors.IsNotFound(err) {
 		return nil
 	} else if err != nil {
@@ -73,12 +79,15 @@ func (r *DiscoveryServerReconciler) waitForConfigMapDeletion(ctx context.Context
 		if err != nil {
 			return err
 		}
+	}
 
-		instance.Status.Phase = robotv1alpha1.DiscoveryServerPhaseDeletingConfigMap
-		err = r.reconcileUpdateInstanceStatus(ctx, instance)
-		if err != nil {
-			return err
-		}
+	discoveryServerConfigMapQuery = &corev1.ConfigMap{}
+	err = r.Get(ctx, *instance.GetDiscoveryServerConfigMapMetadata(), discoveryServerConfigMapQuery)
+	if err != nil && errors.IsNotFound(err) {
+		return nil
+	} else if err != nil {
+		return err
+	} else {
 
 		resourceInterface := r.DynamicClient.Resource(schema.GroupVersionResource{
 			Group:    discoveryServerConfigMapQuery.GroupVersionKind().Group,
@@ -171,8 +180,14 @@ func (r *DiscoveryServerReconciler) waitForPodDeletion(ctx context.Context, inst
 
 func (r *DiscoveryServerReconciler) waitForServiceDeletion(ctx context.Context, instance *robotv1alpha1.DiscoveryServer) error {
 
+	instance.Status.Phase = robotv1alpha1.DiscoveryServerPhaseDeletingService
+	err := r.reconcileUpdateInstanceStatus(ctx, instance)
+	if err != nil {
+		return err
+	}
+
 	discoveryServerServiceQuery := &corev1.Service{}
-	err := r.Get(ctx, *instance.GetDiscoveryServerServiceMetadata(), discoveryServerServiceQuery)
+	err = r.Get(ctx, *instance.GetDiscoveryServerServiceMetadata(), discoveryServerServiceQuery)
 	if err != nil && errors.IsNotFound(err) {
 		return nil
 	} else if err != nil {
@@ -183,12 +198,15 @@ func (r *DiscoveryServerReconciler) waitForServiceDeletion(ctx context.Context, 
 		if err != nil {
 			return err
 		}
+	}
 
-		instance.Status.Phase = robotv1alpha1.DiscoveryServerPhaseDeletingService
-		err = r.reconcileUpdateInstanceStatus(ctx, instance)
-		if err != nil {
-			return err
-		}
+	discoveryServerServiceQuery = &corev1.Service{}
+	err = r.Get(ctx, *instance.GetDiscoveryServerServiceMetadata(), discoveryServerServiceQuery)
+	if err != nil && errors.IsNotFound(err) {
+		return nil
+	} else if err != nil {
+		return err
+	} else {
 
 		resourceInterface := r.DynamicClient.Resource(schema.GroupVersionResource{
 			Group:    discoveryServerServiceQuery.GroupVersionKind().Group,
