@@ -117,8 +117,9 @@ func main() {
 		os.Exit(1)
 	}
 	if err = (&rosBridge.ROSBridgeReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
+		Client:        mgr.GetClient(),
+		Scheme:        mgr.GetScheme(),
+		DynamicClient: dynamicClient,
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "ROSBridge")
 		os.Exit(1)

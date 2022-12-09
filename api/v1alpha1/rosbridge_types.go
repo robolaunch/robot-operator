@@ -49,6 +49,8 @@ const (
 	BridgePhaseCreatingService BridgePhase = "CreatingService"
 	BridgePhaseCreatingPod     BridgePhase = "CreatingPod"
 	BridgePhaseReady           BridgePhase = "Ready"
+	BridgePhaseDeletingPod     BridgePhase = "DeletingPod"
+	BridgePhaseDeletingService BridgePhase = "DeletingService"
 )
 
 // ROSBridgeStatus defines the observed state of ROSBridge
