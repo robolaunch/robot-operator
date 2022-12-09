@@ -7,6 +7,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/dynamic"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -18,7 +19,8 @@ import (
 // RobotReconciler reconciles a Robot object
 type RobotReconciler struct {
 	client.Client
-	Scheme *runtime.Scheme
+	Scheme        *runtime.Scheme
+	DynamicClient dynamic.Interface
 }
 
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=robots,verbs=get;list;watch;create;update;patch;delete
@@ -45,6 +47,16 @@ func (r *RobotReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 
 	_, err = r.reconcileCheckNode(ctx, instance)
 	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	err = r.reconcileCheckDeletion(ctx, instance)
+	if err != nil {
+
+		if errors.IsNotFound(err) {
+			return ctrl.Result{}, nil
+		}
+
 		return ctrl.Result{}, err
 	}
 

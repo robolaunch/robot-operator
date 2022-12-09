@@ -123,6 +123,10 @@ const (
 	RobotPhaseConfiguringWorkspaces   RobotPhase = "ConfiguringWorkspaces"
 	RobotPhaseCreatingBridge          RobotPhase = "CreatingBridge"
 	RobotPhaseReady                   RobotPhase = "Ready"
+	RobotPhaseDeletingBridge          RobotPhase = "DeletingBridge"
+	RobotPhaseDeletingDiscoveryServer RobotPhase = "DeletingDiscoveryServer"
+	RobotPhaseDeletingLoaderJob       RobotPhase = "DeletingLoaderJob"
+	RobotPhaseDeletingVolumes         RobotPhase = "DeletingVolumes"
 
 	RobotPhaseFailed RobotPhase = "Failed"
 )
