@@ -89,12 +89,12 @@ func (r *RobotReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 }
 
 func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.Robot) error {
-	switch instance.Status.VolumeStatus.Var &&
-		instance.Status.VolumeStatus.Opt &&
-		instance.Status.VolumeStatus.Etc &&
-		instance.Status.VolumeStatus.Usr &&
-		instance.Status.VolumeStatus.Display &&
-		instance.Status.VolumeStatus.Workspace {
+	switch instance.Status.VolumeStatuses.Var.Created &&
+		instance.Status.VolumeStatuses.Opt.Created &&
+		instance.Status.VolumeStatuses.Etc.Created &&
+		instance.Status.VolumeStatuses.Usr.Created &&
+		instance.Status.VolumeStatuses.Display.Created &&
+		instance.Status.VolumeStatuses.Workspace.Created {
 	case true:
 
 		switch instance.Status.DiscoveryServerStatus.Created {
@@ -174,52 +174,52 @@ func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *ro
 
 		instance.Status.Phase = robotv1alpha1.RobotPhaseCreatingEnvironment
 
-		if !instance.Status.VolumeStatus.Var {
+		if !instance.Status.VolumeStatuses.Var.Created {
 			err := r.createPVC(ctx, instance, instance.GetPVCVarMetadata())
 			if err != nil {
 				return err
 			}
-			instance.Status.VolumeStatus.Var = true
+			instance.Status.VolumeStatuses.Var.Created = true
 		}
 
-		if !instance.Status.VolumeStatus.Opt {
+		if !instance.Status.VolumeStatuses.Opt.Created {
 			err := r.createPVC(ctx, instance, instance.GetPVCOptMetadata())
 			if err != nil {
 				return err
 			}
-			instance.Status.VolumeStatus.Opt = true
+			instance.Status.VolumeStatuses.Opt.Created = true
 		}
 
-		if !instance.Status.VolumeStatus.Etc {
+		if !instance.Status.VolumeStatuses.Etc.Created {
 			err := r.createPVC(ctx, instance, instance.GetPVCEtcMetadata())
 			if err != nil {
 				return err
 			}
-			instance.Status.VolumeStatus.Etc = true
+			instance.Status.VolumeStatuses.Etc.Created = true
 		}
 
-		if !instance.Status.VolumeStatus.Usr {
+		if !instance.Status.VolumeStatuses.Usr.Created {
 			err := r.createPVC(ctx, instance, instance.GetPVCUsrMetadata())
 			if err != nil {
 				return err
 			}
-			instance.Status.VolumeStatus.Usr = true
+			instance.Status.VolumeStatuses.Usr.Created = true
 		}
 
-		if !instance.Status.VolumeStatus.Display {
+		if !instance.Status.VolumeStatuses.Display.Created {
 			err := r.createPVC(ctx, instance, instance.GetPVCDisplayMetadata())
 			if err != nil {
 				return err
 			}
-			instance.Status.VolumeStatus.Display = true
+			instance.Status.VolumeStatuses.Display.Created = true
 		}
 
-		if !instance.Status.VolumeStatus.Workspace {
+		if !instance.Status.VolumeStatuses.Workspace.Created {
 			err := r.createPVC(ctx, instance, instance.GetPVCWorkspaceMetadata())
 			if err != nil {
 				return err
 			}
-			instance.Status.VolumeStatus.Workspace = true
+			instance.Status.VolumeStatuses.Workspace.Created = true
 		}
 	}
 

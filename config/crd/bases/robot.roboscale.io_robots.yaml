@@ -245,21 +245,51 @@ spec:
                         type: object
                     type: object
                 type: object
-              volumeStatus:
+              volumeStatuses:
                 description: Volume status
                 properties:
                   display:
-                    type: boolean
+                    properties:
+                      created:
+                        type: boolean
+                      persistentVolumeClaimName:
+                        type: string
+                    type: object
                   etc:
-                    type: boolean
+                    properties:
+                      created:
+                        type: boolean
+                      persistentVolumeClaimName:
+                        type: string
+                    type: object
                   opt:
-                    type: boolean
+                    properties:
+                      created:
+                        type: boolean
+                      persistentVolumeClaimName:
+                        type: string
+                    type: object
                   usr:
-                    type: boolean
+                    properties:
+                      created:
+                        type: boolean
+                      persistentVolumeClaimName:
+                        type: string
+                    type: object
                   var:
-                    type: boolean
+                    properties:
+                      created:
+                        type: boolean
+                      persistentVolumeClaimName:
+                        type: string
+                    type: object
                   workspace:
-                    type: boolean
+                    properties:
+                      created:
+                        type: boolean
+                      persistentVolumeClaimName:
+                        type: string
+                    type: object
                 type: object
             type: object
         type: object

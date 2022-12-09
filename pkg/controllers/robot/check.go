@@ -15,49 +15,67 @@ func (r *RobotReconciler) reconcileCheckPVCs(ctx context.Context, instance *robo
 	pvcVarQuery := &corev1.PersistentVolumeClaim{}
 	err := r.Get(ctx, *instance.GetPVCVarMetadata(), pvcVarQuery)
 	if err != nil && errors.IsNotFound(err) {
-		instance.Status.VolumeStatus.Var = false
+		instance.Status.VolumeStatuses.Var.Created = false
 	} else if err != nil {
 		return err
+	} else {
+		instance.Status.VolumeStatuses.Var.Created = true
+		instance.Status.VolumeStatuses.Var.PersistentVolumeClaimName = pvcVarQuery.Name
 	}
 
 	pvcOptQuery := &corev1.PersistentVolumeClaim{}
 	err = r.Get(ctx, *instance.GetPVCOptMetadata(), pvcOptQuery)
 	if err != nil && errors.IsNotFound(err) {
-		instance.Status.VolumeStatus.Opt = false
+		instance.Status.VolumeStatuses.Opt.Created = false
 	} else if err != nil {
 		return err
+	} else {
+		instance.Status.VolumeStatuses.Opt.Created = true
+		instance.Status.VolumeStatuses.Opt.PersistentVolumeClaimName = pvcOptQuery.Name
 	}
 
 	pvcEtcQuery := &corev1.PersistentVolumeClaim{}
 	err = r.Get(ctx, *instance.GetPVCEtcMetadata(), pvcEtcQuery)
 	if err != nil && errors.IsNotFound(err) {
-		instance.Status.VolumeStatus.Etc = false
+		instance.Status.VolumeStatuses.Etc.Created = false
 	} else if err != nil {
 		return err
+	} else {
+		instance.Status.VolumeStatuses.Etc.Created = true
+		instance.Status.VolumeStatuses.Etc.PersistentVolumeClaimName = pvcEtcQuery.Name
 	}
 
 	pvcUsrQuery := &corev1.PersistentVolumeClaim{}
 	err = r.Get(ctx, *instance.GetPVCUsrMetadata(), pvcUsrQuery)
 	if err != nil && errors.IsNotFound(err) {
-		instance.Status.VolumeStatus.Usr = false
+		instance.Status.VolumeStatuses.Usr.Created = false
 	} else if err != nil {
 		return err
+	} else {
+		instance.Status.VolumeStatuses.Usr.Created = true
+		instance.Status.VolumeStatuses.Usr.PersistentVolumeClaimName = pvcUsrQuery.Name
 	}
 
 	pvcDisplayQuery := &corev1.PersistentVolumeClaim{}
 	err = r.Get(ctx, *instance.GetPVCDisplayMetadata(), pvcDisplayQuery)
 	if err != nil && errors.IsNotFound(err) {
-		instance.Status.VolumeStatus.Display = false
+		instance.Status.VolumeStatuses.Display.Created = false
 	} else if err != nil {
 		return err
+	} else {
+		instance.Status.VolumeStatuses.Display.Created = true
+		instance.Status.VolumeStatuses.Display.PersistentVolumeClaimName = pvcDisplayQuery.Name
 	}
 
 	pvcWorkspaceQuery := &corev1.PersistentVolumeClaim{}
 	err = r.Get(ctx, *instance.GetPVCWorkspaceMetadata(), pvcWorkspaceQuery)
 	if err != nil && errors.IsNotFound(err) {
-		instance.Status.VolumeStatus.Workspace = false
+		instance.Status.VolumeStatuses.Workspace.Created = false
 	} else if err != nil {
 		return err
+	} else {
+		instance.Status.VolumeStatuses.Workspace.Created = true
+		instance.Status.VolumeStatuses.Workspace.PersistentVolumeClaimName = pvcWorkspaceQuery.Name
 	}
 
 	return nil

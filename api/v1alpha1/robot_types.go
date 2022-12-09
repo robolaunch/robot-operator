@@ -84,12 +84,17 @@ type RobotSpec struct {
 }
 
 type VolumeStatus struct {
-	Var       bool `json:"var,omitempty"`
-	Etc       bool `json:"etc,omitempty"`
-	Usr       bool `json:"usr,omitempty"`
-	Opt       bool `json:"opt,omitempty"`
-	Display   bool `json:"display,omitempty"`
-	Workspace bool `json:"workspace,omitempty"`
+	Created                   bool   `json:"created,omitempty"`
+	PersistentVolumeClaimName string `json:"persistentVolumeClaimName,omitempty"`
+}
+
+type VolumeStatuses struct {
+	Var       VolumeStatus `json:"var,omitempty"`
+	Etc       VolumeStatus `json:"etc,omitempty"`
+	Usr       VolumeStatus `json:"usr,omitempty"`
+	Opt       VolumeStatus `json:"opt,omitempty"`
+	Display   VolumeStatus `json:"display,omitempty"`
+	Workspace VolumeStatus `json:"workspace,omitempty"`
 }
 
 type DiscoveryServerInstanceStatus struct {
@@ -140,7 +145,7 @@ type RobotStatus struct {
 	// Node name
 	NodeName string `json:"nodeName,omitempty"`
 	// Volume status
-	VolumeStatus VolumeStatus `json:"volumeStatus,omitempty"`
+	VolumeStatuses VolumeStatuses `json:"volumeStatuses,omitempty"`
 	// Discovery server instance status
 	DiscoveryServerStatus DiscoveryServerInstanceStatus `json:"discoveryServerStatus,omitempty"`
 	// ROS bridge instance status
