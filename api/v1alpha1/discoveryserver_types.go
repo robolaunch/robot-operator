@@ -51,6 +51,9 @@ const (
 	DiscoveryServerPhaseCreatingPod       DiscoveryServerPhase = "CreatingPod"
 	DiscoveryServerPhaseCreatingConfigMap DiscoveryServerPhase = "CreatingConfigMap"
 	DiscoveryServerPhaseReady             DiscoveryServerPhase = "Ready"
+	DiscoveryServerPhaseDeletingConfigMap DiscoveryServerPhase = "DeletingConfigMap"
+	DiscoveryServerPhaseDeletingPod       DiscoveryServerPhase = "DeletingPod"
+	DiscoveryServerPhaseDeletingService   DiscoveryServerPhase = "DeletingService"
 )
 
 type ConnectionInfo struct {
