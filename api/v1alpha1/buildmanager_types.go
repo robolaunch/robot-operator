@@ -17,15 +17,58 @@ limitations under the License.
 package v1alpha1
 
 import (
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// Step is a command or script to execute when building a robot. Either `command` or `script` should be specified
+// for each step.
+type Step struct {
+	// Name of the step.
+	Name string `json:"name"`
+	// Name of the workspace.
+	Workspace string `json:"workspace"`
+	// Bash command to run.
+	Command string `json:"command,omitempty"`
+	// Bash script to run.
+	Script string `json:"script,omitempty"`
+	// Environment variables for step.
+	Env []corev1.EnvVar `json:"env,omitempty"`
+}
+
 // BuildManagerSpec defines the desired state of BuildManager
 type BuildManagerSpec struct {
+	Steps []Step `json:"steps,omitempty"`
 }
+
+type StepStatus struct {
+	// Name of the step.
+	Name string `json:"name"`
+	// Name of the workspace.
+	Workspace  string   `json:"workspace"`
+	JobName    string   `json:"jobName,omitempty"`
+	JobCreated bool     `json:"created,omitempty"`
+	JobPhase   JobPhase `json:"jobPhase,omitempty"`
+}
+
+type ScriptConfigMapStatus struct {
+	Created bool `json:"created,omitempty"`
+}
+
+type BuildManagerPhase string
+
+const (
+	BuildManagerCreatingConfigMap BuildManagerPhase = "CreatingConfigMap"
+	BuildManagerBuildingRobot     BuildManagerPhase = "BuildingRobot"
+	BuildManagerReady             BuildManagerPhase = "Ready"
+	BuildManagerFailed            BuildManagerPhase = "Failed"
+)
 
 // BuildManagerStatus defines the observed state of BuildManager
 type BuildManagerStatus struct {
+	Phase                 BuildManagerPhase     `json:"phase,omitempty"`
+	ScriptConfigMapStatus ScriptConfigMapStatus `json:"scriptConfigMapStatus,omitempty"`
+	Steps                 map[string]StepStatus `json:"steps,omitempty"`
 }
 
 //+kubebuilder:object:root=true
