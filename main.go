@@ -134,6 +134,10 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "BuildManager")
 		os.Exit(1)
 	}
+	if err = (&robotv1alpha1.BuildManager{}).SetupWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create webhook", "webhook", "BuildManager")
+		os.Exit(1)
+	}
 	//+kubebuilder:scaffold:builder
 
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {

@@ -11,9 +11,14 @@ const (
 	PHYSICAL_INSTANCE_LABEL_KEY = "robolaunch.io/physical-instance"
 )
 
-// Ready robot properties
+// Ready robot label
 const (
 	ROBOT_IMAGE = "robolaunch.io/robot-image"
+)
+
+// Target robot label
+const (
+	TARGET_ROBOT = "robolaunch.io/target-robot"
 )
 
 // Robot owned resources' postfixes
