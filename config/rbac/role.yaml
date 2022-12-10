@@ -80,6 +80,32 @@ rules:
 - apiGroups:
   - robot.roboscale.io
   resources:
+  - buildmanagers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - buildmanagers/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - buildmanagers/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - robot.roboscale.io
+  resources:
   - discoveryservers
   verbs:
   - create

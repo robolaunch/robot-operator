@@ -33,6 +33,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	robotv1alpha1 "github.com/robolaunch/robot-operator/api/v1alpha1"
+	buildManager "github.com/robolaunch/robot-operator/pkg/controllers/build_manager"
 	robot "github.com/robolaunch/robot-operator/pkg/controllers/robot"
 	discoveryServer "github.com/robolaunch/robot-operator/pkg/controllers/robot/discovery_server"
 	rosBridge "github.com/robolaunch/robot-operator/pkg/controllers/robot/ros_bridge"
@@ -123,6 +124,14 @@ func main() {
 		DynamicClient: dynamicClient,
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "ROSBridge")
+		os.Exit(1)
+	}
+	if err = (&buildManager.BuildManagerReconciler{
+		Client:        mgr.GetClient(),
+		Scheme:        mgr.GetScheme(),
+		DynamicClient: dynamicClient,
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "BuildManager")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder
