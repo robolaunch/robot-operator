@@ -2,6 +2,7 @@ package resources
 
 import (
 	"path/filepath"
+	"strings"
 
 	robotv1alpha1 "github.com/robolaunch/robot-operator/api/v1alpha1"
 	"github.com/robolaunch/robot-operator/internal"
@@ -41,15 +42,53 @@ func GetBuildJob(buildManager *robotv1alpha1.BuildManager, robot *robotv1alpha1.
 
 	robotSpec := robot.Spec
 
+	var cmdBuilder strings.Builder
 	var cmd []string
 	if step.Command != "" {
-		cmd = internal.Bash(step.Command)
-
+		cmdBuilder.WriteString("cd $WORKSPACES_PATH/" + step.Workspace + " && ")
+		cmdBuilder.WriteString(step.Command)
 	} else {
-		cmd = internal.Bash(filepath.Join(internal.CUSTOM_SCRIPTS_PATH, "scripts", step.Name))
+		cmdBuilder.WriteString("cd $WORKSPACES_PATH/" + step.Workspace + " && ")
+		for _, env := range step.Env {
+			cmdBuilder.WriteString(env.Name + "=" + env.Value + " ")
+		}
+		cmdBuilder.WriteString(filepath.Join(internal.CUSTOM_SCRIPTS_PATH, "scripts", step.Name))
 	}
 
+	cmd = internal.Bash(cmdBuilder.String())
+
 	var backoffLimit int32 = 1
+
+	podSpec := corev1.PodSpec{
+		Containers: []corev1.Container{
+			{
+				Name:    step.Name,
+				Image:   robot.Status.Image,
+				Command: cmd,
+				VolumeMounts: []corev1.VolumeMount{
+					configure.GetVolumeMount("", configure.GetVolumeVar(robot)),
+					configure.GetVolumeMount("", configure.GetVolumeUsr(robot)),
+					configure.GetVolumeMount("", configure.GetVolumeOpt(robot)),
+					configure.GetVolumeMount("", configure.GetVolumeEtc(robot)),
+					configure.GetVolumeMount(robotSpec.WorkspacesPath, configure.GetVolumeWorkspace(robot)),
+					configure.GetVolumeMount(internal.CUSTOM_SCRIPTS_PATH, configure.GetVolumeConfigMaps(buildManager)),
+				},
+				Env: step.Env,
+			},
+		},
+		Volumes: []corev1.Volume{
+			configure.GetVolumeVar(robot),
+			configure.GetVolumeUsr(robot),
+			configure.GetVolumeOpt(robot),
+			configure.GetVolumeEtc(robot),
+			configure.GetVolumeWorkspace(robot),
+			configure.GetVolumeConfigMaps(buildManager),
+		},
+		RestartPolicy: corev1.RestartPolicyNever,
+		NodeSelector:  label.GetTenancyMap(robot),
+	}
+
+	configure.InjectGenericEnvironmentVariables(&podSpec, *robot)
 
 	job := batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
@@ -58,34 +97,7 @@ func GetBuildJob(buildManager *robotv1alpha1.BuildManager, robot *robotv1alpha1.
 		},
 		Spec: batchv1.JobSpec{
 			Template: corev1.PodTemplateSpec{
-				Spec: corev1.PodSpec{
-					Containers: []corev1.Container{
-						{
-							Name:    step.Name,
-							Image:   robot.Status.Image,
-							Command: cmd,
-							VolumeMounts: []corev1.VolumeMount{
-								configure.GetVolumeMount("", configure.GetVolumeVar(robot)),
-								configure.GetVolumeMount("", configure.GetVolumeUsr(robot)),
-								configure.GetVolumeMount("", configure.GetVolumeOpt(robot)),
-								configure.GetVolumeMount("", configure.GetVolumeEtc(robot)),
-								configure.GetVolumeMount(robotSpec.WorkspacesPath, configure.GetVolumeWorkspace(robot)),
-								configure.GetVolumeMount(internal.CUSTOM_SCRIPTS_PATH, configure.GetVolumeConfigMaps(buildManager)),
-							},
-							Env: step.Env,
-						},
-					},
-					Volumes: []corev1.Volume{
-						configure.GetVolumeVar(robot),
-						configure.GetVolumeUsr(robot),
-						configure.GetVolumeOpt(robot),
-						configure.GetVolumeEtc(robot),
-						configure.GetVolumeWorkspace(robot),
-						configure.GetVolumeConfigMaps(buildManager),
-					},
-					RestartPolicy: corev1.RestartPolicyNever,
-					NodeSelector:  label.GetTenancyMap(robot),
-				},
+				Spec: podSpec,
 			},
 			BackoffLimit: &backoffLimit,
 		},
