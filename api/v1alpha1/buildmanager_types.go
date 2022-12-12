@@ -57,10 +57,13 @@ type ScriptConfigMapStatus struct {
 type BuildManagerPhase string
 
 const (
-	BuildManagerCreatingConfigMap BuildManagerPhase = "CreatingConfigMap"
-	BuildManagerBuildingRobot     BuildManagerPhase = "BuildingRobot"
-	BuildManagerReady             BuildManagerPhase = "Ready"
-	BuildManagerFailed            BuildManagerPhase = "Failed"
+	BuildManagerWaitingForOtherResources BuildManagerPhase = "WaitingForOtherResources"
+	BuildManagerCreatingConfigMap        BuildManagerPhase = "CreatingConfigMap"
+	BuildManagerBuildingRobot            BuildManagerPhase = "BuildingRobot"
+	BuildManagerReady                    BuildManagerPhase = "Ready"
+	BuildManagerFailed                   BuildManagerPhase = "Failed"
+	BuildManagerDeactivating             BuildManagerPhase = "Deactivating"
+	BuildManagerInactive                 BuildManagerPhase = "Inactive"
 )
 
 // BuildManagerStatus defines the observed state of BuildManager
