@@ -34,6 +34,12 @@ const (
 	ROS_BRIDGE_POSTFIX       = "-bridge"
 )
 
+// BuildManager owned resources' postfixes
+const (
+	CONFIG_MAP_SCRIPTS  = "-scripts"
+	CUSTOM_SCRIPTS_PATH = "/etc/custom"
+)
+
 // Super client configuration
 const (
 	SUPER_CLIENT_CONFIG = "<?xml version='1.0' encoding='UTF-8' ?>" +
