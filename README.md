@@ -62,7 +62,7 @@ The main idea of this project is to manage robots as Kubernetes custom resources
   - Robot-to-Robot Discovery
   - Node-to-Node Discovery
 
-Refer [robolaunch.io](robolaunch.io) and [project wiki](https://bitbucket.org/kaesystems/robot-operator/wiki) for more architectural details and documentations.
+Refer [robolaunch.io](robolaunch.io) and [project wiki](https://github.com/robolaunch/robot-operator/wiki) for more architectural details and documentations.
 
 ## Quick Start
 
