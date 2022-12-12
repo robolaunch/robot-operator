@@ -19,12 +19,14 @@ package launch_manager
 import (
 	"context"
 
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/dynamic"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
+	"github.com/go-logr/logr"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/api/v1alpha1"
 )
 
@@ -39,9 +41,48 @@ type LaunchManagerReconciler struct {
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=launchmanagers/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=launchmanagers/finalizers,verbs=update
 
+var logger logr.Logger
+
 func (r *LaunchManagerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+	logger = log.FromContext(ctx)
+
+	instance, err := r.reconcileGetInstance(ctx, req.NamespacedName)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			return ctrl.Result{}, nil
+		}
+		return ctrl.Result{}, err
+	}
+
+	err = r.reconcileCheckStatus(ctx, instance)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	err = r.reconcileUpdateInstanceStatus(ctx, instance)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	err = r.reconcileCheckResources(ctx, instance)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	err = r.reconcileUpdateInstanceStatus(ctx, instance)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
 	return ctrl.Result{}, nil
+}
+
+func (r *LaunchManagerReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.LaunchManager) error {
+	return nil
+}
+
+func (r *LaunchManagerReconciler) reconcileCheckResources(ctx context.Context, instance *robotv1alpha1.LaunchManager) error {
+	return nil
 }
 
 // SetupWithManager sets up the controller with the Manager.
