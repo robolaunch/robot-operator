@@ -33,7 +33,7 @@ func (r *BuildManagerReconciler) reconcileCheckBuilderJobs(ctx context.Context, 
 	for _, step := range instance.Spec.Steps {
 		jobMetadata := types.NamespacedName{
 			Namespace: instance.Namespace,
-			Name:      step.Name,
+			Name:      instance.Name + "-" + step.Name,
 		}
 
 		jobQuery := &batchv1.Job{}

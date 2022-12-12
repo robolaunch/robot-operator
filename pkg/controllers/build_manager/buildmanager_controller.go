@@ -85,7 +85,7 @@ func (r *BuildManagerReconciler) Reconcile(ctx context.Context, req ctrl.Request
 }
 
 func (r *BuildManagerReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.BuildManager) error {
-	switch instance.Status.Active {
+	switch !instance.Status.Active {
 	case true:
 
 		switch instance.Status.ScriptConfigMapStatus.Created {
