@@ -38,7 +38,11 @@ type Prelaunch struct {
 
 // Launch description of a repository.
 type Launch struct {
+	// Name of the launch.
+	// +kubebuilder:validation:Required
+	Name string `json:"name"`
 	// Name of the workspace.
+	// +kubebuilder:validation:Required
 	Workspace string `json:"workspace"`
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Enum=Distributed;Direct
