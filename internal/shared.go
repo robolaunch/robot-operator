@@ -11,9 +11,14 @@ const (
 	PHYSICAL_INSTANCE_LABEL_KEY = "robolaunch.io/physical-instance"
 )
 
-// Ready robot properties
+// Ready robot label
 const (
 	ROBOT_IMAGE = "robolaunch.io/robot-image"
+)
+
+// Target robot label
+const (
+	TARGET_ROBOT = "robolaunch.io/target-robot"
 )
 
 // Robot owned resources' postfixes
@@ -27,6 +32,12 @@ const (
 	DISCOVERY_SERVER_POSTFIX = "-discovery"
 	JOB_LOADER_POSTFIX       = "-loader"
 	ROS_BRIDGE_POSTFIX       = "-bridge"
+)
+
+// BuildManager owned resources' postfixes
+const (
+	CONFIG_MAP_SCRIPTS  = "-scripts"
+	CUSTOM_SCRIPTS_PATH = "/etc/custom"
 )
 
 // Super client configuration

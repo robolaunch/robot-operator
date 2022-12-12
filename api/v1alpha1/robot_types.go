@@ -136,6 +136,11 @@ const (
 	RobotPhaseFailed RobotPhase = "Failed"
 )
 
+type AttachedObject struct {
+	Reference          corev1.ObjectReference `json:"reference,omitempty"`
+	BuildManagerStatus BuildManagerStatus     `json:"buildManagerStatus,omitempty"`
+}
+
 // RobotStatus defines the observed state of Robot
 type RobotStatus struct {
 	// Phase of robot
@@ -152,6 +157,8 @@ type RobotStatus struct {
 	ROSBridgeStatus ROSBridgeInstanceStatus `json:"rosBridgeStatus,omitempty"`
 	// Loader job status that configures environment
 	LoaderJobStatus LoaderJobStatus `json:"loaderJobStatus,omitempty"`
+	// Attached build object information
+	AttachedObject AttachedObject `json:"attachedObject,omitempty"`
 }
 
 //+kubebuilder:object:root=true

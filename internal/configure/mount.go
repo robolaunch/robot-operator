@@ -144,3 +144,36 @@ func GetVolumeMount(
 
 	return volumeMount
 }
+
+func GetVolumeConfigMaps(buildManager *robotv1alpha1.BuildManager) corev1.Volume {
+
+	configKeys := []corev1.KeyToPath{}
+
+	for _, step := range buildManager.Spec.Steps {
+		if step.Script != "" {
+			var stepMod int32 = 511
+
+			configKeys = append(configKeys,
+				corev1.KeyToPath{
+					Key:  step.Name,
+					Path: "scripts/" + step.Name,
+					Mode: &stepMod,
+				},
+			)
+		}
+	}
+
+	volume := corev1.Volume{
+		Name: "config-volume",
+		VolumeSource: corev1.VolumeSource{
+			ConfigMap: &corev1.ConfigMapVolumeSource{
+				LocalObjectReference: corev1.LocalObjectReference{
+					Name: buildManager.GetConfigMapMetadata().Name,
+				},
+				Items: configKeys,
+			},
+		},
+	}
+
+	return volume
+}
