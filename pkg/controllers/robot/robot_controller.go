@@ -7,13 +7,18 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/dynamic"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/log"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	"github.com/go-logr/logr"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/api/v1alpha1"
+	"github.com/robolaunch/robot-operator/internal/label"
 )
 
 // RobotReconciler reconciles a Robot object
@@ -116,6 +121,12 @@ func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *ro
 							case true:
 
 								instance.Status.Phase = robotv1alpha1.RobotPhaseReady
+
+								// select attached build object
+								err := r.reconcileAttachBuildObject(ctx, instance)
+								if err != nil {
+									return err
+								}
 
 							case false:
 
@@ -258,5 +269,32 @@ func (r *RobotReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Owns(&corev1.PersistentVolumeClaim{}).
 		Owns(&robotv1alpha1.DiscoveryServer{}).
 		Owns(&batchv1.Job{}).
+		Watches(
+			&source.Kind{Type: &robotv1alpha1.BuildManager{}},
+			handler.EnqueueRequestsFromMapFunc(r.watchAttachedResources),
+		).
 		Complete(r)
+}
+
+func (r *RobotReconciler) watchAttachedResources(o client.Object) []reconcile.Request {
+
+	obj := o.(*robotv1alpha1.BuildManager)
+
+	robot := &robotv1alpha1.Robot{}
+	err := r.Get(context.TODO(), types.NamespacedName{
+		Name:      label.GetTargetRobot(obj),
+		Namespace: obj.Namespace,
+	}, robot)
+	if err != nil {
+		return []reconcile.Request{}
+	}
+
+	return []reconcile.Request{
+		{
+			NamespacedName: types.NamespacedName{
+				Name:      robot.Name,
+				Namespace: robot.Namespace,
+			},
+		},
+	}
 }

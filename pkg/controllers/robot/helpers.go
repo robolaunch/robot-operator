@@ -2,8 +2,10 @@ package robot
 
 import (
 	"context"
+	"sort"
 
 	robotv1alpha1 "github.com/robolaunch/robot-operator/api/v1alpha1"
+	"github.com/robolaunch/robot-operator/internal"
 	robotErr "github.com/robolaunch/robot-operator/internal/error"
 	label "github.com/robolaunch/robot-operator/internal/label"
 	nodePkg "github.com/robolaunch/robot-operator/internal/node"
@@ -93,6 +95,48 @@ func (r *RobotReconciler) reconcileCheckImage(ctx context.Context, instance *rob
 
 	if instance.Status.Image == "" {
 		instance.Status.Image = nodePkg.GetImage(*node, *instance)
+	}
+
+	return nil
+}
+
+func (r *RobotReconciler) reconcileAttachBuildObject(ctx context.Context, instance *robotv1alpha1.Robot) error {
+
+	// Get attached build objects for this robot
+	requirements := []labels.Requirement{}
+	newReq, err := labels.NewRequirement(internal.TARGET_ROBOT, selection.In, []string{instance.Name})
+	if err != nil {
+		return err
+	}
+	requirements = append(requirements, *newReq)
+
+	robotSelector := labels.NewSelector().Add(requirements...)
+
+	buildManagerList := robotv1alpha1.BuildManagerList{}
+	err = r.List(ctx, &buildManagerList, &client.ListOptions{Namespace: instance.Namespace, LabelSelector: robotSelector})
+	if err != nil {
+		return err
+	}
+
+	if len(buildManagerList.Items) == 0 {
+		instance.Status.AttachedObject.Reference = corev1.ObjectReference{}
+		return nil
+	}
+
+	// Sort attached build objects for this robot according to their creation timestamps
+	sort.SliceStable(buildManagerList.Items[:], func(i, j int) bool {
+		return buildManagerList.Items[i].CreationTimestamp.String() > buildManagerList.Items[j].CreationTimestamp.String()
+	})
+
+	selectedBuildManager := buildManagerList.Items[0]
+
+	instance.Status.AttachedObject.Reference = corev1.ObjectReference{
+		Kind:            selectedBuildManager.Kind,
+		Namespace:       selectedBuildManager.Namespace,
+		Name:            selectedBuildManager.Name,
+		UID:             selectedBuildManager.UID,
+		APIVersion:      selectedBuildManager.APIVersion,
+		ResourceVersion: selectedBuildManager.ResourceVersion,
 	}
 
 	return nil

@@ -17,8 +17,10 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"github.com/robolaunch/robot-operator/internal"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 )
 
 // Step is a command or script to execute when building a robot. Either `command` or `script` should be specified
@@ -42,10 +44,7 @@ type BuildManagerSpec struct {
 }
 
 type StepStatus struct {
-	// Name of the step.
-	Name string `json:"name"`
-	// Name of the workspace.
-	Workspace  string   `json:"workspace"`
+	Step       Step     `json:"step,omitempty"`
 	JobName    string   `json:"jobName,omitempty"`
 	JobCreated bool     `json:"created,omitempty"`
 	JobPhase   JobPhase `json:"jobPhase,omitempty"`
@@ -67,6 +66,7 @@ const (
 // BuildManagerStatus defines the observed state of BuildManager
 type BuildManagerStatus struct {
 	Phase                 BuildManagerPhase     `json:"phase,omitempty"`
+	Active                bool                  `json:"active,omitempty"`
 	ScriptConfigMapStatus ScriptConfigMapStatus `json:"scriptConfigMapStatus,omitempty"`
 	Steps                 map[string]StepStatus `json:"steps,omitempty"`
 }
@@ -94,4 +94,11 @@ type BuildManagerList struct {
 
 func init() {
 	SchemeBuilder.Register(&BuildManager{}, &BuildManagerList{})
+}
+
+func (buildmanager *BuildManager) GetConfigMapMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Name:      buildmanager.Name + internal.CONFIG_MAP_SCRIPTS,
+		Namespace: buildmanager.Namespace,
+	}
 }
