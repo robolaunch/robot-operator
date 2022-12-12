@@ -8,6 +8,7 @@ import (
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/types"
 )
 
 func (r *RobotReconciler) reconcileCheckPVCs(ctx context.Context, instance *robotv1alpha1.Robot) error {
@@ -152,6 +153,29 @@ func (r *RobotReconciler) reconcileCheckROSBridge(ctx context.Context, instance 
 			instance.Status.ROSBridgeStatus.Created = true
 			instance.Status.ROSBridgeStatus.Status = rosBridgeQuery.Status
 		}
+	}
+
+	return nil
+}
+
+func (r *RobotReconciler) reconcileCheckAttachedBuildManager(ctx context.Context, instance *robotv1alpha1.Robot) error {
+
+	bmReference := instance.Status.AttachedBuildObject.Reference
+
+	// If any build object was attached, record it's status
+	if bmReference.Name != "" {
+
+		buildManager := &robotv1alpha1.BuildManager{}
+		err := r.Get(ctx, types.NamespacedName{Namespace: bmReference.Namespace, Name: bmReference.Name}, buildManager)
+		if err != nil && errors.IsNotFound(err) {
+			// TODO: Empty the reference fields
+			return err
+		} else if err != nil {
+			return err
+		} else {
+			instance.Status.AttachedBuildObject.Status = buildManager.Status
+		}
+
 	}
 
 	return nil

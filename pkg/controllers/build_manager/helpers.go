@@ -62,7 +62,7 @@ func (r *BuildManagerReconciler) reconcileCheckTargetRobot(ctx context.Context, 
 		return err
 	}
 
-	if robot.Status.AttachedObject.Reference.Kind == instance.Kind && robot.Status.AttachedObject.Reference.Name == instance.Name {
+	if robot.Status.AttachedBuildObject.Reference.Kind == instance.Kind && robot.Status.AttachedBuildObject.Reference.Name == instance.Name {
 		instance.Status.Active = true
 	} else {
 		instance.Status.Active = false
