@@ -72,14 +72,16 @@ type LaunchPodStatus struct {
 type LaunchManagerPhase string
 
 const (
-	LaunchManagerPhaseCreatingPod   LaunchManagerPhase = "Launching"
-	LaunchManagerPhaseReady         LaunchManagerPhase = "Ready"
-	LaunchManagerPhaseMalfunctioned LaunchManagerPhase = "Malfunctioned"
+	LaunchManagerPhaseCreatingPod  LaunchManagerPhase = "Launching"
+	LaunchManagerPhaseReady        LaunchManagerPhase = "Ready"
+	LaunchManagerPhaseDeactivating LaunchManagerPhase = "Deactivating"
+	LaunchManagerPhaseInactive     LaunchManagerPhase = "Inactive"
 )
 
 // LaunchManagerStatus defines the observed state of LaunchManager
 type LaunchManagerStatus struct {
 	Phase           LaunchManagerPhase `json:"phase,omitempty"`
+	Active          bool               `json:"active,omitempty"`
 	LaunchPodStatus LaunchPodStatus    `json:"launchPodStatus,omitempty"`
 }
 
