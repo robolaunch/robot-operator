@@ -36,8 +36,20 @@ const (
 
 // BuildManager owned resources' postfixes
 const (
-	CONFIG_MAP_SCRIPTS  = "-scripts"
+	CONFIG_MAP_SCRIPTS = "-scripts"
+)
+
+// LaunchManager owned resources' postfixes
+const (
+	POD_LAUNCH_POSTFIX = "-launch"
+)
+
+// Paths
+
+const (
 	CUSTOM_SCRIPTS_PATH = "/etc/custom"
+	HELPERS_PATH        = "/var/lib/robolaunch-helpers/"
+	X11_UNIX_PATH       = "/tmp/.X11-unix"
 )
 
 // Super client configuration
