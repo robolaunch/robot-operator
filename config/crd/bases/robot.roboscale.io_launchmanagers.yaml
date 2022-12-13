@@ -36,7 +36,7 @@ spec:
             description: LaunchManagerSpec defines the desired state of LaunchManager
             properties:
               launch:
-                items:
+                additionalProperties:
                   description: Launch description of a repository.
                   properties:
                     env:
@@ -161,9 +161,9 @@ spec:
                     launchFilePath:
                       description: Path to launchfile in repository. (eg. `linorobot/linorobot_gazebo/launch.py`)
                       type: string
-                    name:
-                      description: Name of the launch.
-                      type: string
+                    namespacing:
+                      description: Name of the repository.
+                      type: boolean
                     parameters:
                       additionalProperties:
                         type: string
@@ -178,31 +178,212 @@ spec:
                       required:
                       - command
                       type: object
-                    type:
-                      enum:
-                      - Distributed
-                      - Direct
+                    privileged:
+                      description: Launch container privilege.
+                      type: boolean
+                    repository:
+                      description: Name of the repository.
                       type: string
+                    selector:
+                      additionalProperties:
+                        type: string
+                      description: Cluster selector.
+                      type: object
                     workspace:
                       description: Name of the workspace.
                       type: string
                   required:
                   - launchFilePath
-                  - name
-                  - type
+                  - repository
                   - workspace
                   type: object
-                type: array
+                type: object
             type: object
           status:
             description: LaunchManagerStatus defines the observed state of LaunchManager
             properties:
+              active:
+                type: boolean
               launchPodStatus:
                 properties:
                   created:
                     type: boolean
                   ip:
                     type: string
+                  launchStatus:
+                    additionalProperties:
+                      properties:
+                        active:
+                          type: boolean
+                        containerStatus:
+                          description: ContainerStatus contains details for the current
+                            status of this container.
+                          properties:
+                            containerID:
+                              description: Container's ID in the format '<type>://<container_id>'.
+                              type: string
+                            image:
+                              description: 'The image the container is running. More
+                                info: https://kubernetes.io/docs/concepts/containers/images.'
+                              type: string
+                            imageID:
+                              description: ImageID of the container's image.
+                              type: string
+                            lastState:
+                              description: Details about the container's last termination
+                                condition.
+                              properties:
+                                running:
+                                  description: Details about a running container
+                                  properties:
+                                    startedAt:
+                                      description: Time at which the container was
+                                        last (re-)started
+                                      format: date-time
+                                      type: string
+                                  type: object
+                                terminated:
+                                  description: Details about a terminated container
+                                  properties:
+                                    containerID:
+                                      description: Container's ID in the format '<type>://<container_id>'
+                                      type: string
+                                    exitCode:
+                                      description: Exit status from the last termination
+                                        of the container
+                                      format: int32
+                                      type: integer
+                                    finishedAt:
+                                      description: Time at which the container last
+                                        terminated
+                                      format: date-time
+                                      type: string
+                                    message:
+                                      description: Message regarding the last termination
+                                        of the container
+                                      type: string
+                                    reason:
+                                      description: (brief) reason from the last termination
+                                        of the container
+                                      type: string
+                                    signal:
+                                      description: Signal from the last termination
+                                        of the container
+                                      format: int32
+                                      type: integer
+                                    startedAt:
+                                      description: Time at which previous execution
+                                        of the container started
+                                      format: date-time
+                                      type: string
+                                  required:
+                                  - exitCode
+                                  type: object
+                                waiting:
+                                  description: Details about a waiting container
+                                  properties:
+                                    message:
+                                      description: Message regarding why the container
+                                        is not yet running.
+                                      type: string
+                                    reason:
+                                      description: (brief) reason the container is
+                                        not yet running.
+                                      type: string
+                                  type: object
+                              type: object
+                            name:
+                              description: This must be a DNS_LABEL. Each container
+                                in a pod must have a unique name. Cannot be updated.
+                              type: string
+                            ready:
+                              description: Specifies whether the container has passed
+                                its readiness probe.
+                              type: boolean
+                            restartCount:
+                              description: The number of times the container has been
+                                restarted.
+                              format: int32
+                              type: integer
+                            started:
+                              description: Specifies whether the container has passed
+                                its startup probe. Initialized as false, becomes true
+                                after startupProbe is considered successful. Resets
+                                to false when the container is restarted, or if kubelet
+                                loses state temporarily. Is always true when no startupProbe
+                                is defined.
+                              type: boolean
+                            state:
+                              description: Details about the container's current condition.
+                              properties:
+                                running:
+                                  description: Details about a running container
+                                  properties:
+                                    startedAt:
+                                      description: Time at which the container was
+                                        last (re-)started
+                                      format: date-time
+                                      type: string
+                                  type: object
+                                terminated:
+                                  description: Details about a terminated container
+                                  properties:
+                                    containerID:
+                                      description: Container's ID in the format '<type>://<container_id>'
+                                      type: string
+                                    exitCode:
+                                      description: Exit status from the last termination
+                                        of the container
+                                      format: int32
+                                      type: integer
+                                    finishedAt:
+                                      description: Time at which the container last
+                                        terminated
+                                      format: date-time
+                                      type: string
+                                    message:
+                                      description: Message regarding the last termination
+                                        of the container
+                                      type: string
+                                    reason:
+                                      description: (brief) reason from the last termination
+                                        of the container
+                                      type: string
+                                    signal:
+                                      description: Signal from the last termination
+                                        of the container
+                                      format: int32
+                                      type: integer
+                                    startedAt:
+                                      description: Time at which previous execution
+                                        of the container started
+                                      format: date-time
+                                      type: string
+                                  required:
+                                  - exitCode
+                                  type: object
+                                waiting:
+                                  description: Details about a waiting container
+                                  properties:
+                                    message:
+                                      description: Message regarding why the container
+                                        is not yet running.
+                                      type: string
+                                    reason:
+                                      description: (brief) reason the container is
+                                        not yet running.
+                                      type: string
+                                  type: object
+                              type: object
+                          required:
+                          - image
+                          - imageID
+                          - name
+                          - ready
+                          - restartCount
+                          type: object
+                      type: object
+                    type: object
                   phase:
                     description: PodPhase is a label for the condition of a pod at
                       the current time.

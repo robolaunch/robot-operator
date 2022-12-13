@@ -19,7 +19,6 @@ package build_manager
 import (
 	"context"
 	goErr "errors"
-	"sort"
 	"time"
 
 	batchv1 "k8s.io/api/batch/v1"
@@ -134,14 +133,7 @@ func (r *BuildManagerReconciler) reconcileCheckStatus(ctx context.Context, insta
 
 			instance.Status.Phase = robotv1alpha1.BuildManagerBuildingRobot
 
-			keys := []string{}
-			for key := range instance.Status.Steps {
-				keys = append(keys, key)
-			}
-
-			sort.Strings(keys)
-
-			for _, k := range keys {
+			for k := range instance.Status.Steps {
 				if instance.Status.Steps[k].JobCreated {
 
 					if instance.Status.Steps[k].JobPhase == robotv1alpha1.JobSucceeded {
@@ -170,7 +162,7 @@ func (r *BuildManagerReconciler) reconcileCheckStatus(ctx context.Context, insta
 
 			areJobsSucceeded := false
 
-			for _, key := range keys {
+			for key := range instance.Status.Steps {
 				if instance.Status.Steps[key].JobPhase == robotv1alpha1.JobSucceeded {
 					areJobsSucceeded = true
 				} else {
