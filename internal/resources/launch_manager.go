@@ -17,8 +17,8 @@ import (
 func GetLaunchPod(launchManager *robotv1alpha1.LaunchManager, podNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot, buildManager robotv1alpha1.BuildManager) *corev1.Pod {
 
 	containers := []corev1.Container{}
-	for _, l := range launchManager.Spec.Launch {
-		cont := getLaunchContainer(l, robot, buildManager)
+	for k, l := range launchManager.Spec.Launch {
+		cont := getLaunchContainer(l, k, robot, buildManager)
 		containers = append(containers, cont)
 	}
 
@@ -49,7 +49,7 @@ func GetLaunchPod(launchManager *robotv1alpha1.LaunchManager, podNamespacedName 
 	return &launchPod
 }
 
-func getLaunchContainer(launch robotv1alpha1.Launch, robot robotv1alpha1.Robot, buildManager robotv1alpha1.BuildManager) corev1.Container {
+func getLaunchContainer(launch robotv1alpha1.Launch, launchName string, robot robotv1alpha1.Robot, buildManager robotv1alpha1.BuildManager) corev1.Container {
 
 	sleepTimeInt := 3
 	sleepTime := strconv.Itoa(sleepTimeInt)
@@ -63,7 +63,7 @@ func getLaunchContainer(launch robotv1alpha1.Launch, robot robotv1alpha1.Robot, 
 	cmdBuilder.WriteString("$COMMAND")
 
 	container := corev1.Container{
-		Name:    launch.Name,
+		Name:    launchName,
 		Image:   robot.Status.Image,
 		Command: internal.Bash(cmdBuilder.String()),
 		Stdin:   true,
