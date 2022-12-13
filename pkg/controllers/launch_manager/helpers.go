@@ -48,3 +48,21 @@ func (r *LaunchManagerReconciler) reconcileGetTargetRobot(ctx context.Context, i
 
 	return robot, nil
 }
+
+func (r *LaunchManagerReconciler) reconcileGetCurrentBuildManager(ctx context.Context, instance *robotv1alpha1.LaunchManager) (*robotv1alpha1.BuildManager, error) {
+	robot, err := r.reconcileGetTargetRobot(ctx, instance)
+	if err != nil {
+		return nil, err
+	}
+
+	buildManager := &robotv1alpha1.BuildManager{}
+	err = r.Get(ctx, types.NamespacedName{
+		Namespace: robot.Status.AttachedBuildObject.Reference.Namespace,
+		Name:      robot.Status.AttachedBuildObject.Reference.Name,
+	}, buildManager)
+	if err != nil {
+		return nil, err
+	}
+
+	return buildManager, nil
+}

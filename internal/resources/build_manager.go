@@ -88,7 +88,7 @@ func GetBuildJob(buildManager *robotv1alpha1.BuildManager, robot *robotv1alpha1.
 		NodeSelector:  label.GetTenancyMap(robot),
 	}
 
-	configure.InjectGenericEnvironmentVariables(&podSpec, *robot)
+	configure.InjectGenericEnvironmentVariablesForPodSpec(&podSpec, *robot)
 
 	job := batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{

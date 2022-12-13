@@ -232,10 +232,7 @@ func GetCloneCommand(workspaces []robotv1alpha1.Workspace, wsKey int) string {
 
 	var cmdBuilder strings.Builder
 	for key, repo := range workspaces[wsKey].Repositories {
-		cmdBuilder.WriteString("git clone " + repo.URL + " -b " + repo.Branch + " " + repo.Name)
-		if key != len(workspaces[wsKey].Repositories)-1 {
-			cmdBuilder.WriteString("; ")
-		}
+		cmdBuilder.WriteString("git clone " + repo.URL + " -b " + repo.Branch + " " + key + ";")
 	}
 	return cmdBuilder.String()
 }

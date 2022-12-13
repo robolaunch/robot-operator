@@ -19,6 +19,7 @@ package launch_manager
 import (
 	"context"
 
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/dynamic"
@@ -78,10 +79,47 @@ func (r *LaunchManagerReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 }
 
 func (r *LaunchManagerReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.LaunchManager) error {
+
+	switch !instance.Status.Active {
+	case true:
+
+		switch instance.Status.LaunchPodStatus.Created {
+		case true:
+
+			switch instance.Status.LaunchPodStatus.Phase {
+			case v1.PodRunning:
+
+				instance.Status.Phase = robotv1alpha1.LaunchManagerPhaseReady
+
+			}
+
+		case false:
+
+			instance.Status.Phase = robotv1alpha1.LaunchManagerPhaseCreatingPod
+			err := r.createLaunchPod(ctx, instance)
+			if err != nil {
+				return err
+			}
+			instance.Status.Phase = robotv1alpha1.LaunchManagerPhaseLaunching
+
+		}
+
+	case false:
+
+		// delete resources
+
+	}
+
 	return nil
 }
 
 func (r *LaunchManagerReconciler) reconcileCheckResources(ctx context.Context, instance *robotv1alpha1.LaunchManager) error {
+
+	err := r.reconcileCheckLaunchPod(ctx, instance)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
