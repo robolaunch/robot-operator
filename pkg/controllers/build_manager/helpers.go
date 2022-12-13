@@ -74,7 +74,7 @@ func (r *BuildManagerReconciler) reconcileCheckTargetRobot(ctx context.Context, 
 func (r *BuildManagerReconciler) reconcileCheckOtherAttachedResources(ctx context.Context, instance *robotv1alpha1.BuildManager) error {
 
 	if instance.Status.Active {
-		// Get attached build objects for this robot
+		// Get attached build manager objects for this robot
 		requirements := []labels.Requirement{}
 		newReq, err := labels.NewRequirement(internal.TARGET_ROBOT, selection.In, []string{label.GetTargetRobot(instance)})
 		if err != nil {
