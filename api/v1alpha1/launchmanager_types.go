@@ -36,6 +36,8 @@ type Launch struct {
 	// Name of the launch.
 	// +kubebuilder:validation:Required
 	Name string `json:"name"`
+	// Cluster selector.
+	Selector map[string]string `json:"selector,omitempty"`
 	// Name of the workspace.
 	// +kubebuilder:validation:Required
 	Workspace string `json:"workspace"`
@@ -63,10 +65,17 @@ type LaunchManagerSpec struct {
 	Launch []Launch `json:"launch,omitempty"`
 }
 
+type LaunchStatus struct {
+	Name            string                 `json:"name,omitempty"`
+	Active          bool                   `json:"active,omitempty"`
+	ContainerStatus corev1.ContainerStatus `json:"containerStatus,omitempty"`
+}
+
 type LaunchPodStatus struct {
-	Created bool            `json:"created,omitempty"`
-	Phase   corev1.PodPhase `json:"phase,omitempty"`
-	IP      string          `json:"ip,omitempty"`
+	Created      bool            `json:"created,omitempty"`
+	Phase        corev1.PodPhase `json:"phase,omitempty"`
+	IP           string          `json:"ip,omitempty"`
+	LaunchStatus []LaunchStatus  `json:"launchStatus,omitempty"`
 }
 
 type LaunchManagerPhase string
