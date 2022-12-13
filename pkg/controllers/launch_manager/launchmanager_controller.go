@@ -75,8 +75,8 @@ func (r *LaunchManagerReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 	// Check target robot's other attached objects to see if robot's resources are released
 	err = r.reconcileCheckOtherAttachedResources(ctx, instance)
 	if err != nil {
-		var e robotErr.RobotResourcesHasNotBeenReleasedError
-		if goErr.Is(err, &e) {
+		var e *robotErr.RobotResourcesHasNotBeenReleasedError
+		if goErr.As(err, &e) {
 			return ctrl.Result{
 				Requeue:      true,
 				RequeueAfter: 3 * time.Second,
@@ -110,7 +110,7 @@ func (r *LaunchManagerReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 
 func (r *LaunchManagerReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.LaunchManager) error {
 
-	switch !instance.Status.Active {
+	switch instance.Status.Active {
 	case true:
 
 		switch instance.Status.LaunchPodStatus.Created {
@@ -136,7 +136,14 @@ func (r *LaunchManagerReconciler) reconcileCheckStatus(ctx context.Context, inst
 
 	case false:
 
-		// delete resources
+		instance.Status.Phase = robotv1alpha1.LaunchManagerPhaseDeactivating
+
+		err := r.reconcileDeleteLaunchPod(ctx, instance)
+		if err != nil {
+			return err
+		}
+
+		instance.Status.Phase = robotv1alpha1.LaunchManagerPhaseInactive
 
 	}
 

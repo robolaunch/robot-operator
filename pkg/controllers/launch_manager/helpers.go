@@ -128,6 +128,7 @@ func (r *LaunchManagerReconciler) reconcileCheckOtherAttachedResources(ctx conte
 				}
 			}
 		}
+
 	}
 
 	return nil

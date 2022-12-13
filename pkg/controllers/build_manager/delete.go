@@ -76,7 +76,7 @@ func (r *BuildManagerReconciler) reconcileDeleteBuilderJobs(ctx context.Context,
 				if err != nil && errors.IsNotFound(err) {
 					deleted = true
 				}
-				time.Sleep(time.Second * 2)
+				time.Sleep(time.Second * 1)
 			}
 
 			stepStatus := robotv1alpha1.StepStatus{

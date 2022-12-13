@@ -90,8 +90,8 @@ func (r *BuildManagerReconciler) Reconcile(ctx context.Context, req ctrl.Request
 	// Check target robot's other attached objects to see if robot's resources are released
 	err = r.reconcileCheckOtherAttachedResources(ctx, instance)
 	if err != nil {
-		var e robotErr.RobotResourcesHasNotBeenReleasedError
-		if goErr.Is(err, &e) {
+		var e *robotErr.RobotResourcesHasNotBeenReleasedError
+		if goErr.As(err, &e) {
 			return ctrl.Result{
 				Requeue:      true,
 				RequeueAfter: 3 * time.Second,
@@ -207,12 +207,6 @@ func (r *BuildManagerReconciler) reconcileCheckStatus(ctx context.Context, insta
 }
 
 func (r *BuildManagerReconciler) reconcileCheckResources(ctx context.Context, instance *robotv1alpha1.BuildManager) error {
-
-	phase := instance.Status.Phase
-	active := instance.Status.Active
-	instance.Status = robotv1alpha1.BuildManagerStatus{}
-	instance.Status.Phase = phase
-	instance.Status.Active = active
 
 	err := r.reconcileCheckConfigMap(ctx, instance)
 	if err != nil {
