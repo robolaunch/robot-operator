@@ -41,9 +41,6 @@ type Storage struct {
 
 // Repository description.
 type Repository struct {
-	// Name of the repository.
-	// +kubebuilder:validation:Required
-	Name string `json:"name"`
 	// Base URL of the repository.
 	// +kubebuilder:validation:Required
 	URL string `json:"url"`
@@ -61,8 +58,7 @@ type Workspace struct {
 	// +kubebuilder:validation:Required
 	Name string `json:"name"`
 	// Repositories to clone inside workspace's `src` directory.
-	// +kubebuilder:validation:MinItems=1
-	Repositories []Repository `json:"repositories"`
+	Repositories map[string]Repository `json:"repositories"`
 }
 
 // RobotSpec defines the desired state of Robot

@@ -17,15 +17,10 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"github.com/robolaunch/robot-operator/internal"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-)
-
-type LaunchType string
-
-const (
-	LaunchTypeDistributed LaunchType = "Distributed"
-	LaunchTypeDirect      LaunchType = "Direct"
+	"k8s.io/apimachinery/pkg/types"
 )
 
 // Prelaunch command or script is applied just before the node is started.
@@ -44,9 +39,12 @@ type Launch struct {
 	// Name of the workspace.
 	// +kubebuilder:validation:Required
 	Workspace string `json:"workspace"`
+	// Name of the repository.
 	// +kubebuilder:validation:Required
-	// +kubebuilder:validation:Enum=Distributed;Direct
-	Type LaunchType `json:"type"`
+	Repository string `json:"repository"`
+	// Name of the repository.
+	// +kubebuilder:validation:Required
+	Namespacing bool `json:"namespacing,omitempty"`
 	// Additional environment variables to set when launching ROS nodes.
 	Env []corev1.EnvVar `json:"env,omitempty"`
 	// Path to launchfile in repository. (eg. `linorobot/linorobot_gazebo/launch.py`)
@@ -56,6 +54,8 @@ type Launch struct {
 	Parameters map[string]string `json:"parameters,omitempty"`
 	// Command or script to run just before node's execution.
 	Prelaunch Prelaunch `json:"prelaunch,omitempty"`
+	// Launch container privilege.
+	Privileged bool `json:"privileged,omitempty"`
 }
 
 // LaunchManagerSpec defines the desired state of LaunchManager
@@ -72,7 +72,8 @@ type LaunchPodStatus struct {
 type LaunchManagerPhase string
 
 const (
-	LaunchManagerPhaseCreatingPod  LaunchManagerPhase = "Launching"
+	LaunchManagerPhaseCreatingPod  LaunchManagerPhase = "CreatingPod"
+	LaunchManagerPhaseLaunching    LaunchManagerPhase = "Launching"
 	LaunchManagerPhaseReady        LaunchManagerPhase = "Ready"
 	LaunchManagerPhaseDeactivating LaunchManagerPhase = "Deactivating"
 	LaunchManagerPhaseInactive     LaunchManagerPhase = "Inactive"
@@ -108,4 +109,11 @@ type LaunchManagerList struct {
 
 func init() {
 	SchemeBuilder.Register(&LaunchManager{}, &LaunchManagerList{})
+}
+
+func (launchmanager *LaunchManager) GetLaunchPodMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Name:      launchmanager.Name + internal.POD_LAUNCH_POSTFIX,
+		Namespace: launchmanager.Namespace,
+	}
 }
