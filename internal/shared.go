@@ -13,7 +13,9 @@ const (
 
 // Ready robot label
 const (
-	ROBOT_IMAGE = "robolaunch.io/robot-image"
+	ROBOT_IMAGE_USER       = "robolaunch.io/robot-image-user"
+	ROBOT_IMAGE_REPOSITORY = "robolaunch.io/robot-image-repository"
+	ROBOT_IMAGE_TAG        = "robolaunch.io/robot-image-tag"
 )
 
 // Target robot label
