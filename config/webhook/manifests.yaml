@@ -31,6 +31,26 @@ webhooks:
     service:
       name: webhook-service
       namespace: system
+      path: /mutate-robot-roboscale-io-v1alpha1-launchmanager
+  failurePolicy: Fail
+  name: mlaunchmanager.kb.io
+  rules:
+  - apiGroups:
+    - robot.roboscale.io
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - launchmanagers
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
       path: /mutate-robot-roboscale-io-v1alpha1-robot
   failurePolicy: Fail
   name: mrobot.kb.io
@@ -71,6 +91,26 @@ webhooks:
     - UPDATE
     resources:
     - buildmanagers
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /validate-robot-roboscale-io-v1alpha1-launchmanager
+  failurePolicy: Fail
+  name: vlaunchmanager.kb.io
+  rules:
+  - apiGroups:
+    - robot.roboscale.io
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - launchmanagers
   sideEffects: None
 - admissionReviewVersions:
   - v1
