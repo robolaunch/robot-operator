@@ -27,30 +27,35 @@ import (
 )
 
 // log is for logging in this package.
-var buildmanagerlog = logf.Log.WithName("buildmanager-resource")
+var launchmanagerlog = logf.Log.WithName("launchmanager-resource")
 
-func (r *BuildManager) SetupWebhookWithManager(mgr ctrl.Manager) error {
+func (r *LaunchManager) SetupWebhookWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewWebhookManagedBy(mgr).
 		For(r).
 		Complete()
 }
 
-//+kubebuilder:webhook:path=/mutate-robot-roboscale-io-v1alpha1-buildmanager,mutating=true,failurePolicy=fail,sideEffects=None,groups=robot.roboscale.io,resources=buildmanagers,verbs=create;update,versions=v1alpha1,name=mbuildmanager.kb.io,admissionReviewVersions=v1
+// TODO(user): EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 
-var _ webhook.Defaulter = &BuildManager{}
+//+kubebuilder:webhook:path=/mutate-robot-roboscale-io-v1alpha1-launchmanager,mutating=true,failurePolicy=fail,sideEffects=None,groups=robot.roboscale.io,resources=launchmanagers,verbs=create;update,versions=v1alpha1,name=mlaunchmanager.kb.io,admissionReviewVersions=v1
+
+var _ webhook.Defaulter = &LaunchManager{}
 
 // Default implements webhook.Defaulter so a webhook will be registered for the type
-func (r *BuildManager) Default() {
-	buildmanagerlog.Info("default", "name", r.Name)
+func (r *LaunchManager) Default() {
+	launchmanagerlog.Info("default", "name", r.Name)
+
+	// TODO(user): fill in your defaulting logic.
 }
 
-//+kubebuilder:webhook:path=/validate-robot-roboscale-io-v1alpha1-buildmanager,mutating=false,failurePolicy=fail,sideEffects=None,groups=robot.roboscale.io,resources=buildmanagers,verbs=create;update,versions=v1alpha1,name=vbuildmanager.kb.io,admissionReviewVersions=v1
+// TODO(user): change verbs to "verbs=create;update;delete" if you want to enable deletion validation.
+//+kubebuilder:webhook:path=/validate-robot-roboscale-io-v1alpha1-launchmanager,mutating=false,failurePolicy=fail,sideEffects=None,groups=robot.roboscale.io,resources=launchmanagers,verbs=create;update,versions=v1alpha1,name=vlaunchmanager.kb.io,admissionReviewVersions=v1
 
-var _ webhook.Validator = &BuildManager{}
+var _ webhook.Validator = &LaunchManager{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
-func (r *BuildManager) ValidateCreate() error {
-	buildmanagerlog.Info("validate create", "name", r.Name)
+func (r *LaunchManager) ValidateCreate() error {
+	launchmanagerlog.Info("validate create", "name", r.Name)
 
 	err := r.checkTargetRobotLabel()
 	if err != nil {
@@ -61,8 +66,8 @@ func (r *BuildManager) ValidateCreate() error {
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
-func (r *BuildManager) ValidateUpdate(old runtime.Object) error {
-	buildmanagerlog.Info("validate update", "name", r.Name)
+func (r *LaunchManager) ValidateUpdate(old runtime.Object) error {
+	launchmanagerlog.Info("validate update", "name", r.Name)
 
 	err := r.checkTargetRobotLabel()
 	if err != nil {
@@ -73,12 +78,12 @@ func (r *BuildManager) ValidateUpdate(old runtime.Object) error {
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
-func (r *BuildManager) ValidateDelete() error {
-	buildmanagerlog.Info("validate delete", "name", r.Name)
+func (r *LaunchManager) ValidateDelete() error {
+	launchmanagerlog.Info("validate delete", "name", r.Name)
 	return nil
 }
 
-func (r *BuildManager) checkTargetRobotLabel() error {
+func (r *LaunchManager) checkTargetRobotLabel() error {
 	labels := r.GetLabels()
 
 	if _, ok := labels[internal.TARGET_ROBOT]; !ok {

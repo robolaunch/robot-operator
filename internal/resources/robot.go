@@ -111,7 +111,6 @@ func GetLoaderJob(robot *robotv1alpha1.Robot, jobNamespacedName *types.Namespace
 		cmdBuilder.WriteString("mkdir -p " + filepath.Join(robot.Spec.WorkspacesPath, ws.Name, "src") + " && ")
 		cmdBuilder.WriteString("cd " + filepath.Join(robot.Spec.WorkspacesPath, ws.Name, "src") + " && ")
 		cmdBuilder.WriteString(GetCloneCommand(robot.Spec.Workspaces, wsKey))
-		cmdBuilder.WriteString(" && ")
 		clonerCmdBuilder.WriteString(cmdBuilder.String())
 
 	}
@@ -232,10 +231,7 @@ func GetCloneCommand(workspaces []robotv1alpha1.Workspace, wsKey int) string {
 
 	var cmdBuilder strings.Builder
 	for key, repo := range workspaces[wsKey].Repositories {
-		cmdBuilder.WriteString("git clone " + repo.URL + " -b " + repo.Branch + " " + repo.Name)
-		if key != len(workspaces[wsKey].Repositories)-1 {
-			cmdBuilder.WriteString("; ")
-		}
+		cmdBuilder.WriteString("git clone " + repo.URL + " -b " + repo.Branch + " " + key + " &&")
 	}
 	return cmdBuilder.String()
 }

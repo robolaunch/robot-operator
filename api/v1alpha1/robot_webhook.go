@@ -37,7 +37,7 @@ func DefaultRepositoryPaths(r *Robot) {
 		ws := r.Spec.Workspaces[wsKey]
 		for repoKey := range ws.Repositories {
 			repo := ws.Repositories[repoKey]
-			repo.Path = r.Spec.WorkspacesPath + "/" + ws.Name + "/src/" + repo.Name
+			repo.Path = r.Spec.WorkspacesPath + "/" + ws.Name + "/src/" + repoKey
 			ws.Repositories[repoKey] = repo
 		}
 		r.Spec.Workspaces[wsKey] = ws

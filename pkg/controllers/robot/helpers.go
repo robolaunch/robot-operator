@@ -119,7 +119,7 @@ func (r *RobotReconciler) reconcileAttachBuildObject(ctx context.Context, instan
 	}
 
 	if len(buildManagerList.Items) == 0 {
-		instance.Status.AttachedObject.Reference = corev1.ObjectReference{}
+		instance.Status.AttachedBuildObject.Reference = corev1.ObjectReference{}
 		return nil
 	}
 
@@ -130,7 +130,56 @@ func (r *RobotReconciler) reconcileAttachBuildObject(ctx context.Context, instan
 
 	selectedBuildManager := buildManagerList.Items[0]
 
-	instance.Status.AttachedObject.Reference = corev1.ObjectReference{
+	if instance.Status.AttachedBuildObject.Reference.Name != selectedBuildManager.Name {
+		instance.Status.AttachedLaunchObject.Reference = corev1.ObjectReference{}
+		instance.Status.AttachedLaunchObject.Status = robotv1alpha1.LaunchManagerStatus{}
+		instance.Status.AttachedBuildObject.Status = robotv1alpha1.BuildManagerStatus{}
+
+	}
+
+	instance.Status.AttachedBuildObject.Reference = corev1.ObjectReference{
+		Kind:            selectedBuildManager.Kind,
+		Namespace:       selectedBuildManager.Namespace,
+		Name:            selectedBuildManager.Name,
+		UID:             selectedBuildManager.UID,
+		APIVersion:      selectedBuildManager.APIVersion,
+		ResourceVersion: selectedBuildManager.ResourceVersion,
+	}
+
+	return nil
+}
+
+func (r *RobotReconciler) reconcileAttachLaunchObject(ctx context.Context, instance *robotv1alpha1.Robot) error {
+
+	// Get attached build objects for this robot
+	requirements := []labels.Requirement{}
+	newReq, err := labels.NewRequirement(internal.TARGET_ROBOT, selection.In, []string{instance.Name})
+	if err != nil {
+		return err
+	}
+	requirements = append(requirements, *newReq)
+
+	robotSelector := labels.NewSelector().Add(requirements...)
+
+	launchManagerList := robotv1alpha1.LaunchManagerList{}
+	err = r.List(ctx, &launchManagerList, &client.ListOptions{Namespace: instance.Namespace, LabelSelector: robotSelector})
+	if err != nil {
+		return err
+	}
+
+	if len(launchManagerList.Items) == 0 {
+		instance.Status.AttachedLaunchObject.Reference = corev1.ObjectReference{}
+		return nil
+	}
+
+	// Sort attached build objects for this robot according to their creation timestamps
+	sort.SliceStable(launchManagerList.Items[:], func(i, j int) bool {
+		return launchManagerList.Items[i].CreationTimestamp.String() > launchManagerList.Items[j].CreationTimestamp.String()
+	})
+
+	selectedBuildManager := launchManagerList.Items[0]
+
+	instance.Status.AttachedLaunchObject.Reference = corev1.ObjectReference{
 		Kind:            selectedBuildManager.Kind,
 		Namespace:       selectedBuildManager.Namespace,
 		Name:            selectedBuildManager.Name,

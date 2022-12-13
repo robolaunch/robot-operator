@@ -14,15 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package build_manager
+package launch_manager
 
 import (
 	"context"
 	goErr "errors"
 	"time"
 
-	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -42,42 +42,27 @@ import (
 	robotErr "github.com/robolaunch/robot-operator/internal/error"
 )
 
-// BuildManagerReconciler reconciles a BuildManager object
-type BuildManagerReconciler struct {
+// LaunchManagerReconciler reconciles a LaunchManager object
+type LaunchManagerReconciler struct {
 	client.Client
 	Scheme        *runtime.Scheme
 	DynamicClient dynamic.Interface
 }
 
-//+kubebuilder:rbac:groups=robot.roboscale.io,resources=buildmanagers,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=robot.roboscale.io,resources=buildmanagers/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=robot.roboscale.io,resources=buildmanagers/finalizers,verbs=update
-
-//+kubebuilder:rbac:groups=core,resources=configmaps,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=batch,resources=jobs,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=robot.roboscale.io,resources=launchmanagers,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=robot.roboscale.io,resources=launchmanagers/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=robot.roboscale.io,resources=launchmanagers/finalizers,verbs=update
 
 var logger logr.Logger
-var defaultReturnResult ctrl.Result
 
-func (r *BuildManagerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
+func (r *LaunchManagerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	logger = log.FromContext(ctx)
-	defaultReturnResult = ctrl.Result{}
 
 	instance, err := r.reconcileGetInstance(ctx, req.NamespacedName)
 	if err != nil {
 		if errors.IsNotFound(err) {
 			return ctrl.Result{}, nil
 		}
-		return ctrl.Result{}, err
-	}
-
-	err = r.reconcileCheckDeletion(ctx, instance)
-	if err != nil {
-
-		if errors.IsNotFound(err) {
-			return ctrl.Result{}, nil
-		}
-
 		return ctrl.Result{}, err
 	}
 
@@ -123,97 +108,51 @@ func (r *BuildManagerReconciler) Reconcile(ctx context.Context, req ctrl.Request
 	return ctrl.Result{}, nil
 }
 
-func (r *BuildManagerReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.BuildManager) error {
+func (r *LaunchManagerReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.LaunchManager) error {
 
 	switch instance.Status.Active {
 	case true:
 
-		switch instance.Status.ScriptConfigMapStatus.Created {
+		switch instance.Status.LaunchPodStatus.Created {
 		case true:
 
-			instance.Status.Phase = robotv1alpha1.BuildManagerBuildingRobot
+			switch instance.Status.LaunchPodStatus.Phase {
+			case v1.PodRunning:
 
-			for k := range instance.Status.Steps {
-				if instance.Status.Steps[k].JobCreated {
+				instance.Status.Phase = robotv1alpha1.LaunchManagerPhaseReady
 
-					if instance.Status.Steps[k].JobPhase == robotv1alpha1.JobSucceeded {
-						continue
-					} else if instance.Status.Steps[k].JobPhase == robotv1alpha1.JobActive {
-						Requeue(&defaultReturnResult)
-						break
-					} else if instance.Status.Steps[k].JobPhase == robotv1alpha1.JobFailed {
-						Requeue(&defaultReturnResult)
-						break
-					} else {
-						Requeue(&defaultReturnResult)
-						break
-					}
-
-				} else {
-
-					err := r.createBuilderJob(ctx, instance, k)
-					if err != nil {
-						return err
-					}
-
-					break
-				}
-			}
-
-			areJobsSucceeded := false
-
-			for key := range instance.Status.Steps {
-				if instance.Status.Steps[key].JobPhase == robotv1alpha1.JobSucceeded {
-					areJobsSucceeded = true
-				} else {
-					areJobsSucceeded = false
-					break
-				}
-			}
-
-			if areJobsSucceeded {
-				instance.Status.Phase = robotv1alpha1.BuildManagerReady
 			}
 
 		case false:
 
-			instance.Status.Phase = robotv1alpha1.BuildManagerCreatingConfigMap
-			err := r.createScriptConfigMap(ctx, instance)
+			instance.Status.Phase = robotv1alpha1.LaunchManagerPhaseCreatingPod
+			err := r.createLaunchPod(ctx, instance)
 			if err != nil {
 				return err
 			}
-			instance.Status.ScriptConfigMapStatus.Created = true
+			instance.Status.Phase = robotv1alpha1.LaunchManagerPhaseLaunching
 
 		}
 
 	case false:
 
-		instance.Status.Phase = robotv1alpha1.BuildManagerDeactivating
+		instance.Status.Phase = robotv1alpha1.LaunchManagerPhaseDeactivating
 
-		err := r.reconcileDeleteBuilderJobs(ctx, instance)
+		err := r.reconcileDeleteLaunchPod(ctx, instance)
 		if err != nil {
 			return err
 		}
 
-		err = r.reconcileDeleteConfigMap(ctx, instance)
-		if err != nil {
-			return err
-		}
+		instance.Status.Phase = robotv1alpha1.LaunchManagerPhaseInactive
 
-		instance.Status.Phase = robotv1alpha1.BuildManagerInactive
 	}
 
 	return nil
 }
 
-func (r *BuildManagerReconciler) reconcileCheckResources(ctx context.Context, instance *robotv1alpha1.BuildManager) error {
+func (r *LaunchManagerReconciler) reconcileCheckResources(ctx context.Context, instance *robotv1alpha1.LaunchManager) error {
 
-	err := r.reconcileCheckConfigMap(ctx, instance)
-	if err != nil {
-		return err
-	}
-
-	err = r.reconcileCheckBuilderJobs(ctx, instance)
+	err := r.reconcileCheckLaunchPod(ctx, instance)
 	if err != nil {
 		return err
 	}
@@ -222,11 +161,10 @@ func (r *BuildManagerReconciler) reconcileCheckResources(ctx context.Context, in
 }
 
 // SetupWithManager sets up the controller with the Manager.
-func (r *BuildManagerReconciler) SetupWithManager(mgr ctrl.Manager) error {
+func (r *LaunchManagerReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&robotv1alpha1.BuildManager{}).
-		Owns(&corev1.ConfigMap{}).
-		Owns(&batchv1.Job{}).
+		For(&robotv1alpha1.LaunchManager{}).
+		Owns(&corev1.Pod{}).
 		Watches(
 			&source.Kind{Type: &robotv1alpha1.Robot{}},
 			handler.EnqueueRequestsFromMapFunc(r.watchRobots),
@@ -234,7 +172,7 @@ func (r *BuildManagerReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
-func (r *BuildManagerReconciler) watchRobots(o client.Object) []reconcile.Request {
+func (r *LaunchManagerReconciler) watchRobots(o client.Object) []reconcile.Request {
 
 	robot := o.(*robotv1alpha1.Robot)
 
@@ -248,14 +186,14 @@ func (r *BuildManagerReconciler) watchRobots(o client.Object) []reconcile.Reques
 
 	robotSelector := labels.NewSelector().Add(requirements...)
 
-	buildManagerList := robotv1alpha1.BuildManagerList{}
-	err = r.List(context.TODO(), &buildManagerList, &client.ListOptions{Namespace: robot.Namespace, LabelSelector: robotSelector})
+	launchManagerList := robotv1alpha1.LaunchManagerList{}
+	err = r.List(context.TODO(), &launchManagerList, &client.ListOptions{Namespace: robot.Namespace, LabelSelector: robotSelector})
 	if err != nil {
 		return []reconcile.Request{}
 	}
 
-	requests := make([]reconcile.Request, len(buildManagerList.Items))
-	for i, item := range buildManagerList.Items {
+	requests := make([]reconcile.Request, len(launchManagerList.Items))
+	for i, item := range launchManagerList.Items {
 
 		requests[i] = reconcile.Request{
 			NamespacedName: types.NamespacedName{

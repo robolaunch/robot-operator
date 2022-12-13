@@ -7,13 +7,13 @@ import (
 
 func InjectPodDiscoveryServerConnection(pod *corev1.Pod, robot robotv1alpha1.Robot) *corev1.Pod {
 
-	placeEnvironmentVariables(pod, robot)
-	placeConfigFile(pod, robot)
+	placeDiscoveryServerEnvironmentVariables(pod, robot)
+	placeDiscoveryServerConfigFile(pod, robot)
 
 	return pod
 }
 
-func placeEnvironmentVariables(pod *corev1.Pod, robot robotv1alpha1.Robot) {
+func placeDiscoveryServerEnvironmentVariables(pod *corev1.Pod, robot robotv1alpha1.Robot) {
 
 	conn := robot.Status.DiscoveryServerStatus.Status.ConnectionInfo
 
@@ -48,7 +48,7 @@ func placeEnvironmentVariables(pod *corev1.Pod, robot robotv1alpha1.Robot) {
 
 }
 
-func placeConfigFile(pod *corev1.Pod, robot robotv1alpha1.Robot) {
+func placeDiscoveryServerConfigFile(pod *corev1.Pod, robot robotv1alpha1.Robot) {
 
 	conn := robot.Status.DiscoveryServerStatus.Status.ConnectionInfo
 

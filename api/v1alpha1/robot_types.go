@@ -41,9 +41,6 @@ type Storage struct {
 
 // Repository description.
 type Repository struct {
-	// Name of the repository.
-	// +kubebuilder:validation:Required
-	Name string `json:"name"`
 	// Base URL of the repository.
 	// +kubebuilder:validation:Required
 	URL string `json:"url"`
@@ -61,8 +58,7 @@ type Workspace struct {
 	// +kubebuilder:validation:Required
 	Name string `json:"name"`
 	// Repositories to clone inside workspace's `src` directory.
-	// +kubebuilder:validation:MinItems=1
-	Repositories []Repository `json:"repositories"`
+	Repositories map[string]Repository `json:"repositories"`
 }
 
 // RobotSpec defines the desired state of Robot
@@ -136,9 +132,14 @@ const (
 	RobotPhaseFailed RobotPhase = "Failed"
 )
 
-type AttachedObject struct {
-	Reference          corev1.ObjectReference `json:"reference,omitempty"`
-	BuildManagerStatus BuildManagerStatus     `json:"buildManagerStatus,omitempty"`
+type AttachedBuildObject struct {
+	Reference corev1.ObjectReference `json:"reference,omitempty"`
+	Status    BuildManagerStatus     `json:"status,omitempty"`
+}
+
+type AttachedLaunchObject struct {
+	Reference corev1.ObjectReference `json:"reference,omitempty"`
+	Status    LaunchManagerStatus    `json:"status,omitempty"`
 }
 
 // RobotStatus defines the observed state of Robot
@@ -158,7 +159,9 @@ type RobotStatus struct {
 	// Loader job status that configures environment
 	LoaderJobStatus LoaderJobStatus `json:"loaderJobStatus,omitempty"`
 	// Attached build object information
-	AttachedObject AttachedObject `json:"attachedObject,omitempty"`
+	AttachedBuildObject AttachedBuildObject `json:"attachedBuildObject,omitempty"`
+	// Attached launch object information
+	AttachedLaunchObject AttachedLaunchObject `json:"attachedLaunchObject,omitempty"`
 }
 
 //+kubebuilder:object:root=true

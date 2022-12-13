@@ -29,7 +29,7 @@ func (r *BuildManagerReconciler) reconcileCheckConfigMap(ctx context.Context, in
 
 func (r *BuildManagerReconciler) reconcileCheckBuilderJobs(ctx context.Context, instance *robotv1alpha1.BuildManager) error {
 
-	stepStatuses := make(map[string]robotv1alpha1.StepStatus)
+	stepStatuses := []robotv1alpha1.StepStatus{}
 	for _, step := range instance.Spec.Steps {
 		jobMetadata := types.NamespacedName{
 			Namespace: instance.Namespace,
@@ -46,7 +46,7 @@ func (r *BuildManagerReconciler) reconcileCheckBuilderJobs(ctx context.Context, 
 					JobCreated: false,
 				}
 
-				stepStatuses[step.Name] = stepStatus
+				stepStatuses = append(stepStatuses, stepStatus)
 			} else {
 				return err
 			}
@@ -68,7 +68,7 @@ func (r *BuildManagerReconciler) reconcileCheckBuilderJobs(ctx context.Context, 
 				JobPhase:   jobPhase,
 			}
 
-			stepStatuses[step.Name] = stepStatus
+			stepStatuses = append(stepStatuses, stepStatus)
 		}
 	}
 

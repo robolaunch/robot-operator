@@ -13,7 +13,9 @@ const (
 
 // Ready robot label
 const (
-	ROBOT_IMAGE = "robolaunch.io/robot-image"
+	ROBOT_IMAGE_USER       = "robolaunch.io/robot-image-user"
+	ROBOT_IMAGE_REPOSITORY = "robolaunch.io/robot-image-repository"
+	ROBOT_IMAGE_TAG        = "robolaunch.io/robot-image-tag"
 )
 
 // Target robot label
@@ -36,8 +38,20 @@ const (
 
 // BuildManager owned resources' postfixes
 const (
-	CONFIG_MAP_SCRIPTS  = "-scripts"
+	CONFIG_MAP_SCRIPTS = "-scripts"
+)
+
+// LaunchManager owned resources' postfixes
+const (
+	POD_LAUNCH_POSTFIX = "-launch"
+)
+
+// Paths
+
+const (
 	CUSTOM_SCRIPTS_PATH = "/etc/custom"
+	HELPERS_PATH        = "/var/lib/robolaunch-helpers/"
+	X11_UNIX_PATH       = "/tmp/.X11-unix"
 )
 
 // Super client configuration

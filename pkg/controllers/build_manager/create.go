@@ -28,7 +28,7 @@ func (r *BuildManagerReconciler) createScriptConfigMap(ctx context.Context, inst
 	return nil
 }
 
-func (r *BuildManagerReconciler) createBuilderJob(ctx context.Context, instance *robotv1alpha1.BuildManager, jobKey string) error {
+func (r *BuildManagerReconciler) createBuilderJob(ctx context.Context, instance *robotv1alpha1.BuildManager, jobKey int) error {
 
 	robot, err := r.reconcileGetTargetRobot(ctx, instance)
 	if err != nil {

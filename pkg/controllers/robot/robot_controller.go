@@ -120,12 +120,28 @@ func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *ro
 							switch instance.Status.ROSBridgeStatus.Created {
 							case true:
 
-								instance.Status.Phase = robotv1alpha1.RobotPhaseReady
+								switch instance.Status.ROSBridgeStatus.Status.Phase {
+								case robotv1alpha1.BridgePhaseReady:
 
-								// select attached build object
-								err := r.reconcileAttachBuildObject(ctx, instance)
-								if err != nil {
-									return err
+									instance.Status.Phase = robotv1alpha1.RobotPhaseReady
+
+									// select attached build object
+									err := r.reconcileAttachBuildObject(ctx, instance)
+									if err != nil {
+										return err
+									}
+
+									switch instance.Status.AttachedBuildObject.Status.Phase {
+									case robotv1alpha1.BuildManagerReady:
+
+										// select attached launch object
+										err := r.reconcileAttachLaunchObject(ctx, instance)
+										if err != nil {
+											return err
+										}
+
+									}
+
 								}
 
 							case false:
@@ -259,6 +275,16 @@ func (r *RobotReconciler) reconcileCheckResources(ctx context.Context, instance 
 		return err
 	}
 
+	err = r.reconcileCheckAttachedBuildManager(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	err = r.reconcileCheckAttachedLaunchManager(ctx, instance)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -269,16 +295,44 @@ func (r *RobotReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Owns(&corev1.PersistentVolumeClaim{}).
 		Owns(&robotv1alpha1.DiscoveryServer{}).
 		Owns(&batchv1.Job{}).
+		Owns(&robotv1alpha1.ROSBridge{}).
 		Watches(
 			&source.Kind{Type: &robotv1alpha1.BuildManager{}},
-			handler.EnqueueRequestsFromMapFunc(r.watchAttachedResources),
+			handler.EnqueueRequestsFromMapFunc(r.watchAttachedBuildManagers),
+		).
+		Watches(
+			&source.Kind{Type: &robotv1alpha1.LaunchManager{}},
+			handler.EnqueueRequestsFromMapFunc(r.watchAttachedLaunchManagers),
 		).
 		Complete(r)
 }
 
-func (r *RobotReconciler) watchAttachedResources(o client.Object) []reconcile.Request {
+func (r *RobotReconciler) watchAttachedBuildManagers(o client.Object) []reconcile.Request {
 
 	obj := o.(*robotv1alpha1.BuildManager)
+
+	robot := &robotv1alpha1.Robot{}
+	err := r.Get(context.TODO(), types.NamespacedName{
+		Name:      label.GetTargetRobot(obj),
+		Namespace: obj.Namespace,
+	}, robot)
+	if err != nil {
+		return []reconcile.Request{}
+	}
+
+	return []reconcile.Request{
+		{
+			NamespacedName: types.NamespacedName{
+				Name:      robot.Name,
+				Namespace: robot.Namespace,
+			},
+		},
+	}
+}
+
+func (r *RobotReconciler) watchAttachedLaunchManagers(o client.Object) []reconcile.Request {
+
+	obj := o.(*robotv1alpha1.LaunchManager)
 
 	robot := &robotv1alpha1.Robot{}
 	err := r.Get(context.TODO(), types.NamespacedName{

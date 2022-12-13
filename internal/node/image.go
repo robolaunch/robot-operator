@@ -18,10 +18,14 @@ type ReadyRobotProperties struct {
 func GetReadyRobotProperties(robot robotv1alpha1.Robot) ReadyRobotProperties {
 	labels := robot.GetLabels()
 
-	if image, hasImage := labels[internal.ROBOT_IMAGE]; hasImage {
-		return ReadyRobotProperties{
-			Enabled: true,
-			Image:   labels[image],
+	if user, hasUser := labels[internal.ROBOT_IMAGE_USER]; hasUser {
+		if repository, hasRepository := labels[internal.ROBOT_IMAGE_REPOSITORY]; hasRepository {
+			if tag, hasTag := labels[internal.ROBOT_IMAGE_TAG]; hasTag {
+				return ReadyRobotProperties{
+					Enabled: true,
+					Image:   user + "/" + repository + ":" + tag,
+				}
+			}
 		}
 	}
 

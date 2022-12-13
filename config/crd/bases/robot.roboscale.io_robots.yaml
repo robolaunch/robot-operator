@@ -121,16 +121,11 @@ spec:
                         it's absolute path is `/home/workspaces/my_ws`.
                       type: string
                     repositories:
-                      description: Repositories to clone inside workspace's `src`
-                        directory.
-                      items:
+                      additionalProperties:
                         description: Repository description.
                         properties:
                           branch:
                             description: Branch of the repository to clone.
-                            type: string
-                          name:
-                            description: Name of the repository.
                             type: string
                           path:
                             description: '[Autofilled] Absolute path of repository'
@@ -140,11 +135,11 @@ spec:
                             type: string
                         required:
                         - branch
-                        - name
                         - url
                         type: object
-                      minItems: 1
-                      type: array
+                      description: Repositories to clone inside workspace's `src`
+                        directory.
+                      type: object
                   required:
                   - name
                   - repositories
@@ -161,10 +156,71 @@ spec:
           status:
             description: RobotStatus defines the observed state of Robot
             properties:
-              attachedObject:
+              attachedBuildObject:
                 description: Attached build object information
                 properties:
-                  buildManagerStatus:
+                  reference:
+                    description: "ObjectReference contains enough information to let
+                      you inspect or modify the referred object. --- New uses of this
+                      type are discouraged because of difficulty describing its usage
+                      when embedded in APIs. 1. Ignored fields.  It includes many
+                      fields which are not generally honored.  For instance, ResourceVersion
+                      and FieldPath are both very rarely valid in actual usage. 2.
+                      Invalid usage help.  It is impossible to add specific help for
+                      individual usage.  In most embedded usages, there are particular
+                      restrictions like, \"must refer only to types A and B\" or \"UID
+                      not honored\" or \"name must be restricted\". Those cannot be
+                      well described when embedded. 3. Inconsistent validation.  Because
+                      the usages are different, the validation rules are different
+                      by usage, which makes it hard for users to predict what will
+                      happen. 4. The fields are both imprecise and overly precise.
+                      \ Kind is not a precise mapping to a URL. This can produce ambiguity
+                      during interpretation and require a REST mapping.  In most cases,
+                      the dependency is on the group,resource tuple and the version
+                      of the actual struct is irrelevant. 5. We cannot easily change
+                      it.  Because this type is embedded in many locations, updates
+                      to this type will affect numerous schemas.  Don't make new APIs
+                      embed an underspecified API type they do not control. \n Instead
+                      of using this type, create a locally provided and used type
+                      that is well-focused on your reference. For example, ServiceReferences
+                      for admission registration: https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go#L533
+                      ."
+                    properties:
+                      apiVersion:
+                        description: API version of the referent.
+                        type: string
+                      fieldPath:
+                        description: 'If referring to a piece of an object instead
+                          of an entire object, this string should contain a valid
+                          JSON/Go field access statement, such as desiredState.manifest.containers[2].
+                          For example, if the object reference is to a container within
+                          a pod, this would take on a value like: "spec.containers{name}"
+                          (where "name" refers to the name of the container that triggered
+                          the event) or if no container name is specified "spec.containers[2]"
+                          (container with index 2 in this pod). This syntax is chosen
+                          only to have some well-defined way of referencing a part
+                          of an object. TODO: this design is not final and this field
+                          is subject to change in the future.'
+                        type: string
+                      kind:
+                        description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                        type: string
+                      name:
+                        description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                        type: string
+                      namespace:
+                        description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                        type: string
+                      resourceVersion:
+                        description: 'Specific resourceVersion to which this reference
+                          is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                        type: string
+                      uid:
+                        description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                        type: string
+                    type: object
+                    x-kubernetes-map-type: atomic
+                  status:
                     description: BuildManagerStatus defines the observed state of
                       BuildManager
                     properties:
@@ -178,7 +234,7 @@ spec:
                             type: boolean
                         type: object
                       steps:
-                        additionalProperties:
+                        items:
                           properties:
                             created:
                               type: boolean
@@ -333,8 +389,12 @@ spec:
                               - workspace
                               type: object
                           type: object
-                        type: object
+                        type: array
                     type: object
+                type: object
+              attachedLaunchObject:
+                description: Attached launch object information
+                properties:
                   reference:
                     description: "ObjectReference contains enough information to let
                       you inspect or modify the referred object. --- New uses of this
@@ -396,6 +456,207 @@ spec:
                         type: string
                     type: object
                     x-kubernetes-map-type: atomic
+                  status:
+                    description: LaunchManagerStatus defines the observed state of
+                      LaunchManager
+                    properties:
+                      active:
+                        type: boolean
+                      launchPodStatus:
+                        properties:
+                          created:
+                            type: boolean
+                          ip:
+                            type: string
+                          launchStatus:
+                            additionalProperties:
+                              properties:
+                                active:
+                                  type: boolean
+                                containerStatus:
+                                  description: ContainerStatus contains details for
+                                    the current status of this container.
+                                  properties:
+                                    containerID:
+                                      description: Container's ID in the format '<type>://<container_id>'.
+                                      type: string
+                                    image:
+                                      description: 'The image the container is running.
+                                        More info: https://kubernetes.io/docs/concepts/containers/images.'
+                                      type: string
+                                    imageID:
+                                      description: ImageID of the container's image.
+                                      type: string
+                                    lastState:
+                                      description: Details about the container's last
+                                        termination condition.
+                                      properties:
+                                        running:
+                                          description: Details about a running container
+                                          properties:
+                                            startedAt:
+                                              description: Time at which the container
+                                                was last (re-)started
+                                              format: date-time
+                                              type: string
+                                          type: object
+                                        terminated:
+                                          description: Details about a terminated
+                                            container
+                                          properties:
+                                            containerID:
+                                              description: Container's ID in the format
+                                                '<type>://<container_id>'
+                                              type: string
+                                            exitCode:
+                                              description: Exit status from the last
+                                                termination of the container
+                                              format: int32
+                                              type: integer
+                                            finishedAt:
+                                              description: Time at which the container
+                                                last terminated
+                                              format: date-time
+                                              type: string
+                                            message:
+                                              description: Message regarding the last
+                                                termination of the container
+                                              type: string
+                                            reason:
+                                              description: (brief) reason from the
+                                                last termination of the container
+                                              type: string
+                                            signal:
+                                              description: Signal from the last termination
+                                                of the container
+                                              format: int32
+                                              type: integer
+                                            startedAt:
+                                              description: Time at which previous
+                                                execution of the container started
+                                              format: date-time
+                                              type: string
+                                          required:
+                                          - exitCode
+                                          type: object
+                                        waiting:
+                                          description: Details about a waiting container
+                                          properties:
+                                            message:
+                                              description: Message regarding why the
+                                                container is not yet running.
+                                              type: string
+                                            reason:
+                                              description: (brief) reason the container
+                                                is not yet running.
+                                              type: string
+                                          type: object
+                                      type: object
+                                    name:
+                                      description: This must be a DNS_LABEL. Each
+                                        container in a pod must have a unique name.
+                                        Cannot be updated.
+                                      type: string
+                                    ready:
+                                      description: Specifies whether the container
+                                        has passed its readiness probe.
+                                      type: boolean
+                                    restartCount:
+                                      description: The number of times the container
+                                        has been restarted.
+                                      format: int32
+                                      type: integer
+                                    started:
+                                      description: Specifies whether the container
+                                        has passed its startup probe. Initialized
+                                        as false, becomes true after startupProbe
+                                        is considered successful. Resets to false
+                                        when the container is restarted, or if kubelet
+                                        loses state temporarily. Is always true when
+                                        no startupProbe is defined.
+                                      type: boolean
+                                    state:
+                                      description: Details about the container's current
+                                        condition.
+                                      properties:
+                                        running:
+                                          description: Details about a running container
+                                          properties:
+                                            startedAt:
+                                              description: Time at which the container
+                                                was last (re-)started
+                                              format: date-time
+                                              type: string
+                                          type: object
+                                        terminated:
+                                          description: Details about a terminated
+                                            container
+                                          properties:
+                                            containerID:
+                                              description: Container's ID in the format
+                                                '<type>://<container_id>'
+                                              type: string
+                                            exitCode:
+                                              description: Exit status from the last
+                                                termination of the container
+                                              format: int32
+                                              type: integer
+                                            finishedAt:
+                                              description: Time at which the container
+                                                last terminated
+                                              format: date-time
+                                              type: string
+                                            message:
+                                              description: Message regarding the last
+                                                termination of the container
+                                              type: string
+                                            reason:
+                                              description: (brief) reason from the
+                                                last termination of the container
+                                              type: string
+                                            signal:
+                                              description: Signal from the last termination
+                                                of the container
+                                              format: int32
+                                              type: integer
+                                            startedAt:
+                                              description: Time at which previous
+                                                execution of the container started
+                                              format: date-time
+                                              type: string
+                                          required:
+                                          - exitCode
+                                          type: object
+                                        waiting:
+                                          description: Details about a waiting container
+                                          properties:
+                                            message:
+                                              description: Message regarding why the
+                                                container is not yet running.
+                                              type: string
+                                            reason:
+                                              description: (brief) reason the container
+                                                is not yet running.
+                                              type: string
+                                          type: object
+                                      type: object
+                                  required:
+                                  - image
+                                  - imageID
+                                  - name
+                                  - ready
+                                  - restartCount
+                                  type: object
+                              type: object
+                            type: object
+                          phase:
+                            description: PodPhase is a label for the condition of
+                              a pod at the current time.
+                            type: string
+                        type: object
+                      phase:
+                        type: string
+                    type: object
                 type: object
               discoveryServerStatus:
                 description: Discovery server instance status

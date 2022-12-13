@@ -71,7 +71,7 @@ type BuildManagerStatus struct {
 	Phase                 BuildManagerPhase     `json:"phase,omitempty"`
 	Active                bool                  `json:"active,omitempty"`
 	ScriptConfigMapStatus ScriptConfigMapStatus `json:"scriptConfigMapStatus,omitempty"`
-	Steps                 map[string]StepStatus `json:"steps,omitempty"`
+	Steps                 []StepStatus          `json:"steps,omitempty"`
 }
 
 //+kubebuilder:object:root=true

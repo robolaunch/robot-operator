@@ -1,0 +1,12 @@
+apiVersion: robot.roboscale.io/v1alpha1
+kind: LaunchManager
+metadata:
+  labels:
+    app.kubernetes.io/name: launchmanager
+    app.kubernetes.io/instance: launchmanager-sample
+    app.kubernetes.io/part-of: robot-operator
+    app.kuberentes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: robot-operator
+  name: launchmanager-sample
+spec:
+  # TODO(user): Add fields here

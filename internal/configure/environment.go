@@ -6,7 +6,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
-func InjectGenericEnvironmentVariables(podSpec *corev1.PodSpec, robot robotv1alpha1.Robot) *corev1.PodSpec {
+func InjectGenericEnvironmentVariablesForPodSpec(podSpec *corev1.PodSpec, robot robotv1alpha1.Robot) *corev1.PodSpec {
 
 	for key, cont := range podSpec.Containers {
 		cont.Env = append(cont.Env, internal.Env("WORKSPACES_PATH", robot.Spec.WorkspacesPath))
@@ -14,4 +14,14 @@ func InjectGenericEnvironmentVariables(podSpec *corev1.PodSpec, robot robotv1alp
 	}
 
 	return podSpec
+}
+
+func InjectGenericEnvironmentVariables(pod *corev1.Pod, robot robotv1alpha1.Robot) *corev1.Pod {
+
+	for key, cont := range pod.Spec.Containers {
+		cont.Env = append(cont.Env, internal.Env("WORKSPACES_PATH", robot.Spec.WorkspacesPath))
+		pod.Spec.Containers[key] = cont
+	}
+
+	return pod
 }
