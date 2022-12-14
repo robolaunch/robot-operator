@@ -39,6 +39,7 @@ import (
 	discoveryServer "github.com/robolaunch/robot-operator/pkg/controllers/robot/discovery_server"
 	rosBridge "github.com/robolaunch/robot-operator/pkg/controllers/robot/ros_bridge"
 	robotDevSuite "github.com/robolaunch/robot-operator/pkg/controllers/robot_dev_suite"
+	robotVDI "github.com/robolaunch/robot-operator/pkg/controllers/robot_dev_suite/robot_vdi"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -153,10 +154,19 @@ func main() {
 		os.Exit(1)
 	}
 	if err = (&robotDevSuite.RobotDevSuiteReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
+		Client:        mgr.GetClient(),
+		Scheme:        mgr.GetScheme(),
+		DynamicClient: dynamicClient,
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "RobotDevSuite")
+		os.Exit(1)
+	}
+	if err = (&robotVDI.RobotVDIReconciler{
+		Client:        mgr.GetClient(),
+		Scheme:        mgr.GetScheme(),
+		DynamicClient: dynamicClient,
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "RobotVDI")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder

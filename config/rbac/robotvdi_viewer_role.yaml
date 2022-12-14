@@ -1,0 +1,27 @@
+# permissions for end users to view robotvdis.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: robotvdi-viewer-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: robot-operator
+    app.kubernetes.io/part-of: robot-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: robotvdi-viewer-role
+rules:
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - robotvdis
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - robotvdis/status
+  verbs:
+  - get

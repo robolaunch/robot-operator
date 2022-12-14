@@ -210,6 +210,32 @@ rules:
 - apiGroups:
   - robot.roboscale.io
   resources:
+  - robotvdis
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - robotvdis/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - robotvdis/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - robot.roboscale.io
+  resources:
   - rosbridges
   verbs:
   - create
