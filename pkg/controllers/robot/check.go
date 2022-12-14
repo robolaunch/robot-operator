@@ -109,7 +109,7 @@ func (r *RobotReconciler) reconcileCheckDiscoveryServer(ctx context.Context, ins
 
 func (r *RobotReconciler) reconcileCheckLoaderJob(ctx context.Context, instance *robotv1alpha1.Robot) error {
 
-	if instance.Status.Phase != robotv1alpha1.RobotPhaseReady {
+	if instance.Status.Phase != robotv1alpha1.RobotPhaseEnvironmentReady {
 		loaderJobQuery := &batchv1.Job{}
 		err := r.Get(ctx, *instance.GetLoaderJobMetadata(), loaderJobQuery)
 		if err != nil && errors.IsNotFound(err) {

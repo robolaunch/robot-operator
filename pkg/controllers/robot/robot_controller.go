@@ -123,7 +123,7 @@ func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *ro
 								switch instance.Status.ROSBridgeStatus.Status.Phase {
 								case robotv1alpha1.BridgePhaseReady:
 
-									instance.Status.Phase = robotv1alpha1.RobotPhaseReady
+									instance.Status.Phase = robotv1alpha1.RobotPhaseEnvironmentReady
 
 									// select attached build object
 									err := r.reconcileAttachBuildObject(ctx, instance)
@@ -157,7 +157,24 @@ func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *ro
 
 						case false:
 
-							instance.Status.Phase = robotv1alpha1.RobotPhaseReady
+							instance.Status.Phase = robotv1alpha1.RobotPhaseEnvironmentReady
+
+							// select attached build object
+							err := r.reconcileAttachBuildObject(ctx, instance)
+							if err != nil {
+								return err
+							}
+
+							switch instance.Status.AttachedBuildObject.Status.Phase {
+							case robotv1alpha1.BuildManagerReady:
+
+								// select attached launch object
+								err := r.reconcileAttachLaunchObject(ctx, instance)
+								if err != nil {
+									return err
+								}
+
+							}
 
 						}
 
