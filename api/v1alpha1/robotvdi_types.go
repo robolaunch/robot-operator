@@ -79,7 +79,7 @@ const (
 	RobotVDIPhaseCreatingUDPService RobotVDIPhase = "CreatingUDPService"
 	RobotVDIPhaseCreatingPod        RobotVDIPhase = "CreatingPod"
 	RobotVDIPhaseCreatingIngress    RobotVDIPhase = "CreatingIngress"
-	RobotVDIPhaseReady              RobotVDIPhase = "Running"
+	RobotVDIPhaseRunning            RobotVDIPhase = "Running"
 )
 
 // RobotVDIStatus defines the observed state of RobotVDI

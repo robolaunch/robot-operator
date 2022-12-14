@@ -61,6 +61,24 @@ type Workspace struct {
 	Repositories map[string]Repository `json:"repositories"`
 }
 
+type TLSSecretReference struct {
+	// TLS secret object name.
+	// +kubebuilder:validation:Required
+	Name string `json:"name"`
+	// TLS secret object namespace.
+	// +kubebuilder:validation:Required
+	Namespace string `json:"namespace"`
+}
+
+type RootDNSConfig struct {
+	// DNS host.
+	// +kubebuilder:validation:Required
+	Host string `json:"host"`
+	// DNS host.
+	// +kubebuilder:validation:Required
+	Port string `json:"port"`
+}
+
 // RobotSpec defines the desired state of Robot
 type RobotSpec struct {
 	// ROS distro to be used.
@@ -79,6 +97,10 @@ type RobotSpec struct {
 	Workspaces []Workspace `json:"workspaces,omitempty"`
 	// Development enabled
 	Development bool `json:"development,omitempty"`
+	// Root DNS configuration.
+	RootDNSConfig RootDNSConfig `json:"rootDNSConfig,omitempty"`
+	// TLS secret reference.
+	TLSSecretReference TLSSecretReference `json:"tlsSecretRef,omitempty"`
 }
 
 type VolumeStatus struct {
