@@ -77,6 +77,8 @@ type RobotSpec struct {
 	// Workspace definitions of robot.
 	// +kubebuilder:validation:MinItems=1
 	Workspaces []Workspace `json:"workspaces,omitempty"`
+	// Development enabled
+	Development bool `json:"development,omitempty"`
 }
 
 type VolumeStatus struct {

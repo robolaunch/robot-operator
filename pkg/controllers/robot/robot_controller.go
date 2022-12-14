@@ -125,19 +125,28 @@ func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *ro
 
 									instance.Status.Phase = robotv1alpha1.RobotPhaseEnvironmentReady
 
-									// select attached build object
-									err := r.reconcileAttachBuildObject(ctx, instance)
-									if err != nil {
-										return err
-									}
+									switch instance.Spec.Development {
+									case true:
 
-									switch instance.Status.AttachedBuildObject.Status.Phase {
-									case robotv1alpha1.BuildManagerReady:
+										// attach development suite
 
-										// select attached launch object
-										err := r.reconcileAttachLaunchObject(ctx, instance)
+									case false:
+
+										// select attached build object
+										err := r.reconcileAttachBuildObject(ctx, instance)
 										if err != nil {
 											return err
+										}
+
+										switch instance.Status.AttachedBuildObject.Status.Phase {
+										case robotv1alpha1.BuildManagerReady:
+
+											// select attached launch object
+											err := r.reconcileAttachLaunchObject(ctx, instance)
+											if err != nil {
+												return err
+											}
+
 										}
 
 									}
@@ -159,19 +168,28 @@ func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *ro
 
 							instance.Status.Phase = robotv1alpha1.RobotPhaseEnvironmentReady
 
-							// select attached build object
-							err := r.reconcileAttachBuildObject(ctx, instance)
-							if err != nil {
-								return err
-							}
+							switch instance.Spec.Development {
+							case true:
 
-							switch instance.Status.AttachedBuildObject.Status.Phase {
-							case robotv1alpha1.BuildManagerReady:
+								// attach development suite
 
-								// select attached launch object
-								err := r.reconcileAttachLaunchObject(ctx, instance)
+							case false:
+
+								// select attached build object
+								err := r.reconcileAttachBuildObject(ctx, instance)
 								if err != nil {
 									return err
+								}
+
+								switch instance.Status.AttachedBuildObject.Status.Phase {
+								case robotv1alpha1.BuildManagerReady:
+
+									// select attached launch object
+									err := r.reconcileAttachLaunchObject(ctx, instance)
+									if err != nil {
+										return err
+									}
+
 								}
 
 							}
