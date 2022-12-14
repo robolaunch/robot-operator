@@ -161,7 +161,7 @@ type RobotStatus struct {
 	// Attached build object information
 	AttachedBuildObject AttachedBuildObject `json:"attachedBuildObject,omitempty"`
 	// Attached launch object information
-	AttachedLaunchObject AttachedLaunchObject `json:"attachedLaunchObject,omitempty"`
+	AttachedLaunchObjects []AttachedLaunchObject `json:"attachedLaunchObjects,omitempty"`
 }
 
 //+kubebuilder:object:root=true

@@ -57,6 +57,7 @@ type ScriptConfigMapStatus struct {
 type BuildManagerPhase string
 
 const (
+	BuildManagerRobotNotFound            BuildManagerPhase = "RobotNotFound"
 	BuildManagerWaitingForOtherResources BuildManagerPhase = "WaitingForOtherResources"
 	BuildManagerCreatingConfigMap        BuildManagerPhase = "CreatingConfigMap"
 	BuildManagerBuildingRobot            BuildManagerPhase = "BuildingRobot"
