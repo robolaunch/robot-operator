@@ -158,6 +158,32 @@ rules:
 - apiGroups:
   - robot.roboscale.io
   resources:
+  - robotdevsuites
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - robotdevsuites/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - robotdevsuites/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - robot.roboscale.io
+  resources:
   - robots
   verbs:
   - create

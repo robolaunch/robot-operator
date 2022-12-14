@@ -38,6 +38,7 @@ import (
 	robot "github.com/robolaunch/robot-operator/pkg/controllers/robot"
 	discoveryServer "github.com/robolaunch/robot-operator/pkg/controllers/robot/discovery_server"
 	rosBridge "github.com/robolaunch/robot-operator/pkg/controllers/robot/ros_bridge"
+	robotDevSuite "github.com/robolaunch/robot-operator/pkg/controllers/robot_dev_suite"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -149,6 +150,13 @@ func main() {
 	}
 	if err = (&robotv1alpha1.LaunchManager{}).SetupWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "LaunchManager")
+		os.Exit(1)
+	}
+	if err = (&robotDevSuite.RobotDevSuiteReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "RobotDevSuite")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder
