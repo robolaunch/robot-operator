@@ -109,7 +109,7 @@ func (r *RobotReconciler) reconcileCheckDiscoveryServer(ctx context.Context, ins
 
 func (r *RobotReconciler) reconcileCheckLoaderJob(ctx context.Context, instance *robotv1alpha1.Robot) error {
 
-	if instance.Status.Phase != robotv1alpha1.RobotPhaseReady {
+	if instance.Status.Phase != robotv1alpha1.RobotPhaseEnvironmentReady {
 		loaderJobQuery := &batchv1.Job{}
 		err := r.Get(ctx, *instance.GetLoaderJobMetadata(), loaderJobQuery)
 		if err != nil && errors.IsNotFound(err) {
@@ -183,22 +183,19 @@ func (r *RobotReconciler) reconcileCheckAttachedBuildManager(ctx context.Context
 
 func (r *RobotReconciler) reconcileCheckAttachedLaunchManager(ctx context.Context, instance *robotv1alpha1.Robot) error {
 
-	lmReference := instance.Status.AttachedLaunchObject.Reference
-
-	// If any launch object was attached, record it's status
-	if lmReference.Name != "" {
-
+	for k, lm := range instance.Status.AttachedLaunchObjects {
 		launchManager := &robotv1alpha1.LaunchManager{}
-		err := r.Get(ctx, types.NamespacedName{Namespace: lmReference.Namespace, Name: lmReference.Name}, launchManager)
+		err := r.Get(ctx, types.NamespacedName{Namespace: lm.Reference.Namespace, Name: lm.Reference.Name}, launchManager)
 		if err != nil && errors.IsNotFound(err) {
 			// TODO: Empty the reference fields
 			return err
 		} else if err != nil {
 			return err
 		} else {
-			instance.Status.AttachedLaunchObject.Status = launchManager.Status
+			lm.Status = launchManager.Status
 		}
 
+		instance.Status.AttachedLaunchObjects[k] = lm
 	}
 
 	return nil

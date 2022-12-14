@@ -131,8 +131,7 @@ func (r *RobotReconciler) reconcileAttachBuildObject(ctx context.Context, instan
 	selectedBuildManager := buildManagerList.Items[0]
 
 	if instance.Status.AttachedBuildObject.Reference.Name != selectedBuildManager.Name {
-		instance.Status.AttachedLaunchObject.Reference = corev1.ObjectReference{}
-		instance.Status.AttachedLaunchObject.Status = robotv1alpha1.LaunchManagerStatus{}
+		instance.Status.AttachedLaunchObjects = []robotv1alpha1.AttachedLaunchObject{}
 		instance.Status.AttachedBuildObject.Status = robotv1alpha1.BuildManagerStatus{}
 
 	}
@@ -168,24 +167,28 @@ func (r *RobotReconciler) reconcileAttachLaunchObject(ctx context.Context, insta
 	}
 
 	if len(launchManagerList.Items) == 0 {
-		instance.Status.AttachedLaunchObject.Reference = corev1.ObjectReference{}
+		instance.Status.AttachedLaunchObjects = []robotv1alpha1.AttachedLaunchObject{}
 		return nil
 	}
 
 	// Sort attached build objects for this robot according to their creation timestamps
 	sort.SliceStable(launchManagerList.Items[:], func(i, j int) bool {
-		return launchManagerList.Items[i].CreationTimestamp.String() > launchManagerList.Items[j].CreationTimestamp.String()
+		return launchManagerList.Items[i].CreationTimestamp.String() < launchManagerList.Items[j].CreationTimestamp.String()
 	})
 
-	selectedBuildManager := launchManagerList.Items[0]
+	instance.Status.AttachedLaunchObjects = []robotv1alpha1.AttachedLaunchObject{}
 
-	instance.Status.AttachedLaunchObject.Reference = corev1.ObjectReference{
-		Kind:            selectedBuildManager.Kind,
-		Namespace:       selectedBuildManager.Namespace,
-		Name:            selectedBuildManager.Name,
-		UID:             selectedBuildManager.UID,
-		APIVersion:      selectedBuildManager.APIVersion,
-		ResourceVersion: selectedBuildManager.ResourceVersion,
+	for _, lm := range launchManagerList.Items {
+		instance.Status.AttachedLaunchObjects = append(instance.Status.AttachedLaunchObjects, robotv1alpha1.AttachedLaunchObject{
+			Reference: corev1.ObjectReference{
+				Kind:            lm.Kind,
+				Namespace:       lm.Namespace,
+				Name:            lm.Name,
+				UID:             lm.UID,
+				APIVersion:      lm.APIVersion,
+				ResourceVersion: lm.ResourceVersion,
+			},
+		})
 	}
 
 	return nil

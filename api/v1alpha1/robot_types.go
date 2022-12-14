@@ -123,7 +123,11 @@ const (
 	RobotPhaseCreatingDiscoveryServer RobotPhase = "CreatingDiscoveryServer"
 	RobotPhaseConfiguringWorkspaces   RobotPhase = "ConfiguringWorkspaces"
 	RobotPhaseCreatingBridge          RobotPhase = "CreatingBridge"
-	RobotPhaseReady                   RobotPhase = "Ready"
+	RobotPhaseEnvironmentReady        RobotPhase = "EnvironmentReady"
+	RobotPhaseBuilding                RobotPhase = "Building"
+	RobotPhaseBuilt                   RobotPhase = "Built"
+	RobotPhaseLaunching               RobotPhase = "Launching"
+	RobotPhaseRunning                 RobotPhase = "Running"
 	RobotPhaseDeletingBridge          RobotPhase = "DeletingBridge"
 	RobotPhaseDeletingDiscoveryServer RobotPhase = "DeletingDiscoveryServer"
 	RobotPhaseDeletingLoaderJob       RobotPhase = "DeletingLoaderJob"
@@ -161,11 +165,13 @@ type RobotStatus struct {
 	// Attached build object information
 	AttachedBuildObject AttachedBuildObject `json:"attachedBuildObject,omitempty"`
 	// Attached launch object information
-	AttachedLaunchObject AttachedLaunchObject `json:"attachedLaunchObject,omitempty"`
+	AttachedLaunchObjects []AttachedLaunchObject `json:"attachedLaunchObjects,omitempty"`
 }
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
+//+kubebuilder:printcolumn:name="Distro",type=string,JSONPath=`.spec.distro`
+//+kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
 
 // Robot is the Schema for the robots API
 type Robot struct {

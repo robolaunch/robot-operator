@@ -4,14 +4,9 @@ import (
 	"context"
 
 	robotv1alpha1 "github.com/robolaunch/robot-operator/api/v1alpha1"
-	"github.com/robolaunch/robot-operator/internal"
-	robotErr "github.com/robolaunch/robot-operator/internal/error"
 	"github.com/robolaunch/robot-operator/internal/label"
-	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/apimachinery/pkg/selection"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/util/retry"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 func (r *LaunchManagerReconciler) reconcileGetInstance(ctx context.Context, meta types.NamespacedName) (*robotv1alpha1.LaunchManager, error) {
@@ -60,11 +55,15 @@ func (r *LaunchManagerReconciler) reconcileCheckTargetRobot(ctx context.Context,
 		return err
 	}
 
-	if robot.Status.AttachedLaunchObject.Reference.Kind == instance.Kind && robot.Status.AttachedLaunchObject.Reference.Name == instance.Name {
-		instance.Status.Active = true
-	} else {
-		instance.Status.Active = false
+	isActive := false
+	for _, lm := range robot.Status.AttachedLaunchObjects {
+		if lm.Reference.Kind == instance.Kind && lm.Reference.Name == instance.Name {
+			isActive = true
+			break
+		}
 	}
+
+	instance.Status.Active = isActive
 
 	return nil
 }
@@ -85,51 +84,4 @@ func (r *LaunchManagerReconciler) reconcileGetCurrentBuildManager(ctx context.Co
 	}
 
 	return buildManager, nil
-}
-
-func (r *LaunchManagerReconciler) reconcileCheckOtherAttachedResources(ctx context.Context, instance *robotv1alpha1.LaunchManager) error {
-
-	if instance.Status.Active {
-		// Get attached launch manager objects for this robot
-		requirements := []labels.Requirement{}
-		newReq, err := labels.NewRequirement(internal.TARGET_ROBOT, selection.In, []string{label.GetTargetRobot(instance)})
-		if err != nil {
-			return err
-		}
-		requirements = append(requirements, *newReq)
-
-		robotSelector := labels.NewSelector().Add(requirements...)
-
-		launchManagerList := robotv1alpha1.LaunchManagerList{}
-		err = r.List(ctx, &launchManagerList, &client.ListOptions{Namespace: instance.Namespace, LabelSelector: robotSelector})
-		if err != nil {
-			return err
-		}
-
-		for _, lm := range launchManagerList.Items {
-
-			if lm.Name == instance.Name {
-				continue
-			}
-
-			if lm.Status.Active == true {
-				return &robotErr.RobotResourcesHasNotBeenReleasedError{
-					ResourceKind:      instance.Kind,
-					ResourceName:      instance.Name,
-					ResourceNamespace: instance.Namespace,
-				}
-			}
-
-			if lm.Status.Phase != robotv1alpha1.LaunchManagerPhaseInactive {
-				return &robotErr.RobotResourcesHasNotBeenReleasedError{
-					ResourceKind:      instance.Kind,
-					ResourceName:      instance.Name,
-					ResourceNamespace: instance.Namespace,
-				}
-			}
-		}
-
-	}
-
-	return nil
 }

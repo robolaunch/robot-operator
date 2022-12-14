@@ -77,11 +77,12 @@ type LaunchPodStatus struct {
 type LaunchManagerPhase string
 
 const (
-	LaunchManagerPhaseCreatingPod  LaunchManagerPhase = "CreatingPod"
-	LaunchManagerPhaseLaunching    LaunchManagerPhase = "Launching"
-	LaunchManagerPhaseReady        LaunchManagerPhase = "Ready"
-	LaunchManagerPhaseDeactivating LaunchManagerPhase = "Deactivating"
-	LaunchManagerPhaseInactive     LaunchManagerPhase = "Inactive"
+	LaunchManagerPhaseRobotNotFound LaunchManagerPhase = "RobotNotFound"
+	LaunchManagerPhaseCreatingPod   LaunchManagerPhase = "CreatingPod"
+	LaunchManagerPhaseLaunching     LaunchManagerPhase = "Launching"
+	LaunchManagerPhaseReady         LaunchManagerPhase = "Ready"
+	LaunchManagerPhaseDeactivating  LaunchManagerPhase = "Deactivating"
+	LaunchManagerPhaseInactive      LaunchManagerPhase = "Inactive"
 )
 
 // LaunchManagerStatus defines the observed state of LaunchManager
