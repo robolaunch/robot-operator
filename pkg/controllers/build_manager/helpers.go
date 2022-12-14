@@ -97,8 +97,10 @@ func (r *BuildManagerReconciler) reconcileCheckOtherAttachedResources(ctx contex
 
 		for _, lm := range launchManagerList.Items {
 
-			if lm.Name == robot.Status.AttachedLaunchObject.Reference.Name {
-				continue
+			for _, obj := range robot.Status.AttachedLaunchObjects {
+				if lm.Name == obj.Reference.Name {
+					continue
+				}
 			}
 
 			if lm.Status.Active == true {

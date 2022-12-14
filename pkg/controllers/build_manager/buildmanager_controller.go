@@ -71,20 +71,25 @@ func (r *BuildManagerReconciler) Reconcile(ctx context.Context, req ctrl.Request
 		return ctrl.Result{}, err
 	}
 
-	err = r.reconcileCheckDeletion(ctx, instance)
-	if err != nil {
+	// err = r.reconcileCheckDeletion(ctx, instance)
+	// if err != nil {
 
-		if errors.IsNotFound(err) {
-			return ctrl.Result{}, nil
-		}
+	// 	if errors.IsNotFound(err) {
+	// 		return ctrl.Result{}, nil
+	// 	}
 
-		return ctrl.Result{}, err
-	}
+	// 	return ctrl.Result{}, err
+	// }
 
 	// Check target robot's attached object, update activity status
 	err = r.reconcileCheckTargetRobot(ctx, instance)
 	if err != nil {
-		return ctrl.Result{}, err
+		if errors.IsNotFound(err) {
+			instance.Status.Phase = robotv1alpha1.BuildManagerRobotNotFound
+			instance.Status.Active = false
+		} else {
+			return ctrl.Result{}, err
+		}
 	}
 
 	// Check target robot's other attached objects to see if robot's resources are released
@@ -208,14 +213,24 @@ func (r *BuildManagerReconciler) reconcileCheckStatus(ctx context.Context, insta
 
 func (r *BuildManagerReconciler) reconcileCheckResources(ctx context.Context, instance *robotv1alpha1.BuildManager) error {
 
-	err := r.reconcileCheckConfigMap(ctx, instance)
-	if err != nil {
-		return err
-	}
+	switch instance.Status.Active {
+	case true:
 
-	err = r.reconcileCheckBuilderJobs(ctx, instance)
-	if err != nil {
-		return err
+		err := r.reconcileCheckConfigMap(ctx, instance)
+		if err != nil {
+			return err
+		}
+
+		err = r.reconcileCheckBuilderJobs(ctx, instance)
+		if err != nil {
+			return err
+		}
+
+	case false:
+
+		instance.Status.ScriptConfigMapStatus = robotv1alpha1.ScriptConfigMapStatus{}
+		instance.Status.Steps = []robotv1alpha1.StepStatus{}
+
 	}
 
 	return nil

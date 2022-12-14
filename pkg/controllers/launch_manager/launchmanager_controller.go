@@ -18,8 +18,6 @@ package launch_manager
 
 import (
 	"context"
-	goErr "errors"
-	"time"
 
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
@@ -39,7 +37,6 @@ import (
 	"github.com/go-logr/logr"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/api/v1alpha1"
 	"github.com/robolaunch/robot-operator/internal"
-	robotErr "github.com/robolaunch/robot-operator/internal/error"
 )
 
 // LaunchManagerReconciler reconciles a LaunchManager object
@@ -69,20 +66,12 @@ func (r *LaunchManagerReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 	// Check target robot's attached object, update activity status
 	err = r.reconcileCheckTargetRobot(ctx, instance)
 	if err != nil {
-		return ctrl.Result{}, err
-	}
-
-	// Check target robot's other attached objects to see if robot's resources are released
-	err = r.reconcileCheckOtherAttachedResources(ctx, instance)
-	if err != nil {
-		var e *robotErr.RobotResourcesHasNotBeenReleasedError
-		if goErr.As(err, &e) {
-			return ctrl.Result{
-				Requeue:      true,
-				RequeueAfter: 3 * time.Second,
-			}, nil
+		if errors.IsNotFound(err) {
+			instance.Status.Phase = robotv1alpha1.LaunchManagerPhaseRobotNotFound
+			instance.Status.Active = false
+		} else {
+			return ctrl.Result{}, err
 		}
-		return ctrl.Result{}, nil
 	}
 
 	err = r.reconcileCheckStatus(ctx, instance)
@@ -152,9 +141,18 @@ func (r *LaunchManagerReconciler) reconcileCheckStatus(ctx context.Context, inst
 
 func (r *LaunchManagerReconciler) reconcileCheckResources(ctx context.Context, instance *robotv1alpha1.LaunchManager) error {
 
-	err := r.reconcileCheckLaunchPod(ctx, instance)
-	if err != nil {
-		return err
+	switch instance.Status.Active {
+	case true:
+
+		err := r.reconcileCheckLaunchPod(ctx, instance)
+		if err != nil {
+			return err
+		}
+
+	case false:
+
+		instance.Status.LaunchPodStatus = robotv1alpha1.LaunchPodStatus{}
+
 	}
 
 	return nil
