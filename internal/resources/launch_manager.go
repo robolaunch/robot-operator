@@ -18,8 +18,18 @@ func GetLaunchPod(launchManager *robotv1alpha1.LaunchManager, podNamespacedName 
 
 	containers := []corev1.Container{}
 	for k, l := range launchManager.Spec.Launch {
-		cont := getLaunchContainer(l, k, robot, buildManager)
-		containers = append(containers, cont)
+		if physicalInstance, ok := l.Selector[internal.PHYSICAL_INSTANCE_LABEL_KEY]; ok {
+			if physicalInstance == label.GetClusterName(&robot) {
+				cont := getLaunchContainer(l, k, robot, buildManager)
+				containers = append(containers, cont)
+			}
+		} else if cloudInstance, ok := l.Selector[internal.CLOUD_INSTANCE_LABEL_KEY]; ok {
+			if cloudInstance == label.GetClusterName(&robot) {
+				cont := getLaunchContainer(l, k, robot, buildManager)
+				containers = append(containers, cont)
+			}
+		}
+
 	}
 
 	launchPod := corev1.Pod{
