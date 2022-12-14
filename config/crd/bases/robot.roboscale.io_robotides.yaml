@@ -34,9 +34,57 @@ spec:
             type: object
           spec:
             description: RobotIDESpec defines the desired state of RobotIDE
+            properties:
+              ingress:
+                type: boolean
+              privileged:
+                type: boolean
+              resources:
+                description: VDI resource limits.
+                properties:
+                  cpu:
+                    pattern: ^([0-9])+(m)$
+                    type: string
+                  gpuCore:
+                    type: integer
+                  memory:
+                    pattern: ^([0-9])+(Mi|Gi)$
+                    type: string
+                type: object
+              serviceType:
+                default: NodePort
+                description: ServiceType
+                enum:
+                - ClusterIP
+                - NodePort
+                type: string
             type: object
           status:
             description: RobotIDEStatus defines the observed state of RobotIDE
+            properties:
+              ingressStatus:
+                properties:
+                  created:
+                    type: boolean
+                type: object
+              phase:
+                type: string
+              podStatus:
+                properties:
+                  created:
+                    type: boolean
+                  ip:
+                    type: string
+                  phase:
+                    description: PodPhase is a label for the condition of a pod at
+                      the current time.
+                    type: string
+                type: object
+              serviceStatus:
+                properties:
+                  created:
+                    type: boolean
+                type: object
             type: object
         type: object
     served: true

@@ -18,9 +18,10 @@ const (
 	ROBOT_IMAGE_TAG        = "robolaunch.io/robot-image-tag"
 )
 
-// Target robot label
+// Target resource labels
 const (
 	TARGET_ROBOT = "robolaunch.io/target-robot"
+	TARGET_VDI   = "robolaunch.io/target-vdi"
 )
 
 // Robot owned resources' postfixes
