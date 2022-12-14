@@ -85,7 +85,6 @@ func getLaunchContainer(launch robotv1alpha1.Launch, launchName string, robot ro
 			configure.GetVolumeMount("", configure.GetVolumeUsr(&robot)),
 			configure.GetVolumeMount("", configure.GetVolumeOpt(&robot)),
 			configure.GetVolumeMount("", configure.GetVolumeEtc(&robot)),
-			configure.GetVolumeMount(internal.X11_UNIX_PATH, configure.GetVolumeX11Unix(&robot)),
 			configure.GetVolumeMount(robot.Spec.WorkspacesPath, configure.GetVolumeWorkspace(&robot)),
 			configure.GetVolumeMount(internal.CUSTOM_SCRIPTS_PATH, configure.GetVolumeConfigMaps(&buildManager)),
 		},

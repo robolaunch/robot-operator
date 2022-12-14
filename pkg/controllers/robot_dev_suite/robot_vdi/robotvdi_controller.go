@@ -20,6 +20,7 @@ import (
 	"context"
 
 	corev1 "k8s.io/api/core/v1"
+	networkingv1 "k8s.io/api/networking/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/dynamic"
@@ -41,6 +42,11 @@ type RobotVDIReconciler struct {
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=robotvdis,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=robotvdis/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=robotvdis/finalizers,verbs=update
+
+//+kubebuilder:rbac:groups=core,resources=persistentvolumeclaims,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=core,resources=pods,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=core,resources=services,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=networking.k8s.io,resources=ingresses,verbs=get;list;watch;create;update;patch;delete
 
 var logger logr.Logger
 
@@ -101,17 +107,23 @@ func (r *RobotVDIReconciler) reconcileCheckStatus(ctx context.Context, instance 
 							switch instance.Status.IngressStatus.Created {
 							case true:
 
-								// ready
+								instance.Status.Phase = robotv1alpha1.RobotVDIPhaseRunning
 
 							case false:
 
 								instance.Status.Phase = robotv1alpha1.RobotVDIPhaseCreatingIngress
-								// create ingress
+								err := r.reconcileCreateIngress(ctx, instance)
+								if err != nil {
+									return err
+								}
+								instance.Status.PodStatus.Created = true
 
 							}
 
 						case false:
-							// ready
+
+							instance.Status.Phase = robotv1alpha1.RobotVDIPhaseRunning
+
 						}
 
 					}
@@ -119,27 +131,44 @@ func (r *RobotVDIReconciler) reconcileCheckStatus(ctx context.Context, instance 
 				case false:
 
 					instance.Status.Phase = robotv1alpha1.RobotVDIPhaseCreatingPod
-					// create pod
+					err := r.reconcileCreatePod(ctx, instance)
+					if err != nil {
+						return err
+					}
+					instance.Status.PodStatus.Created = true
 
 				}
 
 			case false:
 
 				instance.Status.Phase = robotv1alpha1.RobotVDIPhaseCreatingUDPService
-				// create service
+				err := r.reconcileCreateServiceUDP(ctx, instance)
+				if err != nil {
+					return err
+				}
+				instance.Status.ServiceUDPStatus.Created = true
 
 			}
 
 		case false:
 
-			instance.Status.Phase = robotv1alpha1.RobotVDIPhaseCreatingPVC
-			// create service
+			instance.Status.Phase = robotv1alpha1.RobotVDIPhaseCreatingTCPService
+			err := r.reconcileCreateServiceTCP(ctx, instance)
+			if err != nil {
+				return err
+			}
+			instance.Status.ServiceTCPStatus.Created = true
 
 		}
 
 	case false:
 
-		// create pvc
+		instance.Status.Phase = robotv1alpha1.RobotVDIPhaseCreatingPVC
+		err := r.reconcileCreatePVC(ctx, instance)
+		if err != nil {
+			return err
+		}
+		instance.Status.PVCStatus.Created = true
 
 	}
 
@@ -175,7 +204,9 @@ func (r *RobotVDIReconciler) reconcileCheckResources(ctx context.Context, instan
 func (r *RobotVDIReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&robotv1alpha1.RobotVDI{}).
+		Owns(&corev1.PersistentVolumeClaim{}).
 		Owns(&corev1.Service{}).
 		Owns(&corev1.Pod{}).
+		Owns(&networkingv1.Ingress{}).
 		Complete(r)
 }
