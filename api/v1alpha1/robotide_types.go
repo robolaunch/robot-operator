@@ -17,8 +17,10 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"github.com/robolaunch/robot-operator/internal"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 )
 
 // RobotIDESpec defines the desired state of RobotIDE
@@ -85,4 +87,25 @@ type RobotIDEList struct {
 
 func init() {
 	SchemeBuilder.Register(&RobotIDE{}, &RobotIDEList{})
+}
+
+func (robotide *RobotIDE) GetRobotIDEPodMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Namespace: robotide.Namespace,
+		Name:      robotide.Name + internal.POD_IDE_POSTFIX,
+	}
+}
+
+func (robotide *RobotIDE) GetRobotIDEServiceMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Namespace: robotide.Namespace,
+		Name:      robotide.Name + internal.SVC_IDE_POSTFIX,
+	}
+}
+
+func (robotide *RobotIDE) GetRobotIDEIngressMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Namespace: robotide.Namespace,
+		Name:      robotide.Name + internal.INGRESS_IDE_POSTFIX,
+	}
 }

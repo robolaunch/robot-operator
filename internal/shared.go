@@ -55,6 +55,13 @@ const (
 	INGRESS_VDI_POSTFIX = ""
 )
 
+// RobotIDE owned resources' postfixes
+const (
+	SVC_IDE_POSTFIX     = ""
+	POD_IDE_POSTFIX     = ""
+	INGRESS_IDE_POSTFIX = ""
+)
+
 // Paths
 
 const (
