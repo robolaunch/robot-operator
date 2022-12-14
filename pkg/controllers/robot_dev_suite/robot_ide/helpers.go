@@ -48,3 +48,16 @@ func (r *RobotIDEReconciler) reconcileGetTargetRobot(ctx context.Context, instan
 
 	return robot, nil
 }
+
+func (r *RobotIDEReconciler) reconcileGetTargetRobotVDI(ctx context.Context, instance *robotv1alpha1.RobotIDE) (*robotv1alpha1.RobotVDI, error) {
+	robot := &robotv1alpha1.RobotVDI{}
+	err := r.Get(ctx, types.NamespacedName{
+		Namespace: instance.Namespace,
+		Name:      label.GetTargetRobotVDI(instance),
+	}, robot)
+	if err != nil {
+		return nil, err
+	}
+
+	return robot, nil
+}

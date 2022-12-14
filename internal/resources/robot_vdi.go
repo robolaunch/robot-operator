@@ -230,14 +230,14 @@ func GetRobotVDIIngress(robotVDI *robotv1alpha1.RobotVDI, ingressNamespacedName 
 	secretName := robot.Spec.TLSSecretReference.Name
 
 	annotations := map[string]string{
-		internal.INGRESS_VDI_AUTH_URL_KEY:                   fmt.Sprintf(internal.INGRESS_VDI_AUTH_URL_VAL, tenancy.Organization, rootDNSConfig.Host),
-		internal.INGRESS_VDI_AUTH_SIGNIN_KEY:                fmt.Sprintf(internal.INGRESS_VDI_AUTH_SIGNIN_VAL, tenancy.Organization, rootDNSConfig.Host),
-		internal.INGRESS_VDI_AUTH_RESPONSE_HEADERS_KEY:      internal.INGRESS_VDI_AUTH_RESPONSE_HEADERS_VAL,
-		internal.INGRESS_VDI_CONFIGURATION_SNIPPET_KEY:      internal.INGRESS_VDI_CONFIGURATION_SNIPPET_VAL,
-		internal.INGRESS_VDI_CERT_MANAGER_KEY:               internal.INGRESS_VDI_CERT_MANAGER_VAL,
-		internal.INGRESS_VDI_NGINX_PROXY_BUFFER_SIZE_KEY:    internal.INGRESS_VDI_NGINX_PROXY_BUFFER_SIZE_VAL,
-		internal.INGRESS_VDI_NGINX_PROXY_BUFFERS_NUMBER_KEY: internal.INGRESS_VDI_NGINX_PROXY_BUFFERS_NUMBER_VAL,
-		internal.INGRESS_VDI_NGINX_REWRITE_TARGET_KEY:       internal.INGRESS_VDI_NGINX_REWRITE_TARGET_VAL,
+		internal.INGRESS_AUTH_URL_KEY:                   fmt.Sprintf(internal.INGRESS_AUTH_URL_VAL, tenancy.Organization, rootDNSConfig.Host),
+		internal.INGRESS_AUTH_SIGNIN_KEY:                fmt.Sprintf(internal.INGRESS_AUTH_SIGNIN_VAL, tenancy.Organization, rootDNSConfig.Host),
+		internal.INGRESS_AUTH_RESPONSE_HEADERS_KEY:      internal.INGRESS_AUTH_RESPONSE_HEADERS_VAL,
+		internal.INGRESS_CONFIGURATION_SNIPPET_KEY:      internal.INGRESS_VDI_CONFIGURATION_SNIPPET_VAL,
+		internal.INGRESS_CERT_MANAGER_KEY:               internal.INGRESS_CERT_MANAGER_VAL,
+		internal.INGRESS_NGINX_PROXY_BUFFER_SIZE_KEY:    internal.INGRESS_NGINX_PROXY_BUFFER_SIZE_VAL,
+		internal.INGRESS_NGINX_PROXY_BUFFERS_NUMBER_KEY: internal.INGRESS_VDI_NGINX_PROXY_BUFFERS_NUMBER_VAL,
+		internal.INGRESS_NGINX_REWRITE_TARGET_KEY:       internal.INGRESS_NGINX_REWRITE_TARGET_VAL,
 	}
 
 	pathTypePrefix := networkingv1.PathTypePrefix

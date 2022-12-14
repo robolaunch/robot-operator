@@ -14,3 +14,13 @@ func GetTargetRobot(obj metav1.Object) string {
 
 	return ""
 }
+
+func GetTargetRobotVDI(obj metav1.Object) string {
+	labels := obj.GetLabels()
+
+	if targetRobotVDI, ok := labels[internal.TARGET_VDI]; ok {
+		return targetRobotVDI
+	}
+
+	return ""
+}
