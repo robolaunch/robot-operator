@@ -17,8 +17,10 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"github.com/robolaunch/robot-operator/internal"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 )
 
 // VDI resource limits.
@@ -38,6 +40,8 @@ type RobotVDISpec struct {
 	// +kubebuilder:default="NodePort"
 	ServiceType corev1.ServiceType `json:"serviceType,omitempty"`
 	Ingress     bool               `json:"ingress,omitempty"`
+	Privileged  bool               `json:"privileged,omitempty"`
+	MainDisplay bool               `json:"mainDisplay,omitempty"`
 	// NAT1TO1 for Neko.
 	NAT1TO1 string `json:"nat1to1,omitempty"`
 	// +kubebuilder:validation:Pattern=`^([0-9])+-([0-9])+$`
@@ -49,6 +53,10 @@ type RobotVDIPodStatus struct {
 	Created bool            `json:"created,omitempty"`
 	Phase   corev1.PodPhase `json:"phase,omitempty"`
 	IP      string          `json:"ip,omitempty"`
+}
+
+type RobotVDIPVCStatus struct {
+	Created bool `json:"created,omitempty"`
 }
 
 type RobotVDIServiceTCPStatus struct {
@@ -66,6 +74,7 @@ type RobotVDIIngressStatus struct {
 type RobotVDIPhase string
 
 const (
+	RobotVDIPhaseCreatingPVC        RobotVDIPhase = "CreatingPVC"
 	RobotVDIPhaseCreatingTCPService RobotVDIPhase = "CreatingTCPService"
 	RobotVDIPhaseCreatingUDPService RobotVDIPhase = "CreatingUDPService"
 	RobotVDIPhaseCreatingPod        RobotVDIPhase = "CreatingPod"
@@ -80,6 +89,7 @@ type RobotVDIStatus struct {
 	ServiceTCPStatus RobotVDIServiceTCPStatus `json:"serviceTCPStatus,omitempty"`
 	ServiceUDPStatus RobotVDIServiceUDPStatus `json:"serviceUDPStatus,omitempty"`
 	IngressStatus    RobotVDIIngressStatus    `json:"ingressStatus,omitempty"`
+	PVCStatus        RobotVDIPVCStatus        `json:"pvcStatus,omitempty"`
 }
 
 //+kubebuilder:object:root=true
@@ -105,4 +115,39 @@ type RobotVDIList struct {
 
 func init() {
 	SchemeBuilder.Register(&RobotVDI{}, &RobotVDIList{})
+}
+
+func (robotvdi *RobotVDI) GetRobotVDIPVCMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Namespace: robotvdi.Namespace,
+		Name:      robotvdi.Name + internal.PVC_VDI_POSTFIX,
+	}
+}
+
+func (robotvdi *RobotVDI) GetRobotVDIPodMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Namespace: robotvdi.Namespace,
+		Name:      robotvdi.Name + internal.POD_VDI_POSTFIX,
+	}
+}
+
+func (robotvdi *RobotVDI) GetRobotVDIServiceTCPMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Namespace: robotvdi.Namespace,
+		Name:      robotvdi.Name + internal.SVC_TCP_VDI_POSTFIX,
+	}
+}
+
+func (robotvdi *RobotVDI) GetRobotVDIServiceUDPMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Namespace: robotvdi.Namespace,
+		Name:      robotvdi.Name + internal.SVC_UDP_VDI_POSTFIX,
+	}
+}
+
+func (robotvdi *RobotVDI) GetRobotVDIIngressMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Namespace: robotvdi.Namespace,
+		Name:      robotvdi.Name + internal.INGRESS_VDI_POSTFIX,
+	}
 }
