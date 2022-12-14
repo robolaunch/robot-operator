@@ -77,19 +77,19 @@ func (r *RobotVDIReconciler) reconcileCreatePod(ctx context.Context, instance *r
 		return err
 	}
 
-	vdiService := resources.GetRobotVDIPod(instance, instance.GetRobotVDIPodMetadata(), *robot)
+	vdiPod := resources.GetRobotVDIPod(instance, instance.GetRobotVDIPodMetadata(), *robot)
 
-	err = ctrl.SetControllerReference(instance, vdiService, r.Scheme)
+	err = ctrl.SetControllerReference(instance, vdiPod, r.Scheme)
 	if err != nil {
 		return err
 	}
 
-	err = r.Create(ctx, vdiService)
+	err = r.Create(ctx, vdiPod)
 	if err != nil {
 		return err
 	}
 
-	logger.Info("STATUS: VDI TCP service is created.")
+	logger.Info("STATUS: VDI pod is created.")
 
 	return nil
 }
