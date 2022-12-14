@@ -1,0 +1,27 @@
+# permissions for end users to view robotides.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: robotide-viewer-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: robot-operator
+    app.kubernetes.io/part-of: robot-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: robotide-viewer-role
+rules:
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - robotides
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - robotides/status
+  verbs:
+  - get
