@@ -46,6 +46,15 @@ const (
 	POD_LAUNCH_POSTFIX = "-launch"
 )
 
+// RobotVDI owned resources' postfixes
+const (
+	PVC_VDI_POSTFIX     = "-display"
+	SVC_TCP_VDI_POSTFIX = "-tcp"
+	SVC_UDP_VDI_POSTFIX = "-udp"
+	POD_VDI_POSTFIX     = ""
+	INGRESS_VDI_POSTFIX = ""
+)
+
 // Paths
 
 const (
