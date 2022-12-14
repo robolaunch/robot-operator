@@ -65,6 +65,19 @@ spec:
                 - noetic
                 - melodic
                 type: string
+              rootDNSConfig:
+                description: Root DNS configuration.
+                properties:
+                  host:
+                    description: DNS host.
+                    type: string
+                  port:
+                    description: DNS host.
+                    type: string
+                required:
+                - host
+                - port
+                type: object
               rosBridgeTemplate:
                 description: ROS bridge template
                 properties:
@@ -118,6 +131,19 @@ spec:
                         description: Storage class name
                         type: string
                     type: object
+                type: object
+              tlsSecretRef:
+                description: TLS secret reference.
+                properties:
+                  name:
+                    description: TLS secret object name.
+                    type: string
+                  namespace:
+                    description: TLS secret object namespace.
+                    type: string
+                required:
+                - name
+                - namespace
                 type: object
               workspaces:
                 description: Workspace definitions of robot.

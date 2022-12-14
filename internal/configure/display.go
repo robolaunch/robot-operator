@@ -8,20 +8,29 @@ import (
 
 func InjectPodDisplayConfiguration(pod *corev1.Pod, robot robotv1alpha1.Robot) *corev1.Pod {
 
-	placeDisplayEnvironmentVariables(pod, robot)
+	placeDisplayEnvironmentVariables(pod)
 	placeDisplayVolume(pod, robot)
 
 	return pod
 }
 
-func placeDisplayEnvironmentVariables(pod *corev1.Pod, robot robotv1alpha1.Robot) {
+func InjectPodDisplayConfigurationForVDI(pod *corev1.Pod, robotVDI robotv1alpha1.RobotVDI) *corev1.Pod {
+
+	placeDisplayEnvironmentVariables(pod)
+	placeDisplayVolumeForVDI(pod, robotVDI)
+
+	return pod
+}
+
+func placeDisplayEnvironmentVariables(pod *corev1.Pod) {
 
 	environmentVariables := []corev1.EnvVar{
 		internal.Env("DISPLAY", ":0"),
 	}
 
-	for _, container := range pod.Spec.Containers {
+	for k, container := range pod.Spec.Containers {
 		container.Env = append(container.Env, environmentVariables...)
+		pod.Spec.Containers[k] = container
 	}
 
 }
@@ -33,8 +42,23 @@ func placeDisplayVolume(pod *corev1.Pod, robot robotv1alpha1.Robot) {
 
 	volumeMount := GetVolumeMount(internal.X11_UNIX_PATH, volume)
 
-	for _, container := range pod.Spec.Containers {
+	for k, container := range pod.Spec.Containers {
 		container.VolumeMounts = append(container.VolumeMounts, volumeMount)
+		pod.Spec.Containers[k] = container
+	}
+
+}
+
+func placeDisplayVolumeForVDI(pod *corev1.Pod, robotVDI robotv1alpha1.RobotVDI) {
+
+	volume := GetVolumeX11UnixForVDI(&robotVDI)
+	pod.Spec.Volumes = append(pod.Spec.Volumes, volume)
+
+	volumeMount := GetVolumeMount(internal.X11_UNIX_PATH, volume)
+
+	for k, container := range pod.Spec.Containers {
+		container.VolumeMounts = append(container.VolumeMounts, volumeMount)
+		pod.Spec.Containers[k] = container
 	}
 
 }

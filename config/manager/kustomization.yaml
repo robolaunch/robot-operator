@@ -5,4 +5,4 @@ kind: Kustomization
 images:
 - name: controller
   newName: robolaunchio/robot-controller-manager-dev
-  newTag: platform-v0.3.93
+  newTag: platform-v0.3.97

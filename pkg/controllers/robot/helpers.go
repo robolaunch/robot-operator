@@ -120,6 +120,7 @@ func (r *RobotReconciler) reconcileAttachBuildObject(ctx context.Context, instan
 
 	if len(buildManagerList.Items) == 0 {
 		instance.Status.AttachedBuildObject.Reference = corev1.ObjectReference{}
+		instance.Status.AttachedBuildObject.Status = robotv1alpha1.BuildManagerStatus{}
 		return nil
 	}
 
@@ -133,7 +134,6 @@ func (r *RobotReconciler) reconcileAttachBuildObject(ctx context.Context, instan
 	if instance.Status.AttachedBuildObject.Reference.Name != selectedBuildManager.Name {
 		instance.Status.AttachedLaunchObjects = []robotv1alpha1.AttachedLaunchObject{}
 		instance.Status.AttachedBuildObject.Status = robotv1alpha1.BuildManagerStatus{}
-
 	}
 
 	instance.Status.AttachedBuildObject.Reference = corev1.ObjectReference{
