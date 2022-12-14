@@ -17,15 +17,69 @@ limitations under the License.
 package v1alpha1
 
 import (
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// VDI resource limits.
+type Resources struct {
+	GPUCore int `json:"gpuCore,omitempty"`
+	// +kubebuilder:validation:Pattern=`^([0-9])+(m)$`
+	CPU string `json:"cpu,omitempty"`
+	// +kubebuilder:validation:Pattern=`^([0-9])+(Mi|Gi)$`
+	Memory string `json:"memory,omitempty"`
+}
+
 // RobotVDISpec defines the desired state of RobotVDI
 type RobotVDISpec struct {
+	Resources Resources `json:"resources,omitempty"`
+	// ServiceType
+	// +kubebuilder:validation:Enum=ClusterIP;NodePort
+	// +kubebuilder:default="NodePort"
+	ServiceType corev1.ServiceType `json:"serviceType,omitempty"`
+	Ingress     bool               `json:"ingress,omitempty"`
+	// NAT1TO1 for Neko.
+	NAT1TO1 string `json:"nat1to1,omitempty"`
+	// +kubebuilder:validation:Pattern=`^([0-9])+-([0-9])+$`
+	// +kubebuilder:validation:Required
+	WebRTCPortRange string `json:"webrtcPortRange,omitempty"`
 }
+
+type RobotVDIPodStatus struct {
+	Created bool            `json:"created,omitempty"`
+	Phase   corev1.PodPhase `json:"phase,omitempty"`
+	IP      string          `json:"ip,omitempty"`
+}
+
+type RobotVDIServiceTCPStatus struct {
+	Created bool `json:"created,omitempty"`
+}
+
+type RobotVDIServiceUDPStatus struct {
+	Created bool `json:"created,omitempty"`
+}
+
+type RobotVDIIngressStatus struct {
+	Created bool `json:"created,omitempty"`
+}
+
+type RobotVDIPhase string
+
+const (
+	RobotVDIPhaseCreatingTCPService RobotVDIPhase = "CreatingTCPService"
+	RobotVDIPhaseCreatingUDPService RobotVDIPhase = "CreatingUDPService"
+	RobotVDIPhaseCreatingPod        RobotVDIPhase = "CreatingPod"
+	RobotVDIPhaseCreatingIngress    RobotVDIPhase = "CreatingIngress"
+	RobotVDIPhaseReady              RobotVDIPhase = "Running"
+)
 
 // RobotVDIStatus defines the observed state of RobotVDI
 type RobotVDIStatus struct {
+	Phase            RobotVDIPhase            `json:"phase,omitempty"`
+	PodStatus        RobotVDIPodStatus        `json:"podStatus,omitempty"`
+	ServiceTCPStatus RobotVDIServiceTCPStatus `json:"serviceTCPStatus,omitempty"`
+	ServiceUDPStatus RobotVDIServiceUDPStatus `json:"serviceUDPStatus,omitempty"`
+	IngressStatus    RobotVDIIngressStatus    `json:"ingressStatus,omitempty"`
 }
 
 //+kubebuilder:object:root=true
