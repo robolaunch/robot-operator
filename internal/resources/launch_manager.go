@@ -28,8 +28,10 @@ func GetLaunchPod(launchManager *robotv1alpha1.LaunchManager, podNamespacedName 
 				cont := getLaunchContainer(l, k, robot, buildManager)
 				containers = append(containers, cont)
 			}
+		} else {
+			cont := getLaunchContainer(l, k, robot, buildManager)
+			containers = append(containers, cont)
 		}
-
 	}
 
 	launchPod := corev1.Pod{
