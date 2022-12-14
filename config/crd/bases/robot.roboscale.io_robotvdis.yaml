@@ -37,9 +37,13 @@ spec:
             properties:
               ingress:
                 type: boolean
+              mainDisplay:
+                type: boolean
               nat1to1:
                 description: NAT1TO1 for Neko.
                 type: string
+              privileged:
+                type: boolean
               resources:
                 description: VDI resource limits.
                 properties:
@@ -83,6 +87,11 @@ spec:
                     description: PodPhase is a label for the condition of a pod at
                       the current time.
                     type: string
+                type: object
+              pvcStatus:
+                properties:
+                  created:
+                    type: boolean
                 type: object
               serviceTCPStatus:
                 properties:
