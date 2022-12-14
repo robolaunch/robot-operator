@@ -104,18 +104,33 @@ func (r *RobotIDEReconciler) reconcileCheckStatus(ctx context.Context, instance 
 
 			case false:
 
-				// create ingress
+				instance.Status.Phase = robotv1alpha1.RobotIDEPhaseCreatingIngress
+				err := r.reconcileCreateIngress(ctx, instance)
+				if err != nil {
+					return err
+				}
+				instance.Status.IngressStatus.Created = true
 
 			}
 
 		case false:
 
-			// create pod
+			instance.Status.Phase = robotv1alpha1.RobotIDEPhaseCreatingPod
+			err := r.reconcileCreatePod(ctx, instance)
+			if err != nil {
+				return err
+			}
+			instance.Status.PodStatus.Created = true
 		}
 
 	case false:
 
-		// create service
+		instance.Status.Phase = robotv1alpha1.RobotIDEPhaseCreatingService
+		err := r.reconcileCreateService(ctx, instance)
+		if err != nil {
+			return err
+		}
+		instance.Status.ServiceStatus.Created = true
 
 	}
 

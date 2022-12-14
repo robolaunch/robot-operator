@@ -45,6 +45,7 @@ type RobotIDEPhase string
 const (
 	RobotIDEPhaseCreatingService RobotIDEPhase = "CreatingService"
 	RobotIDEPhaseCreatingPod     RobotIDEPhase = "CreatingPod"
+	RobotIDEPhaseCreatingIngress RobotIDEPhase = "CreatingIngress"
 	RobotIDEPhaseRunning         RobotIDEPhase = "Running"
 )
 
