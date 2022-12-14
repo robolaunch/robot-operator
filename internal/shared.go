@@ -93,6 +93,32 @@ const (
 		"</dds>"
 )
 
+// Ingress annotations
+const (
+	INGRESS_VDI_AUTH_URL_KEY              = "nginx.ingress.kubernetes.io/auth-url"
+	INGRESS_VDI_AUTH_URL_VAL              = "%s"
+	INGRESS_VDI_AUTH_SIGNIN_KEY           = "nginx.ingress.kubernetes.io/auth-signin"
+	INGRESS_VDI_AUTH_SIGNIN_VAL           = "%s"
+	INGRESS_VDI_AUTH_RESPONSE_HEADERS_KEY = "nginx.ingress.kubernetes.io/auth-response-headers"
+	INGRESS_VDI_AUTH_RESPONSE_HEADERS_VAL = "x-auth-request-user, x-auth-request-email, x-auth-request-access-token"
+	INGRESS_VDI_CONFIGURATION_SNIPPET_KEY = "nginx.ingress.kubernetes.io/configuration-snippet"
+	INGRESS_VDI_CONFIGURATION_SNIPPET_VAL = "" +
+		"        #proxy_set_header Host $host;\n" +
+		"		proxy_set_header X-Real-IP $remote_addr;\n" +
+		"		proxy_set_header X-Forwarded-For $remote_addr;\n" +
+		"		proxy_set_header X-Forwarded-Host $host;\n" +
+		"		proxy_set_header X-Forwarded-Port $server_port;\n" +
+		"		proxy_set_header X-Forwarded-Protocol $scheme;\n"
+	INGRESS_VDI_CERT_MANAGER_KEY               = "acme.cert-manager.io/http01-edit-in-place"
+	INGRESS_VDI_CERT_MANAGER_VAL               = "true"
+	INGRESS_VDI_NGINX_PROXY_BUFFER_SIZE_KEY    = "nginx.ingress.kubernetes.io/proxy-buffer-size"
+	INGRESS_VDI_NGINX_PROXY_BUFFER_SIZE_VAL    = "16k"
+	INGRESS_VDI_NGINX_PROXY_BUFFERS_NUMBER_KEY = "nginx.ingress.kubernetes.io/proxy-buffers-number"
+	INGRESS_VDI_NGINX_PROXY_BUFFERS_NUMBER_VAL = "4"
+	INGRESS_VDI_NGINX_REWRITE_TARGET_KEY       = "nginx.ingress.kubernetes.io/rewrite-target"
+	INGRESS_VDI_NGINX_REWRITE_TARGET_VAL       = "/$2"
+)
+
 func Bash(command string) []string {
 	return []string{
 		"/bin/bash",
