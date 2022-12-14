@@ -17,15 +17,49 @@ limitations under the License.
 package v1alpha1
 
 import (
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // RobotIDESpec defines the desired state of RobotIDE
 type RobotIDESpec struct {
+	Resources Resources `json:"resources,omitempty"`
+	// ServiceType
+	// +kubebuilder:validation:Enum=ClusterIP;NodePort
+	// +kubebuilder:default="NodePort"
+	ServiceType corev1.ServiceType `json:"serviceType,omitempty"`
+	Ingress     bool               `json:"ingress,omitempty"`
+	Privileged  bool               `json:"privileged,omitempty"`
+}
+
+type RobotIDEPodStatus struct {
+	Created bool            `json:"created,omitempty"`
+	Phase   corev1.PodPhase `json:"phase,omitempty"`
+	IP      string          `json:"ip,omitempty"`
+}
+
+type RobotIDEPhase string
+
+const (
+	RobotIDEPhaseCreatingService RobotIDEPhase = "CreatingService"
+	RobotIDEPhaseCreatingPod     RobotIDEPhase = "CreatingPod"
+	RobotIDEPhaseRunning         RobotIDEPhase = "Running"
+)
+
+type RobotIDEServiceStatus struct {
+	Created bool `json:"created,omitempty"`
+}
+
+type RobotIDEIngressStatus struct {
+	Created bool `json:"created,omitempty"`
 }
 
 // RobotIDEStatus defines the observed state of RobotIDE
 type RobotIDEStatus struct {
+	Phase         RobotIDEPhase         `json:"phase,omitempty"`
+	PodStatus     RobotIDEPodStatus     `json:"podStatus,omitempty"`
+	ServiceStatus RobotIDEServiceStatus `json:"serviceStatus,omitempty"`
+	IngressStatus RobotIDEIngressStatus `json:"ingressStatus,omitempty"`
 }
 
 //+kubebuilder:object:root=true
