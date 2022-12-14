@@ -24,7 +24,33 @@ func getRobotVDISelector(robotVDI robotv1alpha1.RobotVDI) map[string]string {
 	}
 }
 
-func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot, buildManager robotv1alpha1.BuildManager) *corev1.Pod {
+func GetRobotVDIPVC(robotVDI *robotv1alpha1.RobotVDI, pvcNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot) *corev1.PersistentVolumeClaim {
+
+	pvc := corev1.PersistentVolumeClaim{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      pvcNamespacedName.Name,
+			Namespace: pvcNamespacedName.Namespace,
+		},
+		Spec: corev1.PersistentVolumeClaimSpec{
+			StorageClassName: &robot.Spec.Storage.StorageClassConfig.Name,
+			AccessModes: []corev1.PersistentVolumeAccessMode{
+				robot.Spec.Storage.StorageClassConfig.AccessMode,
+			},
+			Resources: corev1.ResourceRequirements{
+				Limits: corev1.ResourceList{
+					corev1.ResourceName(corev1.ResourceStorage): resource.MustParse("100"),
+				},
+				Requests: corev1.ResourceList{
+					corev1.ResourceName(corev1.ResourceStorage): resource.MustParse("100"),
+				},
+			},
+		},
+	}
+
+	return &pvc
+}
+
+func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot) *corev1.Pod {
 
 	// add tcp port
 	ports := []corev1.ContainerPort{
@@ -87,7 +113,6 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 						configure.GetVolumeMount("", configure.GetVolumeOpt(&robot)),
 						configure.GetVolumeMount("", configure.GetVolumeEtc(&robot)),
 						configure.GetVolumeMount(robot.Spec.WorkspacesPath, configure.GetVolumeWorkspace(&robot)),
-						configure.GetVolumeMount(internal.CUSTOM_SCRIPTS_PATH, configure.GetVolumeConfigMaps(&buildManager)),
 						configure.GetVolumeMount("/dev/shm", configure.GetVolumeDshm()),
 						configure.GetVolumeMount("/cache", configure.GetVolumeXglCache()),
 					},
@@ -107,7 +132,6 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 				configure.GetVolumeOpt(&robot),
 				configure.GetVolumeEtc(&robot),
 				configure.GetVolumeWorkspace(&robot),
-				configure.GetVolumeConfigMaps(&buildManager),
 				configure.GetVolumeDshm(),
 				configure.GetVolumeXglCache(),
 			},
@@ -118,12 +142,16 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 
 	configure.InjectGenericEnvironmentVariables(vdiPod, robot)
 	configure.InjectPodDiscoveryServerConnection(vdiPod, robot)
-	configure.InjectPodDisplayConfiguration(vdiPod, robot)
+	if robotVDI.Spec.MainDisplay {
+		configure.InjectPodDisplayConfiguration(vdiPod, robot)
+	} else {
+		configure.InjectPodDisplayConfigurationForVDI(vdiPod, *robotVDI)
+	}
 
 	return vdiPod
 }
 
-func GetRobotVDIServiceTCP(robotVDI *robotv1alpha1.RobotVDI) *corev1.Service {
+func GetRobotVDIServiceTCP(robotVDI *robotv1alpha1.RobotVDI, svcNamespacedName *types.NamespacedName) *corev1.Service {
 
 	ports := []corev1.ServicePort{
 		{
@@ -144,8 +172,8 @@ func GetRobotVDIServiceTCP(robotVDI *robotv1alpha1.RobotVDI) *corev1.Service {
 
 	service := corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      robotVDI.GetRobotVDIServiceTCPMetadata().Name,
-			Namespace: robotVDI.GetRobotVDIServiceTCPMetadata().Namespace,
+			Name:      svcNamespacedName.Name,
+			Namespace: svcNamespacedName.Namespace,
 		},
 		Spec: serviceSpec,
 	}
@@ -153,7 +181,7 @@ func GetRobotVDIServiceTCP(robotVDI *robotv1alpha1.RobotVDI) *corev1.Service {
 	return &service
 }
 
-func GetVDIServiceUDP(robotVDI *robotv1alpha1.RobotVDI) *corev1.Service {
+func GetRobotVDIServiceUDP(robotVDI *robotv1alpha1.RobotVDI, svcNamespacedName *types.NamespacedName) *corev1.Service {
 
 	ports := []corev1.ServicePort{}
 
@@ -185,8 +213,8 @@ func GetVDIServiceUDP(robotVDI *robotv1alpha1.RobotVDI) *corev1.Service {
 
 	service := corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      robotVDI.GetRobotVDIServiceUDPMetadata().Name,
-			Namespace: robotVDI.GetRobotVDIServiceUDPMetadata().Namespace,
+			Name:      svcNamespacedName.Name,
+			Namespace: svcNamespacedName.Namespace,
 		},
 		Spec: serviceSpec,
 	}
@@ -194,7 +222,7 @@ func GetVDIServiceUDP(robotVDI *robotv1alpha1.RobotVDI) *corev1.Service {
 	return &service
 }
 
-func GetVDIIngress(robotVDI *robotv1alpha1.RobotVDI, robot robotv1alpha1.Robot) *networkingv1.Ingress {
+func GetRobotVDIIngress(robotVDI *robotv1alpha1.RobotVDI, ingressNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot) *networkingv1.Ingress {
 
 	tenancy := label.GetTenancy(&robot)
 
@@ -252,8 +280,8 @@ func GetVDIIngress(robotVDI *robotv1alpha1.RobotVDI, robot robotv1alpha1.Robot) 
 
 	ingress := &networkingv1.Ingress{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:        robotVDI.GetRobotVDIIngressMetadata().Name,
-			Namespace:   robotVDI.GetRobotVDIIngressMetadata().Namespace,
+			Name:        ingressNamespacedName.Name,
+			Namespace:   ingressNamespacedName.Namespace,
 			Annotations: annotations,
 		},
 		Spec: ingressSpec,

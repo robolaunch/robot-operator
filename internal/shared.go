@@ -96,9 +96,9 @@ const (
 // Ingress annotations
 const (
 	INGRESS_VDI_AUTH_URL_KEY              = "nginx.ingress.kubernetes.io/auth-url"
-	INGRESS_VDI_AUTH_URL_VAL              = "%s"
+	INGRESS_VDI_AUTH_URL_VAL              = "https://oauth.%s.%s/oauth2/auth"
 	INGRESS_VDI_AUTH_SIGNIN_KEY           = "nginx.ingress.kubernetes.io/auth-signin"
-	INGRESS_VDI_AUTH_SIGNIN_VAL           = "%s"
+	INGRESS_VDI_AUTH_SIGNIN_VAL           = "https://oauth.%s.%s/oauth2/start?rd=$scheme://$best_http_host$request_uri"
 	INGRESS_VDI_AUTH_RESPONSE_HEADERS_KEY = "nginx.ingress.kubernetes.io/auth-response-headers"
 	INGRESS_VDI_AUTH_RESPONSE_HEADERS_VAL = "x-auth-request-user, x-auth-request-email, x-auth-request-access-token"
 	INGRESS_VDI_CONFIGURATION_SNIPPET_KEY = "nginx.ingress.kubernetes.io/configuration-snippet"
