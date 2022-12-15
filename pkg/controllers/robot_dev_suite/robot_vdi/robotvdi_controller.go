@@ -61,6 +61,10 @@ func (r *RobotVDIReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 		return ctrl.Result{}, err
 	}
 
+	if !instance.DeletionTimestamp.IsZero() {
+		return ctrl.Result{}, nil
+	}
+
 	err = r.reconcileCheckStatus(ctx, instance)
 	if err != nil {
 		return ctrl.Result{}, err
