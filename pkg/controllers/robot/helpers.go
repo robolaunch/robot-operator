@@ -102,6 +102,9 @@ func (r *RobotReconciler) reconcileCheckImage(ctx context.Context, instance *rob
 
 func (r *RobotReconciler) reconcileAttachBuildObject(ctx context.Context, instance *robotv1alpha1.Robot) error {
 
+	// Detach dev objects from robot
+	instance.Status.AttachedDevObjects = []robotv1alpha1.AttachedDevObject{}
+
 	// Get attached build objects for this robot
 	requirements := []labels.Requirement{}
 	newReq, err := labels.NewRequirement(internal.TARGET_ROBOT, selection.In, []string{instance.Name})
@@ -196,7 +199,11 @@ func (r *RobotReconciler) reconcileAttachLaunchObject(ctx context.Context, insta
 
 func (r *RobotReconciler) reconcileAttachDevObject(ctx context.Context, instance *robotv1alpha1.Robot) error {
 
-	// Get attached build objects for this robot
+	// Detach build and launch objects from robot
+	instance.Status.AttachedBuildObject = robotv1alpha1.AttachedBuildObject{}
+	instance.Status.AttachedLaunchObjects = []robotv1alpha1.AttachedLaunchObject{}
+
+	// Get attached dev objects for this robot
 	requirements := []labels.Requirement{}
 	newReq, err := labels.NewRequirement(internal.TARGET_ROBOT, selection.In, []string{instance.Name})
 	if err != nil {

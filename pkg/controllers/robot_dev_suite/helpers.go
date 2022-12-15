@@ -4,9 +4,14 @@ import (
 	"context"
 
 	robotv1alpha1 "github.com/robolaunch/robot-operator/api/v1alpha1"
+	"github.com/robolaunch/robot-operator/internal"
+	robotErr "github.com/robolaunch/robot-operator/internal/error"
 	"github.com/robolaunch/robot-operator/internal/label"
+	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/selection"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/util/retry"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 func (r *RobotDevSuiteReconciler) reconcileGetInstance(ctx context.Context, meta types.NamespacedName) (*robotv1alpha1.RobotDevSuite, error) {
@@ -64,6 +69,77 @@ func (r *RobotDevSuiteReconciler) reconcileCheckTargetRobot(ctx context.Context,
 	}
 
 	instance.Status.Active = isActive
+
+	return nil
+}
+
+func (r *RobotDevSuiteReconciler) reconcileCheckOtherAttachedResources(ctx context.Context, instance *robotv1alpha1.RobotDevSuite) error {
+
+	if instance.Status.Active {
+		// Get attached build manager objects for this robot
+		requirements := []labels.Requirement{}
+		newReq, err := labels.NewRequirement(internal.TARGET_ROBOT, selection.In, []string{label.GetTargetRobot(instance)})
+		if err != nil {
+			return err
+		}
+		requirements = append(requirements, *newReq)
+
+		robotSelector := labels.NewSelector().Add(requirements...)
+
+		launchManagerList := robotv1alpha1.LaunchManagerList{}
+		err = r.List(ctx, &launchManagerList, &client.ListOptions{Namespace: instance.Namespace, LabelSelector: robotSelector})
+		if err != nil {
+			return err
+		}
+
+		for _, lm := range launchManagerList.Items {
+
+			if lm.Status.Active == true {
+				return &robotErr.RobotResourcesHasNotBeenReleasedError{
+					ResourceKind:      instance.Kind,
+					ResourceName:      instance.Name,
+					ResourceNamespace: instance.Namespace,
+				}
+			}
+
+			if lm.Status.Phase != robotv1alpha1.LaunchManagerPhaseInactive {
+				return &robotErr.RobotResourcesHasNotBeenReleasedError{
+					ResourceKind:      instance.Kind,
+					ResourceName:      instance.Name,
+					ResourceNamespace: instance.Namespace,
+				}
+			}
+		}
+
+		buildManagerList := robotv1alpha1.BuildManagerList{}
+		err = r.List(ctx, &buildManagerList, &client.ListOptions{Namespace: instance.Namespace, LabelSelector: robotSelector})
+		if err != nil {
+			return err
+		}
+
+		for _, bm := range buildManagerList.Items {
+
+			if bm.Name == instance.Name {
+				continue
+			}
+
+			if bm.Status.Active == true {
+				return &robotErr.RobotResourcesHasNotBeenReleasedError{
+					ResourceKind:      instance.Kind,
+					ResourceName:      instance.Name,
+					ResourceNamespace: instance.Namespace,
+				}
+			}
+
+			if bm.Status.Phase != robotv1alpha1.BuildManagerInactive {
+				return &robotErr.RobotResourcesHasNotBeenReleasedError{
+					ResourceKind:      instance.Kind,
+					ResourceName:      instance.Name,
+					ResourceNamespace: instance.Namespace,
+				}
+			}
+		}
+	}
 
 	return nil
 }

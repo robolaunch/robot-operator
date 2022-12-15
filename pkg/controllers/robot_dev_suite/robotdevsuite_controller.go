@@ -18,6 +18,8 @@ package robot_dev_suite
 
 import (
 	"context"
+	goErr "errors"
+	"time"
 
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
@@ -35,6 +37,7 @@ import (
 	"github.com/go-logr/logr"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/api/v1alpha1"
 	"github.com/robolaunch/robot-operator/internal"
+	robotErr "github.com/robolaunch/robot-operator/internal/error"
 )
 
 // RobotDevSuiteReconciler reconciles a RobotDevSuite object
@@ -70,6 +73,19 @@ func (r *RobotDevSuiteReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 		} else {
 			return ctrl.Result{}, err
 		}
+	}
+
+	// Check target robot's other attached objects to see if robot's resources are released
+	err = r.reconcileCheckOtherAttachedResources(ctx, instance)
+	if err != nil {
+		var e *robotErr.RobotResourcesHasNotBeenReleasedError
+		if goErr.As(err, &e) {
+			return ctrl.Result{
+				Requeue:      true,
+				RequeueAfter: 3 * time.Second,
+			}, nil
+		}
+		return ctrl.Result{}, nil
 	}
 
 	err = r.reconcileCheckStatus(ctx, instance)
