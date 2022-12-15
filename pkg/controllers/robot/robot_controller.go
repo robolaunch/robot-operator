@@ -128,6 +128,10 @@ func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *ro
 									case true:
 
 										// attach development suite
+										err := r.reconcileAttachDevObject(ctx, instance)
+										if err != nil {
+											return err
+										}
 
 									case false:
 

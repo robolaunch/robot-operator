@@ -46,11 +46,14 @@ const (
 	RobotDevSuitePhaseCreatingRobotVDI = "CreatingRobotVDI"
 	RobotDevSuitePhaseCreatingRobotIDE = "CreatingRobotIDE"
 	RobotDevSuitePhaseRunning          = "Running"
+	RobotDevSuitePhaseDeactivating     = "Deactivating"
+	RobotDevSuitePhaseInactive         = "Inactive"
 )
 
 // RobotDevSuiteStatus defines the observed state of RobotDevSuite
 type RobotDevSuiteStatus struct {
 	Phase          RobotDevSuitePhase     `json:"phase,omitempty"`
+	Active         bool                   `json:"active,omitempty"`
 	RobotVDIStatus RobotVDIInstanceStatus `json:"robotVDIStatus,omitempty"`
 	RobotIDEStatus RobotIDEInstanceStatus `json:"robotIDEStatus,omitempty"`
 }

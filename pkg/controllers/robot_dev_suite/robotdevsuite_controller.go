@@ -79,89 +79,110 @@ func (r *RobotDevSuiteReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 
 func (r *RobotDevSuiteReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.RobotDevSuite) error {
 
-	switch instance.Spec.VDIEnabled {
+	switch instance.Status.Active {
 	case true:
 
-		switch instance.Status.RobotVDIStatus.Created {
+		switch instance.Spec.VDIEnabled {
 		case true:
 
-			switch instance.Status.RobotVDIStatus.Phase {
-			case robotv1alpha1.RobotVDIPhaseRunning:
+			switch instance.Status.RobotVDIStatus.Created {
+			case true:
 
-				switch instance.Spec.IDEEnabled {
-				case true:
+				switch instance.Status.RobotVDIStatus.Phase {
+				case robotv1alpha1.RobotVDIPhaseRunning:
 
-					switch instance.Status.RobotIDEStatus.Created {
+					switch instance.Spec.IDEEnabled {
 					case true:
 
-						switch instance.Status.RobotIDEStatus.Phase {
-						case robotv1alpha1.RobotIDEPhaseRunning:
+						switch instance.Status.RobotIDEStatus.Created {
+						case true:
 
-							instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseRunning
+							switch instance.Status.RobotIDEStatus.Phase {
+							case robotv1alpha1.RobotIDEPhaseRunning:
+
+								instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseRunning
+
+							}
+
+						case false:
+
+							instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseCreatingRobotIDE
+							err := r.reconcileCreateRobotIDE(ctx, instance)
+							if err != nil {
+								return err
+							}
+							instance.Status.RobotIDEStatus.Created = true
 
 						}
 
 					case false:
 
-						instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseCreatingRobotIDE
-						err := r.reconcileCreateRobotIDE(ctx, instance)
-						if err != nil {
-							return err
-						}
-						instance.Status.RobotIDEStatus.Created = true
+						instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseRunning
 
 					}
-
-				case false:
-
-					instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseRunning
-
-				}
-
-			}
-
-		case false:
-
-			instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseCreatingRobotVDI
-			err := r.reconcileCreateRobotVDI(ctx, instance)
-			if err != nil {
-				return err
-			}
-			instance.Status.RobotVDIStatus.Created = true
-
-		}
-
-	case false:
-
-		switch instance.Spec.IDEEnabled {
-		case true:
-
-			switch instance.Status.RobotIDEStatus.Created {
-			case true:
-
-				switch instance.Status.RobotIDEStatus.Phase {
-				case robotv1alpha1.RobotIDEPhaseRunning:
-
-					instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseRunning
 
 				}
 
 			case false:
 
-				instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseCreatingRobotIDE
-				err := r.reconcileCreateRobotIDE(ctx, instance)
+				instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseCreatingRobotVDI
+				err := r.reconcileCreateRobotVDI(ctx, instance)
 				if err != nil {
 					return err
 				}
-				instance.Status.RobotIDEStatus.Created = true
+				instance.Status.RobotVDIStatus.Created = true
 
 			}
 
 		case false:
 
-			instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseRunning
+			switch instance.Spec.IDEEnabled {
+			case true:
+
+				switch instance.Status.RobotIDEStatus.Created {
+				case true:
+
+					switch instance.Status.RobotIDEStatus.Phase {
+					case robotv1alpha1.RobotIDEPhaseRunning:
+
+						instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseRunning
+
+					}
+
+				case false:
+
+					instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseCreatingRobotIDE
+					err := r.reconcileCreateRobotIDE(ctx, instance)
+					if err != nil {
+						return err
+					}
+					instance.Status.RobotIDEStatus.Created = true
+
+				}
+
+			case false:
+
+				instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseRunning
+
+			}
 
 		}
+
+	case false:
+
+		instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseDeactivating
+
+		err := r.reconcileDeleteRobotIDE(ctx, instance)
+		if err != nil {
+			return err
+		}
+
+		err = r.reconcileDeleteRobotVDI(ctx, instance)
+		if err != nil {
+			return err
+		}
+
+		instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseInactive
 
 	}
 

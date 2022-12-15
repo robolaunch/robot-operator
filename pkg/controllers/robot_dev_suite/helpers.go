@@ -48,3 +48,22 @@ func (r *RobotDevSuiteReconciler) reconcileGetTargetRobot(ctx context.Context, i
 
 	return robot, nil
 }
+
+func (r *RobotDevSuiteReconciler) reconcileCheckTargetRobot(ctx context.Context, instance *robotv1alpha1.RobotDevSuite) error {
+	robot, err := r.reconcileGetTargetRobot(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	isActive := false
+	for _, rds := range robot.Status.AttachedDevObjects {
+		if rds.Reference.Kind == instance.Kind && rds.Reference.Name == instance.Name {
+			isActive = true
+			break
+		}
+	}
+
+	instance.Status.Active = isActive
+
+	return nil
+}

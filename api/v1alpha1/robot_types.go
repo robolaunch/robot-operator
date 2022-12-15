@@ -169,6 +169,11 @@ type AttachedLaunchObject struct {
 	Status    LaunchManagerStatus    `json:"status,omitempty"`
 }
 
+type AttachedDevObject struct {
+	Reference corev1.ObjectReference `json:"reference,omitempty"`
+	Status    RobotDevSuiteStatus    `json:"status,omitempty"`
+}
+
 // RobotStatus defines the observed state of Robot
 type RobotStatus struct {
 	// Phase of robot
@@ -189,6 +194,8 @@ type RobotStatus struct {
 	AttachedBuildObject AttachedBuildObject `json:"attachedBuildObject,omitempty"`
 	// Attached launch object information
 	AttachedLaunchObjects []AttachedLaunchObject `json:"attachedLaunchObjects,omitempty"`
+	// Attached dev object information
+	AttachedDevObjects []AttachedDevObject `json:"attachedDevObjects,omitempty"`
 }
 
 //+kubebuilder:object:root=true
