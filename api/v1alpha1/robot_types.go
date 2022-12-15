@@ -113,7 +113,6 @@ type VolumeStatuses struct {
 	Etc       VolumeStatus `json:"etc,omitempty"`
 	Usr       VolumeStatus `json:"usr,omitempty"`
 	Opt       VolumeStatus `json:"opt,omitempty"`
-	Display   VolumeStatus `json:"display,omitempty"`
 	Workspace VolumeStatus `json:"workspace,omitempty"`
 }
 
@@ -243,13 +242,6 @@ func (robot *Robot) GetPVCUsrMetadata() *types.NamespacedName {
 func (robot *Robot) GetPVCEtcMetadata() *types.NamespacedName {
 	return &types.NamespacedName{
 		Name:      robot.Name + internal.PVC_ETC_POSTFIX,
-		Namespace: robot.Namespace,
-	}
-}
-
-func (robot *Robot) GetPVCDisplayMetadata() *types.NamespacedName {
-	return &types.NamespacedName{
-		Name:      robot.Name + internal.PVC_DISPLAY_POSTFIX,
 		Namespace: robot.Namespace,
 	}
 }

@@ -11,8 +11,16 @@ import (
 
 func (r *RobotVDIReconciler) reconcileCheckPVC(ctx context.Context, instance *robotv1alpha1.RobotVDI) error {
 
-	if !instance.Spec.MainDisplay {
-
+	pvcQuery := &corev1.PersistentVolumeClaim{}
+	err := r.Get(ctx, *instance.GetRobotVDIPVCMetadata(), pvcQuery)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			instance.Status.PVCStatus.Created = false
+		} else {
+			return err
+		}
+	} else {
+		instance.Status.PVCStatus.Created = true
 	}
 
 	return nil

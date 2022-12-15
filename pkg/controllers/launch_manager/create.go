@@ -15,12 +15,17 @@ func (r *LaunchManagerReconciler) createLaunchPod(ctx context.Context, instance 
 		return err
 	}
 
+	robotVDI, err := r.reconcileGetTargetRobotVDI(ctx, instance)
+	if err != nil {
+		return err
+	}
+
 	buildManager, err := r.reconcileGetCurrentBuildManager(ctx, instance)
 	if err != nil {
 		return err
 	}
 
-	launchPod := resources.GetLaunchPod(instance, instance.GetLaunchPodMetadata(), *robot, *buildManager)
+	launchPod := resources.GetLaunchPod(instance, instance.GetLaunchPodMetadata(), *robot, *buildManager, *robotVDI)
 	if err != nil {
 		return err
 	}

@@ -86,7 +86,7 @@ func (r *RobotVDIReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 
 func (r *RobotVDIReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.RobotVDI) error {
 
-	switch instance.Status.PVCStatus.Created || instance.Spec.MainDisplay {
+	switch instance.Status.PVCStatus.Created {
 	case true:
 
 		switch instance.Status.ServiceTCPStatus.Created {

@@ -49,6 +49,19 @@ func (r *LaunchManagerReconciler) reconcileGetTargetRobot(ctx context.Context, i
 	return robot, nil
 }
 
+func (r *LaunchManagerReconciler) reconcileGetTargetRobotVDI(ctx context.Context, instance *robotv1alpha1.LaunchManager) (*robotv1alpha1.RobotVDI, error) {
+	robotVDI := &robotv1alpha1.RobotVDI{}
+	err := r.Get(ctx, types.NamespacedName{
+		Namespace: instance.Namespace,
+		Name:      label.GetTargetRobotVDI(instance),
+	}, robotVDI)
+	if err != nil {
+		return nil, err
+	}
+
+	return robotVDI, nil
+}
+
 func (r *LaunchManagerReconciler) reconcileCheckTargetRobot(ctx context.Context, instance *robotv1alpha1.LaunchManager) error {
 	robot, err := r.reconcileGetTargetRobot(ctx, instance)
 	if err != nil {

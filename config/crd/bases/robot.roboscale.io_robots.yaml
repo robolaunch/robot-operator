@@ -786,13 +786,6 @@ spec:
               volumeStatuses:
                 description: Volume status
                 properties:
-                  display:
-                    properties:
-                      created:
-                        type: boolean
-                      persistentVolumeClaimName:
-                        type: string
-                    type: object
                   etc:
                     properties:
                       created:
