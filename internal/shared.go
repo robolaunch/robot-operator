@@ -63,6 +63,12 @@ const (
 	INGRESS_IDE_POSTFIX = ""
 )
 
+// RobotDevSuite owned resources' postfixes
+const (
+	ROBOT_VDI_POSTFIX = "-vdi"
+	ROBOT_IDE_POSTFIX = "-ide"
+)
+
 // Paths
 
 const (

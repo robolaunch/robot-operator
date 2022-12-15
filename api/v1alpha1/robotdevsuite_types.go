@@ -17,23 +17,27 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"github.com/robolaunch/robot-operator/internal"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 )
 
 // RobotDevSuiteSpec defines the desired state of RobotDevSuite
 type RobotDevSuiteSpec struct {
+	VDIEnabled       bool         `json:"vdiEnabled,omitempty"`
 	RobotVDITemplate RobotVDISpec `json:"robotVDITemplate,omitempty"`
+	IDEEnabled       bool         `json:"ideEnabled,omitempty"`
 	RobotIDETemplate RobotIDESpec `json:"robotIDETemplate,omitempty"`
 }
 
 type RobotVDIInstanceStatus struct {
-	Created bool           `json:"created,omitempty"`
-	Status  RobotVDIStatus `json:"status,omitempty"`
+	Created bool          `json:"created,omitempty"`
+	Phase   RobotVDIPhase `json:"phase,omitempty"`
 }
 
 type RobotIDEInstanceStatus struct {
-	Created bool           `json:"created,omitempty"`
-	Status  RobotIDEStatus `json:"status,omitempty"`
+	Created bool          `json:"created,omitempty"`
+	Phase   RobotIDEPhase `json:"phase,omitempty"`
 }
 
 type RobotDevSuitePhase string
@@ -74,4 +78,18 @@ type RobotDevSuiteList struct {
 
 func init() {
 	SchemeBuilder.Register(&RobotDevSuite{}, &RobotDevSuiteList{})
+}
+
+func (robotDevSuite *RobotDevSuite) GetRobotVDIMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Namespace: robotDevSuite.Namespace,
+		Name:      robotDevSuite.Name + internal.ROBOT_VDI_POSTFIX,
+	}
+}
+
+func (robotDevSuite *RobotDevSuite) GetRobotIDEMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Namespace: robotDevSuite.Namespace,
+		Name:      robotDevSuite.Name + internal.ROBOT_IDE_POSTFIX,
+	}
 }
