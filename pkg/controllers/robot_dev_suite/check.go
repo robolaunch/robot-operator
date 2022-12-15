@@ -34,7 +34,7 @@ func (r *RobotDevSuiteReconciler) reconcileCheckRobotIDE(ctx context.Context, in
 	if instance.Spec.IDEEnabled {
 
 		robotIDEQuery := &robotv1alpha1.RobotIDE{}
-		err := r.Get(ctx, *instance.GetRobotVDIMetadata(), robotIDEQuery)
+		err := r.Get(ctx, *instance.GetRobotIDEMetadata(), robotIDEQuery)
 		if err != nil {
 			if errors.IsNotFound(err) {
 				instance.Status.RobotIDEStatus.Created = false
