@@ -24,6 +24,11 @@ const (
 	TARGET_VDI   = "robolaunch.io/target-vdi"
 )
 
+// Special escape labels
+const (
+	ROBOT_DEV_SUITE_OWNED = "robolaunch.io/dev-suite-owned"
+)
+
 // Robot owned resources' postfixes
 const (
 	PVC_VAR_POSTFIX          = "-pvc-var"

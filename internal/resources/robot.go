@@ -227,6 +227,25 @@ func GetROSBridge(robot *robotv1alpha1.Robot, bridgeNamespacedName *types.Namesp
 
 }
 
+func GetRobotDevSuite(robot *robotv1alpha1.Robot, bridgeNamespacedName *types.NamespacedName) *robotv1alpha1.RobotDevSuite {
+
+	labels := robot.Labels
+	labels[internal.TARGET_ROBOT] = robot.Name
+	labels[internal.ROBOT_DEV_SUITE_OWNED] = "true"
+
+	robotDevSuite := robotv1alpha1.RobotDevSuite{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      bridgeNamespacedName.Name,
+			Namespace: bridgeNamespacedName.Namespace,
+			Labels:    robot.Labels,
+		},
+		Spec: robot.Spec.RobotDevSuiteTemplate,
+	}
+
+	return &robotDevSuite
+
+}
+
 func GetCloneCommand(workspaces []robotv1alpha1.Workspace, wsKey int) string {
 
 	var cmdBuilder strings.Builder

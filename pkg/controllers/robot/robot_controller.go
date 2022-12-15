@@ -122,33 +122,34 @@ func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *ro
 								switch instance.Status.ROSBridgeStatus.Status.Phase {
 								case robotv1alpha1.BridgePhaseReady:
 
-									instance.Status.Phase = robotv1alpha1.RobotPhaseEnvironmentReady
-
-									switch instance.Spec.Development {
+									switch instance.Spec.RobotDevSuiteTemplate.IDEEnabled || instance.Spec.RobotDevSuiteTemplate.VDIEnabled {
 									case true:
-
-										// attach development suite
-										err := r.reconcileAttachDevObject(ctx, instance)
-										if err != nil {
-											return err
-										}
 
 									case false:
 
-										// select attached build object
-										err := r.reconcileAttachBuildObject(ctx, instance)
-										if err != nil {
-											return err
-										}
+										switch instance.Status.RobotDevSuiteStatus.Created {
+										case true:
 
-										switch instance.Status.AttachedBuildObject.Status.Phase {
-										case robotv1alpha1.BuildManagerReady:
+											switch instance.Status.RobotDevSuiteStatus.Status.Phase {
+											case robotv1alpha1.RobotDevSuitePhaseRunning:
 
-											// select attached launch object
-											err := r.reconcileAttachLaunchObject(ctx, instance)
+												instance.Status.Phase = robotv1alpha1.RobotPhaseEnvironmentReady
+
+												err := r.reconcileHandleAttachments(ctx, instance)
+												if err != nil {
+													return err
+												}
+
+											}
+
+										case false:
+
+											instance.Status.Phase = robotv1alpha1.RobotPhaseCreatingDevelopmentSuite
+											err := r.createRobotDevSuite(ctx, instance, instance.GetRobotDevSuiteMetadata())
 											if err != nil {
 												return err
 											}
+											instance.Status.RobotDevSuiteStatus.Created = true
 
 										}
 
@@ -169,33 +170,34 @@ func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *ro
 
 						case false:
 
-							instance.Status.Phase = robotv1alpha1.RobotPhaseEnvironmentReady
-
-							switch instance.Spec.Development {
+							switch instance.Spec.RobotDevSuiteTemplate.IDEEnabled || instance.Spec.RobotDevSuiteTemplate.VDIEnabled {
 							case true:
-
-								// attach development suite
-								err := r.reconcileAttachDevObject(ctx, instance)
-								if err != nil {
-									return err
-								}
 
 							case false:
 
-								// select attached build object
-								err := r.reconcileAttachBuildObject(ctx, instance)
-								if err != nil {
-									return err
-								}
+								switch instance.Status.RobotDevSuiteStatus.Created {
+								case true:
 
-								switch instance.Status.AttachedBuildObject.Status.Phase {
-								case robotv1alpha1.BuildManagerReady:
+									switch instance.Status.RobotDevSuiteStatus.Status.Phase {
+									case robotv1alpha1.RobotDevSuitePhaseRunning:
 
-									// select attached launch object
-									err := r.reconcileAttachLaunchObject(ctx, instance)
+										instance.Status.Phase = robotv1alpha1.RobotPhaseEnvironmentReady
+
+										err := r.reconcileHandleAttachments(ctx, instance)
+										if err != nil {
+											return err
+										}
+
+									}
+
+								case false:
+
+									instance.Status.Phase = robotv1alpha1.RobotPhaseCreatingDevelopmentSuite
+									err := r.createRobotDevSuite(ctx, instance, instance.GetRobotDevSuiteMetadata())
 									if err != nil {
 										return err
 									}
+									instance.Status.RobotDevSuiteStatus.Created = true
 
 								}
 
@@ -305,6 +307,11 @@ func (r *RobotReconciler) reconcileCheckResources(ctx context.Context, instance 
 	}
 
 	err = r.reconcileCheckROSBridge(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	err = r.reconcileCheckRobotDevSuite(ctx, instance)
 	if err != nil {
 		return err
 	}

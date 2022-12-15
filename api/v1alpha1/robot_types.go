@@ -149,19 +149,20 @@ type LoaderJobStatus struct {
 type RobotPhase string
 
 const (
-	RobotPhaseCreatingEnvironment     RobotPhase = "CreatingEnvironment"
-	RobotPhaseCreatingDiscoveryServer RobotPhase = "CreatingDiscoveryServer"
-	RobotPhaseConfiguringWorkspaces   RobotPhase = "ConfiguringWorkspaces"
-	RobotPhaseCreatingBridge          RobotPhase = "CreatingBridge"
-	RobotPhaseEnvironmentReady        RobotPhase = "EnvironmentReady"
-	RobotPhaseBuilding                RobotPhase = "Building"
-	RobotPhaseBuilt                   RobotPhase = "Built"
-	RobotPhaseLaunching               RobotPhase = "Launching"
-	RobotPhaseRunning                 RobotPhase = "Running"
-	RobotPhaseDeletingBridge          RobotPhase = "DeletingBridge"
-	RobotPhaseDeletingDiscoveryServer RobotPhase = "DeletingDiscoveryServer"
-	RobotPhaseDeletingLoaderJob       RobotPhase = "DeletingLoaderJob"
-	RobotPhaseDeletingVolumes         RobotPhase = "DeletingVolumes"
+	RobotPhaseCreatingEnvironment      RobotPhase = "CreatingEnvironment"
+	RobotPhaseCreatingDiscoveryServer  RobotPhase = "CreatingDiscoveryServer"
+	RobotPhaseConfiguringWorkspaces    RobotPhase = "ConfiguringWorkspaces"
+	RobotPhaseCreatingBridge           RobotPhase = "CreatingBridge"
+	RobotPhaseCreatingDevelopmentSuite RobotPhase = "CreatingDevelopmentSuite"
+	RobotPhaseEnvironmentReady         RobotPhase = "EnvironmentReady"
+	RobotPhaseBuilding                 RobotPhase = "Building"
+	RobotPhaseBuilt                    RobotPhase = "Built"
+	RobotPhaseLaunching                RobotPhase = "Launching"
+	RobotPhaseRunning                  RobotPhase = "Running"
+	RobotPhaseDeletingBridge           RobotPhase = "DeletingBridge"
+	RobotPhaseDeletingDiscoveryServer  RobotPhase = "DeletingDiscoveryServer"
+	RobotPhaseDeletingLoaderJob        RobotPhase = "DeletingLoaderJob"
+	RobotPhaseDeletingVolumes          RobotPhase = "DeletingVolumes"
 
 	RobotPhaseFailed RobotPhase = "Failed"
 )

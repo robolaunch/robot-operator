@@ -86,3 +86,21 @@ func (r *RobotReconciler) createROSBridge(ctx context.Context, instance *robotv1
 	logger.Info("STATUS: ROS bridge " + rosBridge.Name + " is created.")
 	return nil
 }
+
+func (r *RobotReconciler) createRobotDevSuite(ctx context.Context, instance *robotv1alpha1.Robot, rdsNamespacedName *types.NamespacedName) error {
+
+	robotDevSuite := resources.GetRobotDevSuite(instance, rdsNamespacedName)
+
+	err := ctrl.SetControllerReference(instance, robotDevSuite, r.Scheme)
+	if err != nil {
+		return err
+	}
+
+	err = r.Create(ctx, robotDevSuite)
+	if err != nil {
+		return err
+	}
+
+	logger.Info("STATUS: Robot dev suite " + robotDevSuite.Name + " is created.")
+	return nil
+}
