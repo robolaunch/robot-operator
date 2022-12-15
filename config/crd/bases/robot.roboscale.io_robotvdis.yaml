@@ -37,8 +37,6 @@ spec:
             properties:
               ingress:
                 type: boolean
-              mainDisplay:
-                type: boolean
               nat1to1:
                 description: NAT1TO1 for Neko.
                 type: string

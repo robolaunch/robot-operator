@@ -1365,7 +1365,6 @@ func (in *VolumeStatuses) DeepCopyInto(out *VolumeStatuses) {
 	out.Etc = in.Etc
 	out.Usr = in.Usr
 	out.Opt = in.Opt
-	out.Display = in.Display
 	out.Workspace = in.Workspace
 }
 

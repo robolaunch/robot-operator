@@ -41,7 +41,6 @@ type RobotVDISpec struct {
 	ServiceType corev1.ServiceType `json:"serviceType,omitempty"`
 	Ingress     bool               `json:"ingress,omitempty"`
 	Privileged  bool               `json:"privileged,omitempty"`
-	MainDisplay bool               `json:"mainDisplay,omitempty"`
 	// NAT1TO1 for Neko.
 	NAT1TO1 string `json:"nat1to1,omitempty"`
 	// +kubebuilder:validation:Pattern=`^([0-9])+-([0-9])+$`
