@@ -50,14 +50,14 @@ func (r *RobotIDEReconciler) reconcileGetTargetRobot(ctx context.Context, instan
 }
 
 func (r *RobotIDEReconciler) reconcileGetTargetRobotVDI(ctx context.Context, instance *robotv1alpha1.RobotIDE) (*robotv1alpha1.RobotVDI, error) {
-	robot := &robotv1alpha1.RobotVDI{}
+	robotVDI := &robotv1alpha1.RobotVDI{}
 	err := r.Get(ctx, types.NamespacedName{
 		Namespace: instance.Namespace,
 		Name:      label.GetTargetRobotVDI(instance),
-	}, robot)
+	}, robotVDI)
 	if err != nil {
 		return nil, err
 	}
 
-	return robot, nil
+	return robotVDI, nil
 }

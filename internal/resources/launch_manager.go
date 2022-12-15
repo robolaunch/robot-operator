@@ -14,7 +14,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 )
 
-func GetLaunchPod(launchManager *robotv1alpha1.LaunchManager, podNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot, buildManager robotv1alpha1.BuildManager) *corev1.Pod {
+func GetLaunchPod(launchManager *robotv1alpha1.LaunchManager, podNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot, buildManager robotv1alpha1.BuildManager, robotVDI robotv1alpha1.RobotVDI) *corev1.Pod {
 
 	containers := []corev1.Container{}
 	for k, l := range launchManager.Spec.Launch {
@@ -54,9 +54,9 @@ func GetLaunchPod(launchManager *robotv1alpha1.LaunchManager, podNamespacedName 
 		},
 	}
 
-	configure.InjectGenericEnvironmentVariables(&launchPod, robot)  // Environment variables
-	configure.InjectPodDiscoveryServerConnection(&launchPod, robot) // Discovery server configuration
-	configure.InjectPodDisplayConfiguration(&launchPod, robot)      // Display configuration
+	configure.InjectGenericEnvironmentVariables(&launchPod, robot)      // Environment variables
+	configure.InjectPodDiscoveryServerConnection(&launchPod, robot)     // Discovery server configuration
+	configure.InjectPodDisplayConfigurationForVDI(&launchPod, robotVDI) // Display configuration
 
 	return &launchPod
 }

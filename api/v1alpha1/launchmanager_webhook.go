@@ -62,6 +62,11 @@ func (r *LaunchManager) ValidateCreate() error {
 		return err
 	}
 
+	err = r.checkTargetRobotVDILabel()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -70,6 +75,11 @@ func (r *LaunchManager) ValidateUpdate(old runtime.Object) error {
 	launchmanagerlog.Info("validate update", "name", r.Name)
 
 	err := r.checkTargetRobotLabel()
+	if err != nil {
+		return err
+	}
+
+	err = r.checkTargetRobotVDILabel()
 	if err != nil {
 		return err
 	}
@@ -88,6 +98,16 @@ func (r *LaunchManager) checkTargetRobotLabel() error {
 
 	if _, ok := labels[internal.TARGET_ROBOT]; !ok {
 		return errors.New("target robot label should be added with key " + internal.TARGET_ROBOT)
+	}
+
+	return nil
+}
+
+func (r *LaunchManager) checkTargetRobotVDILabel() error {
+	labels := r.GetLabels()
+
+	if _, ok := labels[internal.TARGET_VDI]; !ok {
+		return errors.New("target robot vdi label should be added with key " + internal.TARGET_VDI)
 	}
 
 	return nil

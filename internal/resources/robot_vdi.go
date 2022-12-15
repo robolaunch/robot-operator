@@ -142,11 +142,7 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 
 	configure.InjectGenericEnvironmentVariables(vdiPod, robot)
 	configure.InjectPodDiscoveryServerConnection(vdiPod, robot)
-	if robotVDI.Spec.MainDisplay {
-		configure.InjectPodDisplayConfiguration(vdiPod, robot)
-	} else {
-		configure.InjectPodDisplayConfigurationForVDI(vdiPod, *robotVDI)
-	}
+	configure.InjectPodDisplayConfigurationForVDI(vdiPod, *robotVDI)
 
 	return vdiPod
 }
