@@ -22,10 +22,33 @@ import (
 
 // RobotDevSuiteSpec defines the desired state of RobotDevSuite
 type RobotDevSuiteSpec struct {
+	RobotVDITemplate RobotVDISpec `json:"robotVDITemplate,omitempty"`
+	RobotIDETemplate RobotIDESpec `json:"robotIDETemplate,omitempty"`
 }
+
+type RobotVDIInstanceStatus struct {
+	Created bool           `json:"created,omitempty"`
+	Status  RobotVDIStatus `json:"status,omitempty"`
+}
+
+type RobotIDEInstanceStatus struct {
+	Created bool           `json:"created,omitempty"`
+	Status  RobotIDEStatus `json:"status,omitempty"`
+}
+
+type RobotDevSuitePhase string
+
+const (
+	RobotDevSuitePhaseCreatingRobotVDI = "CreatingRobotVDI"
+	RobotDevSuitePhaseCreatingRobotIDE = "CreatingRobotIDE"
+	RobotDevSuitePhaseRunning          = "Running"
+)
 
 // RobotDevSuiteStatus defines the observed state of RobotDevSuite
 type RobotDevSuiteStatus struct {
+	Phase          RobotDevSuitePhase     `json:"phase,omitempty"`
+	RobotVDIStatus RobotVDIInstanceStatus `json:"robotVDIStatus,omitempty"`
+	RobotIDEStatus RobotIDEInstanceStatus `json:"robotIDEStatus,omitempty"`
 }
 
 //+kubebuilder:object:root=true
