@@ -169,6 +169,17 @@ func (r *RobotDevSuiteReconciler) reconcileCheckStatus(ctx context.Context, inst
 }
 
 func (r *RobotDevSuiteReconciler) reconcileCheckResources(ctx context.Context, instance *robotv1alpha1.RobotDevSuite) error {
+
+	err := r.reconcileCheckRobotVDI(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	err = r.reconcileCheckRobotIDE(ctx, instance)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -176,5 +187,7 @@ func (r *RobotDevSuiteReconciler) reconcileCheckResources(ctx context.Context, i
 func (r *RobotDevSuiteReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&robotv1alpha1.RobotDevSuite{}).
+		Owns(&robotv1alpha1.RobotVDI{}).
+		Owns(&robotv1alpha1.RobotIDE{}).
 		Complete(r)
 }
