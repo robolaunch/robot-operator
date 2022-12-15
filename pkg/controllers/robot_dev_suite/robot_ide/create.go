@@ -4,6 +4,7 @@ import (
 	"context"
 
 	robotv1alpha1 "github.com/robolaunch/robot-operator/api/v1alpha1"
+	"github.com/robolaunch/robot-operator/internal/label"
 	"github.com/robolaunch/robot-operator/internal/resources"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
@@ -35,10 +36,11 @@ func (r *RobotIDEReconciler) reconcileCreatePod(ctx context.Context, instance *r
 	}
 
 	robotVDI := &robotv1alpha1.RobotVDI{}
-
-	robotVDI, err = r.reconcileGetTargetRobotVDI(ctx, instance)
-	if err != nil {
-		return err
+	if label.GetTargetRobotVDI(instance) != "" {
+		robotVDI, err = r.reconcileGetTargetRobotVDI(ctx, instance)
+		if err != nil {
+			return err
+		}
 	}
 
 	idePod := resources.GetRobotIDEPod(instance, instance.GetRobotIDEPodMetadata(), *robot, *robotVDI)
