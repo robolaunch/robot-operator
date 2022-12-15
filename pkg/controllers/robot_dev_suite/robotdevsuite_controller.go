@@ -20,14 +20,21 @@ import (
 	"context"
 
 	"k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/selection"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/dynamic"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/log"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	"github.com/go-logr/logr"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/api/v1alpha1"
+	"github.com/robolaunch/robot-operator/internal"
 )
 
 // RobotDevSuiteReconciler reconciles a RobotDevSuite object
@@ -52,6 +59,17 @@ func (r *RobotDevSuiteReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 			return ctrl.Result{}, nil
 		}
 		return ctrl.Result{}, err
+	}
+
+	// Check target robot's attached object, update activity status
+	err = r.reconcileCheckTargetRobot(ctx, instance)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseRobotNotFound
+			instance.Status.Active = false
+		} else {
+			return ctrl.Result{}, err
+		}
 	}
 
 	err = r.reconcileCheckStatus(ctx, instance)
@@ -210,5 +228,44 @@ func (r *RobotDevSuiteReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		For(&robotv1alpha1.RobotDevSuite{}).
 		Owns(&robotv1alpha1.RobotVDI{}).
 		Owns(&robotv1alpha1.RobotIDE{}).
+		Watches(
+			&source.Kind{Type: &robotv1alpha1.Robot{}},
+			handler.EnqueueRequestsFromMapFunc(r.watchRobots),
+		).
 		Complete(r)
+}
+
+func (r *RobotDevSuiteReconciler) watchRobots(o client.Object) []reconcile.Request {
+
+	robot := o.(*robotv1alpha1.Robot)
+
+	// Get attached build objects for this robot
+	requirements := []labels.Requirement{}
+	newReq, err := labels.NewRequirement(internal.TARGET_ROBOT, selection.In, []string{robot.Name})
+	if err != nil {
+		return []reconcile.Request{}
+	}
+	requirements = append(requirements, *newReq)
+
+	robotSelector := labels.NewSelector().Add(requirements...)
+
+	robotDevSuiteList := robotv1alpha1.RobotDevSuiteList{}
+	err = r.List(context.TODO(), &robotDevSuiteList, &client.ListOptions{Namespace: robot.Namespace, LabelSelector: robotSelector})
+	if err != nil {
+		return []reconcile.Request{}
+	}
+
+	requests := make([]reconcile.Request, len(robotDevSuiteList.Items))
+	for i, item := range robotDevSuiteList.Items {
+
+		requests[i] = reconcile.Request{
+			NamespacedName: types.NamespacedName{
+				Name:      item.Name,
+				Namespace: item.Namespace,
+			},
+		}
+
+	}
+
+	return requests
 }

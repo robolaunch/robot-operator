@@ -43,6 +43,7 @@ type RobotIDEInstanceStatus struct {
 type RobotDevSuitePhase string
 
 const (
+	RobotDevSuitePhaseRobotNotFound    = "RobotNotFound"
 	RobotDevSuitePhaseCreatingRobotVDI = "CreatingRobotVDI"
 	RobotDevSuitePhaseCreatingRobotIDE = "CreatingRobotIDE"
 	RobotDevSuitePhaseRunning          = "Running"
