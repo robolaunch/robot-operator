@@ -57,17 +57,6 @@ func (r *RobotReconciler) reconcileCheckPVCs(ctx context.Context, instance *robo
 		instance.Status.VolumeStatuses.Usr.PersistentVolumeClaimName = pvcUsrQuery.Name
 	}
 
-	pvcDisplayQuery := &corev1.PersistentVolumeClaim{}
-	err = r.Get(ctx, *instance.GetPVCDisplayMetadata(), pvcDisplayQuery)
-	if err != nil && errors.IsNotFound(err) {
-		instance.Status.VolumeStatuses.Display.Created = false
-	} else if err != nil {
-		return err
-	} else {
-		instance.Status.VolumeStatuses.Display.Created = true
-		instance.Status.VolumeStatuses.Display.PersistentVolumeClaimName = pvcDisplayQuery.Name
-	}
-
 	pvcWorkspaceQuery := &corev1.PersistentVolumeClaim{}
 	err = r.Get(ctx, *instance.GetPVCWorkspaceMetadata(), pvcWorkspaceQuery)
 	if err != nil && errors.IsNotFound(err) {

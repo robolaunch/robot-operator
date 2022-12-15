@@ -98,7 +98,6 @@ func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *ro
 		instance.Status.VolumeStatuses.Opt.Created &&
 		instance.Status.VolumeStatuses.Etc.Created &&
 		instance.Status.VolumeStatuses.Usr.Created &&
-		instance.Status.VolumeStatuses.Display.Created &&
 		instance.Status.VolumeStatuses.Workspace.Created {
 	case true:
 
@@ -266,14 +265,6 @@ func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *ro
 				return err
 			}
 			instance.Status.VolumeStatuses.Usr.Created = true
-		}
-
-		if !instance.Status.VolumeStatuses.Display.Created {
-			err := r.createPVC(ctx, instance, instance.GetPVCDisplayMetadata())
-			if err != nil {
-				return err
-			}
-			instance.Status.VolumeStatuses.Display.Created = true
 		}
 
 		if !instance.Status.VolumeStatuses.Workspace.Created {
