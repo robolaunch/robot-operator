@@ -81,7 +81,7 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 
 	configure.InjectGenericEnvironmentVariables(&pod, robot)
 	configure.InjectPodDiscoveryServerConnection(&pod, robot)
-	configure.InjectPodDisplayConfigurationForVDI(&pod, robotVDI)
+	configure.InjectPodDisplayConfiguration(&pod, robotVDI)
 
 	return &pod
 }

@@ -61,7 +61,7 @@ func GetVolumeEtc(robot *robotv1alpha1.Robot) corev1.Volume {
 	return volume
 }
 
-func GetVolumeX11UnixForVDI(robotVDI *robotv1alpha1.RobotVDI) corev1.Volume {
+func GetVolumeX11Unix(robotVDI *robotv1alpha1.RobotVDI) corev1.Volume {
 
 	volume := corev1.Volume{
 		Name: "x11-unix",
