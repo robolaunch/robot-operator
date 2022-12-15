@@ -35,6 +35,7 @@ const (
 	DISCOVERY_SERVER_POSTFIX = "-discovery"
 	JOB_LOADER_POSTFIX       = "-loader"
 	ROS_BRIDGE_POSTFIX       = "-bridge"
+	ROBOT_DEV_SUITE_POSTFIX  = "-dev"
 )
 
 // BuildManager owned resources' postfixes

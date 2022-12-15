@@ -90,6 +90,8 @@ type RobotSpec struct {
 	DiscoveryServerTemplate DiscoveryServerSpec `json:"discoveryServerTemplate,omitempty"`
 	// ROS bridge template
 	ROSBridgeTemplate ROSBridgeSpec `json:"rosBridgeTemplate,omitempty"`
+	// Robot development suite template
+	RobotDevSuiteTemplate RobotDevSuiteSpec `json:"robotDevSuiteTemplate,omitempty"`
 	// Global path of workspaces. It's fixed to `/home/workspaces` path.
 	WorkspacesPath string `json:"workspacesPath,omitempty"`
 	// Workspace definitions of robot.
@@ -124,6 +126,11 @@ type DiscoveryServerInstanceStatus struct {
 type ROSBridgeInstanceStatus struct {
 	Created bool            `json:"created,omitempty"`
 	Status  ROSBridgeStatus `json:"status,omitempty"`
+}
+
+type RobotDevSuiteInstanceStatus struct {
+	Created bool                `json:"created,omitempty"`
+	Status  RobotDevSuiteStatus `json:"status,omitempty"`
 }
 
 type JobPhase string
@@ -188,6 +195,8 @@ type RobotStatus struct {
 	DiscoveryServerStatus DiscoveryServerInstanceStatus `json:"discoveryServerStatus,omitempty"`
 	// ROS bridge instance status
 	ROSBridgeStatus ROSBridgeInstanceStatus `json:"rosBridgeStatus,omitempty"`
+	// Robot development suite instance status
+	RobotDevSuiteStatus RobotDevSuiteInstanceStatus `json:"robotDevSuiteStatus,omitempty"`
 	// Loader job status that configures environment
 	LoaderJobStatus LoaderJobStatus `json:"loaderJobStatus,omitempty"`
 	// Attached build object information
@@ -277,6 +286,13 @@ func (robot *Robot) GetLoaderJobMetadata() *types.NamespacedName {
 func (robot *Robot) GetROSBridgeMetadata() *types.NamespacedName {
 	return &types.NamespacedName{
 		Name:      robot.Name + internal.ROS_BRIDGE_POSTFIX,
+		Namespace: robot.Namespace,
+	}
+}
+
+func (robot *Robot) GetRobotDevSuiteMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Name:      robot.Name + internal.ROBOT_DEV_SUITE_POSTFIX,
 		Namespace: robot.Namespace,
 	}
 }
