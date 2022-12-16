@@ -61,6 +61,24 @@ type Workspace struct {
 	Repositories map[string]Repository `json:"repositories"`
 }
 
+type TLSSecretReference struct {
+	// TLS secret object name.
+	// +kubebuilder:validation:Required
+	Name string `json:"name"`
+	// TLS secret object namespace.
+	// +kubebuilder:validation:Required
+	Namespace string `json:"namespace"`
+}
+
+type RootDNSConfig struct {
+	// DNS host.
+	// +kubebuilder:validation:Required
+	Host string `json:"host"`
+	// DNS host.
+	// +kubebuilder:validation:Required
+	Port string `json:"port"`
+}
+
 // RobotSpec defines the desired state of Robot
 type RobotSpec struct {
 	// ROS distro to be used.
@@ -72,11 +90,19 @@ type RobotSpec struct {
 	DiscoveryServerTemplate DiscoveryServerSpec `json:"discoveryServerTemplate,omitempty"`
 	// ROS bridge template
 	ROSBridgeTemplate ROSBridgeSpec `json:"rosBridgeTemplate,omitempty"`
+	// Robot development suite template
+	RobotDevSuiteTemplate RobotDevSuiteSpec `json:"robotDevSuiteTemplate,omitempty"`
 	// Global path of workspaces. It's fixed to `/home/workspaces` path.
 	WorkspacesPath string `json:"workspacesPath,omitempty"`
 	// Workspace definitions of robot.
 	// +kubebuilder:validation:MinItems=1
 	Workspaces []Workspace `json:"workspaces,omitempty"`
+	// Development enabled
+	Development bool `json:"development,omitempty"`
+	// Root DNS configuration.
+	RootDNSConfig RootDNSConfig `json:"rootDNSConfig,omitempty"`
+	// TLS secret reference.
+	TLSSecretReference TLSSecretReference `json:"tlsSecretRef,omitempty"`
 }
 
 type VolumeStatus struct {
@@ -89,7 +115,6 @@ type VolumeStatuses struct {
 	Etc       VolumeStatus `json:"etc,omitempty"`
 	Usr       VolumeStatus `json:"usr,omitempty"`
 	Opt       VolumeStatus `json:"opt,omitempty"`
-	Display   VolumeStatus `json:"display,omitempty"`
 	Workspace VolumeStatus `json:"workspace,omitempty"`
 }
 
@@ -101,6 +126,11 @@ type DiscoveryServerInstanceStatus struct {
 type ROSBridgeInstanceStatus struct {
 	Created bool            `json:"created,omitempty"`
 	Status  ROSBridgeStatus `json:"status,omitempty"`
+}
+
+type RobotDevSuiteInstanceStatus struct {
+	Created bool                `json:"created,omitempty"`
+	Status  RobotDevSuiteStatus `json:"status,omitempty"`
 }
 
 type JobPhase string
@@ -119,19 +149,20 @@ type LoaderJobStatus struct {
 type RobotPhase string
 
 const (
-	RobotPhaseCreatingEnvironment     RobotPhase = "CreatingEnvironment"
-	RobotPhaseCreatingDiscoveryServer RobotPhase = "CreatingDiscoveryServer"
-	RobotPhaseConfiguringWorkspaces   RobotPhase = "ConfiguringWorkspaces"
-	RobotPhaseCreatingBridge          RobotPhase = "CreatingBridge"
-	RobotPhaseEnvironmentReady        RobotPhase = "EnvironmentReady"
-	RobotPhaseBuilding                RobotPhase = "Building"
-	RobotPhaseBuilt                   RobotPhase = "Built"
-	RobotPhaseLaunching               RobotPhase = "Launching"
-	RobotPhaseRunning                 RobotPhase = "Running"
-	RobotPhaseDeletingBridge          RobotPhase = "DeletingBridge"
-	RobotPhaseDeletingDiscoveryServer RobotPhase = "DeletingDiscoveryServer"
-	RobotPhaseDeletingLoaderJob       RobotPhase = "DeletingLoaderJob"
-	RobotPhaseDeletingVolumes         RobotPhase = "DeletingVolumes"
+	RobotPhaseCreatingEnvironment      RobotPhase = "CreatingEnvironment"
+	RobotPhaseCreatingDiscoveryServer  RobotPhase = "CreatingDiscoveryServer"
+	RobotPhaseConfiguringWorkspaces    RobotPhase = "ConfiguringWorkspaces"
+	RobotPhaseCreatingBridge           RobotPhase = "CreatingBridge"
+	RobotPhaseCreatingDevelopmentSuite RobotPhase = "CreatingDevelopmentSuite"
+	RobotPhaseEnvironmentReady         RobotPhase = "EnvironmentReady"
+	RobotPhaseBuilding                 RobotPhase = "Building"
+	RobotPhaseBuilt                    RobotPhase = "Built"
+	RobotPhaseLaunching                RobotPhase = "Launching"
+	RobotPhaseRunning                  RobotPhase = "Running"
+	RobotPhaseDeletingBridge           RobotPhase = "DeletingBridge"
+	RobotPhaseDeletingDiscoveryServer  RobotPhase = "DeletingDiscoveryServer"
+	RobotPhaseDeletingLoaderJob        RobotPhase = "DeletingLoaderJob"
+	RobotPhaseDeletingVolumes          RobotPhase = "DeletingVolumes"
 
 	RobotPhaseFailed RobotPhase = "Failed"
 )
@@ -144,6 +175,11 @@ type AttachedBuildObject struct {
 type AttachedLaunchObject struct {
 	Reference corev1.ObjectReference `json:"reference,omitempty"`
 	Status    LaunchManagerStatus    `json:"status,omitempty"`
+}
+
+type AttachedDevObject struct {
+	Reference corev1.ObjectReference `json:"reference,omitempty"`
+	Status    RobotDevSuiteStatus    `json:"status,omitempty"`
 }
 
 // RobotStatus defines the observed state of Robot
@@ -160,12 +196,16 @@ type RobotStatus struct {
 	DiscoveryServerStatus DiscoveryServerInstanceStatus `json:"discoveryServerStatus,omitempty"`
 	// ROS bridge instance status
 	ROSBridgeStatus ROSBridgeInstanceStatus `json:"rosBridgeStatus,omitempty"`
+	// Robot development suite instance status
+	RobotDevSuiteStatus RobotDevSuiteInstanceStatus `json:"robotDevSuiteStatus,omitempty"`
 	// Loader job status that configures environment
 	LoaderJobStatus LoaderJobStatus `json:"loaderJobStatus,omitempty"`
 	// Attached build object information
 	AttachedBuildObject AttachedBuildObject `json:"attachedBuildObject,omitempty"`
 	// Attached launch object information
 	AttachedLaunchObjects []AttachedLaunchObject `json:"attachedLaunchObjects,omitempty"`
+	// Attached dev object information
+	AttachedDevObjects []AttachedDevObject `json:"attachedDevObjects,omitempty"`
 }
 
 //+kubebuilder:object:root=true
@@ -223,13 +263,6 @@ func (robot *Robot) GetPVCEtcMetadata() *types.NamespacedName {
 	}
 }
 
-func (robot *Robot) GetPVCDisplayMetadata() *types.NamespacedName {
-	return &types.NamespacedName{
-		Name:      robot.Name + internal.PVC_DISPLAY_POSTFIX,
-		Namespace: robot.Namespace,
-	}
-}
-
 func (robot *Robot) GetPVCWorkspaceMetadata() *types.NamespacedName {
 	return &types.NamespacedName{
 		Name:      robot.Name + internal.PVC_WORKSPACE_POSTFIX,
@@ -254,6 +287,13 @@ func (robot *Robot) GetLoaderJobMetadata() *types.NamespacedName {
 func (robot *Robot) GetROSBridgeMetadata() *types.NamespacedName {
 	return &types.NamespacedName{
 		Name:      robot.Name + internal.ROS_BRIDGE_POSTFIX,
+		Namespace: robot.Namespace,
+	}
+}
+
+func (robot *Robot) GetRobotDevSuiteMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Name:      robot.Name + internal.ROBOT_DEV_SUITE_POSTFIX,
 		Namespace: robot.Namespace,
 	}
 }

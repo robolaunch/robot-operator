@@ -65,6 +65,46 @@ webhooks:
     resources:
     - robots
   sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /mutate-robot-roboscale-io-v1alpha1-robotide
+  failurePolicy: Fail
+  name: mrobotide.kb.io
+  rules:
+  - apiGroups:
+    - robot.roboscale.io
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - robotides
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /mutate-robot-roboscale-io-v1alpha1-robotvdi
+  failurePolicy: Fail
+  name: mrobotvdi.kb.io
+  rules:
+  - apiGroups:
+    - robot.roboscale.io
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - robotvdis
+  sideEffects: None
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
@@ -131,4 +171,44 @@ webhooks:
     - UPDATE
     resources:
     - robots
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /validate-robot-roboscale-io-v1alpha1-robotide
+  failurePolicy: Fail
+  name: vrobotide.kb.io
+  rules:
+  - apiGroups:
+    - robot.roboscale.io
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - robotides
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /validate-robot-roboscale-io-v1alpha1-robotvdi
+  failurePolicy: Fail
+  name: vrobotvdi.kb.io
+  rules:
+  - apiGroups:
+    - robot.roboscale.io
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - robotvdis
   sideEffects: None

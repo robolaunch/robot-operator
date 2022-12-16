@@ -42,8 +42,9 @@ func placeDiscoveryServerEnvironmentVariables(pod *corev1.Pod, robot robotv1alph
 		},
 	}
 
-	for _, container := range pod.Spec.Containers {
+	for k, container := range pod.Spec.Containers {
 		container.Env = append(container.Env, environmentVariables...)
+		pod.Spec.Containers[k] = container
 	}
 
 }
@@ -79,8 +80,9 @@ func placeDiscoveryServerConfigFile(pod *corev1.Pod, robot robotv1alpha1.Robot) 
 		MountPath: "/etc/discovery-server/",
 	}
 
-	for _, container := range pod.Spec.Containers {
+	for k, container := range pod.Spec.Containers {
 		container.VolumeMounts = append(container.VolumeMounts, volumeMount)
+		pod.Spec.Containers[k] = container
 	}
 
 }

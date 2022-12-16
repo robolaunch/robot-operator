@@ -76,13 +76,43 @@ func (r *BuildManagerReconciler) reconcileCheckOtherAttachedResources(ctx contex
 	if instance.Status.Active {
 		// Get attached build manager objects for this robot
 		requirements := []labels.Requirement{}
-		newReq, err := labels.NewRequirement(internal.TARGET_ROBOT, selection.In, []string{label.GetTargetRobot(instance)})
+		targetReq, err := labels.NewRequirement(internal.TARGET_ROBOT, selection.In, []string{label.GetTargetRobot(instance)})
 		if err != nil {
 			return err
 		}
-		requirements = append(requirements, *newReq)
+
+		ownedReq, err := labels.NewRequirement(internal.ROBOT_DEV_SUITE_OWNED, selection.DoesNotExist, []string{})
+		if err != nil {
+			return err
+		}
+		requirements = append(requirements, *targetReq, *ownedReq)
 
 		robotSelector := labels.NewSelector().Add(requirements...)
+
+		robotDevSuiteList := robotv1alpha1.RobotDevSuiteList{}
+		err = r.List(ctx, &robotDevSuiteList, &client.ListOptions{Namespace: instance.Namespace, LabelSelector: robotSelector.Add()})
+		if err != nil {
+			return err
+		}
+
+		for _, rds := range robotDevSuiteList.Items {
+
+			if rds.Status.Active == true {
+				return &robotErr.RobotResourcesHasNotBeenReleasedError{
+					ResourceKind:      instance.Kind,
+					ResourceName:      instance.Name,
+					ResourceNamespace: instance.Namespace,
+				}
+			}
+
+			if rds.Status.Phase != robotv1alpha1.RobotDevSuitePhaseInactive {
+				return &robotErr.RobotResourcesHasNotBeenReleasedError{
+					ResourceKind:      instance.Kind,
+					ResourceName:      instance.Name,
+					ResourceNamespace: instance.Namespace,
+				}
+			}
+		}
 
 		launchManagerList := robotv1alpha1.LaunchManagerList{}
 		err = r.List(ctx, &launchManagerList, &client.ListOptions{Namespace: instance.Namespace, LabelSelector: robotSelector})
@@ -90,18 +120,7 @@ func (r *BuildManagerReconciler) reconcileCheckOtherAttachedResources(ctx contex
 			return err
 		}
 
-		robot, err := r.reconcileGetTargetRobot(ctx, instance)
-		if err != nil {
-			return err
-		}
-
 		for _, lm := range launchManagerList.Items {
-
-			for _, obj := range robot.Status.AttachedLaunchObjects {
-				if lm.Name == obj.Reference.Name {
-					continue
-				}
-			}
 
 			if lm.Status.Active == true {
 				return &robotErr.RobotResourcesHasNotBeenReleasedError{

@@ -61,13 +61,13 @@ func GetVolumeEtc(robot *robotv1alpha1.Robot) corev1.Volume {
 	return volume
 }
 
-func GetVolumeX11Unix(robot *robotv1alpha1.Robot) corev1.Volume {
+func GetVolumeX11Unix(robotVDI *robotv1alpha1.RobotVDI) corev1.Volume {
 
 	volume := corev1.Volume{
 		Name: "x11-unix",
 		VolumeSource: corev1.VolumeSource{
 			PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-				ClaimName: robot.GetPVCDisplayMetadata().Name,
+				ClaimName: robotVDI.GetRobotVDIPVCMetadata().Name,
 			},
 		},
 	}

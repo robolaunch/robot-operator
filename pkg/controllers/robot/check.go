@@ -57,17 +57,6 @@ func (r *RobotReconciler) reconcileCheckPVCs(ctx context.Context, instance *robo
 		instance.Status.VolumeStatuses.Usr.PersistentVolumeClaimName = pvcUsrQuery.Name
 	}
 
-	pvcDisplayQuery := &corev1.PersistentVolumeClaim{}
-	err = r.Get(ctx, *instance.GetPVCDisplayMetadata(), pvcDisplayQuery)
-	if err != nil && errors.IsNotFound(err) {
-		instance.Status.VolumeStatuses.Display.Created = false
-	} else if err != nil {
-		return err
-	} else {
-		instance.Status.VolumeStatuses.Display.Created = true
-		instance.Status.VolumeStatuses.Display.PersistentVolumeClaimName = pvcDisplayQuery.Name
-	}
-
 	pvcWorkspaceQuery := &corev1.PersistentVolumeClaim{}
 	err = r.Get(ctx, *instance.GetPVCWorkspaceMetadata(), pvcWorkspaceQuery)
 	if err != nil && errors.IsNotFound(err) {
@@ -152,6 +141,33 @@ func (r *RobotReconciler) reconcileCheckROSBridge(ctx context.Context, instance 
 
 			instance.Status.ROSBridgeStatus.Created = true
 			instance.Status.ROSBridgeStatus.Status = rosBridgeQuery.Status
+		}
+	}
+
+	return nil
+}
+
+func (r *RobotReconciler) reconcileCheckRobotDevSuite(ctx context.Context, instance *robotv1alpha1.Robot) error {
+
+	if instance.Spec.RobotDevSuiteTemplate.IDEEnabled || instance.Spec.RobotDevSuiteTemplate.VDIEnabled {
+		robotDevSuiteQuery := &robotv1alpha1.RobotDevSuite{}
+		err := r.Get(ctx, *instance.GetRobotDevSuiteMetadata(), robotDevSuiteQuery)
+		if err != nil && errors.IsNotFound(err) {
+			instance.Status.RobotDevSuiteStatus = robotv1alpha1.RobotDevSuiteInstanceStatus{}
+		} else if err != nil {
+			return err
+		} else {
+
+			if !reflect.DeepEqual(instance.Spec.RobotDevSuiteTemplate, robotDevSuiteQuery.Spec) {
+				robotDevSuiteQuery.Spec = instance.Spec.RobotDevSuiteTemplate
+				err = r.Update(ctx, robotDevSuiteQuery)
+				if err != nil {
+					return err
+				}
+			}
+
+			instance.Status.RobotDevSuiteStatus.Created = true
+			instance.Status.RobotDevSuiteStatus.Status = robotDevSuiteQuery.Status
 		}
 	}
 

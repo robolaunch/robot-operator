@@ -1,0 +1,12 @@
+apiVersion: robot.roboscale.io/v1alpha1
+kind: RobotIDE
+metadata:
+  labels:
+    app.kubernetes.io/name: robotide
+    app.kubernetes.io/instance: robotide-sample
+    app.kubernetes.io/part-of: robot-operator
+    app.kuberentes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: robot-operator
+  name: robotide-sample
+spec:
+  # TODO(user): Add fields here

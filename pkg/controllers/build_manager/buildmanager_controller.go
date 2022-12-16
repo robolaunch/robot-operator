@@ -161,6 +161,10 @@ func (r *BuildManagerReconciler) reconcileCheckStatus(ctx context.Context, insta
 						return err
 					}
 
+					stepStatus := instance.Status.Steps[k]
+					stepStatus.JobCreated = true
+					instance.Status.Steps[k] = stepStatus
+
 					break
 				}
 			}
@@ -213,24 +217,14 @@ func (r *BuildManagerReconciler) reconcileCheckStatus(ctx context.Context, insta
 
 func (r *BuildManagerReconciler) reconcileCheckResources(ctx context.Context, instance *robotv1alpha1.BuildManager) error {
 
-	switch instance.Status.Active {
-	case true:
+	err := r.reconcileCheckConfigMap(ctx, instance)
+	if err != nil {
+		return err
+	}
 
-		err := r.reconcileCheckConfigMap(ctx, instance)
-		if err != nil {
-			return err
-		}
-
-		err = r.reconcileCheckBuilderJobs(ctx, instance)
-		if err != nil {
-			return err
-		}
-
-	case false:
-
-		instance.Status.ScriptConfigMapStatus = robotv1alpha1.ScriptConfigMapStatus{}
-		instance.Status.Steps = []robotv1alpha1.StepStatus{}
-
+	err = r.reconcileCheckBuilderJobs(ctx, instance)
+	if err != nil {
+		return err
 	}
 
 	return nil

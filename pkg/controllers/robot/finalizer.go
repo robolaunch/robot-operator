@@ -67,11 +67,6 @@ func (r *RobotReconciler) reconcileCheckDeletion(ctx context.Context, instance *
 				return err
 			}
 
-			err = r.waitForPersistentVolumeClaimDeletion(ctx, instance, instance.GetPVCDisplayMetadata())
-			if err != nil {
-				return err
-			}
-
 			err = r.waitForPersistentVolumeClaimDeletion(ctx, instance, instance.GetPVCWorkspaceMetadata())
 			if err != nil {
 				return err

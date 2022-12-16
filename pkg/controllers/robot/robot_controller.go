@@ -98,7 +98,6 @@ func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *ro
 		instance.Status.VolumeStatuses.Opt.Created &&
 		instance.Status.VolumeStatuses.Etc.Created &&
 		instance.Status.VolumeStatuses.Usr.Created &&
-		instance.Status.VolumeStatuses.Display.Created &&
 		instance.Status.VolumeStatuses.Workspace.Created {
 	case true:
 
@@ -123,19 +122,40 @@ func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *ro
 								switch instance.Status.ROSBridgeStatus.Status.Phase {
 								case robotv1alpha1.BridgePhaseReady:
 
-									instance.Status.Phase = robotv1alpha1.RobotPhaseEnvironmentReady
+									switch instance.Spec.RobotDevSuiteTemplate.IDEEnabled || instance.Spec.RobotDevSuiteTemplate.VDIEnabled {
+									case true:
 
-									// select attached build object
-									err := r.reconcileAttachBuildObject(ctx, instance)
-									if err != nil {
-										return err
-									}
+										switch instance.Status.RobotDevSuiteStatus.Created {
+										case true:
 
-									switch instance.Status.AttachedBuildObject.Status.Phase {
-									case robotv1alpha1.BuildManagerReady:
+											switch instance.Status.RobotDevSuiteStatus.Status.Phase {
+											case robotv1alpha1.RobotDevSuitePhaseRunning:
 
-										// select attached launch object
-										err := r.reconcileAttachLaunchObject(ctx, instance)
+												instance.Status.Phase = robotv1alpha1.RobotPhaseEnvironmentReady
+
+												err := r.reconcileHandleAttachments(ctx, instance)
+												if err != nil {
+													return err
+												}
+
+											}
+
+										case false:
+
+											instance.Status.Phase = robotv1alpha1.RobotPhaseCreatingDevelopmentSuite
+											err := r.createRobotDevSuite(ctx, instance, instance.GetRobotDevSuiteMetadata())
+											if err != nil {
+												return err
+											}
+											instance.Status.RobotDevSuiteStatus.Created = true
+
+										}
+
+									case false:
+
+										instance.Status.Phase = robotv1alpha1.RobotPhaseEnvironmentReady
+
+										err := r.reconcileHandleAttachments(ctx, instance)
 										if err != nil {
 											return err
 										}
@@ -157,21 +177,35 @@ func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *ro
 
 						case false:
 
-							instance.Status.Phase = robotv1alpha1.RobotPhaseEnvironmentReady
+							switch instance.Spec.RobotDevSuiteTemplate.IDEEnabled || instance.Spec.RobotDevSuiteTemplate.VDIEnabled {
+							case true:
 
-							// select attached build object
-							err := r.reconcileAttachBuildObject(ctx, instance)
-							if err != nil {
-								return err
-							}
+							case false:
 
-							switch instance.Status.AttachedBuildObject.Status.Phase {
-							case robotv1alpha1.BuildManagerReady:
+								switch instance.Status.RobotDevSuiteStatus.Created {
+								case true:
 
-								// select attached launch object
-								err := r.reconcileAttachLaunchObject(ctx, instance)
-								if err != nil {
-									return err
+									switch instance.Status.RobotDevSuiteStatus.Status.Phase {
+									case robotv1alpha1.RobotDevSuitePhaseRunning:
+
+										instance.Status.Phase = robotv1alpha1.RobotPhaseEnvironmentReady
+
+										err := r.reconcileHandleAttachments(ctx, instance)
+										if err != nil {
+											return err
+										}
+
+									}
+
+								case false:
+
+									instance.Status.Phase = robotv1alpha1.RobotPhaseCreatingDevelopmentSuite
+									err := r.createRobotDevSuite(ctx, instance, instance.GetRobotDevSuiteMetadata())
+									if err != nil {
+										return err
+									}
+									instance.Status.RobotDevSuiteStatus.Created = true
+
 								}
 
 							}
@@ -250,14 +284,6 @@ func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *ro
 			instance.Status.VolumeStatuses.Usr.Created = true
 		}
 
-		if !instance.Status.VolumeStatuses.Display.Created {
-			err := r.createPVC(ctx, instance, instance.GetPVCDisplayMetadata())
-			if err != nil {
-				return err
-			}
-			instance.Status.VolumeStatuses.Display.Created = true
-		}
-
 		if !instance.Status.VolumeStatuses.Workspace.Created {
 			err := r.createPVC(ctx, instance, instance.GetPVCWorkspaceMetadata())
 			if err != nil {
@@ -292,6 +318,11 @@ func (r *RobotReconciler) reconcileCheckResources(ctx context.Context, instance 
 		return err
 	}
 
+	err = r.reconcileCheckRobotDevSuite(ctx, instance)
+	if err != nil {
+		return err
+	}
+
 	err = r.reconcileCheckAttachedBuildManager(ctx, instance)
 	if err != nil {
 		return err
@@ -320,6 +351,10 @@ func (r *RobotReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Watches(
 			&source.Kind{Type: &robotv1alpha1.LaunchManager{}},
 			handler.EnqueueRequestsFromMapFunc(r.watchAttachedLaunchManagers),
+		).
+		Watches(
+			&source.Kind{Type: &robotv1alpha1.RobotDevSuite{}},
+			handler.EnqueueRequestsFromMapFunc(r.watchAttachedRobotDevSuites),
 		).
 		Complete(r)
 }
@@ -350,6 +385,29 @@ func (r *RobotReconciler) watchAttachedBuildManagers(o client.Object) []reconcil
 func (r *RobotReconciler) watchAttachedLaunchManagers(o client.Object) []reconcile.Request {
 
 	obj := o.(*robotv1alpha1.LaunchManager)
+
+	robot := &robotv1alpha1.Robot{}
+	err := r.Get(context.TODO(), types.NamespacedName{
+		Name:      label.GetTargetRobot(obj),
+		Namespace: obj.Namespace,
+	}, robot)
+	if err != nil {
+		return []reconcile.Request{}
+	}
+
+	return []reconcile.Request{
+		{
+			NamespacedName: types.NamespacedName{
+				Name:      robot.Name,
+				Namespace: robot.Namespace,
+			},
+		},
+	}
+}
+
+func (r *RobotReconciler) watchAttachedRobotDevSuites(o client.Object) []reconcile.Request {
+
+	obj := o.(*robotv1alpha1.RobotDevSuite)
 
 	robot := &robotv1alpha1.Robot{}
 	err := r.Get(context.TODO(), types.NamespacedName{

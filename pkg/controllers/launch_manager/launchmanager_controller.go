@@ -119,6 +119,7 @@ func (r *LaunchManagerReconciler) reconcileCheckStatus(ctx context.Context, inst
 			if err != nil {
 				return err
 			}
+			instance.Status.LaunchPodStatus.Created = true
 			instance.Status.Phase = robotv1alpha1.LaunchManagerPhaseLaunching
 
 		}
@@ -141,18 +142,9 @@ func (r *LaunchManagerReconciler) reconcileCheckStatus(ctx context.Context, inst
 
 func (r *LaunchManagerReconciler) reconcileCheckResources(ctx context.Context, instance *robotv1alpha1.LaunchManager) error {
 
-	switch instance.Status.Active {
-	case true:
-
-		err := r.reconcileCheckLaunchPod(ctx, instance)
-		if err != nil {
-			return err
-		}
-
-	case false:
-
-		instance.Status.LaunchPodStatus = robotv1alpha1.LaunchPodStatus{}
-
+	err := r.reconcileCheckLaunchPod(ctx, instance)
+	if err != nil {
+		return err
 	}
 
 	return nil

@@ -102,6 +102,9 @@ func (r *RobotReconciler) reconcileCheckImage(ctx context.Context, instance *rob
 
 func (r *RobotReconciler) reconcileAttachBuildObject(ctx context.Context, instance *robotv1alpha1.Robot) error {
 
+	// Detach dev objects from robot
+	instance.Status.AttachedDevObjects = []robotv1alpha1.AttachedDevObject{}
+
 	// Get attached build objects for this robot
 	requirements := []labels.Requirement{}
 	newReq, err := labels.NewRequirement(internal.TARGET_ROBOT, selection.In, []string{instance.Name})
@@ -120,6 +123,7 @@ func (r *RobotReconciler) reconcileAttachBuildObject(ctx context.Context, instan
 
 	if len(buildManagerList.Items) == 0 {
 		instance.Status.AttachedBuildObject.Reference = corev1.ObjectReference{}
+		instance.Status.AttachedBuildObject.Status = robotv1alpha1.BuildManagerStatus{}
 		return nil
 	}
 
@@ -133,7 +137,6 @@ func (r *RobotReconciler) reconcileAttachBuildObject(ctx context.Context, instan
 	if instance.Status.AttachedBuildObject.Reference.Name != selectedBuildManager.Name {
 		instance.Status.AttachedLaunchObjects = []robotv1alpha1.AttachedLaunchObject{}
 		instance.Status.AttachedBuildObject.Status = robotv1alpha1.BuildManagerStatus{}
-
 	}
 
 	instance.Status.AttachedBuildObject.Reference = corev1.ObjectReference{
@@ -150,7 +153,7 @@ func (r *RobotReconciler) reconcileAttachBuildObject(ctx context.Context, instan
 
 func (r *RobotReconciler) reconcileAttachLaunchObject(ctx context.Context, instance *robotv1alpha1.Robot) error {
 
-	// Get attached build objects for this robot
+	// Get attached launch objects for this robot
 	requirements := []labels.Requirement{}
 	newReq, err := labels.NewRequirement(internal.TARGET_ROBOT, selection.In, []string{instance.Name})
 	if err != nil {
@@ -171,7 +174,7 @@ func (r *RobotReconciler) reconcileAttachLaunchObject(ctx context.Context, insta
 		return nil
 	}
 
-	// Sort attached build objects for this robot according to their creation timestamps
+	// Sort attached launch objects for this robot according to their creation timestamps
 	sort.SliceStable(launchManagerList.Items[:], func(i, j int) bool {
 		return launchManagerList.Items[i].CreationTimestamp.String() < launchManagerList.Items[j].CreationTimestamp.String()
 	})
@@ -187,6 +190,56 @@ func (r *RobotReconciler) reconcileAttachLaunchObject(ctx context.Context, insta
 				UID:             lm.UID,
 				APIVersion:      lm.APIVersion,
 				ResourceVersion: lm.ResourceVersion,
+			},
+		})
+	}
+
+	return nil
+}
+
+func (r *RobotReconciler) reconcileAttachDevObject(ctx context.Context, instance *robotv1alpha1.Robot) error {
+
+	// Detach build and launch objects from robot
+	instance.Status.AttachedBuildObject = robotv1alpha1.AttachedBuildObject{}
+	instance.Status.AttachedLaunchObjects = []robotv1alpha1.AttachedLaunchObject{}
+
+	// Get attached dev objects for this robot
+	requirements := []labels.Requirement{}
+	newReq, err := labels.NewRequirement(internal.TARGET_ROBOT, selection.In, []string{instance.Name})
+	if err != nil {
+		return err
+	}
+	requirements = append(requirements, *newReq)
+
+	robotSelector := labels.NewSelector().Add(requirements...)
+
+	robotDevSuiteList := robotv1alpha1.RobotDevSuiteList{}
+	err = r.List(ctx, &robotDevSuiteList, &client.ListOptions{Namespace: instance.Namespace, LabelSelector: robotSelector})
+	if err != nil {
+		return err
+	}
+
+	if len(robotDevSuiteList.Items) == 0 {
+		instance.Status.AttachedDevObjects = []robotv1alpha1.AttachedDevObject{}
+		return nil
+	}
+
+	// Sort attached dev objects for this robot according to their creation timestamps
+	sort.SliceStable(robotDevSuiteList.Items[:], func(i, j int) bool {
+		return robotDevSuiteList.Items[i].CreationTimestamp.String() < robotDevSuiteList.Items[j].CreationTimestamp.String()
+	})
+
+	instance.Status.AttachedDevObjects = []robotv1alpha1.AttachedDevObject{}
+
+	for _, rds := range robotDevSuiteList.Items {
+		instance.Status.AttachedDevObjects = append(instance.Status.AttachedDevObjects, robotv1alpha1.AttachedDevObject{
+			Reference: corev1.ObjectReference{
+				Kind:            rds.Kind,
+				Namespace:       rds.Namespace,
+				Name:            rds.Name,
+				UID:             rds.UID,
+				APIVersion:      rds.APIVersion,
+				ResourceVersion: rds.ResourceVersion,
 			},
 		})
 	}

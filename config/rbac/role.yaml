@@ -78,6 +78,18 @@ rules:
   - update
   - watch
 - apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingresses
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
   - robot.roboscale.io
   resources:
   - buildmanagers
@@ -158,6 +170,58 @@ rules:
 - apiGroups:
   - robot.roboscale.io
   resources:
+  - robotdevsuites
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - robotdevsuites/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - robotdevsuites/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - robotides
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - robotides/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - robotides/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - robot.roboscale.io
+  resources:
   - robots
   verbs:
   - create
@@ -177,6 +241,32 @@ rules:
   - robot.roboscale.io
   resources:
   - robots/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - robotvdis
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - robotvdis/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - robotvdis/status
   verbs:
   - get
   - patch
