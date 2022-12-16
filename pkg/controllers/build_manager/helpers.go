@@ -76,16 +76,21 @@ func (r *BuildManagerReconciler) reconcileCheckOtherAttachedResources(ctx contex
 	if instance.Status.Active {
 		// Get attached build manager objects for this robot
 		requirements := []labels.Requirement{}
-		newReq, err := labels.NewRequirement(internal.TARGET_ROBOT, selection.In, []string{label.GetTargetRobot(instance)})
+		targetReq, err := labels.NewRequirement(internal.TARGET_ROBOT, selection.In, []string{label.GetTargetRobot(instance)})
 		if err != nil {
 			return err
 		}
-		requirements = append(requirements, *newReq)
+
+		ownedReq, err := labels.NewRequirement(internal.ROBOT_DEV_SUITE_OWNED, selection.DoesNotExist, []string{})
+		if err != nil {
+			return err
+		}
+		requirements = append(requirements, *targetReq, *ownedReq)
 
 		robotSelector := labels.NewSelector().Add(requirements...)
 
 		robotDevSuiteList := robotv1alpha1.RobotDevSuiteList{}
-		err = r.List(ctx, &robotDevSuiteList, &client.ListOptions{Namespace: instance.Namespace, LabelSelector: robotSelector})
+		err = r.List(ctx, &robotDevSuiteList, &client.ListOptions{Namespace: instance.Namespace, LabelSelector: robotSelector.Add()})
 		if err != nil {
 			return err
 		}

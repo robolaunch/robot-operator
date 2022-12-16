@@ -161,6 +161,10 @@ func (r *BuildManagerReconciler) reconcileCheckStatus(ctx context.Context, insta
 						return err
 					}
 
+					stepStatus := instance.Status.Steps[k]
+					stepStatus.JobCreated = true
+					instance.Status.Steps[k] = stepStatus
+
 					break
 				}
 			}

@@ -119,6 +119,7 @@ func (r *LaunchManagerReconciler) reconcileCheckStatus(ctx context.Context, inst
 			if err != nil {
 				return err
 			}
+			instance.Status.LaunchPodStatus.Created = true
 			instance.Status.Phase = robotv1alpha1.LaunchManagerPhaseLaunching
 
 		}

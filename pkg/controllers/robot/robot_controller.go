@@ -125,8 +125,6 @@ func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *ro
 									switch instance.Spec.RobotDevSuiteTemplate.IDEEnabled || instance.Spec.RobotDevSuiteTemplate.VDIEnabled {
 									case true:
 
-									case false:
-
 										switch instance.Status.RobotDevSuiteStatus.Created {
 										case true:
 
@@ -151,6 +149,15 @@ func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *ro
 											}
 											instance.Status.RobotDevSuiteStatus.Created = true
 
+										}
+
+									case false:
+
+										instance.Status.Phase = robotv1alpha1.RobotPhaseEnvironmentReady
+
+										err := r.reconcileHandleAttachments(ctx, instance)
+										if err != nil {
+											return err
 										}
 
 									}

@@ -55,27 +55,32 @@ func (r *RobotDevSuiteReconciler) reconcileGetTargetRobot(ctx context.Context, i
 }
 
 func (r *RobotDevSuiteReconciler) reconcileCheckTargetRobot(ctx context.Context, instance *robotv1alpha1.RobotDevSuite) error {
-	robot, err := r.reconcileGetTargetRobot(ctx, instance)
-	if err != nil {
-		return err
-	}
 
-	isActive := false
-	for _, rds := range robot.Status.AttachedDevObjects {
-		if rds.Reference.Kind == instance.Kind && rds.Reference.Name == instance.Name {
-			isActive = true
-			break
+	if label.GetDevSuiteOwned(instance) == "true" {
+		instance.Status.Active = true
+	} else {
+		robot, err := r.reconcileGetTargetRobot(ctx, instance)
+		if err != nil {
+			return err
 		}
-	}
 
-	instance.Status.Active = isActive
+		isActive := false
+		for _, rds := range robot.Status.AttachedDevObjects {
+			if rds.Reference.Kind == instance.Kind && rds.Reference.Name == instance.Name {
+				isActive = true
+				break
+			}
+		}
+
+		instance.Status.Active = isActive
+	}
 
 	return nil
 }
 
 func (r *RobotDevSuiteReconciler) reconcileCheckOtherAttachedResources(ctx context.Context, instance *robotv1alpha1.RobotDevSuite) error {
 
-	if instance.Status.Active {
+	if instance.Status.Active && label.GetDevSuiteOwned(instance) != "true" {
 		// Get attached build manager objects for this robot
 		requirements := []labels.Requirement{}
 		newReq, err := labels.NewRequirement(internal.TARGET_ROBOT, selection.In, []string{label.GetTargetRobot(instance)})

@@ -24,3 +24,13 @@ func GetTargetRobotVDI(obj metav1.Object) string {
 
 	return ""
 }
+
+func GetDevSuiteOwned(obj metav1.Object) string {
+	labels := obj.GetLabels()
+
+	if devSuiteOwned, ok := labels[internal.ROBOT_DEV_SUITE_OWNED]; ok {
+		return devSuiteOwned
+	}
+
+	return ""
+}

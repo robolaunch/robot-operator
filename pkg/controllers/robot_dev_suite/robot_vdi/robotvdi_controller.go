@@ -120,7 +120,7 @@ func (r *RobotVDIReconciler) reconcileCheckStatus(ctx context.Context, instance 
 								if err != nil {
 									return err
 								}
-								instance.Status.PodStatus.Created = true
+								instance.Status.IngressStatus.Created = true
 
 							}
 
