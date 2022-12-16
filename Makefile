@@ -136,21 +136,21 @@ apply:
 # Production
 
 .PHONY: gh-extract
-extract: manifests kustomize ## Extract controller YAMLs, not deploy
+gh-extract: manifests kustomize ## Extract controller YAMLs, not deploy
 	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
 	$(KUSTOMIZE) build config/default > hack/deploy/robot_operator.yaml
 
 .PHONY: gh-select-node
-select-node: 
+gh-select-node: 
 	yq -i e '(select(.kind == "Deployment") | .spec.template.spec.nodeSelector."${LABEL_KEY}") = "${LABEL_VAL}"' hack/deploy/robot_operator.yaml
 	yq -i e '(select(.kind == "Deployment") | .spec.template.spec.nodeSelector."${LABEL_KEY}") = "${LABEL_VAL}"' hack/deploy/cert_manager_1.8.0.yaml
 
 .PHONY: gh-get-cert-manager
-get-cert-manager: 
+gh-get-cert-manager: 
 	kubectl apply -f hack/deploy/cert_manager_1.8.0.yaml
 
 .PHONY: gh-apply
-apply: 
+gh-apply: 
 	kubectl apply -f hack/deploy/robot_operator.yaml
 
 .PHONY: undeploy
