@@ -65,6 +65,7 @@ type RobotIDEStatus struct {
 	IngressStatus RobotIDEIngressStatus `json:"ingressStatus,omitempty"`
 }
 
+//+genclient
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 

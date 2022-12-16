@@ -208,6 +208,7 @@ type RobotStatus struct {
 	AttachedDevObjects []AttachedDevObject `json:"attachedDevObjects,omitempty"`
 }
 
+//+genclient
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 //+kubebuilder:printcolumn:name="Distro",type=string,JSONPath=`.spec.distro`

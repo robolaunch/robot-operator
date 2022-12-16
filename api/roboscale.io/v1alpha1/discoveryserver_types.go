@@ -70,6 +70,7 @@ type DiscoveryServerStatus struct {
 	ConnectionInfo  ConnectionInfo                 `json:"connectionInfo,omitempty"`
 }
 
+//+genclient
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 

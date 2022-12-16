@@ -60,6 +60,7 @@ type ROSBridgeStatus struct {
 	ServiceStatus BridgeServiceStatus `json:"serviceStatus,omitempty"`
 }
 
+//+genclient
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 

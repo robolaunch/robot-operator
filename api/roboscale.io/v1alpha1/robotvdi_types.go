@@ -91,6 +91,7 @@ type RobotVDIStatus struct {
 	PVCStatus        RobotVDIPVCStatus        `json:"pvcStatus,omitempty"`
 }
 
+//+genclient
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 

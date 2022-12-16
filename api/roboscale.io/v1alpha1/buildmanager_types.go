@@ -75,6 +75,7 @@ type BuildManagerStatus struct {
 	Steps                 []StepStatus          `json:"steps,omitempty"`
 }
 
+//+genclient
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 

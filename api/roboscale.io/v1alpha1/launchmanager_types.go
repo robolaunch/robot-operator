@@ -92,6 +92,7 @@ type LaunchManagerStatus struct {
 	LaunchPodStatus LaunchPodStatus    `json:"launchPodStatus,omitempty"`
 }
 
+//+genclient
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 
