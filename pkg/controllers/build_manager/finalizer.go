@@ -3,7 +3,7 @@ package build_manager
 import (
 	"context"
 
-	robotv1alpha1 "github.com/robolaunch/robot-operator/api/v1alpha1"
+	robotv1alpha1 "github.com/robolaunch/robot-operator/api/roboscale.io/v1alpha1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
