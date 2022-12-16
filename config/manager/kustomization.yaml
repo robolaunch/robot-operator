@@ -4,5 +4,5 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 images:
 - name: controller
-  newName: robolaunchio/robot-controller-manager-dev
-  newTag: platform-v0.4.20
+  newName: robolaunchio/robot-controller-manager
+  newTag: v0.1.0
