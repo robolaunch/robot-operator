@@ -32,7 +32,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	robotv1alpha1 "github.com/robolaunch/robot-operator/api/v1alpha1"
+	robotv1alpha1 "github.com/robolaunch/robot-operator/api/roboscale.io/v1alpha1"
 	buildManager "github.com/robolaunch/robot-operator/pkg/controllers/build_manager"
 	launchManager "github.com/robolaunch/robot-operator/pkg/controllers/launch_manager"
 	robot "github.com/robolaunch/robot-operator/pkg/controllers/robot"

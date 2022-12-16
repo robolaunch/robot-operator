@@ -1,7 +1,7 @@
 package resources
 
 import (
-	robotv1alpha1 "github.com/robolaunch/robot-operator/api/v1alpha1"
+	robotv1alpha1 "github.com/robolaunch/robot-operator/api/roboscale.io/v1alpha1"
 	"github.com/robolaunch/robot-operator/internal"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"

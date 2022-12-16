@@ -59,6 +59,7 @@ type RobotDevSuiteStatus struct {
 	RobotIDEStatus RobotIDEInstanceStatus `json:"robotIDEStatus,omitempty"`
 }
 
+//+genclient
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 

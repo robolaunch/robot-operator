@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	robotv1alpha1 "github.com/robolaunch/robot-operator/api/v1alpha1"
+	robotv1alpha1 "github.com/robolaunch/robot-operator/api/roboscale.io/v1alpha1"
 	"github.com/robolaunch/robot-operator/internal"
 	"github.com/robolaunch/robot-operator/internal/label"
 	corev1 "k8s.io/api/core/v1"

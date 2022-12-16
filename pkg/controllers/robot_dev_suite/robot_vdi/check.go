@@ -3,7 +3,7 @@ package robot_vdi
 import (
 	"context"
 
-	robotv1alpha1 "github.com/robolaunch/robot-operator/api/v1alpha1"
+	robotv1alpha1 "github.com/robolaunch/robot-operator/api/roboscale.io/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1"
 	"k8s.io/apimachinery/pkg/api/errors"

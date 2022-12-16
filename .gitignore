@@ -27,3 +27,6 @@ Dockerfile.cross
 
 # local files & folders
 *.local
+
+# vendor
+vendor

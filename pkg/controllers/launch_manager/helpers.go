@@ -3,7 +3,7 @@ package launch_manager
 import (
 	"context"
 
-	robotv1alpha1 "github.com/robolaunch/robot-operator/api/v1alpha1"
+	robotv1alpha1 "github.com/robolaunch/robot-operator/api/roboscale.io/v1alpha1"
 	"github.com/robolaunch/robot-operator/internal/label"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/util/retry"
