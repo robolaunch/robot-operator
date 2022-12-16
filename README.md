@@ -2,20 +2,36 @@
 
 <div align="center">
   <p align="center">
-    <a href="https://github.com/robolaunch/robot-operator/releases">
-      <img src="https://img.shields.io/github/go-mod/go-version/robolaunch/robot-operator" alt="release">
+    <a href="https://github.com/robolaunch/robot-operator/blob/main/LICENSE">
+      <img src="https://img.shields.io/github/license/robolaunch/robot-operator" alt="license">
+    </a>
+    <a href="https://github.com/robolaunch/robot-operator/issues">
+      <img src="https://img.shields.io/github/issues/robolaunch/robot-operator" alt="issues">
     </a>
     <a href="https://github.com/robolaunch/robot-operator/releases">
       <img src="https://img.shields.io/github/v/release/robolaunch/robot-operator" alt="release">
     </a>
-    <a href="https://github.com/robolaunch/robot-operator/blob/main/LICENSE">
-      <img src="https://img.shields.io/github/license/robolaunch/robot-operator" alt="license">
+  </p>
+</div>
+
+<div align="center">
+  <p align="center">
+    <a href="https://github.com/robolaunch/robot-operator/releases">
+      <img src="https://img.shields.io/github/go-mod/go-version/robolaunch/robot-operator" alt="release">
     </a>
+    <a href="https://pkg.go.dev/github.com/robolaunch/robot-operator">
+      <img src="https://pkg.go.dev/badge/github.com/robolaunch/robot-operator.svg" alt="Go Reference">
+    </a>
+    <a href="https://goreportcard.com/report/github.com/robolaunch/robot-operator">
+      <img src="https://goreportcard.com/badge/github.com/robolaunch/robot-operator" alt="Go Reference">
+    </a>
+  </p>
+</div>
+
+<div align="center">
+  <p align="center">
     <a href="https://hub.docker.com/u/robolaunchio/robot-controller-manager">
       <img src="https://img.shields.io/docker/pulls/robolaunchio/robot-controller-manager" alt="pulls">
-    </a>
-    <a href="https://github.com/robolaunch/robot-operator/issues">
-      <img src="https://img.shields.io/github/issues/robolaunch/robot-operator" alt="issues">
     </a>
     <a href="https://github.com/robolaunch/robot-operator/actions">
       <img src="https://github.com/robolaunch/robot-operator/actions/workflows/docker-build-for-push.yml/badge.svg" alt="build">
