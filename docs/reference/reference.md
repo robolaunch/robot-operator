@@ -9,14 +9,14 @@
 Package v1alpha1 contains API Schema definitions for the robot v1alpha1 API group
 
 ### Resource Types
+- [Robot](#robot)
+- [BuildManager](#buildmanager)
+- [LaunchManager](#launchmanager)
+- [RobotDevSuite](#robotdevsuite)
+- [DiscoveryServer](#discoveryserver)
+- [ROSBridge](#rosbridge)
 - [RobotVDI](#robotvdi)
 - [RobotIDE](#robotide)
-- [RobotDevSuite](#robotdevsuite)
-- [Robot](#robot)
-- [ROSBridge](#rosbridge)
-- [LaunchManager](#launchmanager)
-- [DiscoveryServer](#discoveryserver)
-- [BuildManager](#buildmanager)
 
 
 
