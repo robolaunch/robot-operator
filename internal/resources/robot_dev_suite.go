@@ -33,7 +33,7 @@ func GetRobotIDE(robotDevSuite *robotv1alpha1.RobotDevSuite, robotIDENamespacedN
 	}
 
 	if robotDevSuite.Spec.VDIEnabled {
-		robotIDE.Labels[internal.TARGET_VDI] = robotDevSuite.GetRobotVDIMetadata().Name
+		robotIDE.Labels[internal.TARGET_VDI_LABEL_KEY] = robotDevSuite.GetRobotVDIMetadata().Name
 	}
 
 	return &robotIDE

@@ -81,8 +81,8 @@ func (r *RobotVDI) ValidateDelete() error {
 func (r *RobotVDI) checkTargetRobotLabel() error {
 	labels := r.GetLabels()
 
-	if _, ok := labels[internal.TARGET_ROBOT]; !ok {
-		return errors.New("target robot label should be added with key " + internal.TARGET_ROBOT)
+	if _, ok := labels[internal.TARGET_ROBOT_LABEL_KEY]; !ok {
+		return errors.New("target robot label should be added with key " + internal.TARGET_VDI_LABEL_KEY)
 	}
 
 	return nil

@@ -20,8 +20,8 @@ const (
 
 // Target resource labels
 const (
-	TARGET_ROBOT = "robolaunch.io/target-robot"
-	TARGET_VDI   = "robolaunch.io/target-vdi"
+	TARGET_ROBOT_LABEL_KEY = "robolaunch.io/target-robot"
+	TARGET_VDI_LABEL_KEY   = "robolaunch.io/target-vdi"
 )
 
 // Special escape labels

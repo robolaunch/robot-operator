@@ -83,7 +83,7 @@ func (r *RobotDevSuiteReconciler) reconcileCheckOtherAttachedResources(ctx conte
 	if instance.Status.Active && label.GetDevSuiteOwned(instance) != "true" {
 		// Get attached build manager objects for this robot
 		requirements := []labels.Requirement{}
-		newReq, err := labels.NewRequirement(internal.TARGET_ROBOT, selection.In, []string{label.GetTargetRobot(instance)})
+		newReq, err := labels.NewRequirement(internal.TARGET_ROBOT_LABEL_KEY, selection.In, []string{label.GetTargetRobot(instance)})
 		if err != nil {
 			return err
 		}

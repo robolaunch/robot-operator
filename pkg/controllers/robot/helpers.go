@@ -107,7 +107,7 @@ func (r *RobotReconciler) reconcileAttachBuildObject(ctx context.Context, instan
 
 	// Get attached build objects for this robot
 	requirements := []labels.Requirement{}
-	newReq, err := labels.NewRequirement(internal.TARGET_ROBOT, selection.In, []string{instance.Name})
+	newReq, err := labels.NewRequirement(internal.TARGET_ROBOT_LABEL_KEY, selection.In, []string{instance.Name})
 	if err != nil {
 		return err
 	}
@@ -155,7 +155,7 @@ func (r *RobotReconciler) reconcileAttachLaunchObject(ctx context.Context, insta
 
 	// Get attached launch objects for this robot
 	requirements := []labels.Requirement{}
-	newReq, err := labels.NewRequirement(internal.TARGET_ROBOT, selection.In, []string{instance.Name})
+	newReq, err := labels.NewRequirement(internal.TARGET_ROBOT_LABEL_KEY, selection.In, []string{instance.Name})
 	if err != nil {
 		return err
 	}
@@ -205,7 +205,7 @@ func (r *RobotReconciler) reconcileAttachDevObject(ctx context.Context, instance
 
 	// Get attached dev objects for this robot
 	requirements := []labels.Requirement{}
-	newReq, err := labels.NewRequirement(internal.TARGET_ROBOT, selection.In, []string{instance.Name})
+	newReq, err := labels.NewRequirement(internal.TARGET_ROBOT_LABEL_KEY, selection.In, []string{instance.Name})
 	if err != nil {
 		return err
 	}

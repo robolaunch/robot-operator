@@ -8,7 +8,7 @@ import (
 func GetTargetRobot(obj metav1.Object) string {
 	labels := obj.GetLabels()
 
-	if targetRobot, ok := labels[internal.TARGET_ROBOT]; ok {
+	if targetRobot, ok := labels[internal.TARGET_ROBOT_LABEL_KEY]; ok {
 		return targetRobot
 	}
 
@@ -18,7 +18,7 @@ func GetTargetRobot(obj metav1.Object) string {
 func GetTargetRobotVDI(obj metav1.Object) string {
 	labels := obj.GetLabels()
 
-	if targetRobotVDI, ok := labels[internal.TARGET_VDI]; ok {
+	if targetRobotVDI, ok := labels[internal.TARGET_VDI_LABEL_KEY]; ok {
 		return targetRobotVDI
 	}
 

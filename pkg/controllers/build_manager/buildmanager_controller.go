@@ -249,7 +249,7 @@ func (r *BuildManagerReconciler) watchRobots(o client.Object) []reconcile.Reques
 
 	// Get attached build objects for this robot
 	requirements := []labels.Requirement{}
-	newReq, err := labels.NewRequirement(internal.TARGET_ROBOT, selection.In, []string{robot.Name})
+	newReq, err := labels.NewRequirement(internal.TARGET_ROBOT_LABEL_KEY, selection.In, []string{robot.Name})
 	if err != nil {
 		return []reconcile.Request{}
 	}

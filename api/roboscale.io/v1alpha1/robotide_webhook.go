@@ -91,8 +91,8 @@ func (r *RobotIDE) ValidateDelete() error {
 func (r *RobotIDE) checkTargetRobotLabel() error {
 	labels := r.GetLabels()
 
-	if _, ok := labels[internal.TARGET_ROBOT]; !ok {
-		return errors.New("target robot label should be added with key " + internal.TARGET_ROBOT)
+	if _, ok := labels[internal.TARGET_ROBOT_LABEL_KEY]; !ok {
+		return errors.New("target robot label should be added with key " + internal.TARGET_ROBOT_LABEL_KEY)
 	}
 
 	return nil
@@ -101,8 +101,8 @@ func (r *RobotIDE) checkTargetRobotLabel() error {
 func (r *RobotIDE) checkTargetRobotVDILabel() error {
 	labels := r.GetLabels()
 
-	if _, ok := labels[internal.TARGET_VDI]; !ok {
-		return errors.New("target robot vdi label should be added with key " + internal.TARGET_VDI)
+	if _, ok := labels[internal.TARGET_VDI_LABEL_KEY]; !ok {
+		return errors.New("target robot vdi label should be added with key " + internal.TARGET_VDI_LABEL_KEY)
 	}
 
 	return nil

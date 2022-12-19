@@ -230,7 +230,7 @@ func GetROSBridge(robot *robotv1alpha1.Robot, bridgeNamespacedName *types.Namesp
 func GetRobotDevSuite(robot *robotv1alpha1.Robot, bridgeNamespacedName *types.NamespacedName) *robotv1alpha1.RobotDevSuite {
 
 	labels := robot.Labels
-	labels[internal.TARGET_ROBOT] = robot.Name
+	labels[internal.TARGET_ROBOT_LABEL_KEY] = robot.Name
 	labels[internal.ROBOT_DEV_SUITE_OWNED] = "true"
 
 	robotDevSuite := robotv1alpha1.RobotDevSuite{
