@@ -1,0 +1,24 @@
+apiVersion: robot.roboscale.io/v1alpha1
+kind: BuildManager
+metadata:
+  labels:
+    robolaunch.io/target-robot: arcelik-robot
+  name: build
+spec:
+  steps:
+  - name: rosdep
+    workspace: ws-1
+    command: cd $WORKSPACES_PATH/ws-1 && source /opt/ros/foxy/setup.bash && apt-get update && rosdep update && rosdep install --from-path src --ignore-src -y -r
+  - name: external
+    workspace: ws-1
+    script: |
+      #!/bin/bash
+      set -eux
+      pip install odrive pyserial;
+      apt-key adv --keyserver keyserver.ubuntu.com --recv-key F6E65AC044F831AC80A06380C8B3A55A6F3EFCDE || sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key F6E65AC044F831AC80A06380C8B3A55A6F3EFCDE;
+      apt-get install software-properties-common -y;
+      add-apt-repository "deb https://librealsense.intel.com/Debian/apt-repo $(lsb_release -cs) main" -u;
+      apt-get install librealsense2-dkms librealsense2-utils -y;
+  - name: build
+    workspace: ws-1
+    command: cd $WORKSPACES_PATH/ws-1 && source /opt/ros/foxy/setup.bash && colcon build --symlink-install

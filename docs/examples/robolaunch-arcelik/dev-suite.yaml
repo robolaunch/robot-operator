@@ -1,0 +1,18 @@
+apiVersion: robot.roboscale.io/v1alpha1
+kind: RobotDevSuite
+metadata:
+  labels:
+    robolaunch.io/target-robot: arcelik-robot
+  name: dev
+spec:
+  vdiEnabled: true
+  ideEnabled: true
+  robotVDITemplate:
+    serviceType: NodePort
+    ingress: false
+    privileged: false
+    webrtcPortRange: "31024-31027"
+  robotIDETemplate:
+    serviceType: NodePort
+    ingress: false
+    privileged: false

@@ -1,0 +1,24 @@
+apiVersion: robot.roboscale.io/v1alpha1
+kind: LaunchManager
+metadata:
+  labels:
+    robolaunch.io/target-robot: arcelik-robot
+    robolaunch.io/target-vdi: arcelik-robot-dev-vdi
+  name: launch
+spec:
+  launch:
+    slam:
+      selector:
+        robolaunch.io/physical-instance: demo
+      workspace: ws-1
+      repository: repo1
+      namespacing: false
+      launchFilePath: slam/launch/arcelik_slam.launch.py
+    slam2:
+      selector:
+        robolaunch.io/cloud-instance: robot01
+      workspace: ws-1
+      repository: repo1
+      namespacing: false
+      launchFilePath: slam/launch/arcelik_slam.launch.py
+

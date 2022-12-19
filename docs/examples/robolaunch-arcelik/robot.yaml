@@ -1,0 +1,50 @@
+apiVersion: robot.roboscale.io/v1alpha1
+kind: Robot
+metadata:
+  labels:
+    robolaunch.io/organization: boston-uni
+    robolaunch.io/team: robotics
+    robolaunch.io/region: usa-boston
+    robolaunch.io/cloud-instance: robot01
+    robolaunch.io/robot-image-user: "robolaunchio"
+    robolaunch.io/robot-image-repository: "arcelik-robot"
+    robolaunch.io/robot-image-tag: "foxy-agnostic-xfce"
+  name: arcelik-robot
+spec:
+  distro: foxy
+  storage:
+    amount: 30000
+    storageClassConfig:
+      name: openebs-hostpath
+      accessMode: ReadWriteOnce
+  discoveryServerTemplate:
+    attached: true
+    hostname: "xxx"
+    subdomain: "yyy"
+  rosBridgeTemplate:
+    ros:
+      enabled: false
+      distro: noetic
+    ros2:
+      enabled: true
+      distro: foxy
+    image: robolaunchio/foxy-noetic-bridge:v0.0.3
+  robotDevSuiteTemplate:
+    vdiEnabled: true
+    ideEnabled: true
+    robotVDITemplate:
+      serviceType: NodePort
+      ingress: false
+      privileged: false
+      webrtcPortRange: "31016-31019"
+    robotIDETemplate:
+      serviceType: NodePort
+      ingress: false
+      privileged: false
+  workspacesPath: /root/workspaces
+  workspaces:
+  - name: ws-1
+    repositories:
+      repo1:
+        url: "https://bitbucket.org/kaesystems/arcelik-ros2-odrive-mecanum"
+        branch: main
