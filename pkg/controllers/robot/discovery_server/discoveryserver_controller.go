@@ -18,6 +18,8 @@ package discovery_server
 
 import (
 	"context"
+	goErr "errors"
+	"time"
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -29,6 +31,7 @@ import (
 
 	"github.com/go-logr/logr"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/api/roboscale.io/v1alpha1"
+	robotErr "github.com/robolaunch/robot-operator/internal/error"
 )
 
 // DiscoveryServerReconciler reconciles a DiscoveryServer object
@@ -79,12 +82,20 @@ func (r *DiscoveryServerReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 		return ctrl.Result{}, err
 	}
 
-	err = r.reconcileCheckResources(ctx, instance)
+	err = r.reconcileUpdateConnectionInfo(ctx, instance)
 	if err != nil {
-		return ctrl.Result{}, err
+		var e *robotErr.CannotResolveDiscoveryServerError
+		if goErr.As(err, &e) {
+			logger.Info("STATUS: Trying to resolve discovery server DNS.")
+			return ctrl.Result{
+				Requeue:      true,
+				RequeueAfter: 3 * time.Second,
+			}, nil
+		}
+		return ctrl.Result{}, nil
 	}
 
-	err = r.reconcileUpdateConnectionInfo(ctx, instance)
+	err = r.reconcileCheckResources(ctx, instance)
 	if err != nil {
 		return ctrl.Result{}, err
 	}
@@ -99,8 +110,8 @@ func (r *DiscoveryServerReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 
 func (r *DiscoveryServerReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.DiscoveryServer) error {
 
-	switch instance.Spec.Attached {
-	case true:
+	switch instance.Spec.Type {
+	case robotv1alpha1.DiscoveryServerInstanceTypeServer:
 
 		switch instance.Status.ServiceStatus.Created {
 		case true:
@@ -121,12 +132,16 @@ func (r *DiscoveryServerReconciler) reconcileCheckStatus(ctx context.Context, in
 					case false:
 
 						instance.Status.Phase = robotv1alpha1.DiscoveryServerPhaseCreatingConfigMap
-						err := r.createConfigMap(ctx, instance, instance.GetDiscoveryServerConfigMapMetadata())
-						if err != nil {
-							return err
-						}
-						instance.Status.ConfigMapStatus.Created = true
 
+						if instance.Status.ConnectionInfo.IP != "" {
+
+							err := r.createConfigMap(ctx, instance, instance.GetDiscoveryServerConfigMapMetadata())
+							if err != nil {
+								return err
+							}
+							instance.Status.ConfigMapStatus.Created = true
+
+						}
 					}
 
 				}
@@ -153,21 +168,26 @@ func (r *DiscoveryServerReconciler) reconcileCheckStatus(ctx context.Context, in
 
 		}
 
-	case false:
+	case robotv1alpha1.DiscoveryServerInstanceTypeClient:
 
-		switch instance.Status.ConfigMapStatus.Created {
-		case true:
+		if instance.Status.ConnectionInfo.IP != "" {
 
-			instance.Status.Phase = robotv1alpha1.DiscoveryServerPhaseReady
+			switch instance.Status.ConfigMapStatus.Created {
+			case true:
 
-		case false:
+				instance.Status.Phase = robotv1alpha1.DiscoveryServerPhaseReady
 
-			instance.Status.Phase = robotv1alpha1.DiscoveryServerPhaseCreatingConfigMap
-			err := r.createConfigMap(ctx, instance, instance.GetDiscoveryServerConfigMapMetadata())
-			if err != nil {
-				return err
+			case false:
+
+				instance.Status.Phase = robotv1alpha1.DiscoveryServerPhaseCreatingConfigMap
+
+				err := r.createConfigMap(ctx, instance, instance.GetDiscoveryServerConfigMapMetadata())
+				if err != nil {
+					return err
+				}
+				instance.Status.ConfigMapStatus.Created = true
+
 			}
-			instance.Status.ConfigMapStatus.Created = true
 
 		}
 
@@ -178,17 +198,19 @@ func (r *DiscoveryServerReconciler) reconcileCheckStatus(ctx context.Context, in
 
 func (r *DiscoveryServerReconciler) reconcileCheckResources(ctx context.Context, instance *robotv1alpha1.DiscoveryServer) error {
 
-	err := r.reconcileCheckService(ctx, instance)
-	if err != nil {
-		return err
+	if instance.Spec.Type == robotv1alpha1.DiscoveryServerInstanceTypeServer {
+		err := r.reconcileCheckService(ctx, instance)
+		if err != nil {
+			return err
+		}
+
+		err = r.reconcileCheckPod(ctx, instance)
+		if err != nil {
+			return err
+		}
 	}
 
-	err = r.reconcileCheckPod(ctx, instance)
-	if err != nil {
-		return err
-	}
-
-	err = r.reconcileCheckConfigMap(ctx, instance)
+	err := r.reconcileCheckConfigMap(ctx, instance)
 	if err != nil {
 		return err
 	}
