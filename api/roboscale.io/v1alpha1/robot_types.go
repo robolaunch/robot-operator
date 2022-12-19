@@ -90,6 +90,10 @@ type RobotSpec struct {
 	DiscoveryServerTemplate DiscoveryServerSpec `json:"discoveryServerTemplate,omitempty"`
 	// ROS bridge template
 	ROSBridgeTemplate ROSBridgeSpec `json:"rosBridgeTemplate,omitempty"`
+	// Build manager template for initial configuration
+	BuildManagerTemplate BuildManagerSpec `json:"buildManagerTemplate,omitempty"`
+	// Launch manager template for initial configuration
+	LaunchManagerTemplates []LaunchManagerSpec `json:"launchManagerTemplates,omitempty"`
 	// Robot development suite template
 	RobotDevSuiteTemplate RobotDevSuiteSpec `json:"robotDevSuiteTemplate,omitempty"`
 	// Global path of workspaces. It's fixed to `/home/workspaces` path.
@@ -146,6 +150,26 @@ type LoaderJobStatus struct {
 	Phase   JobPhase `json:"phase,omitempty"`
 }
 
+type ManagerStatus struct {
+	Name    string `json:"name,omitempty"`
+	Created bool   `json:"created,omitempty"`
+}
+
+type AttachedBuildObject struct {
+	Reference corev1.ObjectReference `json:"reference,omitempty"`
+	Status    BuildManagerStatus     `json:"status,omitempty"`
+}
+
+type AttachedLaunchObject struct {
+	Reference corev1.ObjectReference `json:"reference,omitempty"`
+	Status    LaunchManagerStatus    `json:"status,omitempty"`
+}
+
+type AttachedDevObject struct {
+	Reference corev1.ObjectReference `json:"reference,omitempty"`
+	Status    RobotDevSuiteStatus    `json:"status,omitempty"`
+}
+
 type RobotPhase string
 
 const (
@@ -167,21 +191,6 @@ const (
 	RobotPhaseFailed RobotPhase = "Failed"
 )
 
-type AttachedBuildObject struct {
-	Reference corev1.ObjectReference `json:"reference,omitempty"`
-	Status    BuildManagerStatus     `json:"status,omitempty"`
-}
-
-type AttachedLaunchObject struct {
-	Reference corev1.ObjectReference `json:"reference,omitempty"`
-	Status    LaunchManagerStatus    `json:"status,omitempty"`
-}
-
-type AttachedDevObject struct {
-	Reference corev1.ObjectReference `json:"reference,omitempty"`
-	Status    RobotDevSuiteStatus    `json:"status,omitempty"`
-}
-
 // RobotStatus defines the observed state of Robot
 type RobotStatus struct {
 	// Phase of robot
@@ -200,6 +209,10 @@ type RobotStatus struct {
 	RobotDevSuiteStatus RobotDevSuiteInstanceStatus `json:"robotDevSuiteStatus,omitempty"`
 	// Loader job status that configures environment
 	LoaderJobStatus LoaderJobStatus `json:"loaderJobStatus,omitempty"`
+	// Initial build manager creation status
+	InitialBuildManagerStatus ManagerStatus `json:"initialBuildManagerStatus,omitempty"`
+	// Initial launch manager creation status
+	InitialLaunchManagerStatuses []ManagerStatus `json:"initialLaunchManagerStatuses,omitempty"`
 	// Attached build object information
 	AttachedBuildObject AttachedBuildObject `json:"attachedBuildObject,omitempty"`
 	// Attached launch object information
