@@ -6,6 +6,7 @@ import (
 	robotv1alpha1 "github.com/robolaunch/robot-operator/api/roboscale.io/v1alpha1"
 	"github.com/robolaunch/robot-operator/internal/label"
 	"github.com/robolaunch/robot-operator/internal/resources"
+	"k8s.io/apimachinery/pkg/api/errors"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
@@ -40,7 +41,9 @@ func (r *LaunchManagerReconciler) createLaunchPod(ctx context.Context, instance 
 	}
 
 	err = r.Create(ctx, launchPod)
-	if err != nil {
+	if err != nil && errors.IsAlreadyExists(err) {
+		return nil
+	} else if err != nil {
 		return err
 	}
 

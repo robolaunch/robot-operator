@@ -5,6 +5,7 @@ import (
 
 	robotv1alpha1 "github.com/robolaunch/robot-operator/api/roboscale.io/v1alpha1"
 	"github.com/robolaunch/robot-operator/internal/resources"
+	"k8s.io/apimachinery/pkg/api/errors"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
@@ -20,7 +21,9 @@ func (r *BuildManagerReconciler) createScriptConfigMap(ctx context.Context, inst
 	}
 
 	err = r.Create(ctx, scriptConfigMap)
-	if err != nil {
+	if err != nil && errors.IsAlreadyExists(err) {
+		return nil
+	} else if err != nil {
 		return err
 	}
 
@@ -47,7 +50,9 @@ func (r *BuildManagerReconciler) createBuilderJob(ctx context.Context, instance 
 	}
 
 	err = r.Create(ctx, job)
-	if err != nil {
+	if err != nil && errors.IsAlreadyExists(err) {
+		return nil
+	} else if err != nil {
 		return err
 	}
 

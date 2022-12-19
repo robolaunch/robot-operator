@@ -6,6 +6,7 @@ import (
 	robotv1alpha1 "github.com/robolaunch/robot-operator/api/roboscale.io/v1alpha1"
 	"github.com/robolaunch/robot-operator/internal/label"
 	"github.com/robolaunch/robot-operator/internal/resources"
+	"k8s.io/apimachinery/pkg/api/errors"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
@@ -19,7 +20,9 @@ func (r *RobotIDEReconciler) reconcileCreateService(ctx context.Context, instanc
 	}
 
 	err = r.Create(ctx, ideService)
-	if err != nil {
+	if err != nil && errors.IsAlreadyExists(err) {
+		return nil
+	} else if err != nil {
 		return err
 	}
 
@@ -51,7 +54,9 @@ func (r *RobotIDEReconciler) reconcileCreatePod(ctx context.Context, instance *r
 	}
 
 	err = r.Create(ctx, idePod)
-	if err != nil {
+	if err != nil && errors.IsAlreadyExists(err) {
+		return nil
+	} else if err != nil {
 		return err
 	}
 
@@ -75,7 +80,9 @@ func (r *RobotIDEReconciler) reconcileCreateIngress(ctx context.Context, instanc
 	}
 
 	err = r.Create(ctx, ideIngress)
-	if err != nil {
+	if err != nil && errors.IsAlreadyExists(err) {
+		return nil
+	} else if err != nil {
 		return err
 	}
 

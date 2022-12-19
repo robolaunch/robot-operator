@@ -5,6 +5,7 @@ import (
 
 	robotv1alpha1 "github.com/robolaunch/robot-operator/api/roboscale.io/v1alpha1"
 	"github.com/robolaunch/robot-operator/internal/resources"
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
@@ -19,7 +20,9 @@ func (r *DiscoveryServerReconciler) createService(ctx context.Context, instance 
 	}
 
 	err = r.Create(ctx, svc)
-	if err != nil {
+	if err != nil && errors.IsAlreadyExists(err) {
+		return nil
+	} else if err != nil {
 		return err
 	}
 
@@ -37,7 +40,9 @@ func (r *DiscoveryServerReconciler) createPod(ctx context.Context, instance *rob
 	}
 
 	err = r.Create(ctx, pod)
-	if err != nil {
+	if err != nil && errors.IsAlreadyExists(err) {
+		return nil
+	} else if err != nil {
 		return err
 	}
 
@@ -58,7 +63,9 @@ func (r *DiscoveryServerReconciler) createConfigMap(ctx context.Context, instanc
 	}
 
 	err = r.Create(ctx, cm)
-	if err != nil {
+	if err != nil && errors.IsAlreadyExists(err) {
+		return nil
+	} else if err != nil {
 		return err
 	}
 

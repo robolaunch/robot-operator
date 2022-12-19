@@ -5,6 +5,7 @@ import (
 
 	robotv1alpha1 "github.com/robolaunch/robot-operator/api/roboscale.io/v1alpha1"
 	"github.com/robolaunch/robot-operator/internal/resources"
+	"k8s.io/apimachinery/pkg/api/errors"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
@@ -23,7 +24,9 @@ func (r *RobotVDIReconciler) reconcileCreatePVC(ctx context.Context, instance *r
 	}
 
 	err = r.Create(ctx, vdiPVC)
-	if err != nil {
+	if err != nil && errors.IsAlreadyExists(err) {
+		return nil
+	} else if err != nil {
 		return err
 	}
 
@@ -42,7 +45,9 @@ func (r *RobotVDIReconciler) reconcileCreateServiceTCP(ctx context.Context, inst
 	}
 
 	err = r.Create(ctx, vdiService)
-	if err != nil {
+	if err != nil && errors.IsAlreadyExists(err) {
+		return nil
+	} else if err != nil {
 		return err
 	}
 
@@ -61,7 +66,9 @@ func (r *RobotVDIReconciler) reconcileCreateServiceUDP(ctx context.Context, inst
 	}
 
 	err = r.Create(ctx, vdiService)
-	if err != nil {
+	if err != nil && errors.IsAlreadyExists(err) {
+		return nil
+	} else if err != nil {
 		return err
 	}
 
@@ -85,7 +92,9 @@ func (r *RobotVDIReconciler) reconcileCreatePod(ctx context.Context, instance *r
 	}
 
 	err = r.Create(ctx, vdiPod)
-	if err != nil {
+	if err != nil && errors.IsAlreadyExists(err) {
+		return nil
+	} else if err != nil {
 		return err
 	}
 
@@ -109,7 +118,9 @@ func (r *RobotVDIReconciler) reconcileCreateIngress(ctx context.Context, instanc
 	}
 
 	err = r.Create(ctx, vdiIngress)
-	if err != nil {
+	if err != nil && errors.IsAlreadyExists(err) {
+		return nil
+	} else if err != nil {
 		return err
 	}
 

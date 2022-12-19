@@ -5,6 +5,7 @@ import (
 
 	robotv1alpha1 "github.com/robolaunch/robot-operator/api/roboscale.io/v1alpha1"
 	"github.com/robolaunch/robot-operator/internal/resources"
+	"k8s.io/apimachinery/pkg/api/errors"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
@@ -18,7 +19,9 @@ func (r *RobotDevSuiteReconciler) reconcileCreateRobotVDI(ctx context.Context, i
 	}
 
 	err = r.Create(ctx, robotVDI)
-	if err != nil {
+	if err != nil && errors.IsAlreadyExists(err) {
+		return nil
+	} else if err != nil {
 		return err
 	}
 
@@ -37,7 +40,9 @@ func (r *RobotDevSuiteReconciler) reconcileCreateRobotIDE(ctx context.Context, i
 	}
 
 	err = r.Create(ctx, robotIDE)
-	if err != nil {
+	if err != nil && errors.IsAlreadyExists(err) {
+		return nil
+	} else if err != nil {
 		return err
 	}
 
