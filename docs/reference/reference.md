@@ -27,6 +27,13 @@ Package v1alpha1 contains API Schema definitions for the robot v1alpha1 API grou
 Robot is the Schema for the robots API
 
 
+|            Label Key           |         Description         |
+|:------------------------------:|:---------------------------:|
+|  `robolaunch.io/organization`  |  Name of the organization.  |
+|      `robolaunch.io/team`      |      Name of the team.      |
+|     `robolaunch.io/region`     |     Name of the region.     |
+| `robolaunch.io/cloud-instance` | Name of the cloud instance. |
+
 
 | Field | Description |
 | --- | --- |
@@ -90,6 +97,9 @@ _Appears in:_
 
 BuildManager is the Schema for the buildmanagers API
 
+|           Label Key          |        Description        |
+|:----------------------------:|:-------------------------:|
+| `robolaunch.io/target-robot` | Name of the target robot. |
 
 
 | Field | Description |
@@ -140,6 +150,11 @@ _Appears in:_
 LaunchManager is the Schema for the launchmanagers API
 
 
+|           Label Key          |        Description        |
+|:----------------------------:|:-------------------------:|
+| `robolaunch.io/target-robot` | Name of the target robot. |
+| `robolaunch.io/target-vdi`   | Name of the target VDI.   |
+
 
 | Field | Description |
 | --- | --- |
@@ -187,6 +202,10 @@ _Appears in:_
 
 RobotDevSuite is the Schema for the robotdevsuites API
 
+
+|           Label Key          |        Description        |
+|:----------------------------:|:-------------------------:|
+| `robolaunch.io/target-robot` | Name of the target robot. |
 
 
 | Field | Description |
