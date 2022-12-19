@@ -5,6 +5,7 @@ import (
 
 	robotv1alpha1 "github.com/robolaunch/robot-operator/api/roboscale.io/v1alpha1"
 	"github.com/robolaunch/robot-operator/internal/resources"
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
@@ -19,7 +20,9 @@ func (r *ROSBridgeReconciler) createService(ctx context.Context, instance *robot
 	}
 
 	err = r.Create(ctx, svc)
-	if err != nil {
+	if err != nil && errors.IsAlreadyExists(err) {
+		return nil
+	} else if err != nil {
 		return err
 	}
 
@@ -42,7 +45,9 @@ func (r *ROSBridgeReconciler) createPod(ctx context.Context, instance *robotv1al
 	}
 
 	err = r.Create(ctx, pod)
-	if err != nil {
+	if err != nil && errors.IsAlreadyExists(err) {
+		return nil
+	} else if err != nil {
 		return err
 	}
 
