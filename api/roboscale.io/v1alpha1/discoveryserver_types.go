@@ -22,12 +22,20 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 )
 
+type DiscoveryServerInstanceType string
+
+const (
+	DiscoveryServerInstanceTypeServer DiscoveryServerInstanceType = "Server"
+	DiscoveryServerInstanceTypeClient DiscoveryServerInstanceType = "Client"
+)
+
 // DiscoveryServerSpec defines the desired state of DiscoveryServer
 type DiscoveryServerSpec struct {
-	Attached  bool   `json:"attached,omitempty"`
-	Cluster   string `json:"cluster,omitempty"`
-	Hostname  string `json:"hostname,omitempty"`
-	Subdomain string `json:"subdomain,omitempty"`
+	Type      DiscoveryServerInstanceType `json:"type,omitempty"`
+	Reference corev1.ObjectReference      `json:"reference,omitempty"`
+	Cluster   string                      `json:"cluster,omitempty"`
+	Hostname  string                      `json:"hostname,omitempty"`
+	Subdomain string                      `json:"subdomain,omitempty"`
 }
 
 type DiscoveryServerServiceStatus struct {
