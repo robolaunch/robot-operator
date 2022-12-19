@@ -27,12 +27,15 @@ Package v1alpha1 contains API Schema definitions for the robot v1alpha1 API grou
 Robot is the Schema for the robots API
 
 
-|            Label Key           |         Description         |
-|:------------------------------:|:---------------------------:|
-|  `robolaunch.io/organization`  |  Name of the organization.  |
-|      `robolaunch.io/team`      |      Name of the team.      |
-|     `robolaunch.io/region`     |     Name of the region.     |
-| `robolaunch.io/cloud-instance` | Name of the cloud instance. |
+| Label Key                              | Description                            |
+|----------------------------------------|----------------------------------------|
+| `robolaunch.io/organization`           | Name of the organization.              |
+| `robolaunch.io/team`                   | Name of the team.                      |
+| `robolaunch.io/region`                 | Name of the region.                    |
+| `robolaunch.io/cloud-instance`         | Name of the cloud instance.            |
+| `robolaunch.io/robot-image-user`       | DockerHub username for custom image.   |
+| `robolaunch.io/robot-image-repository` | DockerHub repository for custom image. |
+| `robolaunch.io/robot-image-tag`        | DockerHub image tag for custom image.  |
 
 
 | Field | Description |
