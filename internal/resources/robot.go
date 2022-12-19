@@ -267,7 +267,7 @@ func GetLaunchManager(robot *robotv1alpha1.Robot, lmNamespacedName *types.Namesp
 
 	labels := robot.Labels
 	labels[internal.TARGET_ROBOT_LABEL_KEY] = robot.Name
-	labels[internal.TARGET_VDI_LABEL_KEY] = robot.GetRobotDevSuiteMetadata().Name
+	labels[internal.TARGET_VDI_LABEL_KEY] = robot.GetRobotDevSuiteMetadata().Name + internal.ROBOT_VDI_POSTFIX
 
 	launchManager := robotv1alpha1.LaunchManager{
 		ObjectMeta: metav1.ObjectMeta{
