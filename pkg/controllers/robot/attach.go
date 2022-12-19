@@ -8,6 +8,16 @@ import (
 
 func (r *RobotReconciler) reconcileHandleAttachments(ctx context.Context, instance *robotv1alpha1.Robot) error {
 
+	err := r.createBuildManager(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	err = r.createLaunchManagers(ctx, instance)
+	if err != nil {
+		return err
+	}
+
 	switch instance.Spec.Development {
 	case true:
 
