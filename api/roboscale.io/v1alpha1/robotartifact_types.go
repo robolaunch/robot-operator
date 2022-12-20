@@ -20,14 +20,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// RobotArtifactSpec defines the desired state of RobotArtifact
-type RobotArtifactSpec struct {
-}
-
-// RobotArtifactStatus defines the observed state of RobotArtifact
-type RobotArtifactStatus struct {
-}
-
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 
@@ -36,8 +28,7 @@ type RobotArtifact struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   RobotArtifactSpec   `json:"spec,omitempty"`
-	Status RobotArtifactStatus `json:"status,omitempty"`
+	Template RobotSpec `json:"template,omitempty"`
 }
 
 //+kubebuilder:object:root=true
