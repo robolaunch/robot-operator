@@ -3,7 +3,7 @@ package robot
 import (
 	"context"
 
-	robotv1alpha1 "github.com/robolaunch/robot-operator/api/roboscale.io/v1alpha1"
+	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 )
 
 func (r *RobotReconciler) reconcileHandleAttachments(ctx context.Context, instance *robotv1alpha1.Robot) error {

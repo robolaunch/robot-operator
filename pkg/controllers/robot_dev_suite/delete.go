@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	robotv1alpha1 "github.com/robolaunch/robot-operator/api/roboscale.io/v1alpha1"
+	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"

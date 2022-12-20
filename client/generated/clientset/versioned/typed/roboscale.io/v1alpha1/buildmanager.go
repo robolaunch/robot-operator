@@ -21,8 +21,8 @@ import (
 	"context"
 	"time"
 
-	v1alpha1 "github.com/robolaunch/robot-operator/api/roboscale.io/v1alpha1"
 	scheme "github.com/robolaunch/robot-operator/client/generated/clientset/versioned/scheme"
+	v1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"

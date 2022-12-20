@@ -21,10 +21,10 @@ import (
 	"context"
 	time "time"
 
-	roboscaleiov1alpha1 "github.com/robolaunch/robot-operator/api/roboscale.io/v1alpha1"
 	versioned "github.com/robolaunch/robot-operator/client/generated/clientset/versioned"
 	internalinterfaces "github.com/robolaunch/robot-operator/client/generated/informers/externalversions/internalinterfaces"
 	v1alpha1 "github.com/robolaunch/robot-operator/client/generated/listers/roboscale.io/v1alpha1"
+	roboscaleiov1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"
