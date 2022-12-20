@@ -141,7 +141,7 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 	}
 
 	configure.InjectGenericEnvironmentVariables(vdiPod, robot)
-	configure.InjectPodDiscoveryServerConnection(vdiPod, robot)
+	configure.InjectPodDiscoveryServerConnection(vdiPod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo)
 	configure.InjectPodDisplayConfiguration(vdiPod, *robotVDI)
 
 	return vdiPod

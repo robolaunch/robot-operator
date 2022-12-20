@@ -80,7 +80,7 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 	}
 
 	configure.InjectGenericEnvironmentVariables(&pod, robot)
-	configure.InjectPodDiscoveryServerConnection(&pod, robot)
+	configure.InjectPodDiscoveryServerConnection(&pod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo)
 	if label.GetTargetRobotVDI(robotIDE) != "" {
 		configure.InjectPodDisplayConfiguration(&pod, robotVDI)
 	}

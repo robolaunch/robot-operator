@@ -87,7 +87,7 @@ func GetDiscoveryServerService(discoveryServer *robotv1alpha1.DiscoveryServer, s
 
 func GetDiscoveryServerConfigMap(discoveryServer *robotv1alpha1.DiscoveryServer, cmNamespacedName *types.NamespacedName) (*corev1.ConfigMap, error) {
 
-	superClientConfig := fmt.Sprintf(internal.SUPER_CLIENT_CONFIG, discoveryServer.Status.PodStatus.IP)
+	superClientConfig := fmt.Sprintf(internal.SUPER_CLIENT_CONFIG, discoveryServer.Status.ConnectionInfo.IP)
 
 	discoveryServerConfigMap := corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
@@ -100,7 +100,7 @@ func GetDiscoveryServerConfigMap(discoveryServer *robotv1alpha1.DiscoveryServer,
 		Data: map[string]string{
 			"DISCOVERY_SERVER_CONFIG":        superClientConfig,
 			"FASTRTPS_DEFAULT_PROFILES_FILE": "/etc/discovery-server/super_client_configuration_file.xml",
-			"ROS_DISCOVERY_SERVER":           discoveryServer.Status.PodStatus.IP + ":11811",
+			"ROS_DISCOVERY_SERVER":           discoveryServer.Status.ConnectionInfo.IP + ":11811",
 		},
 	}
 
@@ -113,10 +113,17 @@ func GetDiscoveryServerDNS(discoveryServer robotv1alpha1.DiscoveryServer) string
 	cluster := label.GetClusterName(&discoveryServer)
 
 	var serviceDNSBuilder strings.Builder
-	if dsConfig.Attached {
-		serviceDNSBuilder.WriteString(dsConfig.Hostname + "." + discoveryServer.GetDiscoveryServerServiceMetadata().Name + "." + discoveryServer.Namespace + ".svc." + cluster + ".local")
+	if dsConfig.Cluster == cluster {
+		if dsConfig.Type == robotv1alpha1.DiscoveryServerInstanceTypeServer {
+			// server
+			serviceDNSBuilder.WriteString(dsConfig.Hostname + "." + discoveryServer.GetDiscoveryServerServiceMetadata().Name + "." + discoveryServer.Namespace + ".svc." + cluster + ".local")
+		} else {
+			// client, server is in the same cluster
+			serviceDNSBuilder.WriteString(dsConfig.Hostname + "." + dsConfig.Reference.Name + "-" + dsConfig.Subdomain + "." + dsConfig.Reference.Namespace + ".svc." + cluster + ".local")
+		}
 	} else {
-		serviceDNSBuilder.WriteString(dsConfig.Hostname + "." + dsConfig.Cluster + "." + discoveryServer.GetDiscoveryServerServiceMetadata().Name + "." + discoveryServer.Namespace + ".svc.clusterset.local")
+		// client, server is in another cluster
+		serviceDNSBuilder.WriteString(dsConfig.Hostname + "." + dsConfig.Cluster + "." + dsConfig.Reference.Name + "-" + dsConfig.Subdomain + "." + dsConfig.Reference.Namespace + ".svc.clusterset.local")
 	}
 
 	return serviceDNSBuilder.String()

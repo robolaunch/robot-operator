@@ -48,7 +48,7 @@ func GetBridgePod(rosbridge *robotv1alpha1.ROSBridge, podNamespacedName *types.N
 		bridgePod.Spec.Containers = append(bridgePod.Spec.Containers, getROS2BridgeContainer(rosbridge))
 	}
 
-	configure.InjectPodDiscoveryServerConnection(&bridgePod, robot)
+	configure.InjectPodDiscoveryServerConnection(&bridgePod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo)
 
 	return &bridgePod
 }

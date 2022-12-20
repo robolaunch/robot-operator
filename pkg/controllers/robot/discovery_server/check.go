@@ -14,7 +14,7 @@ import (
 
 func (r *DiscoveryServerReconciler) reconcileUpdateConnectionInfo(ctx context.Context, instance *robotv1alpha1.DiscoveryServer) error {
 
-	if instance.Status.Phase == robotv1alpha1.DiscoveryServerPhaseReady {
+	if instance.Spec.Type == robotv1alpha1.DiscoveryServerInstanceTypeClient || instance.Status.PodStatus.Phase == corev1.PodRunning {
 		dnsName := resources.GetDiscoveryServerDNS(*instance)
 
 		ips, err := net.LookupIP(dnsName)
@@ -43,34 +43,32 @@ func (r *DiscoveryServerReconciler) reconcileUpdateConnectionInfo(ctx context.Co
 
 func (r *DiscoveryServerReconciler) reconcileCheckPod(ctx context.Context, instance *robotv1alpha1.DiscoveryServer) error {
 
-	if instance.Spec.Attached {
-		discoveryServerPodQuery := &corev1.Pod{}
-		err := r.Get(ctx, *instance.GetDiscoveryServerPodMetadata(), discoveryServerPodQuery)
-		if err != nil && errors.IsNotFound(err) {
-			instance.Status.PodStatus.Created = false
-		} else if err != nil {
-			return err
-		} else {
+	discoveryServerPodQuery := &corev1.Pod{}
+	err := r.Get(ctx, *instance.GetDiscoveryServerPodMetadata(), discoveryServerPodQuery)
+	if err != nil && errors.IsNotFound(err) {
+		instance.Status.PodStatus.Created = false
+	} else if err != nil {
+		return err
+	} else {
 
-			if discoveryServerPodQuery.Spec.Hostname != instance.Spec.Hostname || discoveryServerPodQuery.Spec.Subdomain != instance.GetDiscoveryServerServiceMetadata().Name {
-				err = r.Delete(ctx, discoveryServerPodQuery)
-				if err != nil {
-					return err
-				}
-
-				instance.Status.PodStatus.IP = ""
-				instance.Status.PodStatus.Phase = ""
-				instance.Status.Phase = ""
-
-			} else {
-
-				instance.Status.PodStatus.Created = true
-				instance.Status.PodStatus.IP = discoveryServerPodQuery.Status.PodIP
-				instance.Status.PodStatus.Phase = discoveryServerPodQuery.Status.Phase
-
+		if discoveryServerPodQuery.Spec.Hostname != instance.Spec.Hostname || discoveryServerPodQuery.Spec.Subdomain != instance.GetDiscoveryServerServiceMetadata().Name {
+			err = r.Delete(ctx, discoveryServerPodQuery)
+			if err != nil {
+				return err
 			}
 
+			instance.Status.PodStatus.IP = ""
+			instance.Status.PodStatus.Phase = ""
+			instance.Status.Phase = ""
+
+		} else {
+
+			instance.Status.PodStatus.Created = true
+			instance.Status.PodStatus.IP = discoveryServerPodQuery.Status.PodIP
+			instance.Status.PodStatus.Phase = discoveryServerPodQuery.Status.Phase
+
 		}
+
 	}
 
 	return nil
@@ -78,23 +76,19 @@ func (r *DiscoveryServerReconciler) reconcileCheckPod(ctx context.Context, insta
 
 func (r *DiscoveryServerReconciler) reconcileCheckService(ctx context.Context, instance *robotv1alpha1.DiscoveryServer) error {
 
-	if instance.Spec.Attached {
+	err := r.reconcileCleanupOwnedServices(ctx, instance)
+	if err != nil {
+		return err
+	}
 
-		err := r.reconcileCleanupOwnedServices(ctx, instance)
-		if err != nil {
-			return err
-		}
-
-		discoveryServerServiceQuery := &corev1.Service{}
-		err = r.Get(ctx, *instance.GetDiscoveryServerServiceMetadata(), discoveryServerServiceQuery)
-		if err != nil && errors.IsNotFound(err) {
-			instance.Status.ServiceStatus.Created = false
-		} else if err != nil {
-			return err
-		} else {
-			instance.Status.ServiceStatus.Created = true
-		}
-
+	discoveryServerServiceQuery := &corev1.Service{}
+	err = r.Get(ctx, *instance.GetDiscoveryServerServiceMetadata(), discoveryServerServiceQuery)
+	if err != nil && errors.IsNotFound(err) {
+		instance.Status.ServiceStatus.Created = false
+	} else if err != nil {
+		return err
+	} else {
+		instance.Status.ServiceStatus.Created = true
 	}
 
 	return nil
@@ -139,7 +133,7 @@ func (r *DiscoveryServerReconciler) reconcileCheckConfigMap(ctx context.Context,
 				return err
 			}
 		} else {
-			if configuredIP != instance.Status.PodStatus.IP {
+			if configuredIP != instance.Status.ConnectionInfo.IP {
 				err := r.Delete(ctx, discoveryServerConfigMapQuery)
 				if err != nil {
 					return err

@@ -54,8 +54,8 @@ func GetLaunchPod(launchManager *robotv1alpha1.LaunchManager, podNamespacedName 
 		},
 	}
 
-	configure.InjectGenericEnvironmentVariables(&launchPod, robot)  // Environment variables
-	configure.InjectPodDiscoveryServerConnection(&launchPod, robot) // Discovery server configuration
+	configure.InjectGenericEnvironmentVariables(&launchPod, robot)                                                     // Environment variables
+	configure.InjectPodDiscoveryServerConnection(&launchPod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo) // Discovery server configuration
 	if label.GetTargetRobotVDI(launchManager) != "" {
 		configure.InjectPodDisplayConfiguration(&launchPod, robotVDI) // Display configuration
 	}

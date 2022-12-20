@@ -5,17 +5,15 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
-func InjectPodDiscoveryServerConnection(pod *corev1.Pod, robot robotv1alpha1.Robot) *corev1.Pod {
+func InjectPodDiscoveryServerConnection(pod *corev1.Pod, connectionInfo robotv1alpha1.ConnectionInfo) *corev1.Pod {
 
-	placeDiscoveryServerEnvironmentVariables(pod, robot)
-	placeDiscoveryServerConfigFile(pod, robot)
+	placeDiscoveryServerEnvironmentVariables(pod, connectionInfo)
+	placeDiscoveryServerConfigFile(pod, connectionInfo)
 
 	return pod
 }
 
-func placeDiscoveryServerEnvironmentVariables(pod *corev1.Pod, robot robotv1alpha1.Robot) {
-
-	conn := robot.Status.DiscoveryServerStatus.Status.ConnectionInfo
+func placeDiscoveryServerEnvironmentVariables(pod *corev1.Pod, connectionInfo robotv1alpha1.ConnectionInfo) {
 
 	environmentVariables := []corev1.EnvVar{
 		{
@@ -23,7 +21,7 @@ func placeDiscoveryServerEnvironmentVariables(pod *corev1.Pod, robot robotv1alph
 			ValueFrom: &corev1.EnvVarSource{
 				ConfigMapKeyRef: &corev1.ConfigMapKeySelector{
 					LocalObjectReference: corev1.LocalObjectReference{
-						Name: conn.ConfigMapName,
+						Name: connectionInfo.ConfigMapName,
 					},
 					Key: "FASTRTPS_DEFAULT_PROFILES_FILE",
 				},
@@ -34,7 +32,7 @@ func placeDiscoveryServerEnvironmentVariables(pod *corev1.Pod, robot robotv1alph
 			ValueFrom: &corev1.EnvVarSource{
 				ConfigMapKeyRef: &corev1.ConfigMapKeySelector{
 					LocalObjectReference: corev1.LocalObjectReference{
-						Name: conn.ConfigMapName,
+						Name: connectionInfo.ConfigMapName,
 					},
 					Key: "ROS_DISCOVERY_SERVER",
 				},
@@ -49,9 +47,7 @@ func placeDiscoveryServerEnvironmentVariables(pod *corev1.Pod, robot robotv1alph
 
 }
 
-func placeDiscoveryServerConfigFile(pod *corev1.Pod, robot robotv1alpha1.Robot) {
-
-	conn := robot.Status.DiscoveryServerStatus.Status.ConnectionInfo
+func placeDiscoveryServerConfigFile(pod *corev1.Pod, connectionInfo robotv1alpha1.ConnectionInfo) {
 
 	var mode int32 = 511
 
@@ -60,7 +56,7 @@ func placeDiscoveryServerConfigFile(pod *corev1.Pod, robot robotv1alpha1.Robot) 
 		VolumeSource: corev1.VolumeSource{
 			ConfigMap: &corev1.ConfigMapVolumeSource{
 				LocalObjectReference: corev1.LocalObjectReference{
-					Name: conn.ConfigMapName,
+					Name: connectionInfo.ConfigMapName,
 				},
 				Items: []corev1.KeyToPath{
 					{
