@@ -17,6 +17,7 @@ Package v1alpha1 contains API Schema definitions for the robot v1alpha1 API grou
 - [ROSBridge](#rosbridge)
 - [RobotVDI](#robotvdi)
 - [RobotIDE](#robotide)
+- [RobotArtifact](#robotartifact)
 
 
 
@@ -26,16 +27,6 @@ Package v1alpha1 contains API Schema definitions for the robot v1alpha1 API grou
 
 Robot is the Schema for the robots API
 
-
-| Label Key                              | Description                            |
-|----------------------------------------|----------------------------------------|
-| `robolaunch.io/organization`           | Name of the organization.              |
-| `robolaunch.io/team`                   | Name of the team.                      |
-| `robolaunch.io/region`                 | Name of the region.                    |
-| `robolaunch.io/cloud-instance`         | Name of the cloud instance.            |
-| `robolaunch.io/robot-image-user`       | DockerHub username for custom image.   |
-| `robolaunch.io/robot-image-repository` | DockerHub repository for custom image. |
-| `robolaunch.io/robot-image-tag`        | DockerHub image tag for custom image.  |
 
 
 | Field | Description |
@@ -55,6 +46,7 @@ RobotSpec defines the desired state of Robot
 
 _Appears in:_
 - [Robot](#robot)
+- [RobotArtifact](#robotartifact)
 
 | Field | Description |
 | --- | --- |
@@ -62,6 +54,8 @@ _Appears in:_
 | `storage` _[Storage](#storage)_ | Resource limitations of robot containers. |
 | `discoveryServerTemplate` _[DiscoveryServerSpec](#discoveryserverspec)_ | Discovery server template |
 | `rosBridgeTemplate` _[ROSBridgeSpec](#rosbridgespec)_ | ROS bridge template |
+| `buildManagerTemplate` _[BuildManagerSpec](#buildmanagerspec)_ | Build manager template for initial configuration |
+| `launchManagerTemplates` _[LaunchManagerSpec](#launchmanagerspec) array_ | Launch manager template for initial configuration |
 | `robotDevSuiteTemplate` _[RobotDevSuiteSpec](#robotdevsuitespec)_ | Robot development suite template |
 | `workspacesPath` _string_ | Global path of workspaces. It's fixed to `/home/workspaces` path. |
 | `workspaces` _[Workspace](#workspace) array_ | Workspace definitions of robot. |
@@ -89,6 +83,8 @@ _Appears in:_
 | `rosBridgeStatus` _[ROSBridgeInstanceStatus](#rosbridgeinstancestatus)_ | ROS bridge instance status |
 | `robotDevSuiteStatus` _[RobotDevSuiteInstanceStatus](#robotdevsuiteinstancestatus)_ | Robot development suite instance status |
 | `loaderJobStatus` _[LoaderJobStatus](#loaderjobstatus)_ | Loader job status that configures environment |
+| `initialBuildManagerStatus` _[ManagerStatus](#managerstatus)_ | Initial build manager creation status |
+| `initialLaunchManagerStatuses` _[ManagerStatus](#managerstatus) array_ | Initial launch manager creation status |
 | `attachedBuildObject` _[AttachedBuildObject](#attachedbuildobject)_ | Attached build object information |
 | `attachedLaunchObjects` _[AttachedLaunchObject](#attachedlaunchobject) array_ | Attached launch object information |
 | `attachedDevObjects` _[AttachedDevObject](#attacheddevobject) array_ | Attached dev object information |
@@ -100,9 +96,6 @@ _Appears in:_
 
 BuildManager is the Schema for the buildmanagers API
 
-|           Label Key          |        Description        |
-|:----------------------------:|:-------------------------:|
-| `robolaunch.io/target-robot` | Name of the target robot. |
 
 
 | Field | Description |
@@ -122,6 +115,7 @@ BuildManagerSpec defines the desired state of BuildManager
 
 _Appears in:_
 - [BuildManager](#buildmanager)
+- [RobotSpec](#robotspec)
 
 | Field | Description |
 | --- | --- |
@@ -153,11 +147,6 @@ _Appears in:_
 LaunchManager is the Schema for the launchmanagers API
 
 
-|           Label Key          |        Description        |
-|:----------------------------:|:-------------------------:|
-| `robolaunch.io/target-robot` | Name of the target robot. |
-| `robolaunch.io/target-vdi`   | Name of the target VDI.   |
-
 
 | Field | Description |
 | --- | --- |
@@ -176,6 +165,7 @@ LaunchManagerSpec defines the desired state of LaunchManager
 
 _Appears in:_
 - [LaunchManager](#launchmanager)
+- [RobotSpec](#robotspec)
 
 | Field | Description |
 | --- | --- |
@@ -205,10 +195,6 @@ _Appears in:_
 
 RobotDevSuite is the Schema for the robotdevsuites API
 
-
-|           Label Key          |        Description        |
-|:----------------------------:|:-------------------------:|
-| `robolaunch.io/target-robot` | Name of the target robot. |
 
 
 | Field | Description |
@@ -286,7 +272,8 @@ _Appears in:_
 
 | Field | Description |
 | --- | --- |
-| `attached` _boolean_ |  |
+| `type` _DiscoveryServerInstanceType_ |  |
+| `reference` _[ObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectreference-v1-core)_ |  |
 | `cluster` _string_ |  |
 | `hostname` _string_ |  |
 | `subdomain` _string_ |  |
@@ -725,6 +712,21 @@ _Appears in:_
 | `phase` _[JobPhase](#jobphase)_ |  |
 
 
+#### ManagerStatus
+
+
+
+
+
+_Appears in:_
+- [RobotStatus](#robotstatus)
+
+| Field | Description |
+| --- | --- |
+| `name` _string_ |  |
+| `created` _boolean_ |  |
+
+
 #### Prelaunch
 
 
@@ -785,6 +787,22 @@ _Appears in:_
 | `gpuCore` _integer_ |  |
 | `cpu` _string_ |  |
 | `memory` _string_ |  |
+
+
+#### RobotArtifact
+
+
+
+RobotArtifact is the Schema for the robotartifacts API
+
+
+
+| Field | Description |
+| --- | --- |
+| `apiVersion` _string_ | `robot.roboscale.io/v1alpha1`
+| `kind` _string_ | `RobotArtifact`
+| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |
+| `template` _[RobotSpec](#robotspec)_ |  |
 
 
 #### RobotDevSuiteInstanceStatus
