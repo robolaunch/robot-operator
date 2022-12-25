@@ -11,7 +11,7 @@ resources:
   domain: roboscale.io
   group: robot
   kind: Robot
-  path: github.com/robolaunch/robot-operator/api/v1alpha1
+  path: github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1
   version: v1alpha1
   webhooks:
     defaulting: true
@@ -24,7 +24,7 @@ resources:
   domain: roboscale.io
   group: robot
   kind: DiscoveryServer
-  path: github.com/robolaunch/robot-operator/api/v1alpha1
+  path: github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1
@@ -33,7 +33,7 @@ resources:
   domain: roboscale.io
   group: robot
   kind: ROSBridge
-  path: github.com/robolaunch/robot-operator/api/v1alpha1
+  path: github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1
@@ -42,7 +42,7 @@ resources:
   domain: roboscale.io
   group: robot
   kind: BuildManager
-  path: github.com/robolaunch/robot-operator/api/v1alpha1
+  path: github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1
   version: v1alpha1
   webhooks:
     defaulting: true
@@ -55,7 +55,7 @@ resources:
   domain: roboscale.io
   group: robot
   kind: LaunchManager
-  path: github.com/robolaunch/robot-operator/api/v1alpha1
+  path: github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1
   version: v1alpha1
   webhooks:
     defaulting: true
@@ -68,7 +68,7 @@ resources:
   domain: roboscale.io
   group: robot
   kind: RobotDevSuite
-  path: github.com/robolaunch/robot-operator/api/v1alpha1
+  path: github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1
@@ -77,7 +77,7 @@ resources:
   domain: roboscale.io
   group: robot
   kind: RobotVDI
-  path: github.com/robolaunch/robot-operator/api/v1alpha1
+  path: github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1
   version: v1alpha1
   webhooks:
     defaulting: true
@@ -90,7 +90,7 @@ resources:
   domain: roboscale.io
   group: robot
   kind: RobotIDE
-  path: github.com/robolaunch/robot-operator/api/v1alpha1
+  path: github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1
   version: v1alpha1
   webhooks:
     defaulting: true
@@ -102,7 +102,7 @@ resources:
   domain: roboscale.io
   group: robot
   kind: RobotArtifact
-  path: github.com/robolaunch/robot-operator/api/v1alpha1
+  path: github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1
@@ -111,6 +111,6 @@ resources:
   domain: roboscale.io
   group: robot
   kind: MetricsCollector
-  path: github.com/robolaunch/robot-operator/api/v1alpha1
+  path: github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1
   version: v1alpha1
 version: "3"
