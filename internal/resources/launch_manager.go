@@ -38,6 +38,7 @@ func GetLaunchPod(launchManager *robotv1alpha1.LaunchManager, podNamespacedName 
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      podNamespacedName.Name,
 			Namespace: podNamespacedName.Namespace,
+			Labels:    launchManager.Labels,
 		},
 		Spec: corev1.PodSpec{
 			Containers: containers,

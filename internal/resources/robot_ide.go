@@ -28,11 +28,16 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 	var cmdBuilder strings.Builder
 	cmdBuilder.WriteString("code-server " + robot.Spec.WorkspacesPath + " --bind-addr 0.0.0.0:$CODE_SERVER_PORT --auth none")
 
+	labels := getRobotIDESelector(*robotIDE)
+	for k, v := range robotIDE.Labels {
+		labels[k] = v
+	}
+
 	pod := corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      podNamespacedName.Name,
 			Namespace: podNamespacedName.Namespace,
-			Labels:    getRobotIDESelector(*robotIDE),
+			Labels:    labels,
 		},
 		Spec: corev1.PodSpec{
 			Containers: []corev1.Container{

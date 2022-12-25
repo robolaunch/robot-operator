@@ -94,6 +94,7 @@ func GetBuildJob(buildManager *robotv1alpha1.BuildManager, robot *robotv1alpha1.
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      buildManager.Name + "-" + step.Name,
 			Namespace: buildManager.Namespace,
+			Labels:    buildManager.Labels,
 		},
 		Spec: batchv1.JobSpec{
 			Template: corev1.PodTemplateSpec{
