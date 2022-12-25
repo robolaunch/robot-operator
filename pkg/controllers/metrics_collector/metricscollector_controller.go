@@ -19,11 +19,13 @@ package metrics_collector
 import (
 	"context"
 
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
+	"github.com/go-logr/logr"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 )
 
@@ -37,9 +39,48 @@ type MetricsCollectorReconciler struct {
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=metricscollectors/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=metricscollectors/finalizers,verbs=update
 
+var logger logr.Logger
+
 func (r *MetricsCollectorReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+	logger = log.FromContext(ctx)
+
+	instance, err := r.reconcileGetInstance(ctx, req.NamespacedName)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			return ctrl.Result{}, nil
+		}
+		return ctrl.Result{}, err
+	}
+
+	err = r.reconcileCheckStatus(ctx, instance)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	err = r.reconcileUpdateInstanceStatus(ctx, instance)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	err = r.reconcileCheckResources(ctx, instance)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	err = r.reconcileUpdateInstanceStatus(ctx, instance)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
 	return ctrl.Result{}, nil
+}
+
+func (r *MetricsCollectorReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.MetricsCollector) error {
+	return nil
+}
+
+func (r *MetricsCollectorReconciler) reconcileCheckResources(ctx context.Context, instance *robotv1alpha1.MetricsCollector) error {
+	return nil
 }
 
 // SetupWithManager sets up the controller with the Manager.
