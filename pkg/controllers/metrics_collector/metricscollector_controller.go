@@ -54,17 +54,12 @@ func (r *MetricsCollectorReconciler) Reconcile(ctx context.Context, req ctrl.Req
 		return ctrl.Result{}, err
 	}
 
-	err = r.reconcileCheckStatus(ctx, instance)
+	err = r.reconcileCheckRobotRelatedPods(ctx, instance)
 	if err != nil {
 		return ctrl.Result{}, err
 	}
 
-	err = r.reconcileUpdateInstanceStatus(ctx, instance)
-	if err != nil {
-		return ctrl.Result{}, err
-	}
-
-	err = r.reconcileCheckResources(ctx, instance)
+	err = r.reconcileCheckUtilizations(ctx, instance)
 	if err != nil {
 		return ctrl.Result{}, err
 	}
@@ -77,11 +72,11 @@ func (r *MetricsCollectorReconciler) Reconcile(ctx context.Context, req ctrl.Req
 	return ctrl.Result{}, nil
 }
 
-func (r *MetricsCollectorReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.MetricsCollector) error {
+func (r *MetricsCollectorReconciler) reconcileCheckRobotRelatedPods(ctx context.Context, instance *robotv1alpha1.MetricsCollector) error {
 	return nil
 }
 
-func (r *MetricsCollectorReconciler) reconcileCheckResources(ctx context.Context, instance *robotv1alpha1.MetricsCollector) error {
+func (r *MetricsCollectorReconciler) reconcileCheckUtilizations(ctx context.Context, instance *robotv1alpha1.MetricsCollector) error {
 	return nil
 }
 

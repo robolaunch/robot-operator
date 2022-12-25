@@ -17,15 +17,45 @@ limitations under the License.
 package v1alpha1
 
 import (
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+)
+
+type MetricType string
+
+const (
+	MetricTypeCPU         MetricType = "CPU"
+	MetricTypeMemory      MetricType = "Memory"
+	MetricTypeGPU         MetricType = "GPU"
+	MetricTypeNetworkLoad MetricType = "NetworkLoad"
 )
 
 // MetricsCollectorSpec defines the desired state of MetricsCollector
 type MetricsCollectorSpec struct {
+	// TODO: Add default value
+	WaitSeconds string `json:"waitSeconds,omitempty"`
+	CPU         bool   `json:"cpu"`
+	Memory      bool   `json:"memory"`
+	GPU         bool   `json:"gpu"`
+	NetworkLoad bool   `json:"networkLoad"`
+}
+
+type ResourceUtilization struct {
+	Type  MetricType `json:"type,omitempty"`
+	Value string     `json:"value,omitempty"`
+}
+
+type ComponentMetricStatus struct {
+	OwnerResourceReference corev1.ObjectReference `json:"ownerResourceReference,omitempty"`
+	PodReference           corev1.ObjectReference `json:"podReference,omitempty"`
+	ContainerName          string                 `json:"containerName,omitempty"`
+	Utilization            []ResourceUtilization  `json:"utilization,omitempty"`
 }
 
 // MetricsCollectorStatus defines the observed state of MetricsCollector
 type MetricsCollectorStatus struct {
+	LastUpdateTimestamp string                  `json:"lastUpdateTimestamp,omitempty"`
+	ComponentMetrics    []ComponentMetricStatus `json:"componentMetrics,omitempty"`
 }
 
 //+kubebuilder:object:root=true
