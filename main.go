@@ -35,6 +35,7 @@ import (
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	buildManager "github.com/robolaunch/robot-operator/pkg/controllers/build_manager"
 	launchManager "github.com/robolaunch/robot-operator/pkg/controllers/launch_manager"
+	metrics_collector "github.com/robolaunch/robot-operator/pkg/controllers/metrics_collector"
 	robot "github.com/robolaunch/robot-operator/pkg/controllers/robot"
 	discoveryServer "github.com/robolaunch/robot-operator/pkg/controllers/robot/discovery_server"
 	rosBridge "github.com/robolaunch/robot-operator/pkg/controllers/robot/ros_bridge"
@@ -184,6 +185,13 @@ func main() {
 	}
 	if err = (&robotv1alpha1.RobotIDE{}).SetupWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "RobotIDE")
+		os.Exit(1)
+	}
+	if err = (&metrics_collector.MetricsCollectorReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "MetricsCollector")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder
