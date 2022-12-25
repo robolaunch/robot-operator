@@ -18,7 +18,8 @@ spec:
       name: openebs-hostpath
       accessMode: ReadWriteOnce
   discoveryServerTemplate:
-    attached: true
+    type: Server
+    cluster: robot01
     hostname: "xxx"
     subdomain: "yyy"
   rosBridgeTemplate:
