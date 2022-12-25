@@ -73,6 +73,12 @@ func (r *MetricsCollectorReconciler) Reconcile(ctx context.Context, req ctrl.Req
 }
 
 func (r *MetricsCollectorReconciler) reconcileCheckRobotRelatedPods(ctx context.Context, instance *robotv1alpha1.MetricsCollector) error {
+
+	err := r.reconcileGetPods(ctx, instance)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

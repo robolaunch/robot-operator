@@ -46,7 +46,7 @@ type ResourceUtilization struct {
 }
 
 type ComponentMetricStatus struct {
-	OwnerResourceReference corev1.ObjectReference `json:"ownerResourceReference,omitempty"`
+	OwnerResourceReference metav1.OwnerReference  `json:"ownerReference,omitempty"`
 	PodReference           corev1.ObjectReference `json:"podReference,omitempty"`
 	ContainerName          string                 `json:"containerName,omitempty"`
 	Utilization            []ResourceUtilization  `json:"utilization,omitempty"`
