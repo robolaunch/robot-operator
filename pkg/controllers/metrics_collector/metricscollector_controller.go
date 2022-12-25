@@ -39,6 +39,8 @@ type MetricsCollectorReconciler struct {
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=metricscollectors/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=metricscollectors/finalizers,verbs=update
 
+//+kubebuilder:rbac:groups=core,resources=pods/exec,verbs=get;list;watch;create;update;patch;delete
+
 var logger logr.Logger
 
 func (r *MetricsCollectorReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
