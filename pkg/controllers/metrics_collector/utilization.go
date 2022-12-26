@@ -17,13 +17,13 @@ import (
 func (r *MetricsCollectorReconciler) reconcileGetMetrics(ctx context.Context, instance *robotv1alpha1.MetricsCollector) error {
 	var cmdBuilder strings.Builder
 	// Get CPU usage
-	cmdBuilder.WriteString("cat /sys/fs/cgroup/cpu/cpuacct.usage")
+	cmdBuilder.WriteString(internal.CMD_GET_CPU)
 	cmdBuilder.WriteString(" && ")
 	// Get Memory usage
-	cmdBuilder.WriteString("cat /sys/fs/cgroup/memory/memory.usage_in_bytes")
+	cmdBuilder.WriteString(internal.CMD_GET_MEMORY)
 	cmdBuilder.WriteString(" && ")
 	// Get Network usage
-	cmdBuilder.WriteString("cat /proc/net/dev | awk -F ' ' '{print $1 $2 \":\" $10}' | tail -n+3")
+	cmdBuilder.WriteString(internal.CMD_GET_NETWORK_LOAD)
 
 	for k, c := range instance.Status.ComponentMetrics {
 		out, err := r.readValueFromContainer(instance, c.PodReference.Name, c.ContainerName, cmdBuilder.String())
