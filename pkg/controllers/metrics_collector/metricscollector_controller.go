@@ -18,9 +18,13 @@ package metrics_collector
 
 import (
 	"context"
+	"reflect"
+	"time"
 
 	"k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/rest"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -32,7 +36,9 @@ import (
 // MetricsCollectorReconciler reconciles a MetricsCollector object
 type MetricsCollectorReconciler struct {
 	client.Client
-	Scheme *runtime.Scheme
+	RESTClient rest.Interface
+	RESTConfig *rest.Config
+	Scheme     *runtime.Scheme
 }
 
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=metricscollectors,verbs=get;list;watch;create;update;patch;delete
@@ -46,6 +52,8 @@ var logger logr.Logger
 func (r *MetricsCollectorReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	logger = log.FromContext(ctx)
 
+	logger.Info("RECONCILE: Metrics collector ")
+
 	instance, err := r.reconcileGetInstance(ctx, req.NamespacedName)
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -54,22 +62,32 @@ func (r *MetricsCollectorReconciler) Reconcile(ctx context.Context, req ctrl.Req
 		return ctrl.Result{}, err
 	}
 
-	err = r.reconcileCheckRobotRelatedPods(ctx, instance)
-	if err != nil {
-		return ctrl.Result{}, err
+	if reflect.DeepEqual(instance.Status.LastUpdateTimestamp, metav1.Time{}) || time.Now().Sub(instance.Status.LastUpdateTimestamp.Time) > time.Second*15 {
+
+		logger.Info("UTIL: Collecting utilization for " + instance.Name)
+
+		err = r.reconcileCheckRobotRelatedPods(ctx, instance)
+		if err != nil {
+			return ctrl.Result{}, err
+		}
+
+		err = r.reconcileCheckUtilizations(ctx, instance)
+		if err != nil {
+			return ctrl.Result{}, err
+		}
+
+		instance.Status.LastUpdateTimestamp = metav1.NewTime(time.Now())
+
+		err = r.reconcileUpdateInstanceStatus(ctx, instance)
+		if err != nil {
+			return ctrl.Result{}, err
+		}
 	}
 
-	err = r.reconcileCheckUtilizations(ctx, instance)
-	if err != nil {
-		return ctrl.Result{}, err
-	}
-
-	err = r.reconcileUpdateInstanceStatus(ctx, instance)
-	if err != nil {
-		return ctrl.Result{}, err
-	}
-
-	return ctrl.Result{}, nil
+	return ctrl.Result{
+		Requeue:      true,
+		RequeueAfter: 15 * time.Second,
+	}, nil
 }
 
 func (r *MetricsCollectorReconciler) reconcileCheckRobotRelatedPods(ctx context.Context, instance *robotv1alpha1.MetricsCollector) error {
@@ -83,6 +101,14 @@ func (r *MetricsCollectorReconciler) reconcileCheckRobotRelatedPods(ctx context.
 }
 
 func (r *MetricsCollectorReconciler) reconcileCheckUtilizations(ctx context.Context, instance *robotv1alpha1.MetricsCollector) error {
+
+	if instance.Spec.CPU {
+		err := r.reconcileGetCPUs(ctx, instance)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
