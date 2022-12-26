@@ -5165,6 +5165,7 @@ spec:
         robolaunch.io/cloud-instance: cluster
         robolaunch.io/team: robotics
         robolaunch.io/region: europe-east
+        robolaunch.io/buffer-instance: buffer
 ---
 # Source: cert-manager/templates/deployment.yaml
 apiVersion: apps/v1
@@ -5226,6 +5227,7 @@ spec:
         robolaunch.io/cloud-instance: cluster
         robolaunch.io/team: robotics
         robolaunch.io/region: europe-east
+        robolaunch.io/buffer-instance: buffer
 ---
 # Source: cert-manager/templates/webhook-deployment.yaml
 apiVersion: apps/v1
@@ -5305,6 +5307,7 @@ spec:
         robolaunch.io/cloud-instance: cluster
         robolaunch.io/team: robotics
         robolaunch.io/region: europe-east
+        robolaunch.io/buffer-instance: buffer
 ---
 # Source: cert-manager/templates/webhook-mutating-webhook.yaml
 apiVersion: admissionregistration.k8s.io/v1

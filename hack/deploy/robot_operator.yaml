@@ -3392,6 +3392,7 @@ spec:
         robolaunch.io/organization: robolaunch
         robolaunch.io/team: robotics
         robolaunch.io/region: europe-east
+        robolaunch.io/buffer-instance: buffer
         robolaunch.io/cloud-instance: cluster
 ---
 apiVersion: cert-manager.io/v1
