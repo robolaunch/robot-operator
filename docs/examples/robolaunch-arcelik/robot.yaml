@@ -5,7 +5,8 @@ metadata:
     robolaunch.io/organization: boston-uni
     robolaunch.io/team: robotics
     robolaunch.io/region: usa-boston
-    robolaunch.io/cloud-instance: robot01
+    robolaunch.io/buffer-instance: buffer-1
+    robolaunch.io/cloud-instance: instance-1
     robolaunch.io/robot-image-user: "robolaunchio"
     robolaunch.io/robot-image-repository: "arcelik-robot"
     robolaunch.io/robot-image-tag: "foxy-agnostic-xfce"
@@ -19,7 +20,7 @@ spec:
       accessMode: ReadWriteOnce
   discoveryServerTemplate:
     type: Server
-    cluster: robot01
+    cluster: buffer-1
     hostname: "xxx"
     subdomain: "yyy"
   rosBridgeTemplate:
