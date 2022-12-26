@@ -60,7 +60,7 @@ func (r *MetricsCollectorReconciler) Reconcile(ctx context.Context, req ctrl.Req
 		return ctrl.Result{}, err
 	}
 
-	if reflect.DeepEqual(instance.Status.LastUpdateTimestamp, metav1.Time{}) || time.Now().Sub(instance.Status.LastUpdateTimestamp.Time) > time.Second*15 {
+	if reflect.DeepEqual(instance.Status.LastUpdateTimestamp, metav1.Time{}) || time.Now().Sub(instance.Status.LastUpdateTimestamp.Time) > time.Second*time.Duration(instance.Spec.WaitSeconds) {
 
 		err := r.reconcileCheckNode(ctx, instance)
 		if err != nil {
@@ -87,7 +87,7 @@ func (r *MetricsCollectorReconciler) Reconcile(ctx context.Context, req ctrl.Req
 
 	return ctrl.Result{
 		Requeue:      true,
-		RequeueAfter: 15 * time.Second,
+		RequeueAfter: time.Duration(instance.Spec.WaitSeconds) * time.Second,
 	}, nil
 }
 
