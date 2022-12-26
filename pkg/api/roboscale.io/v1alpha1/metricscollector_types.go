@@ -59,6 +59,7 @@ type ComponentMetricStatus struct {
 type MetricsCollectorStatus struct {
 	LastUpdateTimestamp metav1.Time             `json:"lastUpdateTimestamp,omitempty"`
 	ComponentMetrics    []ComponentMetricStatus `json:"componentMetrics,omitempty"`
+	Allocatable         corev1.ResourceList     `json:"allocatable,omitempty"`
 }
 
 //+kubebuilder:object:root=true
