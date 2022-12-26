@@ -9,6 +9,7 @@ type Tenancy struct {
 	Organization     string
 	Team             string
 	Region           string
+	BufferInstance   string
 	CloudInstance    string
 	PhysicalInstance string
 }
@@ -27,6 +28,10 @@ func GetTenancy(obj metav1.Object) *Tenancy {
 
 	if region, ok := labels[internal.REGION_LABEL_KEY]; ok {
 		tenancy.Region = region
+	}
+
+	if bufferInstance, ok := labels[internal.BUFFER_INSTANCE_LABEL_KEY]; ok {
+		tenancy.BufferInstance = bufferInstance
 	}
 
 	if cloudInstance, ok := labels[internal.CLOUD_INSTANCE_LABEL_KEY]; ok {
@@ -54,6 +59,10 @@ func GetTenancyMap(obj metav1.Object) map[string]string {
 
 	if region, ok := labels[internal.REGION_LABEL_KEY]; ok {
 		tenancyMap[internal.REGION_LABEL_KEY] = region
+	}
+
+	if bufferInstance, ok := labels[internal.BUFFER_INSTANCE_LABEL_KEY]; ok {
+		tenancyMap[internal.BUFFER_INSTANCE_LABEL_KEY] = bufferInstance
 	}
 
 	if cloudInstance, ok := labels[internal.CLOUD_INSTANCE_LABEL_KEY]; ok {
@@ -88,4 +97,9 @@ func GetClusterName(obj metav1.Object) string {
 		return tenancy.CloudInstance
 	}
 	return tenancy.PhysicalInstance
+}
+
+func GetBufferInstanceName(obj metav1.Object) string {
+	tenancy := GetTenancy(obj)
+	return tenancy.BufferInstance
 }
