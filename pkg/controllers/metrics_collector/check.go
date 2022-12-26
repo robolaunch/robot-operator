@@ -30,11 +30,11 @@ func (r *MetricsCollectorReconciler) reconcileGetPods(ctx context.Context, insta
 		return err
 	}
 
-	instance.Status.ComponentMetrics = []robotv1alpha1.ComponentMetricStatus{}
+	newComponentMetrics := []robotv1alpha1.ComponentMetricStatus{}
 
 	for _, pod := range podList.Items {
 		for _, container := range pod.Spec.Containers {
-			instance.Status.ComponentMetrics = append(instance.Status.ComponentMetrics, robotv1alpha1.ComponentMetricStatus{
+			newComponentMetrics = append(newComponentMetrics, robotv1alpha1.ComponentMetricStatus{
 				OwnerResourceReference: pod.OwnerReferences[0],
 				PodReference: corev1.ObjectReference{
 					Kind:            pod.Kind,
@@ -48,6 +48,18 @@ func (r *MetricsCollectorReconciler) reconcileGetPods(ctx context.Context, insta
 			})
 		}
 	}
+
+	for k1, m := range newComponentMetrics {
+		for _, oldM := range instance.Status.ComponentMetrics {
+			if oldM.PodReference.Name == m.PodReference.Name && oldM.ContainerName == m.ContainerName {
+				// save cpu utilization data
+				m.CPUUtilization = oldM.CPUUtilization
+				newComponentMetrics[k1] = m
+			}
+		}
+	}
+
+	instance.Status.ComponentMetrics = newComponentMetrics
 
 	return nil
 }
