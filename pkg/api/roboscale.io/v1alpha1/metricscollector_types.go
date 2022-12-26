@@ -33,28 +33,31 @@ const (
 // MetricsCollectorSpec defines the desired state of MetricsCollector
 type MetricsCollectorSpec struct {
 	// TODO: Add default value
-	WaitSeconds string `json:"waitSeconds,omitempty"`
-	CPU         bool   `json:"cpu"`
-	Memory      bool   `json:"memory"`
-	GPU         bool   `json:"gpu"`
-	NetworkLoad bool   `json:"networkLoad"`
+	// +kubebuilder:default=10
+	WaitSeconds int64 `json:"waitSeconds"`
+	CPU         bool  `json:"cpu"`
+	Memory      bool  `json:"memory"`
+	GPU         bool  `json:"gpu"`
+	NetworkLoad bool  `json:"networkLoad"`
 }
 
-type ResourceUtilization struct {
-	Type  MetricType `json:"type,omitempty"`
-	Value string     `json:"value,omitempty"`
+type CPUUtilization struct {
+	Type       MetricType `json:"type,omitempty"`
+	Value      int64      `json:"value,omitempty"`
+	Percentage string     `json:"percentage,omitempty"`
+	Message    string     `json:"message,omitempty"`
 }
 
 type ComponentMetricStatus struct {
 	OwnerResourceReference metav1.OwnerReference  `json:"ownerReference,omitempty"`
 	PodReference           corev1.ObjectReference `json:"podReference,omitempty"`
 	ContainerName          string                 `json:"containerName,omitempty"`
-	Utilization            []ResourceUtilization  `json:"utilization,omitempty"`
+	CPUUtilization         CPUUtilization         `json:"cpuUtilization,omitempty"`
 }
 
 // MetricsCollectorStatus defines the observed state of MetricsCollector
 type MetricsCollectorStatus struct {
-	LastUpdateTimestamp string                  `json:"lastUpdateTimestamp,omitempty"`
+	LastUpdateTimestamp metav1.Time             `json:"lastUpdateTimestamp,omitempty"`
 	ComponentMetrics    []ComponentMetricStatus `json:"componentMetrics,omitempty"`
 }
 
