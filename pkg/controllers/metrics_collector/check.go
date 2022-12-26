@@ -55,6 +55,8 @@ func (r *MetricsCollectorReconciler) reconcileGetPods(ctx context.Context, insta
 			if oldM.PodReference.Name == m.PodReference.Name && oldM.ContainerName == m.ContainerName {
 				// save cpu utilization data
 				m.CPUUtilization = oldM.CPUUtilization
+				// save network load utilization data
+				m.NetworkLoadUtilization = oldM.NetworkLoadUtilization
 				newComponentMetrics[k1] = m
 			}
 		}

@@ -3,6 +3,7 @@ package metrics_collector
 import (
 	"bytes"
 	"context"
+	goErr "errors"
 	"fmt"
 	"os"
 	"strconv"
@@ -16,76 +17,152 @@ import (
 	"k8s.io/client-go/tools/remotecommand"
 )
 
-func (r *MetricsCollectorReconciler) reconcileGetCPUUsage(ctx context.Context, instance *robotv1alpha1.MetricsCollector) error {
-
+func (r *MetricsCollectorReconciler) reconcileGetMetrics(ctx context.Context, instance *robotv1alpha1.MetricsCollector) error {
 	var cmdBuilder strings.Builder
+	// Get CPU usage
 	cmdBuilder.WriteString("cat /sys/fs/cgroup/cpu/cpuacct.usage")
+	cmdBuilder.WriteString(" && ")
+	// Get Memory usage
+	cmdBuilder.WriteString("cat /sys/fs/cgroup/memory/memory.usage_in_bytes")
+	cmdBuilder.WriteString(" && ")
+	// Get Network usage
+	cmdBuilder.WriteString("cat /proc/net/dev | awk -F ' ' '{print $1 $2 \":\" $10}' | tail -n+3")
 
 	for k, c := range instance.Status.ComponentMetrics {
 		out, err := r.readValueFromContainer(instance, c.PodReference.Name, c.ContainerName, cmdBuilder.String())
 		if err != nil {
-			c.CPUUtilization = robotv1alpha1.CPUUtilization{
-				Value:   "0",
-				Message: err.Error(),
-			}
+			c.Message = err.Error()
 		} else {
 
-			var oldCpuUsage float64 = 0.0
-			if c.CPUUtilization.Value != "" {
-				oldCpuUsage, err = strconv.ParseFloat(c.CPUUtilization.Value, 64)
+			data := strings.Split(out, "\n")
+			if len(data) < 3 {
+				c.Message = "broken data"
+				instance.Status.ComponentMetrics[k] = c
+				return nil
+			}
+
+			cpuData := data[0]
+			memoryData := data[1]
+			networkLoadData := data[2:]
+
+			err := updateCPUUsage(instance, &c.CPUUtilization, cpuData)
+			if err != nil {
+				c.CPUUtilization.Message = err.Error()
+			}
+
+			err = updateMemoryUsage(instance, &c.MemoryUtilization, memoryData)
+			if err != nil {
+				c.MemoryUtilization.Message = err.Error()
+			}
+
+			err = updateNetworkUsage(instance, &c.NetworkLoadUtilization, networkLoadData)
+			if err != nil {
+				c.NetworkLoadUtilization.Message = err.Error()
+			}
+
+			c.Message = "active"
+
+			instance.Status.ComponentMetrics[k] = c
+		}
+	}
+
+	return nil
+}
+
+func updateCPUUsage(instance *robotv1alpha1.MetricsCollector, cpuUtil *robotv1alpha1.CPUUtilization, output string) error {
+
+	var cpuUsage float64 = 0.0
+	if cpuUtil.Value != "" {
+		oldCpuUsage, err := strconv.ParseFloat(cpuUtil.Value, 64)
+		if err != nil {
+			return err
+		}
+		cpuUsage = oldCpuUsage
+	}
+
+	outputFloat64, err := strconv.ParseFloat(output, 64)
+	if err != nil {
+		return err
+	}
+
+	elapsedTimeNano := float64(time.Now().UnixNano() - instance.Status.LastUpdateTimestamp.UnixNano())
+	corePercentage := fmt.Sprintf("%f", (outputFloat64-cpuUsage)*100/elapsedTimeNano) + "%"
+	hostPercentage := fmt.Sprintf("%f", (outputFloat64-cpuUsage)*100/float64(instance.Status.Allocatable.Cpu().Value())/elapsedTimeNano) + "%"
+
+	cpuUtil.Value = output
+	cpuUtil.CorePercentage = corePercentage
+	cpuUtil.HostPercentage = hostPercentage
+	cpuUtil.Message = "active"
+
+	return nil
+}
+
+func updateMemoryUsage(instance *robotv1alpha1.MetricsCollector, memUtil *robotv1alpha1.MemoryUtilization, output string) error {
+
+	outputFloat64, err := strconv.ParseFloat(output, 64)
+	if err != nil {
+		return err
+	}
+
+	hostPercentage := fmt.Sprintf("%f", outputFloat64*100/instance.Status.Allocatable.Memory().AsApproximateFloat64()) + "%"
+
+	memUtil.Value = output
+	memUtil.HostPercentage = hostPercentage
+	memUtil.Message = "active"
+
+	return nil
+}
+
+func updateNetworkUsage(instance *robotv1alpha1.MetricsCollector, netUtil *robotv1alpha1.NetworkLoadUtilization, output []string) error {
+
+	for _, niStr := range output {
+
+		niData := strings.Split(niStr, ":")
+		if len(niData) != 3 {
+			return goErr.New("broken network data: " + niStr)
+		}
+
+		interfaceName := niData[0]
+		interfaceReceive := niData[1]
+		interfaceTransmit := niData[2]
+
+		updated := false
+		for k, iface := range netUtil.Interfaces {
+			if interfaceName == iface.Name {
+				err := updateNetworkInterfaceStatus(&iface, interfaceReceive, interfaceTransmit)
 				if err != nil {
 					return err
 				}
-			}
-
-			elapsedTimeNano := float64(time.Now().UnixNano() - instance.Status.LastUpdateTimestamp.UnixNano())
-			corePercentage := fmt.Sprintf("%f", (out-oldCpuUsage)*100/elapsedTimeNano) + "%"
-			hostPercentage := fmt.Sprintf("%f", (out-oldCpuUsage)*100/float64(instance.Status.Allocatable.Cpu().Value())/elapsedTimeNano) + "%"
-
-			c.CPUUtilization = robotv1alpha1.CPUUtilization{
-				Value:          fmt.Sprintf("%f", out),
-				CorePercentage: corePercentage,
-				HostPercentage: hostPercentage,
-				Message:        "active",
+				netUtil.Interfaces[k] = iface
+				updated = true
+				break
 			}
 		}
 
-		instance.Status.ComponentMetrics[k] = c
+		if !updated {
+			netUtil.Interfaces = append(netUtil.Interfaces, robotv1alpha1.NetworkInterfaceUtilization{
+				Name:     interfaceName,
+				Receive:  interfaceReceive,
+				Transmit: interfaceTransmit,
+			})
+		}
+
 	}
 
 	return nil
 }
 
-func (r *MetricsCollectorReconciler) reconcileGetMemoryUsage(ctx context.Context, instance *robotv1alpha1.MetricsCollector) error {
+func updateNetworkInterfaceStatus(netInterface *robotv1alpha1.NetworkInterfaceUtilization, receive string, transmit string) error {
 
-	var cmdBuilder strings.Builder
-	cmdBuilder.WriteString("cat /sys/fs/cgroup/memory/memory.usage_in_bytes")
+	// convert to Mbit
 
-	for k, c := range instance.Status.ComponentMetrics {
-		out, err := r.readValueFromContainer(instance, c.PodReference.Name, c.ContainerName, cmdBuilder.String())
-		if err != nil {
-			c.MemoryUtilization = robotv1alpha1.MemoryUtilization{
-				Value:   "0",
-				Message: err.Error(),
-			}
-		} else {
-
-			hostPercentage := fmt.Sprintf("%f", out*100/instance.Status.Allocatable.Memory().AsApproximateFloat64()) + "%"
-
-			c.MemoryUtilization = robotv1alpha1.MemoryUtilization{
-				Value:          fmt.Sprintf("%f", out),
-				HostPercentage: hostPercentage,
-				Message:        "active",
-			}
-		}
-
-		instance.Status.ComponentMetrics[k] = c
-	}
+	netInterface.Receive = receive
+	netInterface.Transmit = transmit
 
 	return nil
 }
 
-func (r *MetricsCollectorReconciler) readValueFromContainer(instance *robotv1alpha1.MetricsCollector, podName string, containerName string, cmd string) (float64, error) {
+func (r *MetricsCollectorReconciler) readValueFromContainer(instance *robotv1alpha1.MetricsCollector, podName string, containerName string, cmd string) (string, error) {
 
 	inspectCommand := r.RESTClient.
 		Post().
@@ -103,7 +180,7 @@ func (r *MetricsCollectorReconciler) readValueFromContainer(instance *robotv1alp
 
 	exec, err := remotecommand.NewSPDYExecutor(r.RESTConfig, "POST", inspectCommand.URL())
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 
 	var buff bytes.Buffer
@@ -115,15 +192,12 @@ func (r *MetricsCollectorReconciler) readValueFromContainer(instance *robotv1alp
 	})
 
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 
 	output := string(buff.Bytes()[:])
-	output = strings.ReplaceAll(output, "\n", "")
-	outputFloat64, err := strconv.ParseFloat(output, 64)
-	if err != nil {
-		return 0, err
-	}
+	index := strings.LastIndex(output, "\n")
+	output = output[:index] + strings.Replace(output[index:], "\n", "", 1)
 
-	return outputFloat64, nil
+	return output, nil
 }

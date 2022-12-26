@@ -52,8 +52,6 @@ var logger logr.Logger
 func (r *MetricsCollectorReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	logger = log.FromContext(ctx)
 
-	logger.Info("RECONCILE: Metrics collector.")
-
 	instance, err := r.reconcileGetInstance(ctx, req.NamespacedName)
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -63,8 +61,6 @@ func (r *MetricsCollectorReconciler) Reconcile(ctx context.Context, req ctrl.Req
 	}
 
 	if reflect.DeepEqual(instance.Status.LastUpdateTimestamp, metav1.Time{}) || time.Now().Sub(instance.Status.LastUpdateTimestamp.Time) > time.Second*15 {
-
-		logger.Info("UTIL: Collecting utilization for " + instance.Name)
 
 		err := r.reconcileCheckNode(ctx, instance)
 		if err != nil {
@@ -117,18 +113,9 @@ func (r *MetricsCollectorReconciler) reconcileCheckRobotRelatedPods(ctx context.
 
 func (r *MetricsCollectorReconciler) reconcileCheckUtilizations(ctx context.Context, instance *robotv1alpha1.MetricsCollector) error {
 
-	if instance.Spec.CPU {
-		err := r.reconcileGetCPUUsage(ctx, instance)
-		if err != nil {
-			return err
-		}
-	}
-
-	if instance.Spec.Memory {
-		err := r.reconcileGetMemoryUsage(ctx, instance)
-		if err != nil {
-			return err
-		}
+	err := r.reconcileGetMetrics(ctx, instance)
+	if err != nil {
+		return err
 	}
 
 	return nil

@@ -71,6 +71,8 @@ type ComponentMetricStatus struct {
 	ContainerName          string                 `json:"containerName,omitempty"`
 	CPUUtilization         CPUUtilization         `json:"cpuUtilization,omitempty"`
 	MemoryUtilization      MemoryUtilization      `json:"memoryUtilization,omitempty"`
+	NetworkLoadUtilization NetworkLoadUtilization `json:"networkLoadUtilization,omitempty"`
+	Message                string                 `json:"message,omitempty"`
 }
 
 type MetricsCollectorPhase string
