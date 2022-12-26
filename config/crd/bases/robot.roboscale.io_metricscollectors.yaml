@@ -80,11 +80,49 @@ spec:
                           type: string
                         message:
                           type: string
-                        type:
+                        value:
+                          type: string
+                      type: object
+                    memoryUtilization:
+                      properties:
+                        hostPercentage:
+                          type: string
+                        message:
                           type: string
                         value:
-                          format: int64
-                          type: integer
+                          type: string
+                      type: object
+                    message:
+                      type: string
+                    networkLoadUtilization:
+                      properties:
+                        interfaces:
+                          items:
+                            properties:
+                              name:
+                                type: string
+                              receive:
+                                properties:
+                                  load:
+                                    type: string
+                                  loadKBit:
+                                    type: string
+                                  value:
+                                    type: string
+                                type: object
+                              transmit:
+                                properties:
+                                  load:
+                                    type: string
+                                  loadKBit:
+                                    type: string
+                                  value:
+                                    type: string
+                                type: object
+                            type: object
+                          type: array
+                        message:
+                          type: string
                       type: object
                     ownerReference:
                       description: OwnerReference contains enough information to let
