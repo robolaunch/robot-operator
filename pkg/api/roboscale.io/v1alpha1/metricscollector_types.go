@@ -54,10 +54,15 @@ type MemoryUtilization struct {
 	Message        string `json:"message,omitempty"`
 }
 
+type NetworkLoad struct {
+	Value string `json:"value,omitempty"`
+	Load  string `json:"load,omitempty"`
+}
+
 type NetworkInterfaceUtilization struct {
-	Name     string `json:"name,omitempty"`
-	Transmit string `json:"transmit,omitempty"`
-	Receive  string `json:"receive,omitempty"`
+	Name     string      `json:"name,omitempty"`
+	Transmit NetworkLoad `json:"transmit,omitempty"`
+	Receive  NetworkLoad `json:"receive,omitempty"`
 }
 
 type NetworkLoadUtilization struct {
