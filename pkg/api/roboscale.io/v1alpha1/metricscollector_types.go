@@ -54,6 +54,17 @@ type MemoryUtilization struct {
 	Message        string `json:"message,omitempty"`
 }
 
+type NetworkInterfaceUtilization struct {
+	Name     string `json:"name,omitempty"`
+	Transmit string `json:"transmit,omitempty"`
+	Receive  string `json:"receive,omitempty"`
+}
+
+type NetworkLoadUtilization struct {
+	Interfaces []NetworkInterfaceUtilization `json:"interfaces,omitempty"`
+	Message    string                        `json:"message,omitempty"`
+}
+
 type ComponentMetricStatus struct {
 	OwnerResourceReference metav1.OwnerReference  `json:"ownerReference,omitempty"`
 	PodReference           corev1.ObjectReference `json:"podReference,omitempty"`
