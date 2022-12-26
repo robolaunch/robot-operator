@@ -15,7 +15,7 @@ import (
 	"k8s.io/client-go/tools/remotecommand"
 )
 
-func (r *MetricsCollectorReconciler) reconcileGetCPUs(ctx context.Context, instance *robotv1alpha1.MetricsCollector) error {
+func (r *MetricsCollectorReconciler) reconcileGetCPUUsage(ctx context.Context, instance *robotv1alpha1.MetricsCollector) error {
 
 	var cmdBuilder strings.Builder
 	cmdBuilder.WriteString("cat /sys/fs/cgroup/cpu/cpuacct.usage")
@@ -24,7 +24,6 @@ func (r *MetricsCollectorReconciler) reconcileGetCPUs(ctx context.Context, insta
 		out, err := r.readValueFromContainer(instance, c.PodReference.Name, c.ContainerName, cmdBuilder.String())
 		if err != nil {
 			c.CPUUtilization = robotv1alpha1.CPUUtilization{
-				Type:    robotv1alpha1.MetricTypeCPU,
 				Value:   0,
 				Message: err.Error(),
 			}
@@ -34,10 +33,9 @@ func (r *MetricsCollectorReconciler) reconcileGetCPUs(ctx context.Context, insta
 		elapsedTimeNano := time.Now().UnixNano() - instance.Status.LastUpdateTimestamp.UnixNano()
 
 		c.CPUUtilization = robotv1alpha1.CPUUtilization{
-			Type:           robotv1alpha1.MetricTypeCPU,
 			Value:          out,
-			CorePercentage: strconv.Itoa(int(((out - c.CPUUtilization.Value) * 100 / elapsedTimeNano))) + "%",
-			HostPercentage: strconv.Itoa(int((((out - c.CPUUtilization.Value) * 100 / instance.Status.Allocatable.Cpu().Value()) / elapsedTimeNano))) + "%",
+			CorePercentage: strconv.FormatInt((out-c.CPUUtilization.Value)*100/elapsedTimeNano, 10) + "%",
+			HostPercentage: strconv.FormatInt(((out-c.CPUUtilization.Value)*100/instance.Status.Allocatable.Cpu().Value())/elapsedTimeNano, 10) + "%",
 			Message:        "active",
 		}
 

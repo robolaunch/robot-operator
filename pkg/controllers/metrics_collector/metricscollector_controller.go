@@ -118,7 +118,7 @@ func (r *MetricsCollectorReconciler) reconcileCheckRobotRelatedPods(ctx context.
 func (r *MetricsCollectorReconciler) reconcileCheckUtilizations(ctx context.Context, instance *robotv1alpha1.MetricsCollector) error {
 
 	if instance.Spec.CPU {
-		err := r.reconcileGetCPUs(ctx, instance)
+		err := r.reconcileGetCPUUsage(ctx, instance)
 		if err != nil {
 			return err
 		}

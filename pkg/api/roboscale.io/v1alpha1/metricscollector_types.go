@@ -42,11 +42,10 @@ type MetricsCollectorSpec struct {
 }
 
 type CPUUtilization struct {
-	Type           MetricType `json:"type,omitempty"`
-	Value          int64      `json:"value,omitempty"`
-	HostPercentage string     `json:"hostPercentage,omitempty"`
-	CorePercentage string     `json:"corePercentage,omitempty"`
-	Message        string     `json:"message,omitempty"`
+	Value          int64  `json:"value,omitempty"`
+	HostPercentage string `json:"hostPercentage,omitempty"`
+	CorePercentage string `json:"corePercentage,omitempty"`
+	Message        string `json:"message,omitempty"`
 }
 
 type ComponentMetricStatus struct {
