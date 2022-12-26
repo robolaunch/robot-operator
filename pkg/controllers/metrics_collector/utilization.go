@@ -45,19 +45,25 @@ func (r *MetricsCollectorReconciler) reconcileGetMetrics(ctx context.Context, in
 			memoryData := data[1]
 			networkLoadData := data[2:]
 
-			err := updateCPUUsage(instance, &c.CPUUtilization, cpuData)
-			if err != nil {
-				c.CPUUtilization.Message = err.Error()
+			if instance.Spec.CPU {
+				err := updateCPUUsage(instance, &c.CPUUtilization, cpuData)
+				if err != nil {
+					c.CPUUtilization.Message = err.Error()
+				}
 			}
 
-			err = updateMemoryUsage(instance, &c.MemoryUtilization, memoryData)
-			if err != nil {
-				c.MemoryUtilization.Message = err.Error()
+			if instance.Spec.Memory {
+				err = updateMemoryUsage(instance, &c.MemoryUtilization, memoryData)
+				if err != nil {
+					c.MemoryUtilization.Message = err.Error()
+				}
 			}
 
-			err = updateNetworkUsage(instance, &c.NetworkLoadUtilization, networkLoadData)
-			if err != nil {
-				c.NetworkLoadUtilization.Message = err.Error()
+			if instance.Spec.NetworkLoad {
+				err = updateNetworkUsage(instance, &c.NetworkLoadUtilization, networkLoadData)
+				if err != nil {
+					c.NetworkLoadUtilization.Message = err.Error()
+				}
 			}
 
 			c.Message = "active"
