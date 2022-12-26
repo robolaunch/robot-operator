@@ -32,12 +32,11 @@ func (r *MetricsCollectorReconciler) reconcileGetCPUs(ctx context.Context, insta
 		}
 
 		elapsedTimeNano := time.Now().UnixNano() - instance.Status.LastUpdateTimestamp.UnixNano()
-		logger.Info(strconv.FormatInt(((out-c.CPUUtilization.Value)/elapsedTimeNano)*100, 10) + "%")
 
 		c.CPUUtilization = robotv1alpha1.CPUUtilization{
 			Type:       robotv1alpha1.MetricTypeCPU,
 			Value:      out,
-			Percentage: strconv.Itoa(int(((out-c.CPUUtilization.Value)/elapsedTimeNano)*100)) + "%",
+			Percentage: strconv.Itoa(int(((out - c.CPUUtilization.Value) * 100 / elapsedTimeNano))) + "%",
 			Message:    "active",
 		}
 

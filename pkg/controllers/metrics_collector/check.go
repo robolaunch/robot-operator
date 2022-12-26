@@ -9,6 +9,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/selection"
+	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -60,6 +61,24 @@ func (r *MetricsCollectorReconciler) reconcileGetPods(ctx context.Context, insta
 	}
 
 	instance.Status.ComponentMetrics = newComponentMetrics
+
+	return nil
+}
+
+func (r *MetricsCollectorReconciler) reconcileCheckNode(ctx context.Context, instance *robotv1alpha1.MetricsCollector) error {
+
+	robot, err := r.reconcileGetTargetRobot(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	node := &corev1.Node{}
+	err = r.Get(ctx, types.NamespacedName{Name: robot.Status.NodeName}, node)
+	if err != nil {
+		return err
+	}
+
+	instance.Status.Allocatable = node.Status.Allocatable
 
 	return nil
 }
