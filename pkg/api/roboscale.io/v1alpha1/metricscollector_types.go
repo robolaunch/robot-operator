@@ -42,9 +42,15 @@ type MetricsCollectorSpec struct {
 }
 
 type CPUUtilization struct {
-	Value          int64  `json:"value,omitempty"`
+	Value          string `json:"value,omitempty"`
 	HostPercentage string `json:"hostPercentage,omitempty"`
 	CorePercentage string `json:"corePercentage,omitempty"`
+	Message        string `json:"message,omitempty"`
+}
+
+type MemoryUtilization struct {
+	Value          string `json:"value,omitempty"`
+	HostPercentage string `json:"hostPercentage,omitempty"`
 	Message        string `json:"message,omitempty"`
 }
 
@@ -53,7 +59,15 @@ type ComponentMetricStatus struct {
 	PodReference           corev1.ObjectReference `json:"podReference,omitempty"`
 	ContainerName          string                 `json:"containerName,omitempty"`
 	CPUUtilization         CPUUtilization         `json:"cpuUtilization,omitempty"`
+	MemoryUtilization      MemoryUtilization      `json:"memoryUtilization,omitempty"`
 }
+
+type MetricsCollectorPhase string
+
+const (
+	MetricsCollectorPhaseRobotNotFound MetricsCollectorPhase = "RobotNotFound"
+	MetricsCollectorPhaseRunning       MetricsCollectorPhase = "Running"
+)
 
 // MetricsCollectorStatus defines the observed state of MetricsCollector
 type MetricsCollectorStatus struct {
