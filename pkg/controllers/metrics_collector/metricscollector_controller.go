@@ -124,6 +124,13 @@ func (r *MetricsCollectorReconciler) reconcileCheckUtilizations(ctx context.Cont
 		}
 	}
 
+	if instance.Spec.Memory {
+		err := r.reconcileGetMemoryUsage(ctx, instance)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
