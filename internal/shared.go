@@ -148,6 +148,13 @@ const (
 		"}"
 )
 
+// Commands for collecting metrics
+const (
+	CMD_GET_CPU          = "cat /sys/fs/cgroup/cpu/cpuacct.usage"
+	CMD_GET_MEMORY       = "cat /sys/fs/cgroup/memory/memory.usage_in_bytes"
+	CMD_GET_NETWORK_LOAD = "cat /proc/net/dev | awk -F ' ' '{print $1 $2 \":\" $10}' | tail -n+3"
+)
+
 func Bash(command string) []string {
 	return []string{
 		"/bin/bash",

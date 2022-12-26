@@ -85,11 +85,16 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 	cmdBuilder.WriteString(filepath.Join("/etc", "vdi", "generate-xorg.sh") + " && ")
 	cmdBuilder.WriteString("supervisord -c " + filepath.Join("/etc", "vdi", "supervisord.conf"))
 
+	labels := getRobotVDISelector(*robotVDI)
+	for k, v := range robotVDI.Labels {
+		labels[k] = v
+	}
+
 	vdiPod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      podNamespacedName.Name,
 			Namespace: podNamespacedName.Namespace,
-			Labels:    getRobotVDISelector(*robotVDI),
+			Labels:    labels,
 		},
 		Spec: corev1.PodSpec{
 			Containers: []corev1.Container{
