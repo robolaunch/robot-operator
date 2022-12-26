@@ -86,8 +86,8 @@ func updateCPUUsage(instance *robotv1alpha1.MetricsCollector, cpuUtil *robotv1al
 	}
 
 	elapsedTimeNano := float64(time.Now().UnixNano() - instance.Status.LastUpdateTimestamp.UnixNano())
-	corePercentage := fmt.Sprintf("%f", (outputFloat64-cpuUsage)*100/elapsedTimeNano) + "%"
-	hostPercentage := fmt.Sprintf("%f", (outputFloat64-cpuUsage)*100/float64(instance.Status.Allocatable.Cpu().Value())/elapsedTimeNano) + "%"
+	corePercentage := fmt.Sprintf("%.2f", (outputFloat64-cpuUsage)*100/elapsedTimeNano) + "%"
+	hostPercentage := fmt.Sprintf("%.2f", (outputFloat64-cpuUsage)*100/float64(instance.Status.Allocatable.Cpu().Value())/elapsedTimeNano) + "%"
 
 	cpuUtil.Value = output
 	cpuUtil.CorePercentage = corePercentage
@@ -104,7 +104,7 @@ func updateMemoryUsage(instance *robotv1alpha1.MetricsCollector, memUtil *robotv
 		return err
 	}
 
-	hostPercentage := fmt.Sprintf("%f", outputFloat64*100/instance.Status.Allocatable.Memory().AsApproximateFloat64()) + "%"
+	hostPercentage := fmt.Sprintf("%.2f", outputFloat64*100/instance.Status.Allocatable.Memory().AsApproximateFloat64()) + "%"
 
 	memUtil.Value = output
 	memUtil.HostPercentage = hostPercentage
@@ -129,7 +129,7 @@ func updateNetworkUsage(instance *robotv1alpha1.MetricsCollector, netUtil *robot
 		updated := false
 		for k, iface := range netUtil.Interfaces {
 			if interfaceName == iface.Name {
-				err := updateNetworkInterfaceStatus(&iface, interfaceReceive, interfaceTransmit)
+				err := updateNetworkInterfaceStatus(instance, &iface, interfaceReceive, interfaceTransmit)
 				if err != nil {
 					return err
 				}
@@ -141,9 +141,13 @@ func updateNetworkUsage(instance *robotv1alpha1.MetricsCollector, netUtil *robot
 
 		if !updated {
 			netUtil.Interfaces = append(netUtil.Interfaces, robotv1alpha1.NetworkInterfaceUtilization{
-				Name:     interfaceName,
-				Receive:  interfaceReceive,
-				Transmit: interfaceTransmit,
+				Name: interfaceName,
+				Receive: robotv1alpha1.NetworkLoad{
+					Value: interfaceReceive,
+				},
+				Transmit: robotv1alpha1.NetworkLoad{
+					Value: interfaceTransmit,
+				},
 			})
 		}
 
@@ -152,14 +156,83 @@ func updateNetworkUsage(instance *robotv1alpha1.MetricsCollector, netUtil *robot
 	return nil
 }
 
-func updateNetworkInterfaceStatus(netInterface *robotv1alpha1.NetworkInterfaceUtilization, receive string, transmit string) error {
+func updateNetworkInterfaceStatus(instance *robotv1alpha1.MetricsCollector, netInterface *robotv1alpha1.NetworkInterfaceUtilization, receive string, transmit string) error {
 
-	// convert to Mbit
+	elapsedTimeSeconds := float64(time.Now().Sub(instance.Status.LastUpdateTimestamp.Time).Seconds())
 
-	netInterface.Receive = receive
-	netInterface.Transmit = transmit
+	oldReceiveFloat, err := strconv.ParseFloat(netInterface.Receive.Value, 64)
+	if err != nil {
+		return err
+	}
+
+	receiveFloat, err := strconv.ParseFloat(receive, 64)
+	if err != nil {
+		return err
+	}
+
+	oldTransmitFloat, err := strconv.ParseFloat(netInterface.Transmit.Value, 64)
+	if err != nil {
+		return err
+	}
+
+	transmitFloat, err := strconv.ParseFloat(transmit, 64)
+	if err != nil {
+		return err
+	}
+
+	netInterface.Receive.Value = fmt.Sprintf("%.2f", receiveFloat)
+	netInterface.Transmit.Value = fmt.Sprintf("%.2f", transmitFloat)
+
+	netInterface.Receive.Load = calculateUnit(receiveFloat, oldReceiveFloat, elapsedTimeSeconds)
+	netInterface.Transmit.Load = calculateUnit(transmitFloat, oldTransmitFloat, elapsedTimeSeconds)
+
+	netInterface.Receive.LoadKBit = calculateKBit(receiveFloat, oldReceiveFloat, elapsedTimeSeconds)
+	netInterface.Transmit.LoadKBit = calculateKBit(transmitFloat, oldTransmitFloat, elapsedTimeSeconds)
 
 	return nil
+}
+
+func calculateUnit(newVal float64, oldVal float64, elapsedTime float64) string {
+	loadBytes := (newVal - oldVal) / elapsedTime
+
+	var absoluteVal float64 = loadBytes
+	var unit string = "Bytes/s"
+
+	if int(loadBytes)%125 > 1 {
+
+		if int(loadBytes)%125000 > 1 {
+
+			if int(loadBytes)%125000000 > 1 {
+
+				absoluteVal = loadBytes / 125000000
+				unit = "gBits/s"
+
+			} else {
+
+				absoluteVal = loadBytes / 125000
+				unit = "mBits/s"
+
+			}
+
+		} else {
+
+			absoluteVal = loadBytes / 125
+			unit = "kBits/s"
+
+		}
+
+	}
+
+	return fmt.Sprintf("%.2f", absoluteVal) + " " + unit
+}
+
+func calculateKBit(newVal float64, oldVal float64, elapsedTime float64) string {
+	loadBytes := (newVal - oldVal) / elapsedTime
+
+	absoluteVal := loadBytes / 125
+	unit := "kBits/s"
+
+	return fmt.Sprintf("%.2f", absoluteVal) + " " + unit
 }
 
 func (r *MetricsCollectorReconciler) readValueFromContainer(instance *robotv1alpha1.MetricsCollector, podName string, containerName string, cmd string) (string, error) {

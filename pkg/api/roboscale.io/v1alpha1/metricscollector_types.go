@@ -55,8 +55,9 @@ type MemoryUtilization struct {
 }
 
 type NetworkLoad struct {
-	Value string `json:"value,omitempty"`
-	Load  string `json:"load,omitempty"`
+	Value    string `json:"value,omitempty"`
+	Load     string `json:"load,omitempty"`
+	LoadKBit string `json:"loadKBit,omitempty"`
 }
 
 type NetworkInterfaceUtilization struct {
