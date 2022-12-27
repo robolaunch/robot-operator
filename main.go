@@ -45,6 +45,7 @@ import (
 	robotDevSuite "github.com/robolaunch/robot-operator/pkg/controllers/robot_dev_suite"
 	robotIDE "github.com/robolaunch/robot-operator/pkg/controllers/robot_dev_suite/robot_ide"
 	robotVDI "github.com/robolaunch/robot-operator/pkg/controllers/robot_dev_suite/robot_vdi"
+	workspaceManager "github.com/robolaunch/robot-operator/pkg/controllers/workspace_manager"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -212,6 +213,17 @@ func main() {
 	}
 	if err = (&robotv1alpha1.MetricsCollector{}).SetupWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "MetricsCollector")
+		os.Exit(1)
+	}
+	if err = (&workspaceManager.WorkspaceManagerReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "WorkspaceManager")
+		os.Exit(1)
+	}
+	if err = (&robotv1alpha1.WorkspaceManager{}).SetupWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create webhook", "webhook", "WorkspaceManager")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder

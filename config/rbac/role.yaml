@@ -335,3 +335,29 @@ rules:
   - get
   - patch
   - update
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - workspacemanagers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - workspacemanagers/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - workspacemanagers/status
+  verbs:
+  - get
+  - patch
+  - update
