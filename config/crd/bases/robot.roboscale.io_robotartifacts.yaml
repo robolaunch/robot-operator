@@ -257,14 +257,21 @@ spec:
                   type:
                     type: string
                 type: object
-              distro:
+              distributions:
                 description: ROS distro to be used.
-                enum:
-                - foxy
-                - galactic
-                - noetic
-                - melodic
-                type: string
+                items:
+                  description: ROS distro selection. Allowed distros are Foxy and
+                    Galactic. It is aimed to support Humble, Melodic and Noetic in
+                    further versions.
+                  enum:
+                  - foxy
+                  - galactic
+                  - noetic
+                  - melodic
+                  type: string
+                maxItems: 2
+                minItems: 1
+                type: array
               launchManagerTemplates:
                 description: Launch manager template for initial configuration
                 items:
@@ -593,6 +600,16 @@ spec:
                     least one workspace. A workspace should contain at least one repository
                     in it.
                   properties:
+                    distro:
+                      description: ROS distro selection. Allowed distros are Foxy
+                        and Galactic. It is aimed to support Humble, Melodic and Noetic
+                        in further versions.
+                      enum:
+                      - foxy
+                      - galactic
+                      - noetic
+                      - melodic
+                      type: string
                     name:
                       description: Name of workspace. If a workspace's name is `my_ws`,
                         it's absolute path is `/home/workspaces/my_ws`.
@@ -618,6 +635,7 @@ spec:
                         directory.
                       type: object
                   required:
+                  - distro
                   - name
                   - repositories
                   type: object
@@ -628,7 +646,7 @@ spec:
                   path.
                 type: string
             required:
-            - distro
+            - distributions
             type: object
         type: object
     served: true
