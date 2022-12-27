@@ -83,7 +83,8 @@ type RootDNSConfig struct {
 type RobotSpec struct {
 	// ROS distro to be used.
 	// +kubebuilder:validation:Required
-	Distro ROSDistro `json:"distro"`
+	// +kubebuilder:validation:MaxItems=2
+	Distros []ROSDistro `json:"distros"`
 	// Resource limitations of robot containers.
 	Storage Storage `json:"storage,omitempty"`
 	// Discovery server template
