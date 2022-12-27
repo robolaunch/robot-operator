@@ -69,11 +69,13 @@ func getLaunchContainer(launch robotv1alpha1.Launch, launchName string, robot ro
 	sleepTimeInt := 3
 	sleepTime := strconv.Itoa(sleepTimeInt)
 
+	workspace, _ := robot.GetWorkspaceByName(launch.Workspace)
+
 	var cmdBuilder strings.Builder
 	cmdBuilder.WriteString("echo \"Starting node in " + sleepTime + " seconds...\" && ")
 	cmdBuilder.WriteString("sleep " + sleepTime + " && ")
-	cmdBuilder.WriteString("source " + filepath.Join("/opt", "ros", string(robot.Spec.Distro), "setup.bash") + " && ")
-	cmdBuilder.WriteString("source " + filepath.Join("$WORKSPACES_PATH", launch.Workspace, getWsSubDir(robot.Spec.Distro), "setup.bash") + " && ")
+	cmdBuilder.WriteString("source " + filepath.Join("/opt", "ros", string(workspace.Distro), "setup.bash") + " && ")
+	cmdBuilder.WriteString("source " + filepath.Join("$WORKSPACES_PATH", launch.Workspace, getWsSubDir(workspace.Distro), "setup.bash") + " && ")
 	cmdBuilder.WriteString("$PRELAUNCH; ")
 	cmdBuilder.WriteString("$COMMAND")
 

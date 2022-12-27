@@ -1,6 +1,8 @@
 package v1alpha1
 
 import (
+	"errors"
+
 	"github.com/robolaunch/robot-operator/internal"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -313,4 +315,15 @@ func (robot *Robot) GetRobotDevSuiteMetadata() *types.NamespacedName {
 		Name:      robot.Name + internal.ROBOT_DEV_SUITE_POSTFIX,
 		Namespace: robot.Namespace,
 	}
+}
+
+func (robot *Robot) GetWorkspaceByName(name string) (Workspace, error) {
+
+	for _, ws := range robot.Spec.Workspaces {
+		if ws.Name == name {
+			return ws, nil
+		}
+	}
+
+	return Workspace{}, errors.New("workspace not found")
 }
