@@ -57,6 +57,8 @@ type Workspace struct {
 	// Name of workspace. If a workspace's name is `my_ws`, it's absolute path is `/home/workspaces/my_ws`.
 	// +kubebuilder:validation:Required
 	Name string `json:"name"`
+	// +kubebuilder:validation:Required
+	Distro ROSDistro `json:"distro"`
 	// Repositories to clone inside workspace's `src` directory.
 	Repositories map[string]Repository `json:"repositories"`
 }
@@ -84,7 +86,7 @@ type RobotSpec struct {
 	// ROS distro to be used.
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:MaxItems=2
-	Distros []ROSDistro `json:"distros"`
+	Distributions []ROSDistro `json:"distributions"`
 	// Resource limitations of robot containers.
 	Storage Storage `json:"storage,omitempty"`
 	// Discovery server template
