@@ -57,6 +57,16 @@ func (r *Robot) ValidateCreate() error {
 		return err
 	}
 
+	err = r.checkDistributions()
+	if err != nil {
+		return err
+	}
+
+	err = r.checkWorkspaces()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -96,5 +106,34 @@ func (r *Robot) checkTenancyLabels() error {
 	if _, ok := labels[internal.CLOUD_INSTANCE_LABEL_KEY]; !ok {
 		return errors.New("cloud instance label should be added with key " + internal.CLOUD_INSTANCE_LABEL_KEY)
 	}
+	return nil
+}
+
+func (r *Robot) checkDistributions() error {
+
+	if len(r.Spec.Distributions) == 2 && (r.Spec.Distributions[0] == ROSDistroHumble || r.Spec.Distributions[1] == ROSDistroHumble) {
+		return errors.New("humble cannot be used in a multidistro environment")
+	}
+
+	return nil
+}
+
+func (r *Robot) checkWorkspaces() error {
+
+	for _, ws := range r.Spec.Workspaces {
+
+		distroExists := false
+		for _, distro := range r.Spec.Distributions {
+			if ws.Distro == distro {
+				distroExists = true
+				break
+			}
+		}
+
+		if !distroExists {
+			return errors.New("workspace " + ws.Name + " has unsupported distro defined in `spec.distributions`")
+		}
+	}
+
 	return nil
 }

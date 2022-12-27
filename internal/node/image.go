@@ -39,7 +39,7 @@ func GetImage(node corev1.Node, robot robotv1alpha1.Robot) string {
 	var imageBuilder strings.Builder
 	var tagBuilder strings.Builder
 
-	distro := robot.Spec.Distro
+	distributions := robot.Spec.Distributions
 	readyRobot := GetReadyRobotProperties(robot)
 
 	if readyRobot.Enabled {
@@ -52,7 +52,7 @@ func GetImage(node corev1.Node, robot robotv1alpha1.Robot) string {
 		repository := "robot"
 
 		tagBuilder.WriteString("base-")
-		tagBuilder.WriteString(string(distro))
+		tagBuilder.WriteString(getDistroStr(distributions))
 
 		hasGPU := HasGPU(node)
 
@@ -73,4 +73,24 @@ func GetImage(node corev1.Node, robot robotv1alpha1.Robot) string {
 
 	return imageBuilder.String()
 
+}
+
+func getDistroStr(distributions []robotv1alpha1.ROSDistro) string {
+
+	if len(distributions) == 1 {
+		return string(distributions[0])
+	}
+
+	return setPrecisionBetweenDistributions(distributions)
+}
+
+func setPrecisionBetweenDistributions(distributions []robotv1alpha1.ROSDistro) string {
+
+	if distributions[0] == robotv1alpha1.ROSDistroFoxy || distributions[1] == robotv1alpha1.ROSDistroFoxy {
+		return string(robotv1alpha1.ROSDistroFoxy) + "-" + string(robotv1alpha1.ROSDistroGalactic)
+	}
+
+	// TODO: Add validation webhook for distro selections
+	// multi-distro is allowed for only foxy & galactic
+	return ""
 }

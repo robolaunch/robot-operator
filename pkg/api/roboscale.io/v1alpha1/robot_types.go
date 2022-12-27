@@ -1,6 +1,8 @@
 package v1alpha1
 
 import (
+	"errors"
+
 	"github.com/robolaunch/robot-operator/internal"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -16,10 +18,12 @@ const (
 	ROSDistroMelodic ROSDistro = "melodic"
 	// ROS Noetic Ninjemys
 	ROSDistroNoetic ROSDistro = "noetic"
-	// ROS Foxy Fitzroy
+	// ROS 2 Foxy Fitzroy
 	ROSDistroFoxy ROSDistro = "foxy"
-	// ROS Galactic Geochelone
+	// ROS 2 Galactic Geochelone
 	ROSDistroGalactic ROSDistro = "galactic"
+	// ROS 2 Humble Hawksbill
+	ROSDistroHumble ROSDistro = "humble"
 )
 
 // Storage class configuration for a volume type.
@@ -57,6 +61,8 @@ type Workspace struct {
 	// Name of workspace. If a workspace's name is `my_ws`, it's absolute path is `/home/workspaces/my_ws`.
 	// +kubebuilder:validation:Required
 	Name string `json:"name"`
+	// +kubebuilder:validation:Required
+	Distro ROSDistro `json:"distro"`
 	// Repositories to clone inside workspace's `src` directory.
 	Repositories map[string]Repository `json:"repositories"`
 }
@@ -83,7 +89,9 @@ type RootDNSConfig struct {
 type RobotSpec struct {
 	// ROS distro to be used.
 	// +kubebuilder:validation:Required
-	Distro ROSDistro `json:"distro"`
+	// +kubebuilder:validation:MinItems=1
+	// +kubebuilder:validation:MaxItems=2
+	Distributions []ROSDistro `json:"distributions"`
 	// Resource limitations of robot containers.
 	Storage Storage `json:"storage,omitempty"`
 	// Discovery server template
@@ -310,4 +318,15 @@ func (robot *Robot) GetRobotDevSuiteMetadata() *types.NamespacedName {
 		Name:      robot.Name + internal.ROBOT_DEV_SUITE_POSTFIX,
 		Namespace: robot.Namespace,
 	}
+}
+
+func (robot *Robot) GetWorkspaceByName(name string) (Workspace, error) {
+
+	for _, ws := range robot.Spec.Workspaces {
+		if ws.Name == name {
+			return ws, nil
+		}
+	}
+
+	return Workspace{}, errors.New("workspace not found")
 }

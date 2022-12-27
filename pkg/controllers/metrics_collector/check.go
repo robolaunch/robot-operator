@@ -2,6 +2,7 @@ package metrics_collector
 
 import (
 	"context"
+	"sort"
 
 	"github.com/robolaunch/robot-operator/internal"
 	"github.com/robolaunch/robot-operator/internal/label"
@@ -61,6 +62,20 @@ func (r *MetricsCollectorReconciler) reconcileGetPods(ctx context.Context, insta
 			}
 		}
 	}
+
+	sort.SliceStable(newComponentMetrics, func(i, j int) bool {
+		if newComponentMetrics[i].PodReference.Name < newComponentMetrics[j].PodReference.Name {
+			return true
+		}
+
+		if newComponentMetrics[i].PodReference.Name == newComponentMetrics[j].PodReference.Name {
+			if newComponentMetrics[i].ContainerName < newComponentMetrics[j].ContainerName {
+				return true
+			}
+		}
+
+		return false
+	})
 
 	instance.Status.ComponentMetrics = newComponentMetrics
 
