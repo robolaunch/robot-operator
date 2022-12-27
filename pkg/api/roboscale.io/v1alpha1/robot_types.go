@@ -18,10 +18,12 @@ const (
 	ROSDistroMelodic ROSDistro = "melodic"
 	// ROS Noetic Ninjemys
 	ROSDistroNoetic ROSDistro = "noetic"
-	// ROS Foxy Fitzroy
+	// ROS 2 Foxy Fitzroy
 	ROSDistroFoxy ROSDistro = "foxy"
-	// ROS Galactic Geochelone
+	// ROS 2 Galactic Geochelone
 	ROSDistroGalactic ROSDistro = "galactic"
+	// ROS 2 Humble Hawksbill
+	ROSDistroHumble ROSDistro = "humble"
 )
 
 // Storage class configuration for a volume type.
@@ -87,6 +89,7 @@ type RootDNSConfig struct {
 type RobotSpec struct {
 	// ROS distro to be used.
 	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=2
 	Distributions []ROSDistro `json:"distributions"`
 	// Resource limitations of robot containers.
