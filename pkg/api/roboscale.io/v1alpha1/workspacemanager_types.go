@@ -22,10 +22,29 @@ import (
 
 // WorkspaceManagerSpec defines the desired state of WorkspaceManager
 type WorkspaceManagerSpec struct {
+	// Global path of workspaces. It's fixed to `/home/workspaces` path.
+	WorkspacesPath string `json:"workspacesPath,omitempty"`
+	// Workspace definitions of robot.
+	// +kubebuilder:validation:MinItems=1
+	Workspaces []Workspace `json:"workspaces,omitempty"`
 }
+
+type ClonerJobStatus struct {
+	Created bool     `json:"created,omitempty"`
+	Phase   JobPhase `json:"phase,omitempty"`
+}
+
+type WorkspaceManagerPhase string
+
+const (
+	WorkspaceManagerPhaseConfiguringWorkspaces WorkspaceManagerPhase = "ConfiguringWorkspaces"
+	WorkspaceManagerPhaseReady                 WorkspaceManagerPhase = "Ready"
+)
 
 // WorkspaceManagerStatus defines the observed state of WorkspaceManager
 type WorkspaceManagerStatus struct {
+	Phase           WorkspaceManagerPhase `json:"phase,omitempty"`
+	ClonerJobStatus ClonerJobStatus       `json:"clonerJobStatus,omitempty"`
 }
 
 //+kubebuilder:object:root=true
