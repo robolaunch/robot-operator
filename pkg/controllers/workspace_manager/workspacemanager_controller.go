@@ -19,6 +19,7 @@ package workspace_manager
 import (
 	"context"
 
+	batchv1 "k8s.io/api/batch/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -38,6 +39,8 @@ type WorkspaceManagerReconciler struct {
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=workspacemanagers,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=workspacemanagers/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=workspacemanagers/finalizers,verbs=update
+
+//+kubebuilder:rbac:groups=batch,resources=jobs,verbs=get;list;watch;create;update;patch;delete
 
 var logger logr.Logger
 
@@ -116,10 +119,12 @@ func (r *WorkspaceManagerReconciler) reconcileCheckStatus(ctx context.Context, i
 
 	case false:
 
+		instance.Status.Phase = robotv1alpha1.WorkspaceManagerPhaseConfiguringWorkspaces
 		err := r.createJob(ctx, instance, instance.GetClonerJobMetadata())
 		if err != nil {
 			return err
 		}
+		instance.Status.ClonerJobStatus.Created = true
 
 	}
 
@@ -140,5 +145,6 @@ func (r *WorkspaceManagerReconciler) reconcileCheckResources(ctx context.Context
 func (r *WorkspaceManagerReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&robotv1alpha1.WorkspaceManager{}).
+		Owns(&batchv1.Job{}).
 		Complete(r)
 }
