@@ -621,11 +621,21 @@ spec:
                           branch:
                             description: Branch of the repository to clone.
                             type: string
+                          hash:
+                            description: '[Autofilled] Hash of last commit'
+                            type: string
                           path:
                             description: '[Autofilled] Absolute path of repository'
                             type: string
+                          repo:
+                            description: '[Autofilled] Repository name'
+                            type: string
                           url:
                             description: Base URL of the repository.
+                            type: string
+                          userOrOrganization:
+                            description: '[Autofilled] User or organization, maintainer
+                              of repository'
                             type: string
                         required:
                         - branch
