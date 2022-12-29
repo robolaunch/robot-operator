@@ -76,10 +76,63 @@ func (r *WorkspaceManagerReconciler) Reconcile(ctx context.Context, req ctrl.Req
 }
 
 func (r *WorkspaceManagerReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.WorkspaceManager) error {
+
+	switch instance.Spec.UpdateNeeded {
+	case true:
+
+		err := r.reconcileDeleteClonerJob(ctx, instance)
+		if err != nil {
+			return err
+		}
+
+		instance.Spec.UpdateNeeded = false
+		err = r.Update(ctx, instance, &client.UpdateOptions{})
+		if err != nil {
+			return err
+		}
+
+		instance.Status.Version++
+		instance.Status.Phase = robotv1alpha1.WorkspaceManagerPhaseConfiguringWorkspaces
+
+	}
+
+	switch instance.Status.ClonerJobStatus.Created {
+	case true:
+
+		switch instance.Status.ClonerJobStatus.Phase {
+		case robotv1alpha1.JobSucceeded:
+
+			instance.Status.Phase = robotv1alpha1.WorkspaceManagerPhaseReady
+
+		case robotv1alpha1.JobActive:
+
+			instance.Status.Phase = robotv1alpha1.WorkspaceManagerPhaseConfiguringWorkspaces
+
+		case robotv1alpha1.JobFailed:
+
+			instance.Status.Phase = robotv1alpha1.WorkspaceManagerPhaseFailed
+
+		}
+
+	case false:
+
+		err := r.createJob(ctx, instance, instance.GetClonerJobMetadata())
+		if err != nil {
+			return err
+		}
+
+	}
+
 	return nil
 }
 
 func (r *WorkspaceManagerReconciler) reconcileCheckResources(ctx context.Context, instance *robotv1alpha1.WorkspaceManager) error {
+
+	err := r.reconcileCheckClonerJob(ctx, instance)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
