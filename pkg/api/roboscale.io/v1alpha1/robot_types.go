@@ -53,7 +53,11 @@ type Repository struct {
 	Branch string `json:"branch"`
 	// [Autofilled] Absolute path of repository
 	Path string `json:"path,omitempty"`
-	// [Autofilled] Absolute path of repository
+	// [Autofilled] User or organization, maintainer of repository
+	UserOrOrganization string `json:"userOrOrganization,omitempty"`
+	// [Autofilled] Repository name
+	Repo string `json:"repo,omitempty"`
+	// [Autofilled] Hash of last commit
 	Hash string `json:"hash,omitempty"`
 }
 

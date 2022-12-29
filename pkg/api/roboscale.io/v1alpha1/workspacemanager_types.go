@@ -17,7 +17,9 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"github.com/robolaunch/robot-operator/internal"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 )
 
 // WorkspaceManagerSpec defines the desired state of WorkspaceManager
@@ -41,6 +43,7 @@ type WorkspaceManagerPhase string
 const (
 	WorkspaceManagerPhaseConfiguringWorkspaces WorkspaceManagerPhase = "ConfiguringWorkspaces"
 	WorkspaceManagerPhaseReady                 WorkspaceManagerPhase = "Ready"
+	WorkspaceManagerPhaseFailed                WorkspaceManagerPhase = "Failed"
 )
 
 // WorkspaceManagerStatus defines the observed state of WorkspaceManager
@@ -73,4 +76,11 @@ type WorkspaceManagerList struct {
 
 func init() {
 	SchemeBuilder.Register(&WorkspaceManager{}, &WorkspaceManagerList{})
+}
+
+func (workspacemanager *WorkspaceManager) GetClonerJobMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Name:      workspacemanager.Name + internal.JOB_CLONER_POSTFIX,
+		Namespace: workspacemanager.Namespace,
+	}
 }
