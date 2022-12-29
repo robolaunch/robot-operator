@@ -94,6 +94,11 @@ func (r *WorkspaceManagerReconciler) reconcileCheckStatus(ctx context.Context, i
 			return err
 		}
 
+		err = r.reconcileCleanup(ctx, instance)
+		if err != nil {
+			return err
+		}
+
 		instance.Status.Version++
 		instance.Status.Phase = robotv1alpha1.WorkspaceManagerPhaseConfiguringWorkspaces
 
@@ -120,7 +125,7 @@ func (r *WorkspaceManagerReconciler) reconcileCheckStatus(ctx context.Context, i
 	case false:
 
 		instance.Status.Phase = robotv1alpha1.WorkspaceManagerPhaseConfiguringWorkspaces
-		err := r.createJob(ctx, instance, instance.GetClonerJobMetadata())
+		err := r.createClonerJob(ctx, instance, instance.GetClonerJobMetadata())
 		if err != nil {
 			return err
 		}

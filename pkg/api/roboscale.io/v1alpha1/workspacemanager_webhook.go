@@ -123,7 +123,7 @@ func getPathVariables(URL string) (string, string, error) {
 		return "", "", err
 	}
 
-	path := strings.Split(u.Path, "/")
+	path := strings.Split(u.Path, "/")[1:]
 	if len(path) != 2 {
 		return "", "", errors.New("path is not right")
 	}

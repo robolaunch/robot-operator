@@ -48,3 +48,22 @@ func (r *WorkspaceManagerReconciler) reconcileGetTargetRobot(ctx context.Context
 
 	return robot, nil
 }
+
+func (r *WorkspaceManagerReconciler) reconcileCleanup(ctx context.Context, instance *robotv1alpha1.WorkspaceManager) error {
+
+	err := r.createCleanupJob(ctx, instance, instance.GetCleanupJobMetadata())
+	if err != nil {
+		return err
+	}
+
+	err = r.reconcileCheckCleanupJob(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	err = r.reconcileDeleteCleanupJob(ctx, instance)
+	if err != nil {
+		return err
+	}
+	return nil
+}

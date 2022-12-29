@@ -38,6 +38,11 @@ type ClonerJobStatus struct {
 	Phase   JobPhase `json:"phase,omitempty"`
 }
 
+type CleanupJobStatus struct {
+	Created bool     `json:"created,omitempty"`
+	Phase   JobPhase `json:"phase,omitempty"`
+}
+
 type WorkspaceManagerPhase string
 
 const (
@@ -48,9 +53,10 @@ const (
 
 // WorkspaceManagerStatus defines the observed state of WorkspaceManager
 type WorkspaceManagerStatus struct {
-	Phase           WorkspaceManagerPhase `json:"phase,omitempty"`
-	ClonerJobStatus ClonerJobStatus       `json:"clonerJobStatus,omitempty"`
-	Version         int                   `json:"version,omitempty"`
+	Phase            WorkspaceManagerPhase `json:"phase,omitempty"`
+	ClonerJobStatus  ClonerJobStatus       `json:"clonerJobStatus,omitempty"`
+	CleanupJobStatus CleanupJobStatus      `json:"cleanupJobStatus,omitempty"`
+	Version          int                   `json:"version,omitempty"`
 }
 
 //+kubebuilder:object:root=true
@@ -81,6 +87,13 @@ func init() {
 func (workspacemanager *WorkspaceManager) GetClonerJobMetadata() *types.NamespacedName {
 	return &types.NamespacedName{
 		Name:      workspacemanager.Name + internal.JOB_CLONER_POSTFIX,
+		Namespace: workspacemanager.Namespace,
+	}
+}
+
+func (workspacemanager *WorkspaceManager) GetCleanupJobMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Name:      workspacemanager.Name + internal.JOB_CLEANUP_POSTFIX,
 		Namespace: workspacemanager.Namespace,
 	}
 }

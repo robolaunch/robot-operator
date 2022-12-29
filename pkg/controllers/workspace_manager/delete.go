@@ -48,3 +48,41 @@ func (r *WorkspaceManagerReconciler) reconcileDeleteClonerJob(ctx context.Contex
 
 	return nil
 }
+
+func (r *WorkspaceManagerReconciler) reconcileDeleteCleanupJob(ctx context.Context, instance *robotv1alpha1.WorkspaceManager) error {
+
+	cleanupJobQuery := &batchv1.Job{}
+	err := r.Get(ctx, *instance.GetCleanupJobMetadata(), cleanupJobQuery)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			instance.Status.CleanupJobStatus = robotv1alpha1.CleanupJobStatus{}
+		} else {
+			return err
+		}
+	} else {
+
+		propagationPolicyFG := v1.DeletePropagationForeground
+
+		err := r.Delete(ctx, cleanupJobQuery, &client.DeleteOptions{
+			PropagationPolicy: &propagationPolicyFG,
+		})
+		if err != nil {
+			return err
+		}
+
+		// watch until it's deleted
+		deleted := false
+		for !deleted {
+			jobQuery := &batchv1.Job{}
+			err := r.Get(ctx, *instance.GetCleanupJobMetadata(), jobQuery)
+			if err != nil && errors.IsNotFound(err) {
+				deleted = true
+			}
+			time.Sleep(time.Second * 1)
+		}
+
+		instance.Status.CleanupJobStatus = robotv1alpha1.CleanupJobStatus{}
+	}
+
+	return nil
+}

@@ -11,7 +11,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 )
 
-func (r *WorkspaceManagerReconciler) createJob(ctx context.Context, instance *robotv1alpha1.WorkspaceManager, jobNamespacedName *types.NamespacedName) error {
+func (r *WorkspaceManagerReconciler) createClonerJob(ctx context.Context, instance *robotv1alpha1.WorkspaceManager, jobNamespacedName *types.NamespacedName) error {
 
 	robot, err := r.reconcileGetTargetRobot(ctx, instance)
 	if err != nil {
@@ -19,6 +19,31 @@ func (r *WorkspaceManagerReconciler) createJob(ctx context.Context, instance *ro
 	}
 
 	job := resources.GetClonerJob(instance, jobNamespacedName, robot)
+
+	err = ctrl.SetControllerReference(instance, job, r.Scheme)
+	if err != nil {
+		return err
+	}
+
+	err = r.Create(ctx, job)
+	if err != nil && errors.IsAlreadyExists(err) {
+		return nil
+	} else if err != nil {
+		return err
+	}
+
+	logger.Info("STATUS: Job " + job.Name + " is created.")
+	return nil
+}
+
+func (r *WorkspaceManagerReconciler) createCleanupJob(ctx context.Context, instance *robotv1alpha1.WorkspaceManager, jobNamespacedName *types.NamespacedName) error {
+
+	robot, err := r.reconcileGetTargetRobot(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	job := resources.GetCleanupJob(instance, jobNamespacedName, robot)
 
 	err = ctrl.SetControllerReference(instance, job, r.Scheme)
 	if err != nil {

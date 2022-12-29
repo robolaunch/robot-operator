@@ -46,7 +46,8 @@ const (
 
 // WorkspaceManager owned resources' postfixes
 const (
-	JOB_CLONER_POSTFIX = "-cloner"
+	JOB_CLONER_POSTFIX  = "-cloner"
+	JOB_CLEANUP_POSTFIX = "-cleanup"
 )
 
 // BuildManager owned resources' postfixes
