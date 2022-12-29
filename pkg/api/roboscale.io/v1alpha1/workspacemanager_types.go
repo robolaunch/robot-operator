@@ -27,6 +27,8 @@ type WorkspaceManagerSpec struct {
 	// Workspace definitions of robot.
 	// +kubebuilder:validation:MinItems=1
 	Workspaces []Workspace `json:"workspaces,omitempty"`
+	// Need update
+	UpdateNeeded bool `json:"updateNeeded,omitempty"`
 }
 
 type ClonerJobStatus struct {
@@ -45,6 +47,7 @@ const (
 type WorkspaceManagerStatus struct {
 	Phase           WorkspaceManagerPhase `json:"phase,omitempty"`
 	ClonerJobStatus ClonerJobStatus       `json:"clonerJobStatus,omitempty"`
+	Version         int                   `json:"version,omitempty"`
 }
 
 //+kubebuilder:object:root=true

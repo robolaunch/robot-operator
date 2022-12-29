@@ -53,6 +53,8 @@ type Repository struct {
 	Branch string `json:"branch"`
 	// [Autofilled] Absolute path of repository
 	Path string `json:"path,omitempty"`
+	// [Autofilled] Absolute path of repository
+	Hash string `json:"hash,omitempty"`
 }
 
 // Workspace description. Each robot should contain at least one workspace. A workspace should contain at least one
