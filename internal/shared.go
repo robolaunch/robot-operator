@@ -44,6 +44,11 @@ const (
 	ROBOT_DEV_SUITE_POSTFIX  = "-dev"
 )
 
+// WorkspaceManager owned resources' postfixes
+const (
+	JOB_CLONER_POSTFIX = "-cloner"
+)
+
 // BuildManager owned resources' postfixes
 const (
 	CONFIG_MAP_SCRIPTS = "-scripts"
