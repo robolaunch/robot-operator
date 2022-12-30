@@ -105,12 +105,12 @@ func GetLoaderJob(robot *robotv1alpha1.Robot, jobNamespacedName *types.Namespace
 	}
 
 	var clonerCmdBuilder strings.Builder
-	for wsKey, ws := range robot.Spec.Workspaces {
+	for wsKey, ws := range robot.Spec.WorkspaceManagerTemplate.Workspaces {
 
 		var cmdBuilder strings.Builder
-		cmdBuilder.WriteString("mkdir -p " + filepath.Join(robot.Spec.WorkspacesPath, ws.Name, "src") + " && ")
-		cmdBuilder.WriteString("cd " + filepath.Join(robot.Spec.WorkspacesPath, ws.Name, "src") + " && ")
-		cmdBuilder.WriteString(GetCloneCommand(robot.Spec.Workspaces, wsKey))
+		cmdBuilder.WriteString("mkdir -p " + filepath.Join(robot.Spec.WorkspaceManagerTemplate.WorkspacesPath, ws.Name, "src") + " && ")
+		cmdBuilder.WriteString("cd " + filepath.Join(robot.Spec.WorkspaceManagerTemplate.WorkspacesPath, ws.Name, "src") + " && ")
+		cmdBuilder.WriteString(GetCloneCommand(robot.Spec.WorkspaceManagerTemplate.Workspaces, wsKey))
 		clonerCmdBuilder.WriteString(cmdBuilder.String())
 
 	}

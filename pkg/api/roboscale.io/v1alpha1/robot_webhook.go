@@ -33,14 +33,14 @@ func (r *Robot) Default() {
 }
 
 func DefaultRepositoryPaths(r *Robot) {
-	for wsKey := range r.Spec.Workspaces {
-		ws := r.Spec.Workspaces[wsKey]
+	for wsKey := range r.Spec.WorkspaceManagerTemplate.Workspaces {
+		ws := r.Spec.WorkspaceManagerTemplate.Workspaces[wsKey]
 		for repoKey := range ws.Repositories {
 			repo := ws.Repositories[repoKey]
-			repo.Path = r.Spec.WorkspacesPath + "/" + ws.Name + "/src/" + repoKey
+			repo.Path = r.Spec.WorkspaceManagerTemplate.WorkspacesPath + "/" + ws.Name + "/src/" + repoKey
 			ws.Repositories[repoKey] = repo
 		}
-		r.Spec.Workspaces[wsKey] = ws
+		r.Spec.WorkspaceManagerTemplate.Workspaces[wsKey] = ws
 	}
 }
 
@@ -120,7 +120,7 @@ func (r *Robot) checkDistributions() error {
 
 func (r *Robot) checkWorkspaces() error {
 
-	for _, ws := range r.Spec.Workspaces {
+	for _, ws := range r.Spec.WorkspaceManagerTemplate.Workspaces {
 
 		distroExists := false
 		for _, distro := range r.Spec.Distributions {

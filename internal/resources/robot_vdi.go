@@ -117,7 +117,7 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 						configure.GetVolumeMount("", configure.GetVolumeUsr(&robot)),
 						configure.GetVolumeMount("", configure.GetVolumeOpt(&robot)),
 						configure.GetVolumeMount("", configure.GetVolumeEtc(&robot)),
-						configure.GetVolumeMount(robot.Spec.WorkspacesPath, configure.GetVolumeWorkspace(&robot)),
+						configure.GetVolumeMount(robot.Spec.WorkspaceManagerTemplate.WorkspacesPath, configure.GetVolumeWorkspace(&robot)),
 						configure.GetVolumeMount("/dev/shm", configure.GetVolumeDshm()),
 						configure.GetVolumeMount("/cache", configure.GetVolumeXglCache()),
 					},

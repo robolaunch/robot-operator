@@ -104,17 +104,14 @@ type RobotSpec struct {
 	DiscoveryServerTemplate DiscoveryServerSpec `json:"discoveryServerTemplate,omitempty"`
 	// ROS bridge template
 	ROSBridgeTemplate ROSBridgeSpec `json:"rosBridgeTemplate,omitempty"`
+	// Workspace manager template
+	WorkspaceManagerTemplate WorkspaceManagerSpec `json:"workspaceManagerTemplate,omitempty"`
 	// Build manager template for initial configuration
 	BuildManagerTemplate BuildManagerSpec `json:"buildManagerTemplate,omitempty"`
 	// Launch manager template for initial configuration
 	LaunchManagerTemplates []LaunchManagerSpec `json:"launchManagerTemplates,omitempty"`
 	// Robot development suite template
 	RobotDevSuiteTemplate RobotDevSuiteSpec `json:"robotDevSuiteTemplate,omitempty"`
-	// Global path of workspaces. It's fixed to `/home/workspaces` path.
-	WorkspacesPath string `json:"workspacesPath,omitempty"`
-	// Workspace definitions of robot.
-	// +kubebuilder:validation:MinItems=1
-	Workspaces []Workspace `json:"workspaces,omitempty"`
 	// Development enabled
 	Development bool `json:"development,omitempty"`
 	// Root DNS configuration.
@@ -223,6 +220,8 @@ type RobotStatus struct {
 	RobotDevSuiteStatus RobotDevSuiteInstanceStatus `json:"robotDevSuiteStatus,omitempty"`
 	// Loader job status that configures environment
 	LoaderJobStatus LoaderJobStatus `json:"loaderJobStatus,omitempty"`
+	// Workspace manager status
+	WorkspaceManagerInstanceStatus WorkspaceManagerStatus `json:"workspaceManagerStatus,omitempty"`
 	// Initial build manager creation status
 	InitialBuildManagerStatus ManagerStatus `json:"initialBuildManagerStatus,omitempty"`
 	// Initial launch manager creation status
@@ -328,7 +327,7 @@ func (robot *Robot) GetRobotDevSuiteMetadata() *types.NamespacedName {
 
 func (robot *Robot) GetWorkspaceByName(name string) (Workspace, error) {
 
-	for _, ws := range robot.Spec.Workspaces {
+	for _, ws := range robot.Spec.WorkspaceManagerTemplate.Workspaces {
 		if ws.Name == name {
 			return ws, nil
 		}
