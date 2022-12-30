@@ -118,6 +118,26 @@ func (r *RobotReconciler) createRobotDevSuite(ctx context.Context, instance *rob
 	return nil
 }
 
+func (r *RobotReconciler) createWorkspaceManager(ctx context.Context, instance *robotv1alpha1.Robot, wsmNamespacedName *types.NamespacedName) error {
+
+	workspaceManager := resources.GetWorkspaceManager(instance, wsmNamespacedName)
+
+	err := ctrl.SetControllerReference(instance, workspaceManager, r.Scheme)
+	if err != nil {
+		return err
+	}
+
+	err = r.Create(ctx, workspaceManager)
+	if err != nil && errors.IsAlreadyExists(err) {
+		return nil
+	} else if err != nil {
+		return err
+	}
+
+	logger.Info("STATUS: Workspace manager " + workspaceManager.Name + " is created.")
+	return nil
+}
+
 func (r *RobotReconciler) createBuildManager(ctx context.Context, instance *robotv1alpha1.Robot) error {
 
 	if reflect.DeepEqual(instance.Status.InitialBuildManagerStatus, robotv1alpha1.ManagerStatus{}) && !reflect.DeepEqual(instance.Spec.BuildManagerTemplate, robotv1alpha1.BuildManagerSpec{}) {

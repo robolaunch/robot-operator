@@ -246,6 +246,24 @@ func GetRobotDevSuite(robot *robotv1alpha1.Robot, rdsNamespacedName *types.Names
 
 }
 
+func GetWorkspaceManager(robot *robotv1alpha1.Robot, wsmNamespacedName *types.NamespacedName) *robotv1alpha1.WorkspaceManager {
+
+	labels := robot.Labels
+	labels[internal.TARGET_ROBOT_LABEL_KEY] = robot.Name
+
+	workspaceManager := robotv1alpha1.WorkspaceManager{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      wsmNamespacedName.Name,
+			Namespace: wsmNamespacedName.Namespace,
+			Labels:    robot.Labels,
+		},
+		Spec: robot.Spec.WorkspaceManagerTemplate,
+	}
+
+	return &workspaceManager
+
+}
+
 func GetBuildManager(robot *robotv1alpha1.Robot, bmNamespacedName *types.NamespacedName) *robotv1alpha1.BuildManager {
 
 	labels := robot.Labels

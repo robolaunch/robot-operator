@@ -32,16 +32,17 @@ const (
 
 // Robot owned resources' postfixes
 const (
-	PVC_VAR_POSTFIX          = "-pvc-var"
-	PVC_ETC_POSTFIX          = "-pvc-etc"
-	PVC_OPT_POSTFIX          = "-pvc-opt"
-	PVC_USR_POSTFIX          = "-pvc-usr"
-	PVC_DISPLAY_POSTFIX      = "-pvc-display"
-	PVC_WORKSPACE_POSTFIX    = "-pvc-workspace"
-	DISCOVERY_SERVER_POSTFIX = "-discovery"
-	JOB_LOADER_POSTFIX       = "-loader"
-	ROS_BRIDGE_POSTFIX       = "-bridge"
-	ROBOT_DEV_SUITE_POSTFIX  = "-dev"
+	PVC_VAR_POSTFIX           = "-pvc-var"
+	PVC_ETC_POSTFIX           = "-pvc-etc"
+	PVC_OPT_POSTFIX           = "-pvc-opt"
+	PVC_USR_POSTFIX           = "-pvc-usr"
+	PVC_DISPLAY_POSTFIX       = "-pvc-display"
+	PVC_WORKSPACE_POSTFIX     = "-pvc-workspace"
+	DISCOVERY_SERVER_POSTFIX  = "-discovery"
+	JOB_LOADER_POSTFIX        = "-loader"
+	ROS_BRIDGE_POSTFIX        = "-bridge"
+	ROBOT_DEV_SUITE_POSTFIX   = "-dev"
+	WORKSPACE_MANAGER_POSTFIX = "-ws"
 )
 
 // WorkspaceManager owned resources' postfixes

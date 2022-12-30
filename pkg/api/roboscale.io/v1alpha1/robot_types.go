@@ -161,6 +161,11 @@ type LoaderJobStatus struct {
 	Phase   JobPhase `json:"phase,omitempty"`
 }
 
+type WorkspaceManagerInstanceStatus struct {
+	Created bool                   `json:"created,omitempty"`
+	Status  WorkspaceManagerStatus `json:"status,omitempty"`
+}
+
 type ManagerStatus struct {
 	Name    string `json:"name,omitempty"`
 	Created bool   `json:"created,omitempty"`
@@ -186,9 +191,10 @@ type RobotPhase string
 const (
 	RobotPhaseCreatingEnvironment      RobotPhase = "CreatingEnvironment"
 	RobotPhaseCreatingDiscoveryServer  RobotPhase = "CreatingDiscoveryServer"
-	RobotPhaseConfiguringWorkspaces    RobotPhase = "ConfiguringWorkspaces"
+	RobotPhaseConfiguringEnvironment   RobotPhase = "ConfiguringEnvironment"
 	RobotPhaseCreatingBridge           RobotPhase = "CreatingBridge"
 	RobotPhaseCreatingDevelopmentSuite RobotPhase = "CreatingDevelopmentSuite"
+	RobotPhaseConfiguringWorkspaces    RobotPhase = "ConfiguringWorkspaces"
 	RobotPhaseEnvironmentReady         RobotPhase = "EnvironmentReady"
 	RobotPhaseBuilding                 RobotPhase = "Building"
 	RobotPhaseBuilt                    RobotPhase = "Built"
@@ -221,7 +227,7 @@ type RobotStatus struct {
 	// Loader job status that configures environment
 	LoaderJobStatus LoaderJobStatus `json:"loaderJobStatus,omitempty"`
 	// Workspace manager status
-	WorkspaceManagerInstanceStatus WorkspaceManagerStatus `json:"workspaceManagerStatus,omitempty"`
+	WorkspaceManagerStatus WorkspaceManagerInstanceStatus `json:"workspaceManagerStatus,omitempty"`
 	// Initial build manager creation status
 	InitialBuildManagerStatus ManagerStatus `json:"initialBuildManagerStatus,omitempty"`
 	// Initial launch manager creation status
@@ -321,6 +327,13 @@ func (robot *Robot) GetROSBridgeMetadata() *types.NamespacedName {
 func (robot *Robot) GetRobotDevSuiteMetadata() *types.NamespacedName {
 	return &types.NamespacedName{
 		Name:      robot.Name + internal.ROBOT_DEV_SUITE_POSTFIX,
+		Namespace: robot.Namespace,
+	}
+}
+
+func (robot *Robot) GetWorkspaceManagerMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Name:      robot.Name + internal.WORKSPACE_MANAGER_POSTFIX,
 		Namespace: robot.Namespace,
 	}
 }

@@ -225,7 +225,7 @@ func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *ro
 
 					case robotv1alpha1.JobActive:
 
-						instance.Status.Phase = robotv1alpha1.RobotPhaseConfiguringWorkspaces
+						instance.Status.Phase = robotv1alpha1.RobotPhaseConfiguringEnvironment
 
 					case robotv1alpha1.JobFailed:
 
@@ -236,7 +236,7 @@ func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *ro
 
 				case false:
 
-					instance.Status.Phase = robotv1alpha1.RobotPhaseConfiguringWorkspaces
+					instance.Status.Phase = robotv1alpha1.RobotPhaseConfiguringEnvironment
 					err := r.createJob(ctx, instance, instance.GetLoaderJobMetadata())
 					if err != nil {
 						return err
