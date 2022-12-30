@@ -174,6 +174,32 @@ func (r *RobotReconciler) reconcileCheckRobotDevSuite(ctx context.Context, insta
 	return nil
 }
 
+func (r *RobotReconciler) reconcileCheckWorkspaceManager(ctx context.Context, instance *robotv1alpha1.Robot) error {
+
+	workspaceManagerQuery := &robotv1alpha1.WorkspaceManager{}
+	err := r.Get(ctx, *instance.GetWorkspaceManagerMetadata(), workspaceManagerQuery)
+	if err != nil && errors.IsNotFound(err) {
+		instance.Status.WorkspaceManagerStatus = robotv1alpha1.WorkspaceManagerInstanceStatus{}
+	} else if err != nil {
+		return err
+	} else {
+
+		if !reflect.DeepEqual(instance.Spec.WorkspaceManagerTemplate.Workspaces, workspaceManagerQuery.Spec.Workspaces) {
+			workspaceManagerQuery.Spec = instance.Spec.WorkspaceManagerTemplate
+			workspaceManagerQuery.Spec.UpdateNeeded = true
+			err = r.Update(ctx, workspaceManagerQuery)
+			if err != nil {
+				return err
+			}
+		}
+
+		instance.Status.WorkspaceManagerStatus.Created = true
+		instance.Status.WorkspaceManagerStatus.Status = workspaceManagerQuery.Status
+	}
+
+	return nil
+}
+
 func (r *RobotReconciler) reconcileCheckAttachedBuildManager(ctx context.Context, instance *robotv1alpha1.Robot) error {
 
 	bmReference := instance.Status.AttachedBuildObject.Reference

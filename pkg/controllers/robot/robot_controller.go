@@ -332,6 +332,11 @@ func (r *RobotReconciler) reconcileCheckResources(ctx context.Context, instance 
 		return err
 	}
 
+	err = r.reconcileCheckWorkspaceManager(ctx, instance)
+	if err != nil {
+		return err
+	}
+
 	err = r.reconcileCheckAttachedBuildManager(ctx, instance)
 	if err != nil {
 		return err
