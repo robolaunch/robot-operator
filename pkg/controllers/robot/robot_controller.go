@@ -36,6 +36,10 @@ type RobotReconciler struct {
 //+kubebuilder:rbac:groups=core,resources=persistentvolumeclaims,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=discoveryservers,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=batch,resources=jobs,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=robot.roboscale.io,resources=rosbridges,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=robot.roboscale.io,resources=workspacemanagers,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=robot.roboscale.io,resources=buildmanagers,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=robot.roboscale.io,resources=launchmanagers,verbs=get;list;watch;create;update;patch;delete
 
 var logger logr.Logger
 
@@ -349,6 +353,7 @@ func (r *RobotReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Owns(&robotv1alpha1.DiscoveryServer{}).
 		Owns(&batchv1.Job{}).
 		Owns(&robotv1alpha1.ROSBridge{}).
+		Owns(&robotv1alpha1.WorkspaceManager{}).
 		Watches(
 			&source.Kind{Type: &robotv1alpha1.BuildManager{}},
 			handler.EnqueueRequestsFromMapFunc(r.watchAttachedBuildManagers),
