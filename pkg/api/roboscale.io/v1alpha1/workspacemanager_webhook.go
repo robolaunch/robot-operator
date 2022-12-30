@@ -102,7 +102,7 @@ func (r *WorkspaceManager) setRepositoryInfo() error {
 				return err
 			}
 
-			repo.UserOrOrganization = userOrOrg
+			repo.Owner = userOrOrg
 			repo.Repo = repoName
 
 			lastCommitHash, err := getLastCommitHash(repo)
@@ -135,7 +135,7 @@ func getLastCommitHash(repository Repository) (string, error) {
 
 	client := github.NewClient(nil)
 
-	branch, _, err := client.Repositories.GetBranch(context.Background(), "robolaunch", "robolaunch", "main")
+	branch, _, err := client.Repositories.GetBranch(context.Background(), repository.Owner, repository.Repo, repository.Branch)
 	if err != nil {
 		return "", err
 	}

@@ -28,8 +28,7 @@ func (r *Robot) Default() {
 	robotlog.Info("default", "name", r.Name)
 
 	DefaultRepositoryPaths(r)
-
-	// TODO(user): fill in your defaulting logic.
+	_ = r.setRepositoryInfo()
 }
 
 func DefaultRepositoryPaths(r *Robot) {
@@ -142,12 +141,12 @@ func (r *Robot) setRepositoryInfo() error {
 
 	for k1, ws := range r.Spec.WorkspaceManagerTemplate.Workspaces {
 		for k2, repo := range ws.Repositories {
-			userOrOrg, repoName, err := getPathVariables(repo.URL)
+			owner, repoName, err := getPathVariables(repo.URL)
 			if err != nil {
 				return err
 			}
 
-			repo.UserOrOrganization = userOrOrg
+			repo.Owner = owner
 			repo.Repo = repoName
 
 			lastCommitHash, err := getLastCommitHash(repo)

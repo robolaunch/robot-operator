@@ -43,36 +43,6 @@ type Storage struct {
 	StorageClassConfig StorageClassConfig `json:"storageClassConfig,omitempty"`
 }
 
-// Repository description.
-type Repository struct {
-	// Base URL of the repository.
-	// +kubebuilder:validation:Required
-	URL string `json:"url"`
-	// Branch of the repository to clone.
-	// +kubebuilder:validation:Required
-	Branch string `json:"branch"`
-	// [Autofilled] Absolute path of repository
-	Path string `json:"path,omitempty"`
-	// [Autofilled] User or organization, maintainer of repository
-	UserOrOrganization string `json:"userOrOrganization,omitempty"`
-	// [Autofilled] Repository name
-	Repo string `json:"repo,omitempty"`
-	// [Autofilled] Hash of last commit
-	Hash string `json:"hash,omitempty"`
-}
-
-// Workspace description. Each robot should contain at least one workspace. A workspace should contain at least one
-// repository in it.
-type Workspace struct {
-	// Name of workspace. If a workspace's name is `my_ws`, it's absolute path is `/home/workspaces/my_ws`.
-	// +kubebuilder:validation:Required
-	Name string `json:"name"`
-	// +kubebuilder:validation:Required
-	Distro ROSDistro `json:"distro"`
-	// Repositories to clone inside workspace's `src` directory.
-	Repositories map[string]Repository `json:"repositories"`
-}
-
 type TLSSecretReference struct {
 	// TLS secret object name.
 	// +kubebuilder:validation:Required
