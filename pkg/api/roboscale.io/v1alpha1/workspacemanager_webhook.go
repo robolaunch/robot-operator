@@ -46,7 +46,7 @@ var _ webhook.Defaulter = &WorkspaceManager{}
 // Default implements webhook.Defaulter so a webhook will be registered for the type
 func (r *WorkspaceManager) Default() {
 	workspacemanagerlog.Info("default", "name", r.Name)
-	_ = r.setRepositoryInfo()
+	// _ = r.setRepositoryInfo()
 }
 
 //+kubebuilder:webhook:path=/validate-robot-roboscale-io-v1alpha1-workspacemanager,mutating=false,failurePolicy=fail,sideEffects=None,groups=robot.roboscale.io,resources=workspacemanagers,verbs=create;update,versions=v1alpha1,name=vworkspacemanager.kb.io,admissionReviewVersions=v1

@@ -137,3 +137,27 @@ func (r *Robot) checkWorkspaces() error {
 
 	return nil
 }
+
+func (r *Robot) setRepositoryInfo() error {
+
+	for k1, ws := range r.Spec.WorkspaceManagerTemplate.Workspaces {
+		for k2, repo := range ws.Repositories {
+			userOrOrg, repoName, err := getPathVariables(repo.URL)
+			if err != nil {
+				return err
+			}
+
+			repo.UserOrOrganization = userOrOrg
+			repo.Repo = repoName
+
+			lastCommitHash, err := getLastCommitHash(repo)
+			repo.Hash = lastCommitHash
+
+			ws.Repositories[k2] = repo
+		}
+		r.Spec.WorkspaceManagerTemplate.Workspaces[k1] = ws
+	}
+
+	return nil
+
+}
