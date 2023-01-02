@@ -26,7 +26,7 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 	// discovery server
 
 	var cmdBuilder strings.Builder
-	cmdBuilder.WriteString("code-server " + robot.Spec.WorkspacesPath + " --bind-addr 0.0.0.0:$CODE_SERVER_PORT --auth none")
+	cmdBuilder.WriteString("code-server " + robot.Spec.WorkspaceManagerTemplate.WorkspacesPath + " --bind-addr 0.0.0.0:$CODE_SERVER_PORT --auth none")
 
 	labels := getRobotIDESelector(*robotIDE)
 	for k, v := range robotIDE.Labels {
@@ -56,7 +56,7 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 						configure.GetVolumeMount("", configure.GetVolumeUsr(&robot)),
 						configure.GetVolumeMount("", configure.GetVolumeOpt(&robot)),
 						configure.GetVolumeMount("", configure.GetVolumeEtc(&robot)),
-						configure.GetVolumeMount(robot.Spec.WorkspacesPath, configure.GetVolumeWorkspace(&robot)),
+						configure.GetVolumeMount(robot.Spec.WorkspaceManagerTemplate.WorkspacesPath, configure.GetVolumeWorkspace(&robot)),
 					},
 					Ports: []corev1.ContainerPort{
 						{

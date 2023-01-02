@@ -35,20 +35,45 @@ func (r *RobotReconciler) reconcileHandleAttachments(ctx context.Context, instan
 
 	case false:
 
-		// select attached build object
-		err := r.reconcileAttachBuildObject(ctx, instance)
-		if err != nil {
-			return err
-		}
+		// create workspace manager
+		switch instance.Status.WorkspaceManagerStatus.Created {
+		case true:
 
-		switch instance.Status.AttachedBuildObject.Status.Phase {
-		case robotv1alpha1.BuildManagerReady:
+			switch instance.Status.WorkspaceManagerStatus.Status.Phase {
+			case robotv1alpha1.WorkspaceManagerPhaseReady:
 
-			// select attached launch object
-			err := r.reconcileAttachLaunchObject(ctx, instance)
+				// select attached build object
+				err := r.reconcileAttachBuildObject(ctx, instance)
+				if err != nil {
+					return err
+				}
+
+				switch instance.Status.AttachedBuildObject.Status.Phase {
+				case robotv1alpha1.BuildManagerReady:
+
+					// select attached launch object
+					err := r.reconcileAttachLaunchObject(ctx, instance)
+					if err != nil {
+						return err
+					}
+
+				}
+
+			default:
+
+				instance.Status.AttachedBuildObject = robotv1alpha1.AttachedBuildObject{}
+				instance.Status.AttachedLaunchObjects = []robotv1alpha1.AttachedLaunchObject{}
+
+			}
+
+		case false:
+
+			instance.Status.Phase = robotv1alpha1.RobotPhaseConfiguringWorkspaces
+			err := r.createWorkspaceManager(ctx, instance, instance.GetWorkspaceManagerMetadata())
 			if err != nil {
 				return err
 			}
+			instance.Status.WorkspaceManagerStatus.Created = true
 
 		}
 

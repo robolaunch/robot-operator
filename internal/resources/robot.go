@@ -105,12 +105,12 @@ func GetLoaderJob(robot *robotv1alpha1.Robot, jobNamespacedName *types.Namespace
 	}
 
 	var clonerCmdBuilder strings.Builder
-	for wsKey, ws := range robot.Spec.Workspaces {
+	for wsKey, ws := range robot.Spec.WorkspaceManagerTemplate.Workspaces {
 
 		var cmdBuilder strings.Builder
-		cmdBuilder.WriteString("mkdir -p " + filepath.Join(robot.Spec.WorkspacesPath, ws.Name, "src") + " && ")
-		cmdBuilder.WriteString("cd " + filepath.Join(robot.Spec.WorkspacesPath, ws.Name, "src") + " && ")
-		cmdBuilder.WriteString(GetCloneCommand(robot.Spec.Workspaces, wsKey))
+		cmdBuilder.WriteString("mkdir -p " + filepath.Join(robot.Spec.WorkspaceManagerTemplate.WorkspacesPath, ws.Name, "src") + " && ")
+		cmdBuilder.WriteString("cd " + filepath.Join(robot.Spec.WorkspaceManagerTemplate.WorkspacesPath, ws.Name, "src") + " && ")
+		cmdBuilder.WriteString(GetCloneCommand(robot.Spec.WorkspaceManagerTemplate.Workspaces, wsKey))
 		clonerCmdBuilder.WriteString(cmdBuilder.String())
 
 	}
@@ -141,18 +141,18 @@ func GetLoaderJob(robot *robotv1alpha1.Robot, jobNamespacedName *types.Namespace
 		},
 	}
 
-	clonerContainer := corev1.Container{
-		Name:    "cloner",
-		Image:   "ubuntu:focal",
-		Command: internal.Bash(clonerCmdBuilder.String()),
-		VolumeMounts: []corev1.VolumeMount{
-			configure.GetVolumeMount("", configure.GetVolumeVar(robot)),
-			configure.GetVolumeMount("", configure.GetVolumeUsr(robot)),
-			configure.GetVolumeMount("", configure.GetVolumeOpt(robot)),
-			configure.GetVolumeMount("", configure.GetVolumeEtc(robot)),
-			configure.GetVolumeMount(robot.Spec.WorkspacesPath, configure.GetVolumeWorkspace(robot)),
-		},
-	}
+	// clonerContainer := corev1.Container{
+	// 	Name:    "cloner",
+	// 	Image:   "ubuntu:focal",
+	// 	Command: internal.Bash(clonerCmdBuilder.String()),
+	// 	VolumeMounts: []corev1.VolumeMount{
+	// 		configure.GetVolumeMount("", configure.GetVolumeVar(robot)),
+	// 		configure.GetVolumeMount("", configure.GetVolumeUsr(robot)),
+	// 		configure.GetVolumeMount("", configure.GetVolumeOpt(robot)),
+	// 		configure.GetVolumeMount("", configure.GetVolumeEtc(robot)),
+	// 		configure.GetVolumeMount(robot.Spec.WorkspacesPath, configure.GetVolumeWorkspace(robot)),
+	// 	},
+	// }
 
 	podSpec := &corev1.PodSpec{
 		InitContainers: []corev1.Container{
@@ -160,7 +160,7 @@ func GetLoaderJob(robot *robotv1alpha1.Robot, jobNamespacedName *types.Namespace
 		},
 		Containers: []corev1.Container{
 			preparerContainer,
-			clonerContainer,
+			// clonerContainer,
 		},
 		Volumes: []corev1.Volume{
 			configure.GetVolumeVar(robot),
@@ -243,6 +243,24 @@ func GetRobotDevSuite(robot *robotv1alpha1.Robot, rdsNamespacedName *types.Names
 	}
 
 	return &robotDevSuite
+
+}
+
+func GetWorkspaceManager(robot *robotv1alpha1.Robot, wsmNamespacedName *types.NamespacedName) *robotv1alpha1.WorkspaceManager {
+
+	labels := robot.Labels
+	labels[internal.TARGET_ROBOT_LABEL_KEY] = robot.Name
+
+	workspaceManager := robotv1alpha1.WorkspaceManager{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      wsmNamespacedName.Name,
+			Namespace: wsmNamespacedName.Namespace,
+			Labels:    robot.Labels,
+		},
+		Spec: robot.Spec.WorkspaceManagerTemplate,
+	}
+
+	return &workspaceManager
 
 }
 

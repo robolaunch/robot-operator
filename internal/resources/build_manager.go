@@ -70,7 +70,7 @@ func GetBuildJob(buildManager *robotv1alpha1.BuildManager, robot *robotv1alpha1.
 					configure.GetVolumeMount("", configure.GetVolumeUsr(robot)),
 					configure.GetVolumeMount("", configure.GetVolumeOpt(robot)),
 					configure.GetVolumeMount("", configure.GetVolumeEtc(robot)),
-					configure.GetVolumeMount(robotSpec.WorkspacesPath, configure.GetVolumeWorkspace(robot)),
+					configure.GetVolumeMount(robotSpec.WorkspaceManagerTemplate.WorkspacesPath, configure.GetVolumeWorkspace(robot)),
 					configure.GetVolumeMount(internal.CUSTOM_SCRIPTS_PATH, configure.GetVolumeConfigMaps(buildManager)),
 				},
 				Env: step.Env,

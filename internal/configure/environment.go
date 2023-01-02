@@ -9,7 +9,7 @@ import (
 func InjectGenericEnvironmentVariablesForPodSpec(podSpec *corev1.PodSpec, robot robotv1alpha1.Robot) *corev1.PodSpec {
 
 	for key, cont := range podSpec.Containers {
-		cont.Env = append(cont.Env, internal.Env("WORKSPACES_PATH", robot.Spec.WorkspacesPath))
+		cont.Env = append(cont.Env, internal.Env("WORKSPACES_PATH", robot.Spec.WorkspaceManagerTemplate.WorkspacesPath))
 		podSpec.Containers[key] = cont
 	}
 
@@ -19,7 +19,7 @@ func InjectGenericEnvironmentVariablesForPodSpec(podSpec *corev1.PodSpec, robot 
 func InjectGenericEnvironmentVariables(pod *corev1.Pod, robot robotv1alpha1.Robot) *corev1.Pod {
 
 	for key, cont := range pod.Spec.Containers {
-		cont.Env = append(cont.Env, internal.Env("WORKSPACES_PATH", robot.Spec.WorkspacesPath))
+		cont.Env = append(cont.Env, internal.Env("WORKSPACES_PATH", robot.Spec.WorkspaceManagerTemplate.WorkspacesPath))
 		pod.Spec.Containers[key] = cont
 	}
 

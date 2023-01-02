@@ -43,30 +43,6 @@ type Storage struct {
 	StorageClassConfig StorageClassConfig `json:"storageClassConfig,omitempty"`
 }
 
-// Repository description.
-type Repository struct {
-	// Base URL of the repository.
-	// +kubebuilder:validation:Required
-	URL string `json:"url"`
-	// Branch of the repository to clone.
-	// +kubebuilder:validation:Required
-	Branch string `json:"branch"`
-	// [Autofilled] Absolute path of repository
-	Path string `json:"path,omitempty"`
-}
-
-// Workspace description. Each robot should contain at least one workspace. A workspace should contain at least one
-// repository in it.
-type Workspace struct {
-	// Name of workspace. If a workspace's name is `my_ws`, it's absolute path is `/home/workspaces/my_ws`.
-	// +kubebuilder:validation:Required
-	Name string `json:"name"`
-	// +kubebuilder:validation:Required
-	Distro ROSDistro `json:"distro"`
-	// Repositories to clone inside workspace's `src` directory.
-	Repositories map[string]Repository `json:"repositories"`
-}
-
 type TLSSecretReference struct {
 	// TLS secret object name.
 	// +kubebuilder:validation:Required
@@ -98,17 +74,14 @@ type RobotSpec struct {
 	DiscoveryServerTemplate DiscoveryServerSpec `json:"discoveryServerTemplate,omitempty"`
 	// ROS bridge template
 	ROSBridgeTemplate ROSBridgeSpec `json:"rosBridgeTemplate,omitempty"`
+	// Workspace manager template
+	WorkspaceManagerTemplate WorkspaceManagerSpec `json:"workspaceManagerTemplate,omitempty"`
 	// Build manager template for initial configuration
 	BuildManagerTemplate BuildManagerSpec `json:"buildManagerTemplate,omitempty"`
 	// Launch manager template for initial configuration
 	LaunchManagerTemplates []LaunchManagerSpec `json:"launchManagerTemplates,omitempty"`
 	// Robot development suite template
 	RobotDevSuiteTemplate RobotDevSuiteSpec `json:"robotDevSuiteTemplate,omitempty"`
-	// Global path of workspaces. It's fixed to `/home/workspaces` path.
-	WorkspacesPath string `json:"workspacesPath,omitempty"`
-	// Workspace definitions of robot.
-	// +kubebuilder:validation:MinItems=1
-	Workspaces []Workspace `json:"workspaces,omitempty"`
 	// Development enabled
 	Development bool `json:"development,omitempty"`
 	// Root DNS configuration.
@@ -158,6 +131,11 @@ type LoaderJobStatus struct {
 	Phase   JobPhase `json:"phase,omitempty"`
 }
 
+type WorkspaceManagerInstanceStatus struct {
+	Created bool                   `json:"created,omitempty"`
+	Status  WorkspaceManagerStatus `json:"status,omitempty"`
+}
+
 type ManagerStatus struct {
 	Name    string `json:"name,omitempty"`
 	Created bool   `json:"created,omitempty"`
@@ -183,9 +161,10 @@ type RobotPhase string
 const (
 	RobotPhaseCreatingEnvironment      RobotPhase = "CreatingEnvironment"
 	RobotPhaseCreatingDiscoveryServer  RobotPhase = "CreatingDiscoveryServer"
-	RobotPhaseConfiguringWorkspaces    RobotPhase = "ConfiguringWorkspaces"
+	RobotPhaseConfiguringEnvironment   RobotPhase = "ConfiguringEnvironment"
 	RobotPhaseCreatingBridge           RobotPhase = "CreatingBridge"
 	RobotPhaseCreatingDevelopmentSuite RobotPhase = "CreatingDevelopmentSuite"
+	RobotPhaseConfiguringWorkspaces    RobotPhase = "ConfiguringWorkspaces"
 	RobotPhaseEnvironmentReady         RobotPhase = "EnvironmentReady"
 	RobotPhaseBuilding                 RobotPhase = "Building"
 	RobotPhaseBuilt                    RobotPhase = "Built"
@@ -217,6 +196,8 @@ type RobotStatus struct {
 	RobotDevSuiteStatus RobotDevSuiteInstanceStatus `json:"robotDevSuiteStatus,omitempty"`
 	// Loader job status that configures environment
 	LoaderJobStatus LoaderJobStatus `json:"loaderJobStatus,omitempty"`
+	// Workspace manager status
+	WorkspaceManagerStatus WorkspaceManagerInstanceStatus `json:"workspaceManagerStatus,omitempty"`
 	// Initial build manager creation status
 	InitialBuildManagerStatus ManagerStatus `json:"initialBuildManagerStatus,omitempty"`
 	// Initial launch manager creation status
@@ -320,9 +301,16 @@ func (robot *Robot) GetRobotDevSuiteMetadata() *types.NamespacedName {
 	}
 }
 
+func (robot *Robot) GetWorkspaceManagerMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Name:      robot.Name + internal.WORKSPACE_MANAGER_POSTFIX,
+		Namespace: robot.Namespace,
+	}
+}
+
 func (robot *Robot) GetWorkspaceByName(name string) (Workspace, error) {
 
-	for _, ws := range robot.Spec.Workspaces {
+	for _, ws := range robot.Spec.WorkspaceManagerTemplate.Workspaces {
 		if ws.Name == name {
 			return ws, nil
 		}

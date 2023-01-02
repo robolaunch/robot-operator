@@ -90,7 +90,7 @@ func getLaunchContainer(launch robotv1alpha1.Launch, launchName string, robot ro
 			configure.GetVolumeMount("", configure.GetVolumeUsr(&robot)),
 			configure.GetVolumeMount("", configure.GetVolumeOpt(&robot)),
 			configure.GetVolumeMount("", configure.GetVolumeEtc(&robot)),
-			configure.GetVolumeMount(robot.Spec.WorkspacesPath, configure.GetVolumeWorkspace(&robot)),
+			configure.GetVolumeMount(robot.Spec.WorkspaceManagerTemplate.WorkspacesPath, configure.GetVolumeWorkspace(&robot)),
 			configure.GetVolumeMount(internal.CUSTOM_SCRIPTS_PATH, configure.GetVolumeConfigMaps(&buildManager)),
 		},
 		Env: []corev1.EnvVar{
@@ -121,7 +121,7 @@ func GenerateRunCommandAsEnv(launch robotv1alpha1.Launch, robot robotv1alpha1.Ro
 	robotSpec := robot.Spec
 
 	commandKey := "COMMAND"
-	launchPath := GetLaunchfilePathAbsolute(robotSpec.WorkspacesPath, launch.Workspace, launch.Repository, launch.LaunchFilePath)
+	launchPath := GetLaunchfilePathAbsolute(robotSpec.WorkspaceManagerTemplate.WorkspacesPath, launch.Workspace, launch.Repository, launch.LaunchFilePath)
 
 	var parameterBuilder strings.Builder
 	for key, val := range launch.Parameters {

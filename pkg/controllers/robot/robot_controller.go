@@ -36,6 +36,10 @@ type RobotReconciler struct {
 //+kubebuilder:rbac:groups=core,resources=persistentvolumeclaims,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=discoveryservers,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=batch,resources=jobs,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=robot.roboscale.io,resources=rosbridges,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=robot.roboscale.io,resources=workspacemanagers,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=robot.roboscale.io,resources=buildmanagers,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=robot.roboscale.io,resources=launchmanagers,verbs=get;list;watch;create;update;patch;delete
 
 var logger logr.Logger
 
@@ -221,7 +225,7 @@ func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *ro
 
 					case robotv1alpha1.JobActive:
 
-						instance.Status.Phase = robotv1alpha1.RobotPhaseConfiguringWorkspaces
+						instance.Status.Phase = robotv1alpha1.RobotPhaseConfiguringEnvironment
 
 					case robotv1alpha1.JobFailed:
 
@@ -232,7 +236,7 @@ func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *ro
 
 				case false:
 
-					instance.Status.Phase = robotv1alpha1.RobotPhaseConfiguringWorkspaces
+					instance.Status.Phase = robotv1alpha1.RobotPhaseConfiguringEnvironment
 					err := r.createJob(ctx, instance, instance.GetLoaderJobMetadata())
 					if err != nil {
 						return err
@@ -328,6 +332,11 @@ func (r *RobotReconciler) reconcileCheckResources(ctx context.Context, instance 
 		return err
 	}
 
+	err = r.reconcileCheckWorkspaceManager(ctx, instance)
+	if err != nil {
+		return err
+	}
+
 	err = r.reconcileCheckAttachedBuildManager(ctx, instance)
 	if err != nil {
 		return err
@@ -349,6 +358,7 @@ func (r *RobotReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Owns(&robotv1alpha1.DiscoveryServer{}).
 		Owns(&batchv1.Job{}).
 		Owns(&robotv1alpha1.ROSBridge{}).
+		Owns(&robotv1alpha1.WorkspaceManager{}).
 		Watches(
 			&source.Kind{Type: &robotv1alpha1.BuildManager{}},
 			handler.EnqueueRequestsFromMapFunc(r.watchAttachedBuildManagers),

@@ -1,0 +1,12 @@
+apiVersion: robot.roboscale.io/v1alpha1
+kind: WorkspaceManager
+metadata:
+  labels:
+    app.kubernetes.io/name: workspacemanager
+    app.kubernetes.io/instance: workspacemanager-sample
+    app.kubernetes.io/part-of: robot-operator
+    app.kuberentes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: robot-operator
+  name: workspacemanager-sample
+spec:
+  # TODO(user): Add fields here

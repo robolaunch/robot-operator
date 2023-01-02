@@ -125,6 +125,26 @@ webhooks:
     resources:
     - robotvdis
   sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /mutate-robot-roboscale-io-v1alpha1-workspacemanager
+  failurePolicy: Fail
+  name: mworkspacemanager.kb.io
+  rules:
+  - apiGroups:
+    - robot.roboscale.io
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - workspacemanagers
+  sideEffects: None
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
@@ -251,4 +271,24 @@ webhooks:
     - UPDATE
     resources:
     - robotvdis
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /validate-robot-roboscale-io-v1alpha1-workspacemanager
+  failurePolicy: Fail
+  name: vworkspacemanager.kb.io
+  rules:
+  - apiGroups:
+    - robot.roboscale.io
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - workspacemanagers
   sideEffects: None
