@@ -80,7 +80,7 @@ func GetCleanupJob(workspaceManager *robotv1alpha1.WorkspaceManager, jobNamespac
 	cmdBuilder.WriteString("cd " + workspaceManager.Spec.WorkspacesPath + " && ")
 	cmdBuilder.WriteString("GLOBIGNORE=old &&")
 	cmdBuilder.WriteString("mkdir -p old/backup-" + strconv.Itoa(workspaceManager.Status.Version) + " &&")
-	cmdBuilder.WriteString("mv * old/backup-" + strconv.Itoa(workspaceManager.Status.Version) + " &&")
+	cmdBuilder.WriteString("mv * old/backup-" + strconv.Itoa(workspaceManager.Status.Version) + " || true &&")
 	cmdBuilder.WriteString("rm -rf *")
 
 	cleanupContainer := corev1.Container{
