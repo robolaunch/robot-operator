@@ -59,6 +59,11 @@ func (r *RobotReconciler) reconcileHandleAttachments(ctx context.Context, instan
 
 				}
 
+			default:
+
+				instance.Status.AttachedBuildObject = robotv1alpha1.AttachedBuildObject{}
+				instance.Status.AttachedLaunchObjects = []robotv1alpha1.AttachedLaunchObject{}
+
 			}
 
 		case false:

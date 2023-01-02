@@ -51,7 +51,17 @@ func (r *WorkspaceManagerReconciler) reconcileGetTargetRobot(ctx context.Context
 
 func (r *WorkspaceManagerReconciler) reconcileCleanup(ctx context.Context, instance *robotv1alpha1.WorkspaceManager) error {
 
-	err := r.createCleanupJob(ctx, instance, instance.GetCleanupJobMetadata())
+	err := r.reconcileDeleteClonerJob(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	err = r.reconcileDeleteCleanupJob(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	err = r.createCleanupJob(ctx, instance, instance.GetCleanupJobMetadata())
 	if err != nil {
 		return err
 	}

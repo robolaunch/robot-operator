@@ -18,7 +18,10 @@ package workspace_manager
 
 import (
 	"context"
+	goErr "errors"
+	"time"
 
+	robotErr "github.com/robolaunch/robot-operator/internal/error"
 	batchv1 "k8s.io/api/batch/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -55,6 +58,24 @@ func (r *WorkspaceManagerReconciler) Reconcile(ctx context.Context, req ctrl.Req
 		return ctrl.Result{}, err
 	}
 
+	err = r.reconcileCheckUpdates(ctx, instance)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	// Check target robot's other attached objects to see if robot's resources are released
+	err = r.reconcileCheckOtherAttachedResources(ctx, instance)
+	if err != nil {
+		var e *robotErr.RobotResourcesHasNotBeenReleasedError
+		if goErr.As(err, &e) {
+			return ctrl.Result{
+				Requeue:      true,
+				RequeueAfter: 3 * time.Second,
+			}, nil
+		}
+		return ctrl.Result{}, nil
+	}
+
 	err = r.reconcileCheckStatus(ctx, instance)
 	if err != nil {
 		return ctrl.Result{}, err
@@ -79,30 +100,6 @@ func (r *WorkspaceManagerReconciler) Reconcile(ctx context.Context, req ctrl.Req
 }
 
 func (r *WorkspaceManagerReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.WorkspaceManager) error {
-
-	switch instance.Spec.UpdateNeeded {
-	case true:
-
-		err := r.reconcileDeleteClonerJob(ctx, instance)
-		if err != nil {
-			return err
-		}
-
-		instance.Spec.UpdateNeeded = false
-		err = r.Update(ctx, instance, &client.UpdateOptions{})
-		if err != nil {
-			return err
-		}
-
-		err = r.reconcileCleanup(ctx, instance)
-		if err != nil {
-			return err
-		}
-
-		instance.Status.Version++
-		instance.Status.Phase = robotv1alpha1.WorkspaceManagerPhaseConfiguringWorkspaces
-
-	}
 
 	switch instance.Status.ClonerJobStatus.Created {
 	case true:

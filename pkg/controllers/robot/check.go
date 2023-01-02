@@ -184,6 +184,9 @@ func (r *RobotReconciler) reconcileCheckWorkspaceManager(ctx context.Context, in
 		return err
 	} else {
 
+		instance.Status.WorkspaceManagerStatus.Created = true
+		instance.Status.WorkspaceManagerStatus.Status = workspaceManagerQuery.Status
+
 		if !reflect.DeepEqual(instance.Spec.WorkspaceManagerTemplate.Workspaces, workspaceManagerQuery.Spec.Workspaces) {
 			workspaceManagerQuery.Spec = instance.Spec.WorkspaceManagerTemplate
 			workspaceManagerQuery.Spec.UpdateNeeded = true
@@ -191,10 +194,13 @@ func (r *RobotReconciler) reconcileCheckWorkspaceManager(ctx context.Context, in
 			if err != nil {
 				return err
 			}
+
+			// set phase configuring
+			instance.Status.WorkspaceManagerStatus.Created = true
+			instance.Status.WorkspaceManagerStatus.Status = robotv1alpha1.WorkspaceManagerStatus{}
+			instance.Status.WorkspaceManagerStatus.Status.Phase = robotv1alpha1.WorkspaceManagerPhaseConfiguringWorkspaces
 		}
 
-		instance.Status.WorkspaceManagerStatus.Created = true
-		instance.Status.WorkspaceManagerStatus.Status = workspaceManagerQuery.Status
 	}
 
 	return nil
