@@ -69,6 +69,10 @@ spec:
                           hash:
                             description: '[Autofilled] Hash of last commit'
                             type: string
+                          owner:
+                            description: '[Autofilled] User or organization, maintainer
+                              of repository'
+                            type: string
                           path:
                             description: '[Autofilled] Absolute path of repository'
                             type: string
@@ -77,10 +81,6 @@ spec:
                             type: string
                           url:
                             description: Base URL of the repository.
-                            type: string
-                          userOrOrganization:
-                            description: '[Autofilled] User or organization, maintainer
-                              of repository'
                             type: string
                         required:
                         - branch

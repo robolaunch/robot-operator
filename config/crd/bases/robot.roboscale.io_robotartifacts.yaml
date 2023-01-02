@@ -593,68 +593,75 @@ spec:
                 - name
                 - namespace
                 type: object
-              workspaces:
-                description: Workspace definitions of robot.
-                items:
-                  description: Workspace description. Each robot should contain at
-                    least one workspace. A workspace should contain at least one repository
-                    in it.
-                  properties:
-                    distro:
-                      description: ROS distro selection. Allowed distros are Foxy
-                        and Galactic. It is aimed to support Humble, Melodic and Noetic
-                        in further versions.
-                      enum:
-                      - foxy
-                      - galactic
-                      - noetic
-                      - melodic
-                      type: string
-                    name:
-                      description: Name of workspace. If a workspace's name is `my_ws`,
-                        it's absolute path is `/home/workspaces/my_ws`.
-                      type: string
-                    repositories:
-                      additionalProperties:
-                        description: Repository description.
-                        properties:
-                          branch:
-                            description: Branch of the repository to clone.
-                            type: string
-                          hash:
-                            description: '[Autofilled] Hash of last commit'
-                            type: string
-                          path:
-                            description: '[Autofilled] Absolute path of repository'
-                            type: string
-                          repo:
-                            description: '[Autofilled] Repository name'
-                            type: string
-                          url:
-                            description: Base URL of the repository.
-                            type: string
-                          userOrOrganization:
-                            description: '[Autofilled] User or organization, maintainer
-                              of repository'
-                            type: string
-                        required:
-                        - branch
-                        - url
-                        type: object
-                      description: Repositories to clone inside workspace's `src`
-                        directory.
+              workspaceManagerTemplate:
+                description: Workspace manager template
+                properties:
+                  updateNeeded:
+                    description: Need update
+                    type: boolean
+                  workspaces:
+                    description: Workspace definitions of robot.
+                    items:
+                      description: Workspace description. Each robot should contain
+                        at least one workspace. A workspace should contain at least
+                        one repository in it.
+                      properties:
+                        distro:
+                          description: ROS distro selection. Allowed distros are Foxy
+                            and Galactic. It is aimed to support Humble, Melodic and
+                            Noetic in further versions.
+                          enum:
+                          - foxy
+                          - galactic
+                          - noetic
+                          - melodic
+                          type: string
+                        name:
+                          description: Name of workspace. If a workspace's name is
+                            `my_ws`, it's absolute path is `/home/workspaces/my_ws`.
+                          type: string
+                        repositories:
+                          additionalProperties:
+                            description: Repository description.
+                            properties:
+                              branch:
+                                description: Branch of the repository to clone.
+                                type: string
+                              hash:
+                                description: '[Autofilled] Hash of last commit'
+                                type: string
+                              owner:
+                                description: '[Autofilled] User or organization, maintainer
+                                  of repository'
+                                type: string
+                              path:
+                                description: '[Autofilled] Absolute path of repository'
+                                type: string
+                              repo:
+                                description: '[Autofilled] Repository name'
+                                type: string
+                              url:
+                                description: Base URL of the repository.
+                                type: string
+                            required:
+                            - branch
+                            - url
+                            type: object
+                          description: Repositories to clone inside workspace's `src`
+                            directory.
+                          type: object
+                      required:
+                      - distro
+                      - name
+                      - repositories
                       type: object
-                  required:
-                  - distro
-                  - name
-                  - repositories
-                  type: object
-                minItems: 1
-                type: array
-              workspacesPath:
-                description: Global path of workspaces. It's fixed to `/home/workspaces`
-                  path.
-                type: string
+                    minItems: 1
+                    type: array
+                  workspacesPath:
+                    description: Global path of workspaces. It's fixed to `/home/workspaces`
+                      path.
+                    type: string
+                type: object
             required:
             - distributions
             type: object
