@@ -75,7 +75,7 @@ func (r *DiscoveryServerReconciler) createConfigMap(ctx context.Context, instanc
 
 func (r *DiscoveryServerReconciler) createServiceExport(ctx context.Context, instance *robotv1alpha1.DiscoveryServer, seNamespacedName *types.NamespacedName) error {
 
-	se, err := resources.GetDiscoveryServerServiceExport(instance)
+	se, err := resources.GetDiscoveryServerServiceExport(instance, seNamespacedName)
 	if err != nil {
 		return err
 	}

@@ -108,12 +108,12 @@ func GetDiscoveryServerConfigMap(discoveryServer *robotv1alpha1.DiscoveryServer,
 	return &discoveryServerConfigMap, nil
 }
 
-func GetDiscoveryServerServiceExport(discoveryServer *robotv1alpha1.DiscoveryServer) (*mcsv1alpha1.ServiceExport, error) {
+func GetDiscoveryServerServiceExport(discoveryServer *robotv1alpha1.DiscoveryServer, svcNamespacedName *types.NamespacedName) (*mcsv1alpha1.ServiceExport, error) {
 
 	serviceExport := mcsv1alpha1.ServiceExport{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      discoveryServer.GetDiscoveryServerServiceMetadata().Name,
-			Namespace: discoveryServer.GetDiscoveryServerServiceMetadata().Namespace,
+			Name:      svcNamespacedName.Name,
+			Namespace: svcNamespacedName.Namespace,
 		},
 	}
 
