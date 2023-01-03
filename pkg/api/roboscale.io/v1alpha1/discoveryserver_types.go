@@ -48,6 +48,10 @@ type DiscoveryServerPodStatus struct {
 	IP      string          `json:"ip,omitempty"`
 }
 
+type DiscoveryServerServiceExportStatus struct {
+	Created bool `json:"created,omitempty"`
+}
+
 type DiscoveryServerConfigMapStatus struct {
 	Created bool `json:"created,omitempty"`
 }
@@ -55,13 +59,14 @@ type DiscoveryServerConfigMapStatus struct {
 type DiscoveryServerPhase string
 
 const (
-	DiscoveryServerPhaseCreatingService   DiscoveryServerPhase = "CreatingService"
-	DiscoveryServerPhaseCreatingPod       DiscoveryServerPhase = "CreatingPod"
-	DiscoveryServerPhaseCreatingConfigMap DiscoveryServerPhase = "CreatingConfigMap"
-	DiscoveryServerPhaseReady             DiscoveryServerPhase = "Ready"
-	DiscoveryServerPhaseDeletingConfigMap DiscoveryServerPhase = "DeletingConfigMap"
-	DiscoveryServerPhaseDeletingPod       DiscoveryServerPhase = "DeletingPod"
-	DiscoveryServerPhaseDeletingService   DiscoveryServerPhase = "DeletingService"
+	DiscoveryServerPhaseCreatingService       DiscoveryServerPhase = "CreatingService"
+	DiscoveryServerPhaseCreatingPod           DiscoveryServerPhase = "CreatingPod"
+	DiscoveryServerPhaseCreatingServiceExport DiscoveryServerPhase = "CreatingServiceExport"
+	DiscoveryServerPhaseCreatingConfigMap     DiscoveryServerPhase = "CreatingConfigMap"
+	DiscoveryServerPhaseReady                 DiscoveryServerPhase = "Ready"
+	DiscoveryServerPhaseDeletingConfigMap     DiscoveryServerPhase = "DeletingConfigMap"
+	DiscoveryServerPhaseDeletingPod           DiscoveryServerPhase = "DeletingPod"
+	DiscoveryServerPhaseDeletingService       DiscoveryServerPhase = "DeletingService"
 )
 
 type ConnectionInfo struct {
@@ -71,11 +76,12 @@ type ConnectionInfo struct {
 
 // DiscoveryServerStatus defines the observed state of DiscoveryServer
 type DiscoveryServerStatus struct {
-	Phase           DiscoveryServerPhase           `json:"phase,omitempty"`
-	ServiceStatus   DiscoveryServerServiceStatus   `json:"serviceStatus,omitempty"`
-	PodStatus       DiscoveryServerPodStatus       `json:"podStatus,omitempty"`
-	ConfigMapStatus DiscoveryServerConfigMapStatus `json:"configMapStatus,omitempty"`
-	ConnectionInfo  ConnectionInfo                 `json:"connectionInfo,omitempty"`
+	Phase               DiscoveryServerPhase               `json:"phase,omitempty"`
+	ServiceStatus       DiscoveryServerServiceStatus       `json:"serviceStatus,omitempty"`
+	ServiceExportStatus DiscoveryServerServiceExportStatus `json:"serviceExportStatus,omitempty"`
+	PodStatus           DiscoveryServerPodStatus           `json:"podStatus,omitempty"`
+	ConfigMapStatus     DiscoveryServerConfigMapStatus     `json:"configMapStatus,omitempty"`
+	ConnectionInfo      ConnectionInfo                     `json:"connectionInfo,omitempty"`
 }
 
 //+genclient
