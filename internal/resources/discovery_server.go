@@ -11,6 +11,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/intstr"
+	mcsv1alpha1 "sigs.k8s.io/mcs-api/pkg/apis/v1alpha1"
 )
 
 var discoveryServerPortName = "discovery"
@@ -105,6 +106,18 @@ func GetDiscoveryServerConfigMap(discoveryServer *robotv1alpha1.DiscoveryServer,
 	}
 
 	return &discoveryServerConfigMap, nil
+}
+
+func GetDiscoveryServerServiceExport(discoveryServer *robotv1alpha1.DiscoveryServer) (*mcsv1alpha1.ServiceExport, error) {
+
+	serviceExport := mcsv1alpha1.ServiceExport{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      discoveryServer.GetDiscoveryServerServiceMetadata().Name,
+			Namespace: discoveryServer.GetDiscoveryServerServiceMetadata().Namespace,
+		},
+	}
+
+	return &serviceExport, nil
 }
 
 func GetDiscoveryServerDNS(discoveryServer robotv1alpha1.DiscoveryServer) string {

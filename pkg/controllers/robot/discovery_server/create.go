@@ -72,3 +72,26 @@ func (r *DiscoveryServerReconciler) createConfigMap(ctx context.Context, instanc
 	logger.Info("STATUS: ConfigMap " + cm.Name + " is created.")
 	return nil
 }
+
+func (r *DiscoveryServerReconciler) createServiceExport(ctx context.Context, instance *robotv1alpha1.DiscoveryServer, seNamespacedName *types.NamespacedName) error {
+
+	se, err := resources.GetDiscoveryServerServiceExport(instance)
+	if err != nil {
+		return err
+	}
+
+	err = ctrl.SetControllerReference(instance, se, r.Scheme)
+	if err != nil {
+		return err
+	}
+
+	err = r.Create(ctx, se)
+	if err != nil && errors.IsAlreadyExists(err) {
+		return nil
+	} else if err != nil {
+		return err
+	}
+
+	logger.Info("STATUS: ServiceExport " + se.Name + " is created.")
+	return nil
+}
