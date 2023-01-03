@@ -31,8 +31,8 @@ import (
 
 	"github.com/go-logr/logr"
 	robotErr "github.com/robolaunch/robot-operator/internal/error"
+	mcsv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/external/apis/mcsv1alpha1/v1alpha1"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
-	mcsv1alpha1 "sigs.k8s.io/mcs-api/pkg/apis/v1alpha1"
 )
 
 // DiscoveryServerReconciler reconciles a DiscoveryServer object
