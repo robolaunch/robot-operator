@@ -81,13 +81,6 @@ type ComponentMetricStatus struct {
 	Message                string                 `json:"message,omitempty"`
 }
 
-type MetricsCollectorPhase string
-
-const (
-	MetricsCollectorPhaseRobotNotFound MetricsCollectorPhase = "RobotNotFound"
-	MetricsCollectorPhaseRunning       MetricsCollectorPhase = "Running"
-)
-
 // MetricsCollectorStatus defines the observed state of MetricsCollector
 type MetricsCollectorStatus struct {
 	LastUpdateTimestamp metav1.Time             `json:"lastUpdateTimestamp,omitempty"`

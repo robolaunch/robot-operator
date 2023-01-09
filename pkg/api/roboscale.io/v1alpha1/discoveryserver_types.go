@@ -56,19 +56,6 @@ type DiscoveryServerConfigMapStatus struct {
 	Created bool `json:"created,omitempty"`
 }
 
-type DiscoveryServerPhase string
-
-const (
-	DiscoveryServerPhaseCreatingService       DiscoveryServerPhase = "CreatingService"
-	DiscoveryServerPhaseCreatingPod           DiscoveryServerPhase = "CreatingPod"
-	DiscoveryServerPhaseCreatingServiceExport DiscoveryServerPhase = "CreatingServiceExport"
-	DiscoveryServerPhaseCreatingConfigMap     DiscoveryServerPhase = "CreatingConfigMap"
-	DiscoveryServerPhaseReady                 DiscoveryServerPhase = "Ready"
-	DiscoveryServerPhaseDeletingConfigMap     DiscoveryServerPhase = "DeletingConfigMap"
-	DiscoveryServerPhaseDeletingPod           DiscoveryServerPhase = "DeletingPod"
-	DiscoveryServerPhaseDeletingService       DiscoveryServerPhase = "DeletingService"
-)
-
 type ConnectionInfo struct {
 	IP            string `json:"ip,omitempty"`
 	ConfigMapName string `json:"configMapName,omitempty"`

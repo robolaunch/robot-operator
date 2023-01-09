@@ -40,17 +40,6 @@ type RobotIDEInstanceStatus struct {
 	Phase   RobotIDEPhase `json:"phase,omitempty"`
 }
 
-type RobotDevSuitePhase string
-
-const (
-	RobotDevSuitePhaseRobotNotFound    = "RobotNotFound"
-	RobotDevSuitePhaseCreatingRobotVDI = "CreatingRobotVDI"
-	RobotDevSuitePhaseCreatingRobotIDE = "CreatingRobotIDE"
-	RobotDevSuitePhaseRunning          = "Running"
-	RobotDevSuitePhaseDeactivating     = "Deactivating"
-	RobotDevSuitePhaseInactive         = "Inactive"
-)
-
 // RobotDevSuiteStatus defines the observed state of RobotDevSuite
 type RobotDevSuiteStatus struct {
 	Phase          RobotDevSuitePhase     `json:"phase,omitempty"`

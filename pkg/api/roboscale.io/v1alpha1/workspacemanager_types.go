@@ -73,14 +73,6 @@ type CleanupJobStatus struct {
 	Phase   JobPhase `json:"phase,omitempty"`
 }
 
-type WorkspaceManagerPhase string
-
-const (
-	WorkspaceManagerPhaseConfiguringWorkspaces WorkspaceManagerPhase = "ConfiguringWorkspaces"
-	WorkspaceManagerPhaseReady                 WorkspaceManagerPhase = "Ready"
-	WorkspaceManagerPhaseFailed                WorkspaceManagerPhase = "Failed"
-)
-
 // WorkspaceManagerStatus defines the observed state of WorkspaceManager
 type WorkspaceManagerStatus struct {
 	Phase            WorkspaceManagerPhase `json:"phase,omitempty"`

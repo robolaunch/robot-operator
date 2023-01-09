@@ -70,17 +70,6 @@ type RobotVDIIngressStatus struct {
 	Created bool `json:"created,omitempty"`
 }
 
-type RobotVDIPhase string
-
-const (
-	RobotVDIPhaseCreatingPVC        RobotVDIPhase = "CreatingPVC"
-	RobotVDIPhaseCreatingTCPService RobotVDIPhase = "CreatingTCPService"
-	RobotVDIPhaseCreatingUDPService RobotVDIPhase = "CreatingUDPService"
-	RobotVDIPhaseCreatingPod        RobotVDIPhase = "CreatingPod"
-	RobotVDIPhaseCreatingIngress    RobotVDIPhase = "CreatingIngress"
-	RobotVDIPhaseRunning            RobotVDIPhase = "Running"
-)
-
 // RobotVDIStatus defines the observed state of RobotVDI
 type RobotVDIStatus struct {
 	Phase            RobotVDIPhase            `json:"phase,omitempty"`

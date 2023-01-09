@@ -74,17 +74,6 @@ type LaunchPodStatus struct {
 	LaunchStatus map[string]LaunchStatus `json:"launchStatus,omitempty"`
 }
 
-type LaunchManagerPhase string
-
-const (
-	LaunchManagerPhaseRobotNotFound LaunchManagerPhase = "RobotNotFound"
-	LaunchManagerPhaseCreatingPod   LaunchManagerPhase = "CreatingPod"
-	LaunchManagerPhaseLaunching     LaunchManagerPhase = "Launching"
-	LaunchManagerPhaseReady         LaunchManagerPhase = "Ready"
-	LaunchManagerPhaseDeactivating  LaunchManagerPhase = "Deactivating"
-	LaunchManagerPhaseInactive      LaunchManagerPhase = "Inactive"
-)
-
 // LaunchManagerStatus defines the observed state of LaunchManager
 type LaunchManagerStatus struct {
 	Phase           LaunchManagerPhase `json:"phase,omitempty"`

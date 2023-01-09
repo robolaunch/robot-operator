@@ -54,19 +54,6 @@ type ScriptConfigMapStatus struct {
 	Created bool `json:"created,omitempty"`
 }
 
-type BuildManagerPhase string
-
-const (
-	BuildManagerRobotNotFound            BuildManagerPhase = "RobotNotFound"
-	BuildManagerWaitingForOtherResources BuildManagerPhase = "WaitingForOtherResources"
-	BuildManagerCreatingConfigMap        BuildManagerPhase = "CreatingConfigMap"
-	BuildManagerBuildingRobot            BuildManagerPhase = "BuildingRobot"
-	BuildManagerReady                    BuildManagerPhase = "Ready"
-	BuildManagerFailed                   BuildManagerPhase = "Failed"
-	BuildManagerDeactivating             BuildManagerPhase = "Deactivating"
-	BuildManagerInactive                 BuildManagerPhase = "Inactive"
-)
-
 // BuildManagerStatus defines the observed state of BuildManager
 type BuildManagerStatus struct {
 	Phase                 BuildManagerPhase     `json:"phase,omitempty"`

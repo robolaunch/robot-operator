@@ -153,28 +153,6 @@ type AttachedDevObject struct {
 	Status    RobotDevSuiteStatus    `json:"status,omitempty"`
 }
 
-type RobotPhase string
-
-const (
-	RobotPhaseCreatingEnvironment      RobotPhase = "CreatingEnvironment"
-	RobotPhaseCreatingDiscoveryServer  RobotPhase = "CreatingDiscoveryServer"
-	RobotPhaseConfiguringEnvironment   RobotPhase = "ConfiguringEnvironment"
-	RobotPhaseCreatingBridge           RobotPhase = "CreatingBridge"
-	RobotPhaseCreatingDevelopmentSuite RobotPhase = "CreatingDevelopmentSuite"
-	RobotPhaseConfiguringWorkspaces    RobotPhase = "ConfiguringWorkspaces"
-	RobotPhaseEnvironmentReady         RobotPhase = "EnvironmentReady"
-	RobotPhaseBuilding                 RobotPhase = "Building"
-	RobotPhaseBuilt                    RobotPhase = "Built"
-	RobotPhaseLaunching                RobotPhase = "Launching"
-	RobotPhaseRunning                  RobotPhase = "Running"
-	RobotPhaseDeletingBridge           RobotPhase = "DeletingBridge"
-	RobotPhaseDeletingDiscoveryServer  RobotPhase = "DeletingDiscoveryServer"
-	RobotPhaseDeletingLoaderJob        RobotPhase = "DeletingLoaderJob"
-	RobotPhaseDeletingVolumes          RobotPhase = "DeletingVolumes"
-
-	RobotPhaseFailed RobotPhase = "Failed"
-)
-
 // RobotStatus defines the observed state of Robot
 type RobotStatus struct {
 	// Phase of robot

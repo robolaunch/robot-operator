@@ -43,16 +43,6 @@ type BridgeServiceStatus struct {
 	Created bool `json:"created,omitempty"`
 }
 
-type BridgePhase string
-
-const (
-	BridgePhaseCreatingService BridgePhase = "CreatingService"
-	BridgePhaseCreatingPod     BridgePhase = "CreatingPod"
-	BridgePhaseReady           BridgePhase = "Ready"
-	BridgePhaseDeletingPod     BridgePhase = "DeletingPod"
-	BridgePhaseDeletingService BridgePhase = "DeletingService"
-)
-
 // ROSBridgeStatus defines the observed state of ROSBridge
 type ROSBridgeStatus struct {
 	Phase         BridgePhase         `json:"phase,omitempty"`

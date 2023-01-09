@@ -40,15 +40,6 @@ type RobotIDEPodStatus struct {
 	IP      string          `json:"ip,omitempty"`
 }
 
-type RobotIDEPhase string
-
-const (
-	RobotIDEPhaseCreatingService RobotIDEPhase = "CreatingService"
-	RobotIDEPhaseCreatingPod     RobotIDEPhase = "CreatingPod"
-	RobotIDEPhaseCreatingIngress RobotIDEPhase = "CreatingIngress"
-	RobotIDEPhaseRunning         RobotIDEPhase = "Running"
-)
-
 type RobotIDEServiceStatus struct {
 	Created bool `json:"created,omitempty"`
 }
