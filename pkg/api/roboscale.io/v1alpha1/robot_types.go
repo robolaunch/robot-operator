@@ -1,13 +1,20 @@
 package v1alpha1
 
 import (
-	"errors"
-
-	"github.com/robolaunch/robot-operator/internal"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
 )
+
+func init() {
+	SchemeBuilder.Register(&Robot{}, &RobotList{})
+	SchemeBuilder.Register(&ROSBridge{}, &ROSBridgeList{})
+	SchemeBuilder.Register(&DiscoveryServer{}, &DiscoveryServerList{})
+	SchemeBuilder.Register(&RobotArtifact{}, &RobotArtifactList{})
+}
+
+// ********************************
+// Robot types
+// ********************************
 
 // ROS distro selection. Allowed distros are Foxy and Galactic. It is aimed to support Humble, Melodic and Noetic in further versions.
 // +kubebuilder:validation:Enum=foxy;galactic;noetic;melodic
@@ -209,87 +216,155 @@ type RobotList struct {
 	Items           []Robot `json:"items"`
 }
 
-func init() {
-	SchemeBuilder.Register(&Robot{}, &RobotList{})
+// ********************************
+// DiscoveryServer types
+// ********************************
+
+type DiscoveryServerInstanceType string
+
+const (
+	DiscoveryServerInstanceTypeServer DiscoveryServerInstanceType = "Server"
+	DiscoveryServerInstanceTypeClient DiscoveryServerInstanceType = "Client"
+)
+
+// DiscoveryServerSpec defines the desired state of DiscoveryServer
+type DiscoveryServerSpec struct {
+	Type      DiscoveryServerInstanceType `json:"type,omitempty"`
+	Reference corev1.ObjectReference      `json:"reference,omitempty"`
+	Cluster   string                      `json:"cluster,omitempty"`
+	Hostname  string                      `json:"hostname,omitempty"`
+	Subdomain string                      `json:"subdomain,omitempty"`
 }
 
-func (robot *Robot) GetPVCVarMetadata() *types.NamespacedName {
-	return &types.NamespacedName{
-		Name:      robot.Name + internal.PVC_VAR_POSTFIX,
-		Namespace: robot.Namespace,
-	}
+type DiscoveryServerServiceStatus struct {
+	Created bool `json:"created,omitempty"`
 }
 
-func (robot *Robot) GetPVCOptMetadata() *types.NamespacedName {
-	return &types.NamespacedName{
-		Name:      robot.Name + internal.PVC_OPT_POSTFIX,
-		Namespace: robot.Namespace,
-	}
+type DiscoveryServerPodStatus struct {
+	Created bool            `json:"created,omitempty"`
+	Phase   corev1.PodPhase `json:"phase,omitempty"`
+	IP      string          `json:"ip,omitempty"`
 }
 
-func (robot *Robot) GetPVCUsrMetadata() *types.NamespacedName {
-	return &types.NamespacedName{
-		Name:      robot.Name + internal.PVC_USR_POSTFIX,
-		Namespace: robot.Namespace,
-	}
+type DiscoveryServerServiceExportStatus struct {
+	Created bool `json:"created,omitempty"`
 }
 
-func (robot *Robot) GetPVCEtcMetadata() *types.NamespacedName {
-	return &types.NamespacedName{
-		Name:      robot.Name + internal.PVC_ETC_POSTFIX,
-		Namespace: robot.Namespace,
-	}
+type DiscoveryServerConfigMapStatus struct {
+	Created bool `json:"created,omitempty"`
 }
 
-func (robot *Robot) GetPVCWorkspaceMetadata() *types.NamespacedName {
-	return &types.NamespacedName{
-		Name:      robot.Name + internal.PVC_WORKSPACE_POSTFIX,
-		Namespace: robot.Namespace,
-	}
+type ConnectionInfo struct {
+	IP            string `json:"ip,omitempty"`
+	ConfigMapName string `json:"configMapName,omitempty"`
 }
 
-func (robot *Robot) GetDiscoveryServerMetadata() *types.NamespacedName {
-	return &types.NamespacedName{
-		Name:      robot.Name + internal.DISCOVERY_SERVER_POSTFIX,
-		Namespace: robot.Namespace,
-	}
+// DiscoveryServerStatus defines the observed state of DiscoveryServer
+type DiscoveryServerStatus struct {
+	Phase               DiscoveryServerPhase               `json:"phase,omitempty"`
+	ServiceStatus       DiscoveryServerServiceStatus       `json:"serviceStatus,omitempty"`
+	ServiceExportStatus DiscoveryServerServiceExportStatus `json:"serviceExportStatus,omitempty"`
+	PodStatus           DiscoveryServerPodStatus           `json:"podStatus,omitempty"`
+	ConfigMapStatus     DiscoveryServerConfigMapStatus     `json:"configMapStatus,omitempty"`
+	ConnectionInfo      ConnectionInfo                     `json:"connectionInfo,omitempty"`
 }
 
-func (robot *Robot) GetLoaderJobMetadata() *types.NamespacedName {
-	return &types.NamespacedName{
-		Name:      robot.Name + internal.JOB_LOADER_POSTFIX,
-		Namespace: robot.Namespace,
-	}
+//+genclient
+//+kubebuilder:object:root=true
+//+kubebuilder:subresource:status
+
+// DiscoveryServer is the Schema for the discoveryservers API
+type DiscoveryServer struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   DiscoveryServerSpec   `json:"spec,omitempty"`
+	Status DiscoveryServerStatus `json:"status,omitempty"`
 }
 
-func (robot *Robot) GetROSBridgeMetadata() *types.NamespacedName {
-	return &types.NamespacedName{
-		Name:      robot.Name + internal.ROS_BRIDGE_POSTFIX,
-		Namespace: robot.Namespace,
-	}
+//+kubebuilder:object:root=true
+
+// DiscoveryServerList contains a list of DiscoveryServer
+type DiscoveryServerList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []DiscoveryServer `json:"items"`
 }
 
-func (robot *Robot) GetRobotDevSuiteMetadata() *types.NamespacedName {
-	return &types.NamespacedName{
-		Name:      robot.Name + internal.ROBOT_DEV_SUITE_POSTFIX,
-		Namespace: robot.Namespace,
-	}
+// ********************************
+// ROSBridge types
+// ********************************
+
+type BridgeDistro struct {
+	Enabled bool      `json:"enabled,omitempty"`
+	Distro  ROSDistro `json:"distro,omitempty"`
 }
 
-func (robot *Robot) GetWorkspaceManagerMetadata() *types.NamespacedName {
-	return &types.NamespacedName{
-		Name:      robot.Name + internal.WORKSPACE_MANAGER_POSTFIX,
-		Namespace: robot.Namespace,
-	}
+// ROSBridgeSpec defines the desired state of ROSBridge
+type ROSBridgeSpec struct {
+	ROS   BridgeDistro `json:"ros,omitempty"`
+	ROS2  BridgeDistro `json:"ros2,omitempty"`
+	Image string       `json:"image,omitempty"`
 }
 
-func (robot *Robot) GetWorkspaceByName(name string) (Workspace, error) {
+type BridgePodStatus struct {
+	Created bool            `json:"created,omitempty"`
+	Phase   corev1.PodPhase `json:"phase,omitempty"`
+}
 
-	for _, ws := range robot.Spec.WorkspaceManagerTemplate.Workspaces {
-		if ws.Name == name {
-			return ws, nil
-		}
-	}
+type BridgeServiceStatus struct {
+	Created bool `json:"created,omitempty"`
+}
 
-	return Workspace{}, errors.New("workspace not found")
+// ROSBridgeStatus defines the observed state of ROSBridge
+type ROSBridgeStatus struct {
+	Phase         BridgePhase         `json:"phase,omitempty"`
+	PodStatus     BridgePodStatus     `json:"podStatus,omitempty"`
+	ServiceStatus BridgeServiceStatus `json:"serviceStatus,omitempty"`
+}
+
+//+genclient
+//+kubebuilder:object:root=true
+//+kubebuilder:subresource:status
+
+// ROSBridge is the Schema for the rosbridges API
+type ROSBridge struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   ROSBridgeSpec   `json:"spec,omitempty"`
+	Status ROSBridgeStatus `json:"status,omitempty"`
+}
+
+//+kubebuilder:object:root=true
+
+// ROSBridgeList contains a list of ROSBridge
+type ROSBridgeList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []ROSBridge `json:"items"`
+}
+
+// ********************************
+// RobotArtifact types
+// ********************************
+
+//+kubebuilder:object:root=true
+//+kubebuilder:subresource:status
+
+// RobotArtifact is the Schema for the robotartifacts API
+type RobotArtifact struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Template RobotSpec `json:"template,omitempty"`
+}
+
+//+kubebuilder:object:root=true
+
+// RobotArtifactList contains a list of RobotArtifact
+type RobotArtifactList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []RobotArtifact `json:"items"`
 }
