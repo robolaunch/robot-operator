@@ -21,6 +21,14 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+func init() {
+	SchemeBuilder.Register(&MetricsCollector{}, &MetricsCollectorList{})
+}
+
+// ********************************
+// MetricsCollector types
+// ********************************
+
 type MetricType string
 
 const (
@@ -107,8 +115,4 @@ type MetricsCollectorList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []MetricsCollector `json:"items"`
-}
-
-func init() {
-	SchemeBuilder.Register(&MetricsCollector{}, &MetricsCollectorList{})
 }

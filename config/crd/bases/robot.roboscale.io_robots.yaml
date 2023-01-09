@@ -526,12 +526,8 @@ spec:
                   host:
                     description: DNS host.
                     type: string
-                  port:
-                    description: DNS host.
-                    type: string
                 required:
                 - host
-                - port
                 type: object
               rosBridgeTemplate:
                 description: ROS bridge template

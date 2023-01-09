@@ -26,6 +26,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 )
 
+// ********************************
+// MetricsCollector webhooks
+// ********************************
+
 // log is for logging in this package.
 var metricscollectorlog = logf.Log.WithName("metricscollector-resource")
 
