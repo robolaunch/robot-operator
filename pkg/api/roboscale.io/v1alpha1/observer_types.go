@@ -21,6 +21,35 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+func init() {
+	SchemeBuilder.Register(&MetricsCollector{}, &MetricsCollectorList{})
+}
+
+//+kubebuilder:object:root=true
+//+kubebuilder:subresource:status
+
+// MetricsCollector is the Schema for the metricscollectors API
+type MetricsCollector struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   MetricsCollectorSpec   `json:"spec,omitempty"`
+	Status MetricsCollectorStatus `json:"status,omitempty"`
+}
+
+//+kubebuilder:object:root=true
+
+// MetricsCollectorList contains a list of MetricsCollector
+type MetricsCollectorList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []MetricsCollector `json:"items"`
+}
+
+// ********************************
+// MetricsCollector types
+// ********************************
+
 type MetricType string
 
 const (
@@ -81,41 +110,9 @@ type ComponentMetricStatus struct {
 	Message                string                 `json:"message,omitempty"`
 }
 
-type MetricsCollectorPhase string
-
-const (
-	MetricsCollectorPhaseRobotNotFound MetricsCollectorPhase = "RobotNotFound"
-	MetricsCollectorPhaseRunning       MetricsCollectorPhase = "Running"
-)
-
 // MetricsCollectorStatus defines the observed state of MetricsCollector
 type MetricsCollectorStatus struct {
 	LastUpdateTimestamp metav1.Time             `json:"lastUpdateTimestamp,omitempty"`
 	ComponentMetrics    []ComponentMetricStatus `json:"componentMetrics,omitempty"`
 	Allocatable         corev1.ResourceList     `json:"allocatable,omitempty"`
-}
-
-//+kubebuilder:object:root=true
-//+kubebuilder:subresource:status
-
-// MetricsCollector is the Schema for the metricscollectors API
-type MetricsCollector struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
-
-	Spec   MetricsCollectorSpec   `json:"spec,omitempty"`
-	Status MetricsCollectorStatus `json:"status,omitempty"`
-}
-
-//+kubebuilder:object:root=true
-
-// MetricsCollectorList contains a list of MetricsCollector
-type MetricsCollectorList struct {
-	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []MetricsCollector `json:"items"`
-}
-
-func init() {
-	SchemeBuilder.Register(&MetricsCollector{}, &MetricsCollectorList{})
 }

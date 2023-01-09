@@ -26,31 +26,35 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 )
 
-// log is for logging in this package.
-var buildmanagerlog = logf.Log.WithName("buildmanager-resource")
+// ********************************
+// MetricsCollector webhooks
+// ********************************
 
-func (r *BuildManager) SetupWebhookWithManager(mgr ctrl.Manager) error {
+// log is for logging in this package.
+var metricscollectorlog = logf.Log.WithName("metricscollector-resource")
+
+func (r *MetricsCollector) SetupWebhookWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewWebhookManagedBy(mgr).
 		For(r).
 		Complete()
 }
 
-//+kubebuilder:webhook:path=/mutate-robot-roboscale-io-v1alpha1-buildmanager,mutating=true,failurePolicy=fail,sideEffects=None,groups=robot.roboscale.io,resources=buildmanagers,verbs=create;update,versions=v1alpha1,name=mbuildmanager.kb.io,admissionReviewVersions=v1
+//+kubebuilder:webhook:path=/mutate-robot-roboscale-io-v1alpha1-metricscollector,mutating=true,failurePolicy=fail,sideEffects=None,groups=robot.roboscale.io,resources=metricscollectors,verbs=create;update,versions=v1alpha1,name=mmetricscollector.kb.io,admissionReviewVersions=v1
 
-var _ webhook.Defaulter = &BuildManager{}
+var _ webhook.Defaulter = &MetricsCollector{}
 
 // Default implements webhook.Defaulter so a webhook will be registered for the type
-func (r *BuildManager) Default() {
-	buildmanagerlog.Info("default", "name", r.Name)
+func (r *MetricsCollector) Default() {
+	metricscollectorlog.Info("default", "name", r.Name)
 }
 
-//+kubebuilder:webhook:path=/validate-robot-roboscale-io-v1alpha1-buildmanager,mutating=false,failurePolicy=fail,sideEffects=None,groups=robot.roboscale.io,resources=buildmanagers,verbs=create;update,versions=v1alpha1,name=vbuildmanager.kb.io,admissionReviewVersions=v1
+//+kubebuilder:webhook:path=/validate-robot-roboscale-io-v1alpha1-metricscollector,mutating=false,failurePolicy=fail,sideEffects=None,groups=robot.roboscale.io,resources=metricscollectors,verbs=create;update,versions=v1alpha1,name=vmetricscollector.kb.io,admissionReviewVersions=v1
 
-var _ webhook.Validator = &BuildManager{}
+var _ webhook.Validator = &MetricsCollector{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
-func (r *BuildManager) ValidateCreate() error {
-	buildmanagerlog.Info("validate create", "name", r.Name)
+func (r *MetricsCollector) ValidateCreate() error {
+	metricscollectorlog.Info("validate create", "name", r.Name)
 
 	err := r.checkTargetRobotLabel()
 	if err != nil {
@@ -61,8 +65,8 @@ func (r *BuildManager) ValidateCreate() error {
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
-func (r *BuildManager) ValidateUpdate(old runtime.Object) error {
-	buildmanagerlog.Info("validate update", "name", r.Name)
+func (r *MetricsCollector) ValidateUpdate(old runtime.Object) error {
+	metricscollectorlog.Info("validate update", "name", r.Name)
 
 	err := r.checkTargetRobotLabel()
 	if err != nil {
@@ -73,12 +77,12 @@ func (r *BuildManager) ValidateUpdate(old runtime.Object) error {
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
-func (r *BuildManager) ValidateDelete() error {
-	buildmanagerlog.Info("validate delete", "name", r.Name)
+func (r *MetricsCollector) ValidateDelete() error {
+	metricscollectorlog.Info("validate delete", "name", r.Name)
 	return nil
 }
 
-func (r *BuildManager) checkTargetRobotLabel() error {
+func (r *MetricsCollector) checkTargetRobotLabel() error {
 	labels := r.GetLabels()
 
 	if _, ok := labels[internal.TARGET_ROBOT_LABEL_KEY]; !ok {
