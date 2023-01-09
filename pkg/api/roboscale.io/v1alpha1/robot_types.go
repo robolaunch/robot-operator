@@ -12,6 +12,94 @@ func init() {
 	SchemeBuilder.Register(&RobotArtifact{}, &RobotArtifactList{})
 }
 
+//+genclient
+//+kubebuilder:object:root=true
+//+kubebuilder:subresource:status
+//+kubebuilder:printcolumn:name="Distro",type=string,JSONPath=`.spec.distro`
+//+kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
+
+// Robot is the Schema for the robots API
+type Robot struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   RobotSpec   `json:"spec,omitempty"`
+	Status RobotStatus `json:"status,omitempty"`
+}
+
+//+kubebuilder:object:root=true
+
+// RobotList contains a list of Robot
+type RobotList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []Robot `json:"items"`
+}
+
+//+genclient
+//+kubebuilder:object:root=true
+//+kubebuilder:subresource:status
+
+// DiscoveryServer is the Schema for the discoveryservers API
+type DiscoveryServer struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   DiscoveryServerSpec   `json:"spec,omitempty"`
+	Status DiscoveryServerStatus `json:"status,omitempty"`
+}
+
+//+kubebuilder:object:root=true
+
+// DiscoveryServerList contains a list of DiscoveryServer
+type DiscoveryServerList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []DiscoveryServer `json:"items"`
+}
+
+//+genclient
+//+kubebuilder:object:root=true
+//+kubebuilder:subresource:status
+
+// ROSBridge is the Schema for the rosbridges API
+type ROSBridge struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   ROSBridgeSpec   `json:"spec,omitempty"`
+	Status ROSBridgeStatus `json:"status,omitempty"`
+}
+
+//+kubebuilder:object:root=true
+
+// ROSBridgeList contains a list of ROSBridge
+type ROSBridgeList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []ROSBridge `json:"items"`
+}
+
+//+kubebuilder:object:root=true
+//+kubebuilder:subresource:status
+
+// RobotArtifact is the Schema for the robotartifacts API
+type RobotArtifact struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Template RobotSpec `json:"template,omitempty"`
+}
+
+//+kubebuilder:object:root=true
+
+// RobotArtifactList contains a list of RobotArtifact
+type RobotArtifactList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []RobotArtifact `json:"items"`
+}
+
 // ********************************
 // Robot types
 // ********************************
@@ -192,30 +280,6 @@ type RobotStatus struct {
 	AttachedDevObjects []AttachedDevObject `json:"attachedDevObjects,omitempty"`
 }
 
-//+genclient
-//+kubebuilder:object:root=true
-//+kubebuilder:subresource:status
-//+kubebuilder:printcolumn:name="Distro",type=string,JSONPath=`.spec.distro`
-//+kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
-
-// Robot is the Schema for the robots API
-type Robot struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
-
-	Spec   RobotSpec   `json:"spec,omitempty"`
-	Status RobotStatus `json:"status,omitempty"`
-}
-
-//+kubebuilder:object:root=true
-
-// RobotList contains a list of Robot
-type RobotList struct {
-	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []Robot `json:"items"`
-}
-
 // ********************************
 // DiscoveryServer types
 // ********************************
@@ -269,28 +333,6 @@ type DiscoveryServerStatus struct {
 	ConnectionInfo      ConnectionInfo                     `json:"connectionInfo,omitempty"`
 }
 
-//+genclient
-//+kubebuilder:object:root=true
-//+kubebuilder:subresource:status
-
-// DiscoveryServer is the Schema for the discoveryservers API
-type DiscoveryServer struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
-
-	Spec   DiscoveryServerSpec   `json:"spec,omitempty"`
-	Status DiscoveryServerStatus `json:"status,omitempty"`
-}
-
-//+kubebuilder:object:root=true
-
-// DiscoveryServerList contains a list of DiscoveryServer
-type DiscoveryServerList struct {
-	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []DiscoveryServer `json:"items"`
-}
-
 // ********************************
 // ROSBridge types
 // ********************************
@@ -323,48 +365,6 @@ type ROSBridgeStatus struct {
 	ServiceStatus BridgeServiceStatus `json:"serviceStatus,omitempty"`
 }
 
-//+genclient
-//+kubebuilder:object:root=true
-//+kubebuilder:subresource:status
-
-// ROSBridge is the Schema for the rosbridges API
-type ROSBridge struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
-
-	Spec   ROSBridgeSpec   `json:"spec,omitempty"`
-	Status ROSBridgeStatus `json:"status,omitempty"`
-}
-
-//+kubebuilder:object:root=true
-
-// ROSBridgeList contains a list of ROSBridge
-type ROSBridgeList struct {
-	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []ROSBridge `json:"items"`
-}
-
 // ********************************
 // RobotArtifact types
 // ********************************
-
-//+kubebuilder:object:root=true
-//+kubebuilder:subresource:status
-
-// RobotArtifact is the Schema for the robotartifacts API
-type RobotArtifact struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
-
-	Template RobotSpec `json:"template,omitempty"`
-}
-
-//+kubebuilder:object:root=true
-
-// RobotArtifactList contains a list of RobotArtifact
-type RobotArtifactList struct {
-	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []RobotArtifact `json:"items"`
-}

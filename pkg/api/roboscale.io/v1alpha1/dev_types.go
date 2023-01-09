@@ -27,6 +27,72 @@ func init() {
 	SchemeBuilder.Register(&RobotVDI{}, &RobotVDIList{})
 }
 
+//+genclient
+//+kubebuilder:object:root=true
+//+kubebuilder:subresource:status
+
+// RobotDevSuite is the Schema for the robotdevsuites API
+type RobotDevSuite struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   RobotDevSuiteSpec   `json:"spec,omitempty"`
+	Status RobotDevSuiteStatus `json:"status,omitempty"`
+}
+
+//+kubebuilder:object:root=true
+
+// RobotDevSuiteList contains a list of RobotDevSuite
+type RobotDevSuiteList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []RobotDevSuite `json:"items"`
+}
+
+//+genclient
+//+kubebuilder:object:root=true
+//+kubebuilder:subresource:status
+
+// RobotIDE is the Schema for the robotides API
+type RobotIDE struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   RobotIDESpec   `json:"spec,omitempty"`
+	Status RobotIDEStatus `json:"status,omitempty"`
+}
+
+//+kubebuilder:object:root=true
+
+// RobotIDEList contains a list of RobotIDE
+type RobotIDEList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []RobotIDE `json:"items"`
+}
+
+//+genclient
+//+kubebuilder:object:root=true
+//+kubebuilder:subresource:status
+
+// RobotVDI is the Schema for the robotvdis API
+type RobotVDI struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   RobotVDISpec   `json:"spec,omitempty"`
+	Status RobotVDIStatus `json:"status,omitempty"`
+}
+
+//+kubebuilder:object:root=true
+
+// RobotVDIList contains a list of RobotVDI
+type RobotVDIList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []RobotVDI `json:"items"`
+}
+
 // ********************************
 // RobotDevSuite types
 // ********************************
@@ -55,28 +121,6 @@ type RobotDevSuiteStatus struct {
 	Active         bool                   `json:"active,omitempty"`
 	RobotVDIStatus RobotVDIInstanceStatus `json:"robotVDIStatus,omitempty"`
 	RobotIDEStatus RobotIDEInstanceStatus `json:"robotIDEStatus,omitempty"`
-}
-
-//+genclient
-//+kubebuilder:object:root=true
-//+kubebuilder:subresource:status
-
-// RobotDevSuite is the Schema for the robotdevsuites API
-type RobotDevSuite struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
-
-	Spec   RobotDevSuiteSpec   `json:"spec,omitempty"`
-	Status RobotDevSuiteStatus `json:"status,omitempty"`
-}
-
-//+kubebuilder:object:root=true
-
-// RobotDevSuiteList contains a list of RobotDevSuite
-type RobotDevSuiteList struct {
-	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []RobotDevSuite `json:"items"`
 }
 
 // ********************************
@@ -114,28 +158,6 @@ type RobotIDEStatus struct {
 	PodStatus     RobotIDEPodStatus     `json:"podStatus,omitempty"`
 	ServiceStatus RobotIDEServiceStatus `json:"serviceStatus,omitempty"`
 	IngressStatus RobotIDEIngressStatus `json:"ingressStatus,omitempty"`
-}
-
-//+genclient
-//+kubebuilder:object:root=true
-//+kubebuilder:subresource:status
-
-// RobotIDE is the Schema for the robotides API
-type RobotIDE struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
-
-	Spec   RobotIDESpec   `json:"spec,omitempty"`
-	Status RobotIDEStatus `json:"status,omitempty"`
-}
-
-//+kubebuilder:object:root=true
-
-// RobotIDEList contains a list of RobotIDE
-type RobotIDEList struct {
-	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []RobotIDE `json:"items"`
 }
 
 // ********************************
@@ -197,26 +219,4 @@ type RobotVDIStatus struct {
 	ServiceUDPStatus RobotVDIServiceUDPStatus `json:"serviceUDPStatus,omitempty"`
 	IngressStatus    RobotVDIIngressStatus    `json:"ingressStatus,omitempty"`
 	PVCStatus        RobotVDIPVCStatus        `json:"pvcStatus,omitempty"`
-}
-
-//+genclient
-//+kubebuilder:object:root=true
-//+kubebuilder:subresource:status
-
-// RobotVDI is the Schema for the robotvdis API
-type RobotVDI struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
-
-	Spec   RobotVDISpec   `json:"spec,omitempty"`
-	Status RobotVDIStatus `json:"status,omitempty"`
-}
-
-//+kubebuilder:object:root=true
-
-// RobotVDIList contains a list of RobotVDI
-type RobotVDIList struct {
-	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []RobotVDI `json:"items"`
 }

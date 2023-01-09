@@ -27,6 +27,71 @@ func init() {
 	SchemeBuilder.Register(&LaunchManager{}, &LaunchManagerList{})
 }
 
+//+kubebuilder:object:root=true
+//+kubebuilder:subresource:status
+
+// WorkspaceManager is the Schema for the workspacemanagers API
+type WorkspaceManager struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   WorkspaceManagerSpec   `json:"spec,omitempty"`
+	Status WorkspaceManagerStatus `json:"status,omitempty"`
+}
+
+//+kubebuilder:object:root=true
+
+// WorkspaceManagerList contains a list of WorkspaceManager
+type WorkspaceManagerList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []WorkspaceManager `json:"items"`
+}
+
+//+genclient
+//+kubebuilder:object:root=true
+//+kubebuilder:subresource:status
+
+// BuildManager is the Schema for the buildmanagers API
+type BuildManager struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   BuildManagerSpec   `json:"spec,omitempty"`
+	Status BuildManagerStatus `json:"status,omitempty"`
+}
+
+//+kubebuilder:object:root=true
+
+// BuildManagerList contains a list of BuildManager
+type BuildManagerList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []BuildManager `json:"items"`
+}
+
+//+genclient
+//+kubebuilder:object:root=true
+//+kubebuilder:subresource:status
+
+// LaunchManager is the Schema for the launchmanagers API
+type LaunchManager struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   LaunchManagerSpec   `json:"spec,omitempty"`
+	Status LaunchManagerStatus `json:"status,omitempty"`
+}
+
+//+kubebuilder:object:root=true
+
+// LaunchManagerList contains a list of LaunchManager
+type LaunchManagerList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []LaunchManager `json:"items"`
+}
+
 // ********************************
 // WorkspaceManager types
 // ********************************
@@ -90,27 +155,6 @@ type WorkspaceManagerStatus struct {
 	Version          int                   `json:"version,omitempty"`
 }
 
-//+kubebuilder:object:root=true
-//+kubebuilder:subresource:status
-
-// WorkspaceManager is the Schema for the workspacemanagers API
-type WorkspaceManager struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
-
-	Spec   WorkspaceManagerSpec   `json:"spec,omitempty"`
-	Status WorkspaceManagerStatus `json:"status,omitempty"`
-}
-
-//+kubebuilder:object:root=true
-
-// WorkspaceManagerList contains a list of WorkspaceManager
-type WorkspaceManagerList struct {
-	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []WorkspaceManager `json:"items"`
-}
-
 // ********************************
 // BuildManager types
 // ********************************
@@ -152,28 +196,6 @@ type BuildManagerStatus struct {
 	Active                bool                  `json:"active,omitempty"`
 	ScriptConfigMapStatus ScriptConfigMapStatus `json:"scriptConfigMapStatus,omitempty"`
 	Steps                 []StepStatus          `json:"steps,omitempty"`
-}
-
-//+genclient
-//+kubebuilder:object:root=true
-//+kubebuilder:subresource:status
-
-// BuildManager is the Schema for the buildmanagers API
-type BuildManager struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
-
-	Spec   BuildManagerSpec   `json:"spec,omitempty"`
-	Status BuildManagerStatus `json:"status,omitempty"`
-}
-
-//+kubebuilder:object:root=true
-
-// BuildManagerList contains a list of BuildManager
-type BuildManagerList struct {
-	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []BuildManager `json:"items"`
 }
 
 // ********************************
@@ -236,26 +258,4 @@ type LaunchManagerStatus struct {
 	Phase           LaunchManagerPhase `json:"phase,omitempty"`
 	Active          bool               `json:"active,omitempty"`
 	LaunchPodStatus LaunchPodStatus    `json:"launchPodStatus,omitempty"`
-}
-
-//+genclient
-//+kubebuilder:object:root=true
-//+kubebuilder:subresource:status
-
-// LaunchManager is the Schema for the launchmanagers API
-type LaunchManager struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
-
-	Spec   LaunchManagerSpec   `json:"spec,omitempty"`
-	Status LaunchManagerStatus `json:"status,omitempty"`
-}
-
-//+kubebuilder:object:root=true
-
-// LaunchManagerList contains a list of LaunchManager
-type LaunchManagerList struct {
-	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []LaunchManager `json:"items"`
 }
