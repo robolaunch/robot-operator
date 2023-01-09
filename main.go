@@ -35,6 +35,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
+	mcsv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/external/apis/mcsv1alpha1/v1alpha1"
+
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	buildManager "github.com/robolaunch/robot-operator/pkg/controllers/build_manager"
 	launchManager "github.com/robolaunch/robot-operator/pkg/controllers/launch_manager"
@@ -58,6 +60,8 @@ func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 
 	utilruntime.Must(robotv1alpha1.AddToScheme(scheme))
+
+	utilruntime.Must(mcsv1alpha1.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
 }
 

@@ -31,6 +31,7 @@ import (
 
 	"github.com/go-logr/logr"
 	robotErr "github.com/robolaunch/robot-operator/internal/error"
+	mcsv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/external/apis/mcsv1alpha1/v1alpha1"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 )
 
@@ -48,6 +49,7 @@ type DiscoveryServerReconciler struct {
 //+kubebuilder:rbac:groups=core,resources=pods,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=core,resources=services,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=core,resources=configmaps,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=multicluster.x-k8s.io,resources=serviceexports,verbs=get;list;watch;create;update;patch;delete
 
 var logger logr.Logger
 
@@ -124,24 +126,38 @@ func (r *DiscoveryServerReconciler) reconcileCheckStatus(ctx context.Context, in
 
 					// TODO: Cover other pod phases
 
-					switch instance.Status.ConfigMapStatus.Created {
+					switch instance.Status.ServiceExportStatus.Created {
 					case true:
 
-						instance.Status.Phase = robotv1alpha1.DiscoveryServerPhaseReady
+						switch instance.Status.ConfigMapStatus.Created {
+						case true:
+
+							instance.Status.Phase = robotv1alpha1.DiscoveryServerPhaseReady
+
+						case false:
+
+							instance.Status.Phase = robotv1alpha1.DiscoveryServerPhaseCreatingConfigMap
+
+							if instance.Status.ConnectionInfo.IP != "" {
+
+								err := r.createConfigMap(ctx, instance, instance.GetDiscoveryServerConfigMapMetadata())
+								if err != nil {
+									return err
+								}
+								instance.Status.ConfigMapStatus.Created = true
+
+							}
+						}
 
 					case false:
 
-						instance.Status.Phase = robotv1alpha1.DiscoveryServerPhaseCreatingConfigMap
-
-						if instance.Status.ConnectionInfo.IP != "" {
-
-							err := r.createConfigMap(ctx, instance, instance.GetDiscoveryServerConfigMapMetadata())
-							if err != nil {
-								return err
-							}
-							instance.Status.ConfigMapStatus.Created = true
-
+						instance.Status.Phase = robotv1alpha1.DiscoveryServerPhaseCreatingServiceExport
+						err := r.createServiceExport(ctx, instance, instance.GetDiscoveryServerServiceMetadata())
+						if err != nil {
+							return err
 						}
+						instance.Status.ServiceExportStatus.Created = true
+
 					}
 
 				}
@@ -225,5 +241,6 @@ func (r *DiscoveryServerReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Owns(&corev1.Pod{}).
 		Owns(&corev1.Service{}).
 		Owns(&corev1.ConfigMap{}).
+		Owns(&mcsv1alpha1.ServiceExport{}).
 		Complete(r)
 }

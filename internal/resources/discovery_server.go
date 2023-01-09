@@ -6,6 +6,7 @@ import (
 
 	"github.com/robolaunch/robot-operator/internal"
 	"github.com/robolaunch/robot-operator/internal/label"
+	mcsv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/external/apis/mcsv1alpha1/v1alpha1"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -105,6 +106,18 @@ func GetDiscoveryServerConfigMap(discoveryServer *robotv1alpha1.DiscoveryServer,
 	}
 
 	return &discoveryServerConfigMap, nil
+}
+
+func GetDiscoveryServerServiceExport(discoveryServer *robotv1alpha1.DiscoveryServer, svcNamespacedName *types.NamespacedName) (*mcsv1alpha1.ServiceExport, error) {
+
+	serviceExport := mcsv1alpha1.ServiceExport{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      svcNamespacedName.Name,
+			Namespace: svcNamespacedName.Namespace,
+		},
+	}
+
+	return &serviceExport, nil
 }
 
 func GetDiscoveryServerDNS(discoveryServer robotv1alpha1.DiscoveryServer) string {

@@ -6,6 +6,7 @@ import (
 
 	robotErr "github.com/robolaunch/robot-operator/internal/error"
 	"github.com/robolaunch/robot-operator/internal/resources"
+	mcsv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/external/apis/mcsv1alpha1/v1alpha1"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -89,6 +90,21 @@ func (r *DiscoveryServerReconciler) reconcileCheckService(ctx context.Context, i
 		return err
 	} else {
 		instance.Status.ServiceStatus.Created = true
+	}
+
+	return nil
+}
+
+func (r *DiscoveryServerReconciler) reconcileCheckServiceExport(ctx context.Context, instance *robotv1alpha1.DiscoveryServer) error {
+
+	discoveryServerServiceExportQuery := &mcsv1alpha1.ServiceExport{}
+	err := r.Get(ctx, *instance.GetDiscoveryServerServiceMetadata(), discoveryServerServiceExportQuery)
+	if err != nil && errors.IsNotFound(err) {
+		instance.Status.ServiceExportStatus.Created = false
+	} else if err != nil {
+		return err
+	} else {
+		instance.Status.ServiceExportStatus.Created = true
 	}
 
 	return nil

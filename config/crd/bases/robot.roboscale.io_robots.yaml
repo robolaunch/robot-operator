@@ -1308,6 +1308,11 @@ spec:
                               a pod at the current time.
                             type: string
                         type: object
+                      serviceExportStatus:
+                        properties:
+                          created:
+                            type: boolean
+                        type: object
                       serviceStatus:
                         properties:
                           created:

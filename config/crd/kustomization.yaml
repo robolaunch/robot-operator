@@ -13,6 +13,8 @@ resources:
 - bases/robot.roboscale.io_robotartifacts.yaml
 - bases/robot.roboscale.io_metricscollectors.yaml
 - bases/robot.roboscale.io_workspacemanagers.yaml
+- bases/multicluster.x-k8s.io_serviceexports.yaml
+- bases/multicluster.x-k8s.io_serviceimports.yaml
 #+kubebuilder:scaffold:crdkustomizeresource
 
 patchesStrategicMerge:
