@@ -56,9 +56,6 @@ type RootDNSConfig struct {
 	// DNS host.
 	// +kubebuilder:validation:Required
 	Host string `json:"host"`
-	// DNS host.
-	// +kubebuilder:validation:Required
-	Port string `json:"port"`
 }
 
 // RobotSpec defines the desired state of Robot
