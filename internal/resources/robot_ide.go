@@ -80,10 +80,10 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 				configure.GetVolumeWorkspace(&robot),
 			},
 			RestartPolicy: corev1.RestartPolicyNever,
-			NodeSelector:  label.GetTenancyMap(&robot),
 		},
 	}
 
+	configure.SchedulePod(&pod, label.GetTenancyMap(robotIDE))
 	configure.InjectGenericEnvironmentVariables(&pod, robot)
 	configure.InjectPodDiscoveryServerConnection(&pod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo)
 	if label.GetTargetRobotVDI(robotIDE) != "" {

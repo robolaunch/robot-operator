@@ -51,10 +51,10 @@ func GetLaunchPod(launchManager *robotv1alpha1.LaunchManager, podNamespacedName 
 				configure.GetVolumeConfigMaps(&buildManager),
 			},
 			RestartPolicy: corev1.RestartPolicyNever,
-			NodeSelector:  label.GetTenancyMap(&robot),
 		},
 	}
 
+	configure.SchedulePod(&launchPod, label.GetTenancyMap(launchManager))
 	configure.InjectGenericEnvironmentVariables(&launchPod, robot)                                                     // Environment variables
 	configure.InjectPodDiscoveryServerConnection(&launchPod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo) // Discovery server configuration
 	if label.GetTargetRobotVDI(launchManager) != "" {

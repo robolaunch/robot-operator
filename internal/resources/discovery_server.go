@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/robolaunch/robot-operator/internal"
+	"github.com/robolaunch/robot-operator/internal/configure"
 	"github.com/robolaunch/robot-operator/internal/label"
 	mcsv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/external/apis/mcsv1alpha1/v1alpha1"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
@@ -56,6 +57,8 @@ func GetDiscoveryServerPod(discoveryServer *robotv1alpha1.DiscoveryServer, podNa
 			Subdomain:     discoveryServer.GetDiscoveryServerServiceMetadata().Name,
 		},
 	}
+
+	configure.SchedulePod(&discoveryServerPod, label.GetTenancyMap(discoveryServer))
 
 	return &discoveryServerPod
 }
