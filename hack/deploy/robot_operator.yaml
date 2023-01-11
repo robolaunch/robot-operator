@@ -386,6 +386,11 @@ spec:
                       description: PodPhase is a label for the condition of a pod at the current time.
                       type: string
                   type: object
+                serviceExportStatus:
+                  properties:
+                    created:
+                      type: boolean
+                  type: object
                 serviceStatus:
                   properties:
                     created:
@@ -742,6 +747,203 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
+    cert-manager.io/inject-ca-from: robot-system/robot-serving-cert
+    controller-gen.kubebuilder.io/version: v0.9.2
+  name: metricscollectors.robot.roboscale.io
+spec:
+  conversion:
+    strategy: Webhook
+    webhook:
+      clientConfig:
+        service:
+          name: robot-webhook-service
+          namespace: robot-system
+          path: /convert
+      conversionReviewVersions:
+        - v1
+  group: robot.roboscale.io
+  names:
+    kind: MetricsCollector
+    listKind: MetricsCollectorList
+    plural: metricscollectors
+    singular: metricscollector
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          description: MetricsCollector is the Schema for the metricscollectors API
+          properties:
+            apiVersion:
+              description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+              type: string
+            kind:
+              description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+              type: string
+            metadata:
+              type: object
+            spec:
+              description: MetricsCollectorSpec defines the desired state of MetricsCollector
+              properties:
+                cpu:
+                  type: boolean
+                gpu:
+                  type: boolean
+                memory:
+                  type: boolean
+                networkLoad:
+                  type: boolean
+                waitSeconds:
+                  default: 10
+                  description: 'TODO: Add default value'
+                  format: int64
+                  type: integer
+              required:
+                - cpu
+                - gpu
+                - memory
+                - networkLoad
+                - waitSeconds
+              type: object
+            status:
+              description: MetricsCollectorStatus defines the observed state of MetricsCollector
+              properties:
+                allocatable:
+                  additionalProperties:
+                    anyOf:
+                      - type: integer
+                      - type: string
+                    pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                    x-kubernetes-int-or-string: true
+                  description: ResourceList is a set of (resource name, quantity) pairs.
+                  type: object
+                componentMetrics:
+                  items:
+                    properties:
+                      containerName:
+                        type: string
+                      cpuUtilization:
+                        properties:
+                          corePercentage:
+                            type: string
+                          hostPercentage:
+                            type: string
+                          message:
+                            type: string
+                          value:
+                            type: string
+                        type: object
+                      memoryUtilization:
+                        properties:
+                          hostPercentage:
+                            type: string
+                          message:
+                            type: string
+                          value:
+                            type: string
+                        type: object
+                      message:
+                        type: string
+                      networkLoadUtilization:
+                        properties:
+                          interfaces:
+                            items:
+                              properties:
+                                name:
+                                  type: string
+                                receive:
+                                  properties:
+                                    load:
+                                      type: string
+                                    loadKBit:
+                                      type: string
+                                    value:
+                                      type: string
+                                  type: object
+                                transmit:
+                                  properties:
+                                    load:
+                                      type: string
+                                    loadKBit:
+                                      type: string
+                                    value:
+                                      type: string
+                                  type: object
+                              type: object
+                            type: array
+                          message:
+                            type: string
+                        type: object
+                      ownerReference:
+                        description: OwnerReference contains enough information to let you identify an owning object. An owning object must be in the same namespace as the dependent, or be cluster-scoped, so there is no namespace field.
+                        properties:
+                          apiVersion:
+                            description: API version of the referent.
+                            type: string
+                          blockOwnerDeletion:
+                            description: If true, AND if the owner has the "foregroundDeletion" finalizer, then the owner cannot be deleted from the key-value store until this reference is removed. See https://kubernetes.io/docs/concepts/architecture/garbage-collection/#foreground-deletion for how the garbage collector interacts with this field and enforces the foreground deletion. Defaults to false. To set this field, a user needs "delete" permission of the owner, otherwise 422 (Unprocessable Entity) will be returned.
+                            type: boolean
+                          controller:
+                            description: If true, this reference points to the managing controller.
+                            type: boolean
+                          kind:
+                            description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                            type: string
+                          name:
+                            description: 'Name of the referent. More info: http://kubernetes.io/docs/user-guide/identifiers#names'
+                            type: string
+                          uid:
+                            description: 'UID of the referent. More info: http://kubernetes.io/docs/user-guide/identifiers#uids'
+                            type: string
+                        required:
+                          - apiVersion
+                          - kind
+                          - name
+                          - uid
+                        type: object
+                        x-kubernetes-map-type: atomic
+                      podReference:
+                        description: "ObjectReference contains enough information to let you inspect or modify the referred object. --- New uses of this type are discouraged because of difficulty describing its usage when embedded in APIs. 1. Ignored fields.  It includes many fields which are not generally honored.  For instance, ResourceVersion and FieldPath are both very rarely valid in actual usage. 2. Invalid usage help.  It is impossible to add specific help for individual usage.  In most embedded usages, there are particular restrictions like, \"must refer only to types A and B\" or \"UID not honored\" or \"name must be restricted\". Those cannot be well described when embedded. 3. Inconsistent validation.  Because the usages are different, the validation rules are different by usage, which makes it hard for users to predict what will happen. 4. The fields are both imprecise and overly precise.  Kind is not a precise mapping to a URL. This can produce ambiguity during interpretation and require a REST mapping.  In most cases, the dependency is on the group,resource tuple and the version of the actual struct is irrelevant. 5. We cannot easily change it.  Because this type is embedded in many locations, updates to this type will affect numerous schemas.  Don't make new APIs embed an underspecified API type they do not control. \n Instead of using this type, create a locally provided and used type that is well-focused on your reference. For example, ServiceReferences for admission registration: https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go#L533 ."
+                        properties:
+                          apiVersion:
+                            description: API version of the referent.
+                            type: string
+                          fieldPath:
+                            description: 'If referring to a piece of an object instead of an entire object, this string should contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2]. For example, if the object reference is to a container within a pod, this would take on a value like: "spec.containers{name}" (where "name" refers to the name of the container that triggered the event) or if no container name is specified "spec.containers[2]" (container with index 2 in this pod). This syntax is chosen only to have some well-defined way of referencing a part of an object. TODO: this design is not final and this field is subject to change in the future.'
+                            type: string
+                          kind:
+                            description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                            type: string
+                          name:
+                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                            type: string
+                          namespace:
+                            description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                            type: string
+                          resourceVersion:
+                            description: 'Specific resourceVersion to which this reference is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                            type: string
+                          uid:
+                            description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                            type: string
+                        type: object
+                        x-kubernetes-map-type: atomic
+                    type: object
+                  type: array
+                lastUpdateTimestamp:
+                  format: date-time
+                  type: string
+              type: object
+          type: object
+      served: true
+      storage: true
+      subresources:
+        status: {}
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
     controller-gen.kubebuilder.io/version: v0.9.2
   creationTimestamp: null
   name: robotartifacts.robot.roboscale.io
@@ -920,14 +1122,19 @@ spec:
                     type:
                       type: string
                   type: object
-                distro:
+                distributions:
                   description: ROS distro to be used.
-                  enum:
-                    - foxy
-                    - galactic
-                    - noetic
-                    - melodic
-                  type: string
+                  items:
+                    description: ROS distro selection. Allowed distros are Foxy and Galactic. It is aimed to support Humble, Melodic and Noetic in further versions.
+                    enum:
+                      - foxy
+                      - galactic
+                      - noetic
+                      - melodic
+                    type: string
+                  maxItems: 2
+                  minItems: 1
+                  type: array
                 launchManagerTemplates:
                   description: Launch manager template for initial configuration
                   items:
@@ -1137,12 +1344,8 @@ spec:
                     host:
                       description: DNS host.
                       type: string
-                    port:
-                      description: DNS host.
-                      type: string
                   required:
                     - host
-                    - port
                   type: object
                 rosBridgeTemplate:
                   description: ROS bridge template
@@ -1207,44 +1410,69 @@ spec:
                     - name
                     - namespace
                   type: object
-                workspaces:
-                  description: Workspace definitions of robot.
-                  items:
-                    description: Workspace description. Each robot should contain at least one workspace. A workspace should contain at least one repository in it.
-                    properties:
-                      name:
-                        description: Name of workspace. If a workspace's name is `my_ws`, it's absolute path is `/home/workspaces/my_ws`.
-                        type: string
-                      repositories:
-                        additionalProperties:
-                          description: Repository description.
-                          properties:
-                            branch:
-                              description: Branch of the repository to clone.
-                              type: string
-                            path:
-                              description: '[Autofilled] Absolute path of repository'
-                              type: string
-                            url:
-                              description: Base URL of the repository.
-                              type: string
-                          required:
-                            - branch
-                            - url
-                          type: object
-                        description: Repositories to clone inside workspace's `src` directory.
+                workspaceManagerTemplate:
+                  description: Workspace manager template
+                  properties:
+                    updateNeeded:
+                      description: Need update
+                      type: boolean
+                    workspaces:
+                      description: Workspace definitions of robot.
+                      items:
+                        description: Workspace description. Each robot should contain at least one workspace. A workspace should contain at least one repository in it.
+                        properties:
+                          distro:
+                            description: ROS distro selection. Allowed distros are Foxy and Galactic. It is aimed to support Humble, Melodic and Noetic in further versions.
+                            enum:
+                              - foxy
+                              - galactic
+                              - noetic
+                              - melodic
+                            type: string
+                          name:
+                            description: Name of workspace. If a workspace's name is `my_ws`, it's absolute path is `/home/workspaces/my_ws`.
+                            type: string
+                          repositories:
+                            additionalProperties:
+                              description: Repository description.
+                              properties:
+                                branch:
+                                  description: Branch of the repository to clone.
+                                  type: string
+                                hash:
+                                  description: '[Autofilled] Hash of last commit'
+                                  type: string
+                                owner:
+                                  description: '[Autofilled] User or organization, maintainer of repository'
+                                  type: string
+                                path:
+                                  description: '[Autofilled] Absolute path of repository'
+                                  type: string
+                                repo:
+                                  description: '[Autofilled] Repository name'
+                                  type: string
+                                url:
+                                  description: Base URL of the repository.
+                                  type: string
+                              required:
+                                - branch
+                                - url
+                              type: object
+                            description: Repositories to clone inside workspace's `src` directory.
+                            type: object
+                        required:
+                          - distro
+                          - name
+                          - repositories
                         type: object
-                    required:
-                      - name
-                      - repositories
-                    type: object
-                  minItems: 1
-                  type: array
-                workspacesPath:
-                  description: Global path of workspaces. It's fixed to `/home/workspaces` path.
-                  type: string
+                      minItems: 1
+                      type: array
+                    workspacesPath:
+                      description: Global path of workspaces. It's fixed to `/home/workspaces` path.
+                      type: string
+                  type: object
               required:
-                - distro
+                - distributions
               type: object
           type: object
       served: true
@@ -1664,14 +1892,19 @@ spec:
                     type:
                       type: string
                   type: object
-                distro:
+                distributions:
                   description: ROS distro to be used.
-                  enum:
-                    - foxy
-                    - galactic
-                    - noetic
-                    - melodic
-                  type: string
+                  items:
+                    description: ROS distro selection. Allowed distros are Foxy and Galactic. It is aimed to support Humble, Melodic and Noetic in further versions.
+                    enum:
+                      - foxy
+                      - galactic
+                      - noetic
+                      - melodic
+                    type: string
+                  maxItems: 2
+                  minItems: 1
+                  type: array
                 launchManagerTemplates:
                   description: Launch manager template for initial configuration
                   items:
@@ -1881,12 +2114,8 @@ spec:
                     host:
                       description: DNS host.
                       type: string
-                    port:
-                      description: DNS host.
-                      type: string
                   required:
                     - host
-                    - port
                   type: object
                 rosBridgeTemplate:
                   description: ROS bridge template
@@ -1951,44 +2180,69 @@ spec:
                     - name
                     - namespace
                   type: object
-                workspaces:
-                  description: Workspace definitions of robot.
-                  items:
-                    description: Workspace description. Each robot should contain at least one workspace. A workspace should contain at least one repository in it.
-                    properties:
-                      name:
-                        description: Name of workspace. If a workspace's name is `my_ws`, it's absolute path is `/home/workspaces/my_ws`.
-                        type: string
-                      repositories:
-                        additionalProperties:
-                          description: Repository description.
-                          properties:
-                            branch:
-                              description: Branch of the repository to clone.
-                              type: string
-                            path:
-                              description: '[Autofilled] Absolute path of repository'
-                              type: string
-                            url:
-                              description: Base URL of the repository.
-                              type: string
-                          required:
-                            - branch
-                            - url
-                          type: object
-                        description: Repositories to clone inside workspace's `src` directory.
+                workspaceManagerTemplate:
+                  description: Workspace manager template
+                  properties:
+                    updateNeeded:
+                      description: Need update
+                      type: boolean
+                    workspaces:
+                      description: Workspace definitions of robot.
+                      items:
+                        description: Workspace description. Each robot should contain at least one workspace. A workspace should contain at least one repository in it.
+                        properties:
+                          distro:
+                            description: ROS distro selection. Allowed distros are Foxy and Galactic. It is aimed to support Humble, Melodic and Noetic in further versions.
+                            enum:
+                              - foxy
+                              - galactic
+                              - noetic
+                              - melodic
+                            type: string
+                          name:
+                            description: Name of workspace. If a workspace's name is `my_ws`, it's absolute path is `/home/workspaces/my_ws`.
+                            type: string
+                          repositories:
+                            additionalProperties:
+                              description: Repository description.
+                              properties:
+                                branch:
+                                  description: Branch of the repository to clone.
+                                  type: string
+                                hash:
+                                  description: '[Autofilled] Hash of last commit'
+                                  type: string
+                                owner:
+                                  description: '[Autofilled] User or organization, maintainer of repository'
+                                  type: string
+                                path:
+                                  description: '[Autofilled] Absolute path of repository'
+                                  type: string
+                                repo:
+                                  description: '[Autofilled] Repository name'
+                                  type: string
+                                url:
+                                  description: Base URL of the repository.
+                                  type: string
+                              required:
+                                - branch
+                                - url
+                              type: object
+                            description: Repositories to clone inside workspace's `src` directory.
+                            type: object
+                        required:
+                          - distro
+                          - name
+                          - repositories
                         type: object
-                    required:
-                      - name
-                      - repositories
-                    type: object
-                  minItems: 1
-                  type: array
-                workspacesPath:
-                  description: Global path of workspaces. It's fixed to `/home/workspaces` path.
-                  type: string
+                      minItems: 1
+                      type: array
+                    workspacesPath:
+                      description: Global path of workspaces. It's fixed to `/home/workspaces` path.
+                      type: string
+                  type: object
               required:
-                - distro
+                - distributions
               type: object
             status:
               description: RobotStatus defines the observed state of Robot
@@ -2431,6 +2685,11 @@ spec:
                               description: PodPhase is a label for the condition of a pod at the current time.
                               type: string
                           type: object
+                        serviceExportStatus:
+                          properties:
+                            created:
+                              type: boolean
+                          type: object
                         serviceStatus:
                           properties:
                             created:
@@ -2563,6 +2822,34 @@ spec:
                           type: boolean
                         persistentVolumeClaimName:
                           type: string
+                      type: object
+                  type: object
+                workspaceManagerStatus:
+                  description: Workspace manager status
+                  properties:
+                    created:
+                      type: boolean
+                    status:
+                      description: WorkspaceManagerStatus defines the observed state of WorkspaceManager
+                      properties:
+                        cleanupJobStatus:
+                          properties:
+                            created:
+                              type: boolean
+                            phase:
+                              type: string
+                          type: object
+                        clonerJobStatus:
+                          properties:
+                            created:
+                              type: boolean
+                            phase:
+                              type: string
+                          type: object
+                        phase:
+                          type: string
+                        version:
+                          type: integer
                       type: object
                   type: object
               type: object
@@ -2772,6 +3059,326 @@ spec:
       subresources:
         status: {}
 ---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.9.2
+  creationTimestamp: null
+  name: serviceexports.multicluster.x-k8s.io
+spec:
+  group: multicluster.x-k8s.io
+  names:
+    kind: ServiceExport
+    listKind: ServiceExportList
+    plural: serviceexports
+    singular: serviceexport
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          description: ServiceExport declares that the Service with the same name and namespace as this export should be consumable from other clusters.
+          properties:
+            apiVersion:
+              description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+              type: string
+            kind:
+              description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+              type: string
+            metadata:
+              type: object
+            status:
+              description: status describes the current state of an exported service. Service configuration comes from the Service that had the same name and namespace as this ServiceExport. Populated by the multi-cluster service implementation's controller.
+              properties:
+                conditions:
+                  items:
+                    description: "Condition contains details for one aspect of the current state of this API Resource. --- This struct is intended for direct use as an array at the field path .status.conditions.  For example, \n type FooStatus struct{ // Represents the observations of a foo's current state. // Known .status.conditions.type are: \"Available\", \"Progressing\", and \"Degraded\" // +patchMergeKey=type // +patchStrategy=merge // +listType=map // +listMapKey=type Conditions []metav1.Condition `json:\"conditions,omitempty\" patchStrategy:\"merge\" patchMergeKey:\"type\" protobuf:\"bytes,1,rep,name=conditions\"` \n // other fields }"
+                    properties:
+                      lastTransitionTime:
+                        description: lastTransitionTime is the last time the condition transitioned from one status to another. This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+                        format: date-time
+                        type: string
+                      message:
+                        description: message is a human readable message indicating details about the transition. This may be an empty string.
+                        maxLength: 32768
+                        type: string
+                      observedGeneration:
+                        description: observedGeneration represents the .metadata.generation that the condition was set based upon. For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date with respect to the current state of the instance.
+                        format: int64
+                        minimum: 0
+                        type: integer
+                      reason:
+                        description: reason contains a programmatic identifier indicating the reason for the condition's last transition. Producers of specific condition types may define expected values and meanings for this field, and whether the values are considered a guaranteed API. The value should be a CamelCase string. This field may not be empty.
+                        maxLength: 1024
+                        minLength: 1
+                        pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                        type: string
+                      status:
+                        description: status of the condition, one of True, False, Unknown.
+                        enum:
+                          - "True"
+                          - "False"
+                          - Unknown
+                        type: string
+                      type:
+                        description: type of condition in CamelCase or in foo.example.com/CamelCase. --- Many .condition.type values are consistent across resources like Available, but because arbitrary conditions can be useful (see .node.status.conditions), the ability to deconflict is important. The regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)
+                        maxLength: 316
+                        pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                        type: string
+                    required:
+                      - lastTransitionTime
+                      - message
+                      - reason
+                      - status
+                      - type
+                    type: object
+                  type: array
+                  x-kubernetes-list-map-keys:
+                    - type
+                  x-kubernetes-list-type: map
+              type: object
+          type: object
+      served: true
+      storage: true
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.9.2
+  creationTimestamp: null
+  name: serviceimports.multicluster.x-k8s.io
+spec:
+  group: multicluster.x-k8s.io
+  names:
+    kind: ServiceImport
+    listKind: ServiceImportList
+    plural: serviceimports
+    singular: serviceimport
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          description: ServiceImport describes a service imported from clusters in a ClusterSet.
+          properties:
+            apiVersion:
+              description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+              type: string
+            kind:
+              description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+              type: string
+            metadata:
+              type: object
+            spec:
+              description: spec defines the behavior of a ServiceImport.
+              properties:
+                ips:
+                  description: ip will be used as the VIP for this service when type is ClusterSetIP.
+                  items:
+                    type: string
+                  maxItems: 1
+                  type: array
+                ports:
+                  items:
+                    description: ServicePort represents the port on which the service is exposed
+                    properties:
+                      appProtocol:
+                        description: The application protocol for this port. This field follows standard Kubernetes label syntax. Un-prefixed names are reserved for IANA standard service names (as per RFC-6335 and http://www.iana.org/assignments/service-names). Non-standard protocols should use prefixed names such as mycompany.com/my-custom-protocol. Field can be enabled with ServiceAppProtocol feature gate.
+                        type: string
+                      name:
+                        description: The name of this port within the service. This must be a DNS_LABEL. All ports within a ServiceSpec must have unique names. When considering the endpoints for a Service, this must match the 'name' field in the EndpointPort. Optional if only one ServicePort is defined on this service.
+                        type: string
+                      port:
+                        description: The port that will be exposed by this service.
+                        format: int32
+                        type: integer
+                      protocol:
+                        default: TCP
+                        description: The IP protocol for this port. Supports "TCP", "UDP", and "SCTP". Default is TCP.
+                        type: string
+                    required:
+                      - port
+                    type: object
+                  type: array
+                  x-kubernetes-list-type: atomic
+                sessionAffinity:
+                  description: 'Supports "ClientIP" and "None". Used to maintain session affinity. Enable client IP based session affinity. Must be ClientIP or None. Defaults to None. Ignored when type is Headless More info: https://kubernetes.io/docs/concepts/services-networking/service/#virtual-ips-and-service-proxies'
+                  type: string
+                sessionAffinityConfig:
+                  description: sessionAffinityConfig contains session affinity configuration.
+                  properties:
+                    clientIP:
+                      description: clientIP contains the configurations of Client IP based session affinity.
+                      properties:
+                        timeoutSeconds:
+                          description: timeoutSeconds specifies the seconds of ClientIP type session sticky time. The value must be >0 && <=86400(for 1 day) if ServiceAffinity == "ClientIP". Default value is 10800(for 3 hours).
+                          format: int32
+                          type: integer
+                      type: object
+                  type: object
+                type:
+                  description: type defines the type of this service. Must be ClusterSetIP or Headless.
+                  enum:
+                    - ClusterSetIP
+                    - Headless
+                  type: string
+              required:
+                - ports
+                - type
+              type: object
+            status:
+              description: status contains information about the exported services that form the multi-cluster service referenced by this ServiceImport.
+              properties:
+                clusters:
+                  description: clusters is the list of exporting clusters from which this service was derived.
+                  items:
+                    description: ClusterStatus contains service configuration mapped to a specific source cluster
+                    properties:
+                      cluster:
+                        description: cluster is the name of the exporting cluster. Must be a valid RFC-1123 DNS label.
+                        type: string
+                    required:
+                      - cluster
+                    type: object
+                  type: array
+                  x-kubernetes-list-map-keys:
+                    - cluster
+                  x-kubernetes-list-type: map
+              type: object
+          type: object
+      served: true
+      storage: true
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    cert-manager.io/inject-ca-from: robot-system/robot-serving-cert
+    controller-gen.kubebuilder.io/version: v0.9.2
+  name: workspacemanagers.robot.roboscale.io
+spec:
+  conversion:
+    strategy: Webhook
+    webhook:
+      clientConfig:
+        service:
+          name: robot-webhook-service
+          namespace: robot-system
+          path: /convert
+      conversionReviewVersions:
+        - v1
+  group: robot.roboscale.io
+  names:
+    kind: WorkspaceManager
+    listKind: WorkspaceManagerList
+    plural: workspacemanagers
+    singular: workspacemanager
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          description: WorkspaceManager is the Schema for the workspacemanagers API
+          properties:
+            apiVersion:
+              description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+              type: string
+            kind:
+              description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+              type: string
+            metadata:
+              type: object
+            spec:
+              description: WorkspaceManagerSpec defines the desired state of WorkspaceManager
+              properties:
+                updateNeeded:
+                  description: Need update
+                  type: boolean
+                workspaces:
+                  description: Workspace definitions of robot.
+                  items:
+                    description: Workspace description. Each robot should contain at least one workspace. A workspace should contain at least one repository in it.
+                    properties:
+                      distro:
+                        description: ROS distro selection. Allowed distros are Foxy and Galactic. It is aimed to support Humble, Melodic and Noetic in further versions.
+                        enum:
+                          - foxy
+                          - galactic
+                          - noetic
+                          - melodic
+                        type: string
+                      name:
+                        description: Name of workspace. If a workspace's name is `my_ws`, it's absolute path is `/home/workspaces/my_ws`.
+                        type: string
+                      repositories:
+                        additionalProperties:
+                          description: Repository description.
+                          properties:
+                            branch:
+                              description: Branch of the repository to clone.
+                              type: string
+                            hash:
+                              description: '[Autofilled] Hash of last commit'
+                              type: string
+                            owner:
+                              description: '[Autofilled] User or organization, maintainer of repository'
+                              type: string
+                            path:
+                              description: '[Autofilled] Absolute path of repository'
+                              type: string
+                            repo:
+                              description: '[Autofilled] Repository name'
+                              type: string
+                            url:
+                              description: Base URL of the repository.
+                              type: string
+                          required:
+                            - branch
+                            - url
+                          type: object
+                        description: Repositories to clone inside workspace's `src` directory.
+                        type: object
+                    required:
+                      - distro
+                      - name
+                      - repositories
+                    type: object
+                  minItems: 1
+                  type: array
+                workspacesPath:
+                  description: Global path of workspaces. It's fixed to `/home/workspaces` path.
+                  type: string
+              type: object
+            status:
+              description: WorkspaceManagerStatus defines the observed state of WorkspaceManager
+              properties:
+                cleanupJobStatus:
+                  properties:
+                    created:
+                      type: boolean
+                    phase:
+                      type: string
+                  type: object
+                clonerJobStatus:
+                  properties:
+                    created:
+                      type: boolean
+                    phase:
+                      type: string
+                  type: object
+                phase:
+                  type: string
+                version:
+                  type: integer
+              type: object
+          type: object
+      served: true
+      storage: true
+      subresources:
+        status: {}
+---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -2899,7 +3506,31 @@ rules:
   - apiGroups:
       - ""
     resources:
+      - pods/exec
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - ""
+    resources:
       - services
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - multicluster.x-k8s.io
+    resources:
+      - serviceexports
     verbs:
       - create
       - delete
@@ -2994,6 +3625,32 @@ rules:
       - robot.roboscale.io
     resources:
       - launchmanagers/status
+    verbs:
+      - get
+      - patch
+      - update
+  - apiGroups:
+      - robot.roboscale.io
+    resources:
+      - metricscollectors
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - robot.roboscale.io
+    resources:
+      - metricscollectors/finalizers
+    verbs:
+      - update
+  - apiGroups:
+      - robot.roboscale.io
+    resources:
+      - metricscollectors/status
     verbs:
       - get
       - patch
@@ -3124,6 +3781,32 @@ rules:
       - robot.roboscale.io
     resources:
       - rosbridges/status
+    verbs:
+      - get
+      - patch
+      - update
+  - apiGroups:
+      - robot.roboscale.io
+    resources:
+      - workspacemanagers
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - robot.roboscale.io
+    resources:
+      - workspacemanagers/finalizers
+    verbs:
+      - update
+  - apiGroups:
+      - robot.roboscale.io
+    resources:
+      - workspacemanagers/status
     verbs:
       - get
       - patch
@@ -3345,7 +4028,7 @@ spec:
             - --leader-elect
           command:
             - /manager
-          image: robolaunchio/robot-controller-manager:v0.1.4
+          image: robolaunchio/robot-controller-manager:v0.1.5
           livenessProbe:
             httpGet:
               path: /healthz
@@ -3451,6 +4134,66 @@ webhooks:
       service:
         name: robot-webhook-service
         namespace: robot-system
+        path: /mutate-robot-roboscale-io-v1alpha1-robotide
+    failurePolicy: Fail
+    name: mrobotide.kb.io
+    rules:
+      - apiGroups:
+          - robot.roboscale.io
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - robotides
+    sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: robot-webhook-service
+        namespace: robot-system
+        path: /mutate-robot-roboscale-io-v1alpha1-robotvdi
+    failurePolicy: Fail
+    name: mrobotvdi.kb.io
+    rules:
+      - apiGroups:
+          - robot.roboscale.io
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - robotvdis
+    sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: robot-webhook-service
+        namespace: robot-system
+        path: /mutate-robot-roboscale-io-v1alpha1-workspacemanager
+    failurePolicy: Fail
+    name: mworkspacemanager.kb.io
+    rules:
+      - apiGroups:
+          - robot.roboscale.io
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - workspacemanagers
+    sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: robot-webhook-service
+        namespace: robot-system
         path: /mutate-robot-roboscale-io-v1alpha1-buildmanager
     failurePolicy: Fail
     name: mbuildmanager.kb.io
@@ -3491,6 +4234,26 @@ webhooks:
       service:
         name: robot-webhook-service
         namespace: robot-system
+        path: /mutate-robot-roboscale-io-v1alpha1-metricscollector
+    failurePolicy: Fail
+    name: mmetricscollector.kb.io
+    rules:
+      - apiGroups:
+          - robot.roboscale.io
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - metricscollectors
+    sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: robot-webhook-service
+        namespace: robot-system
         path: /mutate-robot-roboscale-io-v1alpha1-robot
     failurePolicy: Fail
     name: mrobot.kb.io
@@ -3505,15 +4268,30 @@ webhooks:
         resources:
           - robots
     sideEffects: None
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  annotations:
+    cert-manager.io/inject-ca-from: robot-system/robot-serving-cert
+  labels:
+    app.kubernetes.io/component: webhook
+    app.kubernetes.io/created-by: robot-operator
+    app.kubernetes.io/instance: validating-webhook-configuration
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: validatingwebhookconfiguration
+    app.kubernetes.io/part-of: robot-operator
+  name: robot-validating-webhook-configuration
+webhooks:
   - admissionReviewVersions:
       - v1
     clientConfig:
       service:
         name: robot-webhook-service
         namespace: robot-system
-        path: /mutate-robot-roboscale-io-v1alpha1-robotide
+        path: /validate-robot-roboscale-io-v1alpha1-robotide
     failurePolicy: Fail
-    name: mrobotide.kb.io
+    name: vrobotide.kb.io
     rules:
       - apiGroups:
           - robot.roboscale.io
@@ -3531,9 +4309,9 @@ webhooks:
       service:
         name: robot-webhook-service
         namespace: robot-system
-        path: /mutate-robot-roboscale-io-v1alpha1-robotvdi
+        path: /validate-robot-roboscale-io-v1alpha1-robotvdi
     failurePolicy: Fail
-    name: mrobotvdi.kb.io
+    name: vrobotvdi.kb.io
     rules:
       - apiGroups:
           - robot.roboscale.io
@@ -3545,21 +4323,26 @@ webhooks:
         resources:
           - robotvdis
     sideEffects: None
----
-apiVersion: admissionregistration.k8s.io/v1
-kind: ValidatingWebhookConfiguration
-metadata:
-  annotations:
-    cert-manager.io/inject-ca-from: robot-system/robot-serving-cert
-  labels:
-    app.kubernetes.io/component: webhook
-    app.kubernetes.io/created-by: robot-operator
-    app.kubernetes.io/instance: validating-webhook-configuration
-    app.kubernetes.io/managed-by: kustomize
-    app.kubernetes.io/name: validatingwebhookconfiguration
-    app.kubernetes.io/part-of: robot-operator
-  name: robot-validating-webhook-configuration
-webhooks:
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: robot-webhook-service
+        namespace: robot-system
+        path: /validate-robot-roboscale-io-v1alpha1-workspacemanager
+    failurePolicy: Fail
+    name: vworkspacemanager.kb.io
+    rules:
+      - apiGroups:
+          - robot.roboscale.io
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - workspacemanagers
+    sideEffects: None
   - admissionReviewVersions:
       - v1
     clientConfig:
@@ -3606,6 +4389,26 @@ webhooks:
       service:
         name: robot-webhook-service
         namespace: robot-system
+        path: /validate-robot-roboscale-io-v1alpha1-metricscollector
+    failurePolicy: Fail
+    name: vmetricscollector.kb.io
+    rules:
+      - apiGroups:
+          - robot.roboscale.io
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - metricscollectors
+    sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: robot-webhook-service
+        namespace: robot-system
         path: /validate-robot-roboscale-io-v1alpha1-robot
     failurePolicy: Fail
     name: vrobot.kb.io
@@ -3619,44 +4422,4 @@ webhooks:
           - UPDATE
         resources:
           - robots
-    sideEffects: None
-  - admissionReviewVersions:
-      - v1
-    clientConfig:
-      service:
-        name: robot-webhook-service
-        namespace: robot-system
-        path: /validate-robot-roboscale-io-v1alpha1-robotide
-    failurePolicy: Fail
-    name: vrobotide.kb.io
-    rules:
-      - apiGroups:
-          - robot.roboscale.io
-        apiVersions:
-          - v1alpha1
-        operations:
-          - CREATE
-          - UPDATE
-        resources:
-          - robotides
-    sideEffects: None
-  - admissionReviewVersions:
-      - v1
-    clientConfig:
-      service:
-        name: robot-webhook-service
-        namespace: robot-system
-        path: /validate-robot-roboscale-io-v1alpha1-robotvdi
-    failurePolicy: Fail
-    name: vrobotvdi.kb.io
-    rules:
-      - apiGroups:
-          - robot.roboscale.io
-        apiVersions:
-          - v1alpha1
-        operations:
-          - CREATE
-          - UPDATE
-        resources:
-          - robotvdis
     sideEffects: None
