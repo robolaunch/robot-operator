@@ -76,6 +76,36 @@ func GetTenancyMap(obj metav1.Object) map[string]string {
 	return tenancyMap
 }
 
+func GetTenancyMapFromTenancy(tenancy Tenancy) map[string]string {
+	tenancyMap := make(map[string]string)
+
+	if tenancy.Organization != "" {
+		tenancyMap[internal.ORGANIZATION_LABEL_KEY] = tenancy.Organization
+	}
+
+	if tenancy.Team != "" {
+		tenancyMap[internal.TEAM_LABEL_KEY] = tenancy.Team
+	}
+
+	if tenancy.Region != "" {
+		tenancyMap[internal.REGION_LABEL_KEY] = tenancy.Region
+	}
+
+	if tenancy.BufferInstance != "" {
+		tenancyMap[internal.BUFFER_INSTANCE_LABEL_KEY] = tenancy.BufferInstance
+	}
+
+	if tenancy.CloudInstance != "" {
+		tenancyMap[internal.CLOUD_INSTANCE_LABEL_KEY] = tenancy.CloudInstance
+	}
+
+	if tenancy.PhysicalInstance != "" {
+		tenancyMap[internal.PHYSICAL_INSTANCE_LABEL_KEY] = tenancy.PhysicalInstance
+	}
+
+	return tenancyMap
+}
+
 type InstanceType string
 
 const (

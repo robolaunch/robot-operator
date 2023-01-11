@@ -141,10 +141,10 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 				configure.GetVolumeXglCache(),
 			},
 			RestartPolicy: corev1.RestartPolicyNever,
-			NodeSelector:  label.GetTenancyMap(&robot),
 		},
 	}
 
+	configure.SchedulePod(vdiPod, label.GetTenancyMap(robotVDI))
 	configure.InjectGenericEnvironmentVariables(vdiPod, robot)
 	configure.InjectPodDiscoveryServerConnection(vdiPod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo)
 	configure.InjectPodDisplayConfiguration(vdiPod, *robotVDI)
