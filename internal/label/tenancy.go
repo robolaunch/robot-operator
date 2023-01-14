@@ -6,12 +6,12 @@ import (
 )
 
 type Tenancy struct {
-	Organization     string
-	Team             string
-	Region           string
-	BufferInstance   string
-	CloudInstance    string
-	PhysicalInstance string
+	Organization       string
+	Team               string
+	Region             string
+	CloudInstance      string
+	CloudInstanceAlias string
+	PhysicalInstance   string
 }
 
 func GetTenancy(obj metav1.Object) *Tenancy {
@@ -30,12 +30,12 @@ func GetTenancy(obj metav1.Object) *Tenancy {
 		tenancy.Region = region
 	}
 
-	if bufferInstance, ok := labels[internal.BUFFER_INSTANCE_LABEL_KEY]; ok {
-		tenancy.BufferInstance = bufferInstance
-	}
-
 	if cloudInstance, ok := labels[internal.CLOUD_INSTANCE_LABEL_KEY]; ok {
 		tenancy.CloudInstance = cloudInstance
+	}
+
+	if cloudInstanceAlias, ok := labels[internal.CLOUD_INSTANCE_ALIAS_LABEL_KEY]; ok {
+		tenancy.CloudInstanceAlias = cloudInstanceAlias
 	}
 
 	if physicalInstance, ok := labels[internal.PHYSICAL_INSTANCE_LABEL_KEY]; ok {
@@ -61,12 +61,12 @@ func GetTenancyMap(obj metav1.Object) map[string]string {
 		tenancyMap[internal.REGION_LABEL_KEY] = region
 	}
 
-	if bufferInstance, ok := labels[internal.BUFFER_INSTANCE_LABEL_KEY]; ok {
-		tenancyMap[internal.BUFFER_INSTANCE_LABEL_KEY] = bufferInstance
-	}
-
 	if cloudInstance, ok := labels[internal.CLOUD_INSTANCE_LABEL_KEY]; ok {
 		tenancyMap[internal.CLOUD_INSTANCE_LABEL_KEY] = cloudInstance
+	}
+
+	if cloudInstanceAlias, ok := labels[internal.CLOUD_INSTANCE_ALIAS_LABEL_KEY]; ok {
+		tenancyMap[internal.CLOUD_INSTANCE_ALIAS_LABEL_KEY] = cloudInstanceAlias
 	}
 
 	if physicalInstance, ok := labels[internal.PHYSICAL_INSTANCE_LABEL_KEY]; ok {
@@ -91,12 +91,12 @@ func GetTenancyMapFromTenancy(tenancy Tenancy) map[string]string {
 		tenancyMap[internal.REGION_LABEL_KEY] = tenancy.Region
 	}
 
-	if tenancy.BufferInstance != "" {
-		tenancyMap[internal.BUFFER_INSTANCE_LABEL_KEY] = tenancy.BufferInstance
-	}
-
 	if tenancy.CloudInstance != "" {
 		tenancyMap[internal.CLOUD_INSTANCE_LABEL_KEY] = tenancy.CloudInstance
+	}
+
+	if tenancy.CloudInstanceAlias != "" {
+		tenancyMap[internal.CLOUD_INSTANCE_ALIAS_LABEL_KEY] = tenancy.CloudInstanceAlias
 	}
 
 	if tenancy.PhysicalInstance != "" {
@@ -127,9 +127,4 @@ func GetClusterName(obj metav1.Object) string {
 		return tenancy.CloudInstance
 	}
 	return tenancy.PhysicalInstance
-}
-
-func GetBufferInstanceName(obj metav1.Object) string {
-	tenancy := GetTenancy(obj)
-	return tenancy.BufferInstance
 }

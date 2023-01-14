@@ -129,10 +129,6 @@ func GetDiscoveryServerDNS(discoveryServer robotv1alpha1.DiscoveryServer) string
 
 	cluster := label.GetClusterName(&discoveryServer)
 
-	if label.GetInstanceType(&discoveryServer) == label.InstanceTypeCloudInstance {
-		cluster = label.GetBufferInstanceName(&discoveryServer)
-	}
-
 	var serviceDNSBuilder strings.Builder
 	if dsConfig.Cluster == cluster {
 		if dsConfig.Type == robotv1alpha1.DiscoveryServerInstanceTypeServer {

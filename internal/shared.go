@@ -4,12 +4,12 @@ import corev1 "k8s.io/api/core/v1"
 
 // Tenancy labels
 const (
-	ORGANIZATION_LABEL_KEY      = "robolaunch.io/organization"
-	TEAM_LABEL_KEY              = "robolaunch.io/team"
-	REGION_LABEL_KEY            = "robolaunch.io/region"
-	BUFFER_INSTANCE_LABEL_KEY   = "robolaunch.io/buffer-instance"
-	CLOUD_INSTANCE_LABEL_KEY    = "robolaunch.io/cloud-instance"
-	PHYSICAL_INSTANCE_LABEL_KEY = "robolaunch.io/physical-instance"
+	ORGANIZATION_LABEL_KEY         = "robolaunch.io/organization"
+	TEAM_LABEL_KEY                 = "robolaunch.io/team"
+	REGION_LABEL_KEY               = "robolaunch.io/region"
+	CLOUD_INSTANCE_LABEL_KEY       = "robolaunch.io/cloud-instance"
+	CLOUD_INSTANCE_ALIAS_LABEL_KEY = "robolaunch.io/cloud-instance-alias"
+	PHYSICAL_INSTANCE_LABEL_KEY    = "robolaunch.io/physical-instance"
 )
 
 // Ready robot label
