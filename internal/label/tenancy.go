@@ -6,11 +6,12 @@ import (
 )
 
 type Tenancy struct {
-	Organization     string
-	Team             string
-	Region           string
-	CloudInstance    string
-	PhysicalInstance string
+	Organization       string
+	Team               string
+	Region             string
+	CloudInstance      string
+	CloudInstanceAlias string
+	PhysicalInstance   string
 }
 
 func GetTenancy(obj metav1.Object) *Tenancy {
@@ -31,6 +32,10 @@ func GetTenancy(obj metav1.Object) *Tenancy {
 
 	if cloudInstance, ok := labels[internal.CLOUD_INSTANCE_LABEL_KEY]; ok {
 		tenancy.CloudInstance = cloudInstance
+	}
+
+	if cloudInstanceAlias, ok := labels[internal.CLOUD_INSTANCE_ALIAS_LABEL_KEY]; ok {
+		tenancy.CloudInstanceAlias = cloudInstanceAlias
 	}
 
 	if physicalInstance, ok := labels[internal.PHYSICAL_INSTANCE_LABEL_KEY]; ok {
@@ -60,6 +65,10 @@ func GetTenancyMap(obj metav1.Object) map[string]string {
 		tenancyMap[internal.CLOUD_INSTANCE_LABEL_KEY] = cloudInstance
 	}
 
+	if cloudInstanceAlias, ok := labels[internal.CLOUD_INSTANCE_ALIAS_LABEL_KEY]; ok {
+		tenancyMap[internal.CLOUD_INSTANCE_ALIAS_LABEL_KEY] = cloudInstanceAlias
+	}
+
 	if physicalInstance, ok := labels[internal.PHYSICAL_INSTANCE_LABEL_KEY]; ok {
 		tenancyMap[internal.PHYSICAL_INSTANCE_LABEL_KEY] = physicalInstance
 	}
@@ -84,6 +93,10 @@ func GetTenancyMapFromTenancy(tenancy Tenancy) map[string]string {
 
 	if tenancy.CloudInstance != "" {
 		tenancyMap[internal.CLOUD_INSTANCE_LABEL_KEY] = tenancy.CloudInstance
+	}
+
+	if tenancy.CloudInstanceAlias != "" {
+		tenancyMap[internal.CLOUD_INSTANCE_ALIAS_LABEL_KEY] = tenancy.CloudInstanceAlias
 	}
 
 	if tenancy.PhysicalInstance != "" {
