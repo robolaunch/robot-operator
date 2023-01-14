@@ -7,7 +7,6 @@ const (
 	ORGANIZATION_LABEL_KEY      = "robolaunch.io/organization"
 	TEAM_LABEL_KEY              = "robolaunch.io/team"
 	REGION_LABEL_KEY            = "robolaunch.io/region"
-	BUFFER_INSTANCE_LABEL_KEY   = "robolaunch.io/buffer-instance"
 	CLOUD_INSTANCE_LABEL_KEY    = "robolaunch.io/cloud-instance"
 	PHYSICAL_INSTANCE_LABEL_KEY = "robolaunch.io/physical-instance"
 )
