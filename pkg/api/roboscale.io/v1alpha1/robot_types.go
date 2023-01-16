@@ -121,6 +121,21 @@ const (
 	ROSDistroHumble ROSDistro = "humble"
 )
 
+// RMW implementation selection. Robot operator currently supports only FastRTPS. See https://docs.ros.org/en/foxy/How-To-Guides/Working-with-multiple-RMW-implementations.html.
+// +kubebuilder:validation:Enum=rmw_fastrtps_cpp
+type RMWImplementation string
+
+const (
+	// Cyclone DDS
+	RMWImplementationCycloneDDS ROSDistro = "rmw_cyclonedds_cpp"
+	// FastRTPS
+	RMWImplementationFastRTPS ROSDistro = "rmw_fastrtps_cpp"
+	// Connext
+	RMWImplementationConnext ROSDistro = "rmw_connext_cpp"
+	// Gurum DDS
+	RMWImplementationGurumDDS ROSDistro = "rmw_gurumdds_cpp"
+)
+
 // Storage class configuration for a volume type.
 type StorageClassConfig struct {
 	// Storage class name
@@ -160,6 +175,9 @@ type RobotSpec struct {
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=2
 	Distributions []ROSDistro `json:"distributions"`
+	// +kubebuilder:validation:Required
+	// +kubebuilder:default=rmw_fastrtps_cpp
+	RMWImplementation RMWImplementation `json:"rmwImplementation"`
 	// Resource limitations of robot containers.
 	Storage Storage `json:"storage,omitempty"`
 	// Discovery server template

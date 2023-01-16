@@ -452,6 +452,13 @@ spec:
                       type: object
                   type: object
                 type: array
+              rmwImplementation:
+                default: rmw_fastrtps_cpp
+                description: RMW implementation selection. Robot operator currently
+                  supports only FastRTPS. See https://docs.ros.org/en/foxy/How-To-Guides/Working-with-multiple-RMW-implementations.html.
+                enum:
+                - rmw_fastrtps_cpp
+                type: string
               robotDevSuiteTemplate:
                 description: Robot development suite template
                 properties:
@@ -667,6 +674,7 @@ spec:
                 type: object
             required:
             - distributions
+            - rmwImplementation
             type: object
           status:
             description: RobotStatus defines the observed state of Robot

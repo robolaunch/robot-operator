@@ -118,9 +118,10 @@ func GetLoaderJob(robot *robotv1alpha1.Robot, jobNamespacedName *types.Namespace
 	clonerCmdBuilder.WriteString("echo \"DONE\"")
 
 	copierContainer := corev1.Container{
-		Name:    "copier",
-		Image:   robot.Status.Image,
-		Command: internal.Bash(copierCmdBuilder.String()),
+		Name:            "copier",
+		Image:           robot.Status.Image,
+		Command:         internal.Bash(copierCmdBuilder.String()),
+		ImagePullPolicy: corev1.PullAlways,
 		VolumeMounts: []corev1.VolumeMount{
 			configure.GetVolumeMount("/ros/", configure.GetVolumeVar(robot)),
 			configure.GetVolumeMount("/ros/", configure.GetVolumeUsr(robot)),
@@ -179,9 +180,10 @@ func GetLoaderJob(robot *robotv1alpha1.Robot, jobNamespacedName *types.Namespace
 		driverInstallerCmdBuilder.WriteString(filepath.Join("/etc", "vdi", "install-driver.sh"))
 
 		driverInstaller := corev1.Container{
-			Name:    "driver-installer",
-			Image:   robot.Status.Image,
-			Command: internal.Bash(driverInstallerCmdBuilder.String()),
+			Name:            "driver-installer",
+			Image:           robot.Status.Image,
+			Command:         internal.Bash(driverInstallerCmdBuilder.String()),
+			ImagePullPolicy: corev1.PullAlways,
 			VolumeMounts: []corev1.VolumeMount{
 				configure.GetVolumeMount("", configure.GetVolumeVar(robot)),
 				configure.GetVolumeMount("", configure.GetVolumeUsr(robot)),
