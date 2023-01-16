@@ -210,6 +210,15 @@ func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *ro
 
 								}
 
+							case false:
+
+								instance.Status.Phase = robotv1alpha1.RobotPhaseEnvironmentReady
+
+								err := r.reconcileHandleAttachments(ctx, instance)
+								if err != nil {
+									return err
+								}
+
 							}
 
 						case false:
