@@ -8,13 +8,6 @@ import (
 
 func InjectRMWImplementationConfiguration(pod *corev1.Pod, robot robotv1alpha1.Robot) *corev1.Pod {
 
-	placeRMWImplementationEnvironmentVariables(pod, robot)
-
-	return pod
-}
-
-func placeRMWImplementationEnvironmentVariables(pod *corev1.Pod, robot robotv1alpha1.Robot) {
-
 	environmentVariables := []corev1.EnvVar{
 		internal.Env("RMW_IMPLEMENTATION", string(robot.Spec.RMWImplementation)),
 	}
@@ -24,4 +17,19 @@ func placeRMWImplementationEnvironmentVariables(pod *corev1.Pod, robot robotv1al
 		pod.Spec.Containers[k] = container
 	}
 
+	return pod
+}
+
+func InjectRMWImplementationConfigurationForPodSpec(podSpec *corev1.PodSpec, robot robotv1alpha1.Robot) *corev1.PodSpec {
+
+	environmentVariables := []corev1.EnvVar{
+		internal.Env("RMW_IMPLEMENTATION", string(robot.Spec.RMWImplementation)),
+	}
+
+	for k, container := range podSpec.Containers {
+		container.Env = append(container.Env, environmentVariables...)
+		podSpec.Containers[k] = container
+	}
+
+	return podSpec
 }
