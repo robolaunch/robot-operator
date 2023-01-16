@@ -436,6 +436,18 @@ spec:
                           repository:
                             description: Name of the repository.
                             type: string
+                          resources:
+                            description: Launch container resource limits.
+                            properties:
+                              cpu:
+                                pattern: ^([0-9])+(m)$
+                                type: string
+                              gpuCore:
+                                type: integer
+                              memory:
+                                pattern: ^([0-9])+(Mi|Gi)$
+                                type: string
+                            type: object
                           selector:
                             additionalProperties:
                               type: string

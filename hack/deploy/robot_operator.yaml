@@ -559,6 +559,18 @@ spec:
                       repository:
                         description: Name of the repository.
                         type: string
+                      resources:
+                        description: Launch container resource limits.
+                        properties:
+                          cpu:
+                            pattern: ^([0-9])+(m)$
+                            type: string
+                          gpuCore:
+                            type: integer
+                          memory:
+                            pattern: ^([0-9])+(Mi|Gi)$
+                            type: string
+                        type: object
                       selector:
                         additionalProperties:
                           type: string
@@ -1254,6 +1266,18 @@ spec:
                             repository:
                               description: Name of the repository.
                               type: string
+                            resources:
+                              description: Launch container resource limits.
+                              properties:
+                                cpu:
+                                  pattern: ^([0-9])+(m)$
+                                  type: string
+                                gpuCore:
+                                  type: integer
+                                memory:
+                                  pattern: ^([0-9])+(Mi|Gi)$
+                                  type: string
+                              type: object
                             selector:
                               additionalProperties:
                                 type: string
@@ -2031,6 +2055,18 @@ spec:
                             repository:
                               description: Name of the repository.
                               type: string
+                            resources:
+                              description: Launch container resource limits.
+                              properties:
+                                cpu:
+                                  pattern: ^([0-9])+(m)$
+                                  type: string
+                                gpuCore:
+                                  type: integer
+                                memory:
+                                  pattern: ^([0-9])+(Mi|Gi)$
+                                  type: string
+                              type: object
                             selector:
                               additionalProperties:
                                 type: string
@@ -4042,7 +4078,7 @@ spec:
             - --leader-elect
           command:
             - /manager
-          image: robolaunchio/robot-controller-manager:v0.1.7
+          image: robolaunchio/robot-controller-manager:v0.1.8
           livenessProbe:
             httpGet:
               path: /healthz
