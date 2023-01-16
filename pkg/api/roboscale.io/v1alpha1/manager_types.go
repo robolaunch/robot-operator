@@ -234,6 +234,8 @@ type Launch struct {
 	Prelaunch Prelaunch `json:"prelaunch,omitempty"`
 	// Launch container privilege.
 	Privileged bool `json:"privileged,omitempty"`
+	// Launch container resource limits.
+	Resources Resources `json:"resources,omitempty"`
 }
 
 // LaunchManagerSpec defines the desired state of LaunchManager

@@ -94,6 +94,9 @@ func getLaunchContainer(launch robotv1alpha1.Launch, launchName string, robot ro
 			configure.GetVolumeMount(robot.Spec.WorkspaceManagerTemplate.WorkspacesPath, configure.GetVolumeWorkspace(&robot)),
 			configure.GetVolumeMount(internal.CUSTOM_SCRIPTS_PATH, configure.GetVolumeConfigMaps(&buildManager)),
 		},
+		Resources: corev1.ResourceRequirements{
+			Limits: getResourceLimits(launch.Resources),
+		},
 		Env: []corev1.EnvVar{
 			GeneratePrelaunchCommandAsEnv(launch, robot),
 			GenerateRunCommandAsEnv(launch, robot),
