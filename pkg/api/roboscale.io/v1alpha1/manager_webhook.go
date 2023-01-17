@@ -294,8 +294,18 @@ func (r *LaunchManager) checkTargetRobotLabel() error {
 func (r *LaunchManager) checkTargetRobotVDILabel() error {
 	labels := r.GetLabels()
 
-	if _, ok := labels[internal.TARGET_VDI_LABEL_KEY]; !ok {
-		return errors.New("target robot vdi label should be added with key " + internal.TARGET_VDI_LABEL_KEY)
+	needDisplay := false
+	for _, l := range r.Spec.Launch {
+		if l.Display {
+			needDisplay = true
+			break
+		}
+	}
+
+	if needDisplay {
+		if _, ok := labels[internal.TARGET_VDI_LABEL_KEY]; !ok {
+			return errors.New("target robot vdi label should be added with key " + internal.TARGET_VDI_LABEL_KEY)
+		}
 	}
 
 	return nil
