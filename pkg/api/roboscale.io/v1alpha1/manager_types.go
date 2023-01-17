@@ -240,7 +240,9 @@ type Launch struct {
 
 // LaunchManagerSpec defines the desired state of LaunchManager
 type LaunchManagerSpec struct {
-	Launch map[string]Launch `json:"launch,omitempty"`
+	// Display connection.
+	Display bool              `json:"display,omitempty"`
+	Launch  map[string]Launch `json:"launch,omitempty"`
 }
 
 type LaunchStatus struct {

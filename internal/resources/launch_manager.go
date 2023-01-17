@@ -58,7 +58,8 @@ func GetLaunchPod(launchManager *robotv1alpha1.LaunchManager, podNamespacedName 
 	configure.InjectGenericEnvironmentVariables(&launchPod, robot)                                                     // Environment variables
 	configure.InjectRMWImplementationConfiguration(&launchPod, robot)                                                  // RMW implementation configuration
 	configure.InjectPodDiscoveryServerConnection(&launchPod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo) // Discovery server configuration
-	if label.GetTargetRobotVDI(launchManager) != "" {
+	if launchManager.Spec.Display && label.GetTargetRobotVDI(launchManager) != "" {
+		// TODO: Add control for validating robot VDI
 		configure.InjectPodDisplayConfiguration(&launchPod, robotVDI) // Display configuration
 	}
 
