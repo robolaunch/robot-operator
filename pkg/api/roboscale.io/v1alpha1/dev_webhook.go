@@ -89,8 +89,10 @@ func (r *RobotIDE) checkTargetRobotLabel() error {
 func (r *RobotIDE) checkTargetRobotVDILabel() error {
 	labels := r.GetLabels()
 
-	if _, ok := labels[internal.TARGET_VDI_LABEL_KEY]; !ok {
-		return errors.New("target robot vdi label should be added with key " + internal.TARGET_VDI_LABEL_KEY)
+	if r.Spec.Display {
+		if _, ok := labels[internal.TARGET_VDI_LABEL_KEY]; !ok {
+			return errors.New("target robot vdi label should be added with key " + internal.TARGET_VDI_LABEL_KEY)
+		}
 	}
 
 	return nil
