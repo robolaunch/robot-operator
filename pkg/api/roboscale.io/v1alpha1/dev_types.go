@@ -136,6 +136,8 @@ type RobotIDESpec struct {
 	ServiceType corev1.ServiceType `json:"serviceType,omitempty"`
 	Ingress     bool               `json:"ingress,omitempty"`
 	Privileged  bool               `json:"privileged,omitempty"`
+	// Display configuration.
+	Display bool `json:"display,omitempty"`
 }
 
 type RobotIDEPodStatus struct {
