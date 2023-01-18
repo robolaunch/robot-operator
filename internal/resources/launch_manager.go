@@ -112,6 +112,26 @@ func getLaunchContainer(launch robotv1alpha1.Launch, launchName string, robot ro
 	return container
 }
 
+func HasLaunchInThisInstance(launchManager *robotv1alpha1.LaunchManager, robot robotv1alpha1.Robot) bool {
+
+	for _, l := range launchManager.Spec.Launch {
+		if physicalInstance, ok := l.Selector[internal.PHYSICAL_INSTANCE_LABEL_KEY]; ok {
+			if physicalInstance == label.GetClusterName(&robot) {
+				return true
+			}
+		} else if cloudInstance, ok := l.Selector[internal.CLOUD_INSTANCE_LABEL_KEY]; ok {
+			if cloudInstance == label.GetClusterName(&robot) {
+				return true
+
+			}
+		} else {
+			return true
+		}
+	}
+
+	return false
+}
+
 func GetWorkspaceSourceFilePath(workspacesPath string, wsName string, distro robotv1alpha1.ROSDistro) string {
 	return filepath.Join(workspacesPath, wsName, getWsSubDir(distro), "setup.bash")
 }
