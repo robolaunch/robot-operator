@@ -112,7 +112,7 @@ func getLaunchContainer(launch robotv1alpha1.Launch, launchName string, robot ro
 	return container
 }
 
-func HasLaunchInThisInstance(launchManager *robotv1alpha1.LaunchManager, robot robotv1alpha1.Robot) bool {
+func HasLaunchInThisInstance(launchManager robotv1alpha1.LaunchManager, robot robotv1alpha1.Robot) bool {
 
 	for _, l := range launchManager.Spec.Launch {
 		if physicalInstance, ok := l.Selector[internal.PHYSICAL_INSTANCE_LABEL_KEY]; ok {
