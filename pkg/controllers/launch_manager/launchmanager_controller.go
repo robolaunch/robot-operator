@@ -36,6 +36,7 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/robolaunch/robot-operator/internal"
+	"github.com/robolaunch/robot-operator/internal/resources"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 )
 
@@ -102,25 +103,39 @@ func (r *LaunchManagerReconciler) reconcileCheckStatus(ctx context.Context, inst
 	switch instance.Status.Active {
 	case true:
 
-		switch instance.Status.LaunchPodStatus.Created {
+		robot, err := r.reconcileGetTargetRobot(ctx, instance)
+		if err != nil {
+			return err
+		}
+
+		switch resources.HasLaunchInThisInstance(*instance, *robot) {
 		case true:
 
-			switch instance.Status.LaunchPodStatus.Phase {
-			case v1.PodRunning:
+			switch instance.Status.LaunchPodStatus.Created {
+			case true:
 
-				instance.Status.Phase = robotv1alpha1.LaunchManagerPhaseReady
+				switch instance.Status.LaunchPodStatus.Phase {
+				case v1.PodRunning:
+
+					instance.Status.Phase = robotv1alpha1.LaunchManagerPhaseReady
+
+				}
+
+			case false:
+
+				instance.Status.Phase = robotv1alpha1.LaunchManagerPhaseCreatingPod
+				err := r.createLaunchPod(ctx, instance)
+				if err != nil {
+					return err
+				}
+				instance.Status.LaunchPodStatus.Created = true
+				instance.Status.Phase = robotv1alpha1.LaunchManagerPhaseLaunching
 
 			}
 
 		case false:
 
-			instance.Status.Phase = robotv1alpha1.LaunchManagerPhaseCreatingPod
-			err := r.createLaunchPod(ctx, instance)
-			if err != nil {
-				return err
-			}
-			instance.Status.LaunchPodStatus.Created = true
-			instance.Status.Phase = robotv1alpha1.LaunchManagerPhaseLaunching
+			instance.Status.Phase = robotv1alpha1.LaunchManagerPhaseReady
 
 		}
 
