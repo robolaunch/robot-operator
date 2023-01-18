@@ -35,6 +35,9 @@ spec:
           spec:
             description: RobotIDESpec defines the desired state of RobotIDE
             properties:
+              display:
+                description: Display configuration.
+                type: boolean
               ingress:
                 type: boolean
               privileged:

@@ -284,6 +284,9 @@ spec:
                 items:
                   description: LaunchManagerSpec defines the desired state of LaunchManager
                   properties:
+                    display:
+                      description: Display connection.
+                      type: boolean
                     launch:
                       additionalProperties:
                         description: Launch description of a repository.
@@ -479,6 +482,9 @@ spec:
                   robotIDETemplate:
                     description: RobotIDESpec defines the desired state of RobotIDE
                     properties:
+                      display:
+                        description: Display configuration.
+                        type: boolean
                       ingress:
                         type: boolean
                       privileged:
