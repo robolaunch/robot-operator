@@ -187,9 +187,15 @@ spec:
               discoveryServerTemplate:
                 description: Discovery server template
                 properties:
+                  args:
+                    items:
+                      type: string
+                    type: array
                   cluster:
                     type: string
                   hostname:
+                    type: string
+                  image:
                     type: string
                   reference:
                     description: "ObjectReference contains enough information to let
