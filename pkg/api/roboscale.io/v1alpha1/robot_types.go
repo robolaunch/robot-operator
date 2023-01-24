@@ -316,6 +316,8 @@ type DiscoveryServerSpec struct {
 	Cluster   string                      `json:"cluster,omitempty"`
 	Hostname  string                      `json:"hostname,omitempty"`
 	Subdomain string                      `json:"subdomain,omitempty"`
+	Image     string                      `json:"image,omitempty"`
+	Args      []string                    `json:"args,omitempty"`
 }
 
 type DiscoveryServerServiceStatus struct {

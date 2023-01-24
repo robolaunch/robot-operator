@@ -29,12 +29,8 @@ func GetDiscoveryServerPod(discoveryServer *robotv1alpha1.DiscoveryServer, podNa
 	containers := []corev1.Container{
 		{
 			Name:  "discovery-server",
-			Image: "deeyi2000/ubuntu-fastdds-suite:v2.4.0",
-			Args: []string{
-				"fast-discovery-server-1.0.0",
-				"-i",
-				"0",
-			},
+			Image: discoveryServer.Spec.Image,
+			Args:  discoveryServer.Spec.Args,
 			Ports: []corev1.ContainerPort{
 				{
 					Name:          discoveryServerPortName,
