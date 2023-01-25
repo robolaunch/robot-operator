@@ -1,0 +1,18 @@
+name: Technical Story
+description: Describe the technical requirements or use-cases for this repository
+labels: ["tech-story"]
+body:
+  - type: textarea
+    id: story
+    attributes:
+      label: "The Technical Story"
+    validations:
+      required: true
+
+  - type: textarea
+    id: parent-story
+    attributes:
+      label: Parent Story
+      value: Choose parent story or stories from robolaunch/robolaunch.
+    validations:
+      required: true
