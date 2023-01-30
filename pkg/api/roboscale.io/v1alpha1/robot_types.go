@@ -105,7 +105,7 @@ type RobotArtifactList struct {
 // ********************************
 
 // ROS distro selection. Allowed distros are Foxy and Galactic. It is aimed to support Humble, Melodic and Noetic in further versions.
-// +kubebuilder:validation:Enum=foxy;galactic;noetic;melodic
+// +kubebuilder:validation:Enum=foxy;galactic;noetic;melodic;humble
 type ROSDistro string
 
 const (
