@@ -127,13 +127,13 @@ type RMWImplementation string
 
 const (
 	// Cyclone DDS
-	RMWImplementationCycloneDDS ROSDistro = "rmw_cyclonedds_cpp"
+	RMWImplementationCycloneDDS RMWImplementation = "rmw_cyclonedds_cpp"
 	// FastRTPS
-	RMWImplementationFastRTPS ROSDistro = "rmw_fastrtps_cpp"
+	RMWImplementationFastRTPS RMWImplementation = "rmw_fastrtps_cpp"
 	// Connext
-	RMWImplementationConnext ROSDistro = "rmw_connext_cpp"
+	RMWImplementationConnext RMWImplementation = "rmw_connext_cpp"
 	// Gurum DDS
-	RMWImplementationGurumDDS ROSDistro = "rmw_gurumdds_cpp"
+	RMWImplementationGurumDDS RMWImplementation = "rmw_gurumdds_cpp"
 )
 
 // Storage class configuration for a volume type.
