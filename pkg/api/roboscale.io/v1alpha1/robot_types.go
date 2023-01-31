@@ -15,7 +15,7 @@ func init() {
 //+genclient
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
-//+kubebuilder:printcolumn:name="Distro",type=string,JSONPath=`.spec.distro`
+//+kubebuilder:printcolumn:name="Distributions",type=string,JSONPath=`.spec.distributions`
 //+kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
 
 // Robot is the Schema for the robots API
