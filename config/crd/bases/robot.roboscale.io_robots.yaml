@@ -16,8 +16,8 @@ spec:
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
-    - jsonPath: .spec.distro
-      name: Distro
+    - jsonPath: .spec.distributions
+      name: Distributions
       type: string
     - jsonPath: .status.phase
       name: Phase

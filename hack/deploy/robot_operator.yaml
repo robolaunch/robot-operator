@@ -1158,6 +1158,7 @@ spec:
                       - galactic
                       - noetic
                       - melodic
+                      - humble
                     type: string
                   maxItems: 2
                   minItems: 1
@@ -1412,6 +1413,7 @@ spec:
                             - galactic
                             - noetic
                             - melodic
+                            - humble
                           type: string
                         enabled:
                           type: boolean
@@ -1425,6 +1427,7 @@ spec:
                             - galactic
                             - noetic
                             - melodic
+                            - humble
                           type: string
                         enabled:
                           type: boolean
@@ -1479,6 +1482,7 @@ spec:
                               - galactic
                               - noetic
                               - melodic
+                              - humble
                             type: string
                           name:
                             description: Name of workspace. If a workspace's name is `my_ws`, it's absolute path is `/home/workspaces/my_ws`.
@@ -1778,8 +1782,8 @@ spec:
   scope: Namespaced
   versions:
     - additionalPrinterColumns:
-        - jsonPath: .spec.distro
-          name: Distro
+        - jsonPath: .spec.distributions
+          name: Distributions
           type: string
         - jsonPath: .status.phase
           name: Phase
@@ -1965,6 +1969,7 @@ spec:
                       - galactic
                       - noetic
                       - melodic
+                      - humble
                     type: string
                   maxItems: 2
                   minItems: 1
@@ -2219,6 +2224,7 @@ spec:
                             - galactic
                             - noetic
                             - melodic
+                            - humble
                           type: string
                         enabled:
                           type: boolean
@@ -2232,6 +2238,7 @@ spec:
                             - galactic
                             - noetic
                             - melodic
+                            - humble
                           type: string
                         enabled:
                           type: boolean
@@ -2286,6 +2293,7 @@ spec:
                               - galactic
                               - noetic
                               - melodic
+                              - humble
                             type: string
                           name:
                             description: Name of workspace. If a workspace's name is `my_ws`, it's absolute path is `/home/workspaces/my_ws`.
@@ -3105,6 +3113,7 @@ spec:
                         - galactic
                         - noetic
                         - melodic
+                        - humble
                       type: string
                     enabled:
                       type: boolean
@@ -3118,6 +3127,7 @@ spec:
                         - galactic
                         - noetic
                         - melodic
+                        - humble
                       type: string
                     enabled:
                       type: boolean
@@ -3397,6 +3407,7 @@ spec:
                           - galactic
                           - noetic
                           - melodic
+                          - humble
                         type: string
                       name:
                         description: Name of workspace. If a workspace's name is `my_ws`, it's absolute path is `/home/workspaces/my_ws`.
@@ -4117,7 +4128,7 @@ spec:
             - --leader-elect
           command:
             - /manager
-          image: robolaunchio/robot-controller-manager:v0.2.0
+          image: robolaunchio/robot-controller-manager:v0.2.2
           livenessProbe:
             httpGet:
               path: /healthz
@@ -4357,6 +4368,26 @@ webhooks:
         resources:
           - robots
     sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: robot-webhook-service
+        namespace: robot-system
+        path: /mutate-robot-roboscale-io-v1alpha1-discoveryserver
+    failurePolicy: Fail
+    name: mdiscoveryserver.kb.io
+    rules:
+      - apiGroups:
+          - robot.roboscale.io
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - discoveryservers
+    sideEffects: None
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
@@ -4511,4 +4542,24 @@ webhooks:
           - UPDATE
         resources:
           - robots
+    sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: robot-webhook-service
+        namespace: robot-system
+        path: /validate-robot-roboscale-io-v1alpha1-discoveryserver
+    failurePolicy: Fail
+    name: vdiscoveryserver.kb.io
+    rules:
+      - apiGroups:
+          - robot.roboscale.io
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - discoveryservers
     sideEffects: None
