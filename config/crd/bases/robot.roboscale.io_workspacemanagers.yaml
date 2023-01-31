@@ -54,6 +54,7 @@ spec:
                       - galactic
                       - noetic
                       - melodic
+                      - humble
                       type: string
                     name:
                       description: Name of workspace. If a workspace's name is `my_ws`,

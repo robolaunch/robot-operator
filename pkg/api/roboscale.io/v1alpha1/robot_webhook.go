@@ -2,8 +2,10 @@ package v1alpha1
 
 import (
 	"errors"
+	"reflect"
 
 	"github.com/robolaunch/robot-operator/internal"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
@@ -240,6 +242,10 @@ func (r *DiscoveryServer) checkContainerInfo() error {
 
 		if len(r.Spec.Args) == 0 {
 			return errors.New("discovery server entrypoint should be set if the type is server")
+		}
+
+		if !reflect.DeepEqual(r.Spec.Reference, corev1.ObjectReference{}) {
+			return errors.New("reference should be nil if the type is server")
 		}
 	}
 

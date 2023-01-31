@@ -51,6 +51,7 @@ func GetLaunchPod(launchManager *robotv1alpha1.LaunchManager, podNamespacedName 
 				configure.GetVolumeConfigMaps(&buildManager),
 			},
 			RestartPolicy: corev1.RestartPolicyNever,
+			NodeSelector:  label.GetTenancyMap(&robot),
 		},
 	}
 

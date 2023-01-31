@@ -274,6 +274,7 @@ spec:
                   - galactic
                   - noetic
                   - melodic
+                  - humble
                   type: string
                 maxItems: 2
                 minItems: 1
@@ -569,6 +570,7 @@ spec:
                         - galactic
                         - noetic
                         - melodic
+                        - humble
                         type: string
                       enabled:
                         type: boolean
@@ -584,6 +586,7 @@ spec:
                         - galactic
                         - noetic
                         - melodic
+                        - humble
                         type: string
                       enabled:
                         type: boolean
@@ -642,6 +645,7 @@ spec:
                           - galactic
                           - noetic
                           - melodic
+                          - humble
                           type: string
                         name:
                           description: Name of workspace. If a workspace's name is
