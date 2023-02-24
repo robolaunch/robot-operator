@@ -168,6 +168,11 @@ spec:
                     script:
                       description: Bash script to run.
                       type: string
+                    selector:
+                      additionalProperties:
+                        type: string
+                      description: Cluster selector.
+                      type: object
                     workspace:
                       description: Name of the workspace.
                       type: string
@@ -331,6 +336,11 @@ spec:
                         script:
                           description: Bash script to run.
                           type: string
+                        selector:
+                          additionalProperties:
+                            type: string
+                          description: Cluster selector.
+                          type: object
                         workspace:
                           description: Name of the workspace.
                           type: string
