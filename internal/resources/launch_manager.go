@@ -100,8 +100,8 @@ func getLaunchContainer(launch robotv1alpha1.Launch, launchName string, robot ro
 			Limits: getResourceLimits(launch.Resources),
 		},
 		Env: []corev1.EnvVar{
-			GeneratePrelaunchCommandAsEnv(launch, robot),
-			GenerateRunCommandAsEnv(launch, robot),
+			GeneratePrelaunchCommandAsEnv(launch.Prelaunch, robot),
+			GenerateLaunchCommandAsEnv(launch, robot),
 		},
 		ImagePullPolicy:          corev1.PullAlways,
 		TerminationMessagePolicy: corev1.TerminationMessageReadFile,
@@ -141,7 +141,7 @@ func GetLaunchfilePathAbsolute(workspacesPath string, wsName string, repoName st
 	return filepath.Join(workspacesPath, wsName, "src", repoName, lfRelativePath)
 }
 
-func GenerateRunCommandAsEnv(launch robotv1alpha1.Launch, robot robotv1alpha1.Robot) corev1.EnvVar {
+func GenerateLaunchCommandAsEnv(launch robotv1alpha1.Launch, robot robotv1alpha1.Robot) corev1.EnvVar {
 
 	robotName := robot.Name
 	robotSpec := robot.Spec
@@ -168,10 +168,37 @@ func GenerateRunCommandAsEnv(launch robotv1alpha1.Launch, robot robotv1alpha1.Ro
 	return internal.Env(commandKey, cmdBuilder.String())
 }
 
-func GeneratePrelaunchCommandAsEnv(launch robotv1alpha1.Launch, robot robotv1alpha1.Robot) corev1.EnvVar {
+func GenerateRunCommandAsEnv(run robotv1alpha1.Run, robot robotv1alpha1.Robot) corev1.EnvVar {
+
+	robotName := robot.Name
+
+	commandKey := "COMMAND"
+
+	var parameterBuilder strings.Builder
+	if run.Namespacing {
+		rosNs := strings.ReplaceAll(robotName, "-", "_")
+		run.Parameters["__ns"] = rosNs
+	}
+	if len(run.Parameters) > 0 {
+		parameterBuilder.WriteString("--ros-args ")
+	}
+	for key, val := range run.Parameters {
+		parameterBuilder.WriteString("-r " + key + ":=" + val + " ")
+	}
+
+	var cmdBuilder strings.Builder
+
+	cmdBuilder.WriteString("ros2 run ")
+	cmdBuilder.WriteString(run.Package + " " + run.Executable + " ")
+	cmdBuilder.WriteString(parameterBuilder.String())
+
+	return internal.Env(commandKey, cmdBuilder.String())
+}
+
+func GeneratePrelaunchCommandAsEnv(prelaunch robotv1alpha1.Prelaunch, robot robotv1alpha1.Robot) corev1.EnvVar {
 
 	commandKey := "PRELAUNCH"
-	command := launch.Prelaunch.Command
+	command := prelaunch.Command
 
 	if command == "" {
 		command = "sleep 1"
