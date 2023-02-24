@@ -272,6 +272,7 @@ type LaunchManagerSpec struct {
 	// Display connection.
 	Display bool              `json:"display,omitempty"`
 	Launch  map[string]Launch `json:"launch,omitempty"`
+	Run     map[string]Run    `json:"run,omitempty"`
 }
 
 type LaunchStatus struct {
