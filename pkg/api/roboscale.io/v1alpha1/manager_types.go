@@ -240,6 +240,33 @@ type Launch struct {
 	Resources Resources `json:"resources,omitempty"`
 }
 
+// Run description.
+type Run struct {
+	// Cluster selector.
+	Selector map[string]string `json:"selector,omitempty"`
+	// Name of the workspace.
+	// +kubebuilder:validation:Required
+	Workspace string `json:"workspace"`
+	// Name of the repository.
+	// +kubebuilder:validation:Required
+	Namespacing bool `json:"namespacing,omitempty"`
+	// Additional environment variables to set when launching ROS nodes.
+	Env []corev1.EnvVar `json:"env,omitempty"`
+	// Package name in `ros2 run <package> <executable>`.
+	// +kubebuilder:validation:Required
+	Package string `json:"package"`
+	// Executable name in `ros2 run <package> <executable>`.
+	Executable string `json:"executable"`
+	// Launch parameters.
+	Parameters map[string]string `json:"parameters,omitempty"`
+	// Command or script to run just before node's execution.
+	Prelaunch Prelaunch `json:"prelaunch,omitempty"`
+	// Launch container privilege.
+	Privileged bool `json:"privileged,omitempty"`
+	// Launch container resource limits.
+	Resources Resources `json:"resources,omitempty"`
+}
+
 // LaunchManagerSpec defines the desired state of LaunchManager
 type LaunchManagerSpec struct {
 	// Display connection.
