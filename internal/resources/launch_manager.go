@@ -113,6 +113,52 @@ func getLaunchContainer(launch robotv1alpha1.Launch, launchName string, robot ro
 	return container
 }
 
+func getRunContainer(run robotv1alpha1.Run, launchName string, robot robotv1alpha1.Robot, buildManager robotv1alpha1.BuildManager) corev1.Container {
+
+	sleepTimeInt := 3
+	sleepTime := strconv.Itoa(sleepTimeInt)
+
+	workspace, _ := robot.GetWorkspaceByName(run.Workspace)
+
+	var cmdBuilder strings.Builder
+	cmdBuilder.WriteString("echo \"Starting node in " + sleepTime + " seconds...\" && ")
+	cmdBuilder.WriteString("sleep " + sleepTime + " && ")
+	cmdBuilder.WriteString("source " + filepath.Join("/opt", "ros", string(workspace.Distro), "setup.bash") + " && ")
+	cmdBuilder.WriteString("source " + filepath.Join("$WORKSPACES_PATH", run.Workspace, getWsSubDir(workspace.Distro), "setup.bash") + " && ")
+	cmdBuilder.WriteString("$PRELAUNCH; ")
+	cmdBuilder.WriteString("$COMMAND")
+
+	container := corev1.Container{
+		Name:    launchName,
+		Image:   robot.Status.Image,
+		Command: internal.Bash(cmdBuilder.String()),
+		Stdin:   true,
+		TTY:     true,
+		VolumeMounts: []corev1.VolumeMount{
+			configure.GetVolumeMount("", configure.GetVolumeVar(&robot)),
+			configure.GetVolumeMount("", configure.GetVolumeUsr(&robot)),
+			configure.GetVolumeMount("", configure.GetVolumeOpt(&robot)),
+			configure.GetVolumeMount("", configure.GetVolumeEtc(&robot)),
+			configure.GetVolumeMount(robot.Spec.WorkspaceManagerTemplate.WorkspacesPath, configure.GetVolumeWorkspace(&robot)),
+			configure.GetVolumeMount(internal.CUSTOM_SCRIPTS_PATH, configure.GetVolumeConfigMaps(&buildManager)),
+		},
+		Resources: corev1.ResourceRequirements{
+			Limits: getResourceLimits(run.Resources),
+		},
+		Env: []corev1.EnvVar{
+			GeneratePrelaunchCommandAsEnv(run.Prelaunch, robot),
+			GenerateRunCommandAsEnv(run, robot),
+		},
+		ImagePullPolicy:          corev1.PullAlways,
+		TerminationMessagePolicy: corev1.TerminationMessageReadFile,
+		SecurityContext: &corev1.SecurityContext{
+			Privileged: &run.Privileged,
+		},
+	}
+
+	return container
+}
+
 func HasLaunchInThisInstance(launchManager robotv1alpha1.LaunchManager, robot robotv1alpha1.Robot) bool {
 
 	for _, l := range launchManager.Spec.Launch {
