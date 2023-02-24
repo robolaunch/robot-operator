@@ -162,6 +162,8 @@ type WorkspaceManagerStatus struct {
 // Step is a command or script to execute when building a robot. Either `command` or `script` should be specified
 // for each step.
 type Step struct {
+	// Cluster selector.
+	Selector map[string]string `json:"selector,omitempty"`
 	// Name of the step.
 	Name string `json:"name"`
 	// Name of the workspace.

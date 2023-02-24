@@ -3,6 +3,8 @@ package build_manager
 import (
 	"context"
 
+	"github.com/robolaunch/robot-operator/internal"
+	"github.com/robolaunch/robot-operator/internal/label"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -31,44 +33,60 @@ func (r *BuildManagerReconciler) reconcileCheckBuilderJobs(ctx context.Context, 
 
 	stepStatuses := []robotv1alpha1.StepStatus{}
 	for _, step := range instance.Spec.Steps {
-		jobMetadata := types.NamespacedName{
-			Namespace: instance.Namespace,
-			Name:      instance.Name + "-" + step.Name,
+
+		runOnCluster := false
+		if physicalInstance, ok := step.Selector[internal.PHYSICAL_INSTANCE_LABEL_KEY]; ok {
+			if physicalInstance == label.GetClusterName(instance) {
+				runOnCluster = true
+			}
+		} else if cloudInstance, ok := step.Selector[internal.CLOUD_INSTANCE_LABEL_KEY]; ok {
+			if cloudInstance == label.GetClusterName(instance) {
+				runOnCluster = true
+			}
+		} else {
+			runOnCluster = true
 		}
 
-		jobQuery := &batchv1.Job{}
-		err := r.Get(ctx, jobMetadata, jobQuery)
-		if err != nil {
-			if errors.IsNotFound(err) {
+		if runOnCluster {
+			jobMetadata := types.NamespacedName{
+				Namespace: instance.Namespace,
+				Name:      instance.Name + "-" + step.Name,
+			}
+
+			jobQuery := &batchv1.Job{}
+			err := r.Get(ctx, jobMetadata, jobQuery)
+			if err != nil {
+				if errors.IsNotFound(err) {
+					stepStatus := robotv1alpha1.StepStatus{
+						Step:       step,
+						JobName:    jobMetadata.Name,
+						JobCreated: false,
+					}
+
+					stepStatuses = append(stepStatuses, stepStatus)
+				} else {
+					return err
+				}
+			} else {
+				var jobPhase robotv1alpha1.JobPhase
+				switch 1 {
+				case int(jobQuery.Status.Succeeded):
+					jobPhase = robotv1alpha1.JobSucceeded
+				case int(jobQuery.Status.Active):
+					jobPhase = robotv1alpha1.JobActive
+				case int(jobQuery.Status.Failed):
+					jobPhase = robotv1alpha1.JobFailed
+				}
+
 				stepStatus := robotv1alpha1.StepStatus{
 					Step:       step,
 					JobName:    jobMetadata.Name,
-					JobCreated: false,
+					JobCreated: true,
+					JobPhase:   jobPhase,
 				}
 
 				stepStatuses = append(stepStatuses, stepStatus)
-			} else {
-				return err
 			}
-		} else {
-			var jobPhase robotv1alpha1.JobPhase
-			switch 1 {
-			case int(jobQuery.Status.Succeeded):
-				jobPhase = robotv1alpha1.JobSucceeded
-			case int(jobQuery.Status.Active):
-				jobPhase = robotv1alpha1.JobActive
-			case int(jobQuery.Status.Failed):
-				jobPhase = robotv1alpha1.JobFailed
-			}
-
-			stepStatus := robotv1alpha1.StepStatus{
-				Step:       step,
-				JobName:    jobMetadata.Name,
-				JobCreated: true,
-				JobPhase:   jobPhase,
-			}
-
-			stepStatuses = append(stepStatuses, stepStatus)
 		}
 	}
 

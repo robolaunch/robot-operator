@@ -97,7 +97,7 @@ func (r *BuildManagerReconciler) reconcileCheckOtherAttachedResources(ctx contex
 
 		for _, rds := range robotDevSuiteList.Items {
 
-			if rds.Status.Active == true {
+			if rds.Status.Active {
 				return &robotErr.RobotResourcesHasNotBeenReleasedError{
 					ResourceKind:      instance.Kind,
 					ResourceName:      instance.Name,
@@ -122,7 +122,7 @@ func (r *BuildManagerReconciler) reconcileCheckOtherAttachedResources(ctx contex
 
 		for _, lm := range launchManagerList.Items {
 
-			if lm.Status.Active == true {
+			if lm.Status.Active {
 				return &robotErr.RobotResourcesHasNotBeenReleasedError{
 					ResourceKind:      instance.Kind,
 					ResourceName:      instance.Name,
@@ -151,7 +151,7 @@ func (r *BuildManagerReconciler) reconcileCheckOtherAttachedResources(ctx contex
 				continue
 			}
 
-			if bm.Status.Active == true {
+			if bm.Status.Active {
 				return &robotErr.RobotResourcesHasNotBeenReleasedError{
 					ResourceKind:      instance.Kind,
 					ResourceName:      instance.Name,
