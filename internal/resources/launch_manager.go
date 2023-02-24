@@ -34,6 +34,23 @@ func GetLaunchPod(launchManager *robotv1alpha1.LaunchManager, podNamespacedName 
 		}
 	}
 
+	for k, r := range launchManager.Spec.Run {
+		if physicalInstance, ok := r.Selector[internal.PHYSICAL_INSTANCE_LABEL_KEY]; ok {
+			if physicalInstance == label.GetClusterName(&robot) {
+				cont := getRunContainer(r, k, robot, buildManager)
+				containers = append(containers, cont)
+			}
+		} else if cloudInstance, ok := r.Selector[internal.CLOUD_INSTANCE_LABEL_KEY]; ok {
+			if cloudInstance == label.GetClusterName(&robot) {
+				cont := getRunContainer(r, k, robot, buildManager)
+				containers = append(containers, cont)
+			}
+		} else {
+			cont := getRunContainer(r, k, robot, buildManager)
+			containers = append(containers, cont)
+		}
+	}
+
 	launchPod := corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      podNamespacedName.Name,
