@@ -3,7 +3,6 @@ package robot_vdi
 import (
 	"context"
 
-	"github.com/robolaunch/robot-operator/internal/node"
 	"github.com/robolaunch/robot-operator/internal/resources"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -90,7 +89,7 @@ func (r *RobotVDIReconciler) reconcileCreatePod(ctx context.Context, instance *r
 		return err
 	}
 
-	vdiPod := resources.GetRobotVDIPod(instance, instance.GetRobotVDIPodMetadata(), *robot, node.IsK3s(*activeNode))
+	vdiPod := resources.GetRobotVDIPod(instance, instance.GetRobotVDIPodMetadata(), *robot, *activeNode)
 
 	err = ctrl.SetControllerReference(instance, vdiPod, r.Scheme)
 	if err != nil {

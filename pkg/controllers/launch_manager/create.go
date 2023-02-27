@@ -30,7 +30,12 @@ func (r *LaunchManagerReconciler) createLaunchPod(ctx context.Context, instance 
 		return err
 	}
 
-	launchPod := resources.GetLaunchPod(instance, instance.GetLaunchPodMetadata(), *robot, *buildManager, *robotVDI)
+	activeNode, err := r.reconcileCheckNode(ctx, robot)
+	if err != nil {
+		return err
+	}
+
+	launchPod := resources.GetLaunchPod(instance, instance.GetLaunchPodMetadata(), *robot, *buildManager, *robotVDI, *activeNode)
 	if err != nil {
 		return err
 	}
