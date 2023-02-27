@@ -14,7 +14,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 )
 
-func GetLaunchPod(launchManager *robotv1alpha1.LaunchManager, podNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot, buildManager robotv1alpha1.BuildManager, robotVDI robotv1alpha1.RobotVDI) *corev1.Pod {
+func GetLaunchPod(launchManager *robotv1alpha1.LaunchManager, podNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot, buildManager robotv1alpha1.BuildManager, robotVDI robotv1alpha1.RobotVDI, node corev1.Node) *corev1.Pod {
 
 	containers := []corev1.Container{}
 	for k, l := range launchManager.Spec.Launch {
@@ -76,6 +76,7 @@ func GetLaunchPod(launchManager *robotv1alpha1.LaunchManager, podNamespacedName 
 	configure.InjectGenericEnvironmentVariables(&launchPod, robot)                                                     // Environment variables
 	configure.InjectRMWImplementationConfiguration(&launchPod, robot)                                                  // RMW implementation configuration
 	configure.InjectPodDiscoveryServerConnection(&launchPod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo) // Discovery server configuration
+	configure.InjectRuntimeClass(&launchPod, robot, node)
 	if launchManager.Spec.Display && label.GetTargetRobotVDI(launchManager) != "" {
 		// TODO: Add control for validating robot VDI
 		configure.InjectPodDisplayConfiguration(&launchPod, robotVDI) // Display configuration

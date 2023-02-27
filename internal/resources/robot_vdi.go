@@ -50,7 +50,7 @@ func GetRobotVDIPVC(robotVDI *robotv1alpha1.RobotVDI, pvcNamespacedName *types.N
 	return &pvc
 }
 
-func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot, isK3s bool) *corev1.Pod {
+func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot, node corev1.Node) *corev1.Pod {
 
 	// add tcp port
 	ports := []corev1.ContainerPort{
@@ -149,10 +149,7 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 	configure.InjectRMWImplementationConfiguration(vdiPod, robot)
 	configure.InjectPodDiscoveryServerConnection(vdiPod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo)
 	configure.InjectPodDisplayConfiguration(vdiPod, *robotVDI)
-	if isK3s {
-		var runtimeClassName string = "nvidia"
-		vdiPod.Spec.RuntimeClassName = &runtimeClassName
-	}
+	configure.InjectRuntimeClass(vdiPod, robot, node)
 
 	return vdiPod
 }

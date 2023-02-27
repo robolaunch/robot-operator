@@ -21,7 +21,7 @@ func getRobotIDESelector(robotIDE robotv1alpha1.RobotIDE) map[string]string {
 	}
 }
 
-func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot, robotVDI robotv1alpha1.RobotVDI) *corev1.Pod {
+func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot, robotVDI robotv1alpha1.RobotVDI, node corev1.Node) *corev1.Pod {
 
 	// discovery server
 
@@ -87,6 +87,7 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 	configure.InjectGenericEnvironmentVariables(&pod, robot)
 	configure.InjectRMWImplementationConfiguration(&pod, robot)
 	configure.InjectPodDiscoveryServerConnection(&pod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo)
+	configure.InjectRuntimeClass(&pod, robot, node)
 	if robotIDE.Spec.Display && label.GetTargetRobotVDI(robotIDE) != "" {
 		// TODO: Add control for validating robot VDI
 		configure.InjectPodDisplayConfiguration(&pod, robotVDI)
