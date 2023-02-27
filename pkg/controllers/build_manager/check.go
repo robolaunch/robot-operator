@@ -32,15 +32,21 @@ func (r *BuildManagerReconciler) reconcileCheckConfigMap(ctx context.Context, in
 func (r *BuildManagerReconciler) reconcileCheckBuilderJobs(ctx context.Context, instance *robotv1alpha1.BuildManager) error {
 
 	stepStatuses := []robotv1alpha1.StepStatus{}
+
+	robot, err := r.reconcileGetTargetRobot(ctx, instance)
+	if err != nil {
+		return err
+	}
+
 	for _, step := range instance.Spec.Steps {
 
 		runOnCluster := false
 		if physicalInstance, ok := step.Selector[internal.PHYSICAL_INSTANCE_LABEL_KEY]; ok {
-			if physicalInstance == label.GetClusterName(instance) {
+			if physicalInstance == label.GetClusterName(robot) {
 				runOnCluster = true
 			}
 		} else if cloudInstance, ok := step.Selector[internal.CLOUD_INSTANCE_LABEL_KEY]; ok {
-			if cloudInstance == label.GetClusterName(instance) {
+			if cloudInstance == label.GetClusterName(robot) {
 				runOnCluster = true
 			}
 		} else {
