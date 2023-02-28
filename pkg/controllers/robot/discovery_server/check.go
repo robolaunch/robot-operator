@@ -5,6 +5,7 @@ import (
 	"net"
 
 	robotErr "github.com/robolaunch/robot-operator/internal/error"
+	"github.com/robolaunch/robot-operator/internal/handle"
 	"github.com/robolaunch/robot-operator/internal/resources"
 	mcsv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/external/apis/mcsv1alpha1/v1alpha1"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
@@ -51,6 +52,11 @@ func (r *DiscoveryServerReconciler) reconcileCheckPod(ctx context.Context, insta
 	} else if err != nil {
 		return err
 	} else {
+
+		err := handle.HandlePod(ctx, r, *discoveryServerPodQuery)
+		if err != nil {
+			return err
+		}
 
 		if discoveryServerPodQuery.Spec.Hostname != instance.Spec.Hostname || discoveryServerPodQuery.Spec.Subdomain != instance.GetDiscoveryServerServiceMetadata().Name {
 			err = r.Delete(ctx, discoveryServerPodQuery)
