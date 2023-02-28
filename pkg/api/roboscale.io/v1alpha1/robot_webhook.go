@@ -68,6 +68,11 @@ func (r *Robot) ValidateCreate() error {
 		return err
 	}
 
+	err = r.checkRobotDevSuite()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -86,6 +91,11 @@ func (r *Robot) ValidateUpdate(old runtime.Object) error {
 	}
 
 	err = r.checkWorkspaces()
+	if err != nil {
+		return err
+	}
+
+	err = r.checkRobotDevSuite()
 	if err != nil {
 		return err
 	}
@@ -153,6 +163,17 @@ func (r *Robot) checkWorkspaces() error {
 	return nil
 }
 
+func (r *Robot) checkRobotDevSuite() error {
+
+	dst := r.Spec.RobotDevSuiteTemplate
+
+	if dst.IDEEnabled && dst.RobotIDETemplate.Display && !dst.VDIEnabled {
+		return errors.New("cannot open an ide with a display when vdi disabled")
+	}
+
+	return nil
+}
+
 func (r *Robot) setRepositoryInfo() error {
 
 	for k1, ws := range r.Spec.WorkspaceManagerTemplate.Workspaces {
@@ -166,6 +187,10 @@ func (r *Robot) setRepositoryInfo() error {
 			repo.Repo = repoName
 
 			lastCommitHash, err := getLastCommitHash(repo)
+			if err != nil {
+				return err
+			}
+
 			repo.Hash = lastCommitHash
 
 			ws.Repositories[k2] = repo
