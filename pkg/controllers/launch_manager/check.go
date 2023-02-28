@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/robolaunch/robot-operator/internal"
+	"github.com/robolaunch/robot-operator/internal/handle"
 	"github.com/robolaunch/robot-operator/internal/label"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
@@ -26,6 +27,12 @@ func (r *LaunchManagerReconciler) reconcileCheckLaunchPod(ctx context.Context, i
 			return err
 		}
 	} else {
+
+		err := handle.HandlePod(ctx, r, *launchPodQuery)
+		if err != nil {
+			return err
+		}
+
 		instance.Status.LaunchPodStatus.Created = true
 		instance.Status.LaunchPodStatus.IP = launchPodQuery.Status.PodIP
 		instance.Status.LaunchPodStatus.Phase = launchPodQuery.Status.Phase

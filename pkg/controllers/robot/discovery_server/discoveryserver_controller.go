@@ -84,6 +84,16 @@ func (r *DiscoveryServerReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 		return ctrl.Result{}, err
 	}
 
+	err = r.reconcileCheckResources(ctx, instance)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	err = r.reconcileUpdateInstanceStatus(ctx, instance)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
 	err = r.reconcileUpdateConnectionInfo(ctx, instance)
 	if err != nil {
 		var e *robotErr.CannotResolveDiscoveryServerError
@@ -95,11 +105,6 @@ func (r *DiscoveryServerReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 			}, nil
 		}
 		return ctrl.Result{}, nil
-	}
-
-	err = r.reconcileCheckResources(ctx, instance)
-	if err != nil {
-		return ctrl.Result{}, err
 	}
 
 	err = r.reconcileUpdateInstanceStatus(ctx, instance)
@@ -221,6 +226,11 @@ func (r *DiscoveryServerReconciler) reconcileCheckResources(ctx context.Context,
 		}
 
 		err = r.reconcileCheckPod(ctx, instance)
+		if err != nil {
+			return err
+		}
+
+		err = r.reconcileCheckServiceExport(ctx, instance)
 		if err != nil {
 			return err
 		}

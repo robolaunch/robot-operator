@@ -46,7 +46,12 @@ func (r *RobotIDEReconciler) reconcileCreatePod(ctx context.Context, instance *r
 		}
 	}
 
-	idePod := resources.GetRobotIDEPod(instance, instance.GetRobotIDEPodMetadata(), *robot, *robotVDI)
+	activeNode, err := r.reconcileCheckNode(ctx, robot)
+	if err != nil {
+		return err
+	}
+
+	idePod := resources.GetRobotIDEPod(instance, instance.GetRobotIDEPodMetadata(), *robot, *robotVDI, *activeNode)
 
 	err = ctrl.SetControllerReference(instance, idePod, r.Scheme)
 	if err != nil {
