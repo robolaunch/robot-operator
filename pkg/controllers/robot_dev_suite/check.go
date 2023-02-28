@@ -2,6 +2,7 @@ package robot_dev_suite
 
 import (
 	"context"
+	"reflect"
 
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -20,6 +21,15 @@ func (r *RobotDevSuiteReconciler) reconcileCheckRobotVDI(ctx context.Context, in
 				return err
 			}
 		} else {
+
+			if !reflect.DeepEqual(instance.Spec.RobotVDITemplate, robotVDIQuery.Spec) {
+				robotVDIQuery.Spec = instance.Spec.RobotVDITemplate
+				err = r.Update(ctx, robotVDIQuery)
+				if err != nil {
+					return err
+				}
+			}
+
 			instance.Status.RobotVDIStatus.Created = true
 			instance.Status.RobotVDIStatus.Phase = robotVDIQuery.Status.Phase
 		}
@@ -42,6 +52,15 @@ func (r *RobotDevSuiteReconciler) reconcileCheckRobotIDE(ctx context.Context, in
 				return err
 			}
 		} else {
+
+			if !reflect.DeepEqual(instance.Spec.RobotIDETemplate, robotIDEQuery.Spec) {
+				robotIDEQuery.Spec = instance.Spec.RobotIDETemplate
+				err = r.Update(ctx, robotIDEQuery)
+				if err != nil {
+					return err
+				}
+			}
+
 			instance.Status.RobotIDEStatus.Created = true
 			instance.Status.RobotIDEStatus.Phase = robotIDEQuery.Status.Phase
 		}
