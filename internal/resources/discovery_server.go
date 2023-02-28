@@ -100,7 +100,6 @@ func GetDiscoveryServerConfigMap(discoveryServer *robotv1alpha1.DiscoveryServer,
 		Data: map[string]string{
 			"DISCOVERY_SERVER_CONFIG":        superClientConfig,
 			"FASTRTPS_DEFAULT_PROFILES_FILE": "/etc/discovery-server/super_client_configuration_file.xml",
-			"ROS_DISCOVERY_SERVER":           discoveryServer.Status.ConnectionInfo.IP + ":11811",
 		},
 	}
 
