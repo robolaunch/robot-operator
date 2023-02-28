@@ -27,17 +27,6 @@ func placeDiscoveryServerEnvironmentVariables(pod *corev1.Pod, connectionInfo ro
 				},
 			},
 		},
-		{
-			Name: "ROS_DISCOVERY_SERVER",
-			ValueFrom: &corev1.EnvVarSource{
-				ConfigMapKeyRef: &corev1.ConfigMapKeySelector{
-					LocalObjectReference: corev1.LocalObjectReference{
-						Name: connectionInfo.ConfigMapName,
-					},
-					Key: "ROS_DISCOVERY_SERVER",
-				},
-			},
-		},
 	}
 
 	for k, container := range pod.Spec.Containers {
