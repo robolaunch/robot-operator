@@ -3,6 +3,7 @@ package ros_bridge
 import (
 	"context"
 
+	"github.com/robolaunch/robot-operator/internal/handle"
 	"github.com/robolaunch/robot-operator/internal/resources"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
@@ -33,6 +34,11 @@ func (r *ROSBridgeReconciler) reconcileCheckPod(ctx context.Context, instance *r
 	} else if err != nil {
 		return err
 	} else {
+
+		err := handle.HandlePod(ctx, r, *bridgePodQuery)
+		if err != nil {
+			return err
+		}
 
 		rosBridgeFound := false
 		ros2BridgeFound := false
