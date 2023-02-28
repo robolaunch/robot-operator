@@ -149,14 +149,15 @@ func (r *RobotReconciler) reconcileCheckROSBridge(ctx context.Context, instance 
 
 func (r *RobotReconciler) reconcileCheckRobotDevSuite(ctx context.Context, instance *robotv1alpha1.Robot) error {
 
-	if instance.Spec.RobotDevSuiteTemplate.IDEEnabled || instance.Spec.RobotDevSuiteTemplate.VDIEnabled {
-		robotDevSuiteQuery := &robotv1alpha1.RobotDevSuite{}
-		err := r.Get(ctx, *instance.GetRobotDevSuiteMetadata(), robotDevSuiteQuery)
-		if err != nil && errors.IsNotFound(err) {
-			instance.Status.RobotDevSuiteStatus = robotv1alpha1.RobotDevSuiteInstanceStatus{}
-		} else if err != nil {
-			return err
-		} else {
+	robotDevSuiteQuery := &robotv1alpha1.RobotDevSuite{}
+	err := r.Get(ctx, *instance.GetRobotDevSuiteMetadata(), robotDevSuiteQuery)
+	if err != nil && errors.IsNotFound(err) {
+		instance.Status.RobotDevSuiteStatus = robotv1alpha1.RobotDevSuiteInstanceStatus{}
+	} else if err != nil {
+		return err
+	} else {
+
+		if instance.Spec.RobotDevSuiteTemplate.IDEEnabled || instance.Spec.RobotDevSuiteTemplate.VDIEnabled {
 
 			if !reflect.DeepEqual(instance.Spec.RobotDevSuiteTemplate, robotDevSuiteQuery.Spec) {
 				robotDevSuiteQuery.Spec = instance.Spec.RobotDevSuiteTemplate
@@ -168,7 +169,16 @@ func (r *RobotReconciler) reconcileCheckRobotDevSuite(ctx context.Context, insta
 
 			instance.Status.RobotDevSuiteStatus.Created = true
 			instance.Status.RobotDevSuiteStatus.Status = robotDevSuiteQuery.Status
+
+		} else {
+
+			err := r.Delete(ctx, robotDevSuiteQuery)
+			if err != nil {
+				return err
+			}
+
 		}
+
 	}
 
 	return nil
