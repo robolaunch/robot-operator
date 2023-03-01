@@ -15,10 +15,3 @@ body:
       label: Why is this needed?
     validations:
       required: true
-  
-  - type: textarea
-    id: related-tech-story
-    attributes:
-      label: Related Technical Story
-    validations:
-      required: true
