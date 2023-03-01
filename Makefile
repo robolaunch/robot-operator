@@ -3,6 +3,10 @@
 IMG ?= controller:latest
 # ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
 ENVTEST_K8S_VERSION = 1.25.0
+# Manifest location
+MANIFEST_LOCATION = hack/deploy/manifests
+# Local manifest location
+LOCAL_MANIFEST_LOCATION = hack/deploy.local/manifests
 
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
 ifeq (,$(shell go env GOBIN))
@@ -118,40 +122,40 @@ deploy: manifests kustomize ## Deploy controller to the K8s cluster specified in
 .PHONY: extract
 extract: manifests kustomize ## Extract controller YAMLs, not deploy
 	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
-	$(KUSTOMIZE) build config/default > hack/deploy.local/robot_operator.yaml
+	$(KUSTOMIZE) build config/default > $(LOCAL_MANIFEST_LOCATION)/robot_operator.yaml
 
 .PHONY: select-node
 select-node: 
-	yq -i e '(select(.kind == "Deployment") | .spec.template.spec.nodeSelector."${LABEL_KEY}") = "${LABEL_VAL}"' hack/deploy.local/robot_operator.yaml
-	yq -i e '(select(.kind == "Deployment") | .spec.template.spec.nodeSelector."${LABEL_KEY}") = "${LABEL_VAL}"' hack/deploy.local/cert_manager_1.8.0.yaml
+	yq -i e '(select(.kind == "Deployment") | .spec.template.spec.nodeSelector."${LABEL_KEY}") = "${LABEL_VAL}"' $(LOCAL_MANIFEST_LOCATION)/robot_operator.yaml
+	yq -i e '(select(.kind == "Deployment") | .spec.template.spec.nodeSelector."${LABEL_KEY}") = "${LABEL_VAL}"' $(LOCAL_MANIFEST_LOCATION)/cert_manager_1.8.0.yaml
 
 .PHONY: get-cert-manager
 get-cert-manager: 
-	kubectl apply -f hack/deploy.local/cert_manager_1.8.0.yaml
+	kubectl apply -f $(LOCAL_MANIFEST_LOCATION)/cert_manager_1.8.0.yaml
 
 .PHONY: apply
 apply: 
-	kubectl apply -f hack/deploy.local/robot_operator.yaml
+	kubectl apply -f $(LOCAL_MANIFEST_LOCATION)/robot_operator.yaml
 
 # Production
 
 .PHONY: gh-extract
 gh-extract: manifests kustomize ## Extract controller YAMLs, not deploy
 	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
-	$(KUSTOMIZE) build config/default > hack/deploy/robot_operator.yaml
+	$(KUSTOMIZE) build config/default > $(MANIFEST_LOCATION)/robot_operator.yaml
 
 .PHONY: gh-select-node
 gh-select-node: 
-	yq -i e '(select(.kind == "Deployment") | .spec.template.spec.nodeSelector."${LABEL_KEY}") = "${LABEL_VAL}"' hack/deploy/robot_operator.yaml
-	yq -i e '(select(.kind == "Deployment") | .spec.template.spec.nodeSelector."${LABEL_KEY}") = "${LABEL_VAL}"' hack/deploy/cert_manager_1.8.0.yaml
+	yq -i e '(select(.kind == "Deployment") | .spec.template.spec.nodeSelector."${LABEL_KEY}") = "${LABEL_VAL}"' $(MANIFEST_LOCATION)/robot_operator.yaml
+	yq -i e '(select(.kind == "Deployment") | .spec.template.spec.nodeSelector."${LABEL_KEY}") = "${LABEL_VAL}"' $(MANIFEST_LOCATION)/cert_manager_1.8.0.yaml
 
 .PHONY: gh-get-cert-manager
 gh-get-cert-manager: 
-	kubectl apply -f hack/deploy/cert_manager_1.8.0.yaml
+	kubectl apply -f $(MANIFEST_LOCATION)/cert_manager_1.8.0.yaml
 
 .PHONY: gh-apply
 gh-apply: 
-	kubectl apply -f hack/deploy/robot_operator.yaml
+	kubectl apply -f $(MANIFEST_LOCATION)/robot_operator.yaml
 
 .PHONY: undeploy
 undeploy: ## Undeploy controller from the K8s cluster specified in ~/.kube/config. Call with ignore-not-found=true to ignore resource not found errors during deletion.
