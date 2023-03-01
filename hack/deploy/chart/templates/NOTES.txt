@@ -1,0 +1,16 @@
+
+               __          __                       __  
+   _________  / /_  ____  / /___ ___  ______  _____/ /_ 
+  / ___/ __ \/ __ \/ __ \/ / __ `/ / / / __ \/ ___/ __ \
+ / /  / /_/ / /_/ / /_/ / / /_/ / /_/ / / / / /__/ / / /
+/_/   \____/_.___/\____/_/\__,_/\__,_/_/ /_/\___/_/ /_/ 
+                                                        
+"We Empower ROS/ROS2 based GPU Offloaded Robots & Geographically Distributed Fleets”
+
+robolaunch Robot Operator {{ .Chart.AppVersion }}
+
+Organization: {{ .Values.organization }}
+Team: {{ .Values.team }}
+Region: {{ .Values.region }}
+CloudInstance: {{ .Values.cloudInstance }}
+CloudInstanceAlias: {{ .Values.cloudInstanceAlias }}

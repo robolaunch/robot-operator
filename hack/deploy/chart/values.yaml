@@ -1,0 +1,24 @@
+organization: robolaunch
+team: robotics
+region: europe-east
+cloudInstance: cluster
+cloudInstanceAlias: cluster-alias
+
+replicaCount: 1
+
+managerResources:
+  limits:
+    cpu: 500m
+    memory: 128Mi
+  requests:
+    cpu: 10m
+    memory: 64Mi
+
+rbacProxyResources:
+  limits:
+    cpu: 500m
+    memory: 128Mi
+  requests:
+    cpu: 5m
+    memory: 64Mi
+
