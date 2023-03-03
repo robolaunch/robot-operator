@@ -30,3 +30,6 @@ Dockerfile.cross
 
 # vendor
 vendor
+
+# helm packages
+*.tgz
