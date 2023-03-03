@@ -12,5 +12,5 @@ robolaunch Robot Operator {{ .Chart.AppVersion }}
 Organization: {{ .Values.organization }}
 Team: {{ .Values.team }}
 Region: {{ .Values.region }}
-CloudInstance: {{ .Values.cloudInstance }}
-CloudInstanceAlias: {{ .Values.cloudInstanceAlias }}
+Cloud Instance: {{ .Values.cloudInstance }}
+Alias for Cloud Instance: {{ .Values.cloudInstanceAlias }}
