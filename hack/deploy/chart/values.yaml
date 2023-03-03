@@ -1,8 +1,9 @@
-organization: robolaunch
-team: robotics
-region: europe-east
-cloudInstance: cluster
-cloudInstanceAlias: cluster-alias
+global:
+  organization: robolaunch
+  team: robotics
+  region: europe-east
+  cloudInstance: cluster
+  cloudInstanceAlias: cluster-alias
 
 replicaCount: 1
 

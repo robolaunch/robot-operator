@@ -4605,11 +4605,11 @@ spec:
             defaultMode: 420
             secretName: webhook-server-cert
       nodeSelector:
-        robolaunch.io/organization: {{ .Values.organization }}
-        robolaunch.io/team: {{ .Values.team }}
-        robolaunch.io/region: {{ .Values.region }}
-        robolaunch.io/cloud-instance: {{ .Values.cloudInstance }}
-        robolaunch.io/cloud-instance-alias: {{ .Values.cloudInstanceAlias }}
+        robolaunch.io/organization: {{ .Values.global.organization }}
+        robolaunch.io/team: {{ .Values.global.team }}
+        robolaunch.io/region: {{ .Values.global.region }}
+        robolaunch.io/cloud-instance: {{ .Values.global.cloudInstance }}
+        robolaunch.io/cloud-instance-alias: {{ .Values.global.cloudInstanceAlias }}
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate
