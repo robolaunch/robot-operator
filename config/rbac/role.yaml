@@ -68,18 +68,6 @@ rules:
 - apiGroups:
   - ""
   resources:
-  - pods/exec
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - ""
-  resources:
   - services
   verbs:
   - create
@@ -187,32 +175,6 @@ rules:
   - robot.roboscale.io
   resources:
   - launchmanagers/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - robot.roboscale.io
-  resources:
-  - metricscollectors
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - robot.roboscale.io
-  resources:
-  - metricscollectors/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - robot.roboscale.io
-  resources:
-  - metricscollectors/status
   verbs:
   - get
   - patch
