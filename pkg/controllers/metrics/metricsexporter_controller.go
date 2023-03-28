@@ -19,6 +19,7 @@ package metrics
 import (
 	"context"
 
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -80,6 +81,28 @@ func (r *MetricsExporterReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 }
 
 func (r *MetricsExporterReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.MetricsExporter) error {
+
+	switch instance.Status.PodStatus.Created {
+	case true:
+
+		switch instance.Status.PodStatus.Phase {
+		case v1.PodRunning:
+
+			instance.Status.Phase = robotv1alpha1.MetricsExporterPhaseReady
+
+		}
+
+	case false:
+
+		instance.Status.Phase = robotv1alpha1.MetricsExporterPhaseCreatingPod
+		err := r.reconcileCreatePod(ctx, instance)
+		if err != nil {
+			return err
+		}
+		instance.Status.PodStatus.Created = true
+
+	}
+
 	return nil
 }
 

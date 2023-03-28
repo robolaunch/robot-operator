@@ -8,7 +8,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 )
 
-func GetMetricsExporterPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.NamespacedName, node corev1.Node) *corev1.Pod {
+func GetMetricsExporterPod(metricsExporter *robotv1alpha1.MetricsExporter, podNamespacedName *types.NamespacedName, node corev1.Node) *corev1.Pod {
 
 	privileged := true
 

@@ -60,7 +60,15 @@ type MetricsExporterPodStatus struct {
 	Phase   corev1.PodPhase `json:"phase,omitempty"`
 }
 
+type MetricsExporterPhase string
+
+const (
+	MetricsExporterPhaseCreatingPod MetricsExporterPhase = "CreatingPod"
+	MetricsExporterPhaseReady       MetricsExporterPhase = "Ready"
+)
+
 // MetricsExporterStatus defines the observed state of MetricsExporter
 type MetricsExporterStatus struct {
+	Phase     MetricsExporterPhase     `json:"phase,omitempty"`
 	PodStatus MetricsExporterPodStatus `json:"podStatus,omitempty"`
 }
