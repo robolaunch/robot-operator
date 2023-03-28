@@ -19,7 +19,7 @@ package metrics
 import (
 	"context"
 
-	v1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -82,25 +82,27 @@ func (r *MetricsExporterReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 
 func (r *MetricsExporterReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.MetricsExporter) error {
 
-	switch instance.Status.PodStatus.Created {
-	case true:
+	if instance.Spec.GPU.Track || instance.Spec.Network.Track {
+		switch instance.Status.PodStatus.Created {
+		case true:
 
-		switch instance.Status.PodStatus.Phase {
-		case v1.PodRunning:
+			switch instance.Status.PodStatus.Phase {
+			case corev1.PodRunning:
 
-			instance.Status.Phase = robotv1alpha1.MetricsExporterPhaseReady
+				instance.Status.Phase = robotv1alpha1.MetricsExporterPhaseReady
+
+			}
+
+		case false:
+
+			instance.Status.Phase = robotv1alpha1.MetricsExporterPhaseCreatingPod
+			err := r.reconcileCreatePod(ctx, instance)
+			if err != nil {
+				return err
+			}
+			instance.Status.PodStatus.Created = true
 
 		}
-
-	case false:
-
-		instance.Status.Phase = robotv1alpha1.MetricsExporterPhaseCreatingPod
-		err := r.reconcileCreatePod(ctx, instance)
-		if err != nil {
-			return err
-		}
-		instance.Status.PodStatus.Created = true
-
 	}
 
 	return nil
@@ -120,5 +122,6 @@ func (r *MetricsExporterReconciler) reconcileCheckResources(ctx context.Context,
 func (r *MetricsExporterReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&robotv1alpha1.MetricsExporter{}).
+		Owns(&corev1.Pod{}).
 		Complete(r)
 }

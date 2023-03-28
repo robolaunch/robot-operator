@@ -1,6 +1,8 @@
 package resources
 
 import (
+	"strconv"
+
 	"github.com/robolaunch/robot-operator/internal"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
@@ -18,22 +20,22 @@ func GetMetricsExporterPod(metricsExporter *robotv1alpha1.MetricsExporter, podNa
 			Namespace: podNamespacedName.Namespace,
 		},
 		Spec: corev1.PodSpec{
-			Containers: []corev1.Container{
-				{
-					Name:    "gpu-util",
-					Image:   "robolaunchio/custom-metrics-dev:v0.0.01",
-					Command: internal.Bash("./gpu-util.sh"),
-					Env: []corev1.EnvVar{
-						internal.Env("GPU_LATENCY", "3"),
-					},
-					SecurityContext: &corev1.SecurityContext{
-						Privileged: &privileged,
-					},
-				},
-			},
-
 			RestartPolicy: corev1.RestartPolicyNever,
 		},
+	}
+
+	if metricsExporter.Spec.GPU.Track {
+		pod.Spec.Containers = append(pod.Spec.Containers, corev1.Container{
+			Name:    "gpu-util",
+			Image:   "robolaunchio/custom-metrics-dev:v0.0.01",
+			Command: internal.Bash("./gpu-util.sh"),
+			Env: []corev1.EnvVar{
+				internal.Env("GPU_LATENCY", strconv.Itoa(metricsExporter.Spec.GPU.Interval)),
+			},
+			SecurityContext: &corev1.SecurityContext{
+				Privileged: &privileged,
+			},
+		})
 	}
 
 	return &pod
