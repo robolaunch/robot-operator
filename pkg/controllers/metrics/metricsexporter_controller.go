@@ -19,6 +19,7 @@ package metrics
 import (
 	"context"
 
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -42,7 +43,48 @@ var logger logr.Logger
 
 func (r *MetricsExporterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	logger = log.FromContext(ctx)
+
+	instance, err := r.reconcileGetInstance(ctx, req.NamespacedName)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			return ctrl.Result{}, nil
+		}
+		return ctrl.Result{}, err
+	}
+
+	if !instance.DeletionTimestamp.IsZero() {
+		return ctrl.Result{}, nil
+	}
+
+	err = r.reconcileCheckStatus(ctx, instance)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	err = r.reconcileUpdateInstanceStatus(ctx, instance)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	err = r.reconcileCheckResources(ctx, instance)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	err = r.reconcileUpdateInstanceStatus(ctx, instance)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
 	return ctrl.Result{}, nil
+}
+
+func (r *MetricsExporterReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.MetricsExporter) error {
+	return nil
+}
+
+func (r *MetricsExporterReconciler) reconcileCheckResources(ctx context.Context, instance *robotv1alpha1.MetricsExporter) error {
+	return nil
 }
 
 // SetupWithManager sets up the controller with the Manager.
