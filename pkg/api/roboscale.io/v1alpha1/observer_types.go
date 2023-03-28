@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -54,6 +55,12 @@ type MetricsExporterSpec struct {
 	Foo string `json:"foo,omitempty"`
 }
 
+type MetricsExporterPodStatus struct {
+	Created bool            `json:"created,omitempty"`
+	Phase   corev1.PodPhase `json:"phase,omitempty"`
+}
+
 // MetricsExporterStatus defines the observed state of MetricsExporter
 type MetricsExporterStatus struct {
+	PodStatus MetricsExporterPodStatus `json:"podStatus,omitempty"`
 }
