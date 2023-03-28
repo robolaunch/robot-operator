@@ -107,6 +107,12 @@ func (r *MetricsExporterReconciler) reconcileCheckStatus(ctx context.Context, in
 }
 
 func (r *MetricsExporterReconciler) reconcileCheckResources(ctx context.Context, instance *robotv1alpha1.MetricsExporter) error {
+
+	err := r.reconcileCheckPod(ctx, instance)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
