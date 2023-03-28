@@ -50,9 +50,21 @@ type MetricsExporterList struct {
 // MetricsExporter types
 // ********************************
 
+type GPUMetrics struct {
+	Track    bool `json:"track,omitempty"`
+	Interval int  `json:"interval,omitempty"`
+}
+
+type NetworkMetrics struct {
+	Track      bool     `json:"track,omitempty"`
+	Interval   int      `json:"interval,omitempty"`
+	Interfaces []string `json:"interfaces,omitempty"`
+}
+
 // MetricsExporterSpec defines the desired state of MetricsExporter
 type MetricsExporterSpec struct {
-	Foo string `json:"foo,omitempty"`
+	GPU     GPUMetrics     `json:"gpu,omitempty"`
+	Network NetworkMetrics `json:"network,omitempty"`
 }
 
 type MetricsExporterPodStatus struct {
