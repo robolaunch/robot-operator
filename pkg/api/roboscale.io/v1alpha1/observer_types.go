@@ -87,8 +87,11 @@ type MetricsExporterServiceAccountStatus struct {
 type MetricsExporterPhase string
 
 const (
-	MetricsExporterPhaseCreatingPod MetricsExporterPhase = "CreatingPod"
-	MetricsExporterPhaseReady       MetricsExporterPhase = "Ready"
+	MetricsExporterPhaseCreatingRole           MetricsExporterPhase = "CreatingRole"
+	MetricsExporterPhaseCreatingServiceAccount MetricsExporterPhase = "CreatingServiceAccount"
+	MetricsExporterPhaseCreatingRoleBinding    MetricsExporterPhase = "CreatingRoleBinding"
+	MetricsExporterPhaseCreatingPod            MetricsExporterPhase = "CreatingPod"
+	MetricsExporterPhaseReady                  MetricsExporterPhase = "Ready"
 )
 
 // MetricsExporterStatus defines the observed state of MetricsExporter

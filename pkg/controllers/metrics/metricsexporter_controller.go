@@ -20,6 +20,7 @@ import (
 	"context"
 
 	corev1 "k8s.io/api/core/v1"
+	rbacv1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -118,19 +119,34 @@ func (r *MetricsExporterReconciler) reconcileCheckStatus(ctx context.Context, in
 
 				case false:
 
-					// create role binding
+					instance.Status.Phase = robotv1alpha1.MetricsExporterPhaseCreatingRoleBinding
+					err := r.reconcileCreateRoleBinding(ctx, instance)
+					if err != nil {
+						return err
+					}
+					instance.Status.RoleBindingStatus.Created = true
 
 				}
 
 			case false:
 
-				// create service account
+				instance.Status.Phase = robotv1alpha1.MetricsExporterPhaseCreatingServiceAccount
+				err := r.reconcileCreateServiceAccount(ctx, instance)
+				if err != nil {
+					return err
+				}
+				instance.Status.ServiceAccountStatus.Created = true
 
 			}
 
 		case false:
 
-			// create role
+			instance.Status.Phase = robotv1alpha1.MetricsExporterPhaseCreatingRole
+			err := r.reconcileCreateRole(ctx, instance)
+			if err != nil {
+				return err
+			}
+			instance.Status.RoleStatus.Created = true
 
 		}
 
@@ -141,7 +157,22 @@ func (r *MetricsExporterReconciler) reconcileCheckStatus(ctx context.Context, in
 
 func (r *MetricsExporterReconciler) reconcileCheckResources(ctx context.Context, instance *robotv1alpha1.MetricsExporter) error {
 
-	err := r.reconcileCheckPod(ctx, instance)
+	err := r.reconcileCheckRole(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	err = r.reconcileCheckServiceAccount(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	err = r.reconcileCheckRoleBinding(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	err = r.reconcileCheckPod(ctx, instance)
 	if err != nil {
 		return err
 	}
@@ -153,6 +184,9 @@ func (r *MetricsExporterReconciler) reconcileCheckResources(ctx context.Context,
 func (r *MetricsExporterReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&robotv1alpha1.MetricsExporter{}).
+		Owns(&rbacv1.Role{}).
+		Owns(&rbacv1.RoleBinding{}).
+		Owns(&corev1.ServiceAccount{}).
 		Owns(&corev1.Pod{}).
 		Complete(r)
 }
