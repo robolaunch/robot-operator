@@ -92,6 +92,20 @@ spec:
                       utilization:
                         type: string
                     type: object
+                  network:
+                    properties:
+                      lastUpdateTimestamp:
+                        type: string
+                      load:
+                        additionalProperties:
+                          properties:
+                            in:
+                              type: string
+                            out:
+                              type: string
+                          type: object
+                        type: object
+                    type: object
                 type: object
             type: object
         type: object
