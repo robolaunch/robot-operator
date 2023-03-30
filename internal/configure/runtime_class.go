@@ -16,3 +16,13 @@ func InjectRuntimeClass(pod *corev1.Pod, robot v1alpha1.Robot, currentNode corev
 
 	return pod
 }
+
+func InjectRuntimeClassForMetricsExporter(pod *corev1.Pod, currentNode corev1.Node) *corev1.Pod {
+
+	if node.IsK3s(currentNode) {
+		nvidiaRuntimeClass := "nvidia"
+		pod.Spec.RuntimeClassName = &nvidiaRuntimeClass
+	}
+
+	return pod
+}

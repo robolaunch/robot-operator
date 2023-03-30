@@ -107,10 +107,3 @@ const (
 	RobotVDIPhaseCreatingIngress    RobotVDIPhase = "CreatingIngress"
 	RobotVDIPhaseRunning            RobotVDIPhase = "Running"
 )
-
-type MetricsCollectorPhase string
-
-const (
-	MetricsCollectorPhaseRobotNotFound MetricsCollectorPhase = "RobotNotFound"
-	MetricsCollectorPhaseRunning       MetricsCollectorPhase = "Running"
-)

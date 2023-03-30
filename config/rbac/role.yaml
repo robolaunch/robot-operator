@@ -68,6 +68,18 @@ rules:
 - apiGroups:
   - ""
   resources:
+  - serviceaccounts
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
   - services
   verbs:
   - create
@@ -93,6 +105,30 @@ rules:
   - networking.k8s.io
   resources:
   - ingresses
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - rolebindings
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - roles
   verbs:
   - create
   - delete
@@ -175,6 +211,32 @@ rules:
   - robot.roboscale.io
   resources:
   - launchmanagers/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - metricsexporters
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - metricsexporters/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - metricsexporters/status
   verbs:
   - get
   - patch
