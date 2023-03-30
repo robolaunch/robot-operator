@@ -93,6 +93,9 @@ const (
 
 // MetricsExporterStatus defines the observed state of MetricsExporter
 type MetricsExporterStatus struct {
-	Phase     MetricsExporterPhase     `json:"phase,omitempty"`
-	PodStatus MetricsExporterPodStatus `json:"podStatus,omitempty"`
+	Phase                MetricsExporterPhase                `json:"phase,omitempty"`
+	RoleStatus           MetricsExporterRoleStatus           `json:"roleStatus,omitempty"`
+	RoleBindingStatus    MetricsExporterRoleBindingStatus    `json:"roleBindingStatus,omitempty"`
+	ServiceAccountStatus MetricsExporterServiceAccountStatus `json:"saStatus,omitempty"`
+	PodStatus            MetricsExporterPodStatus            `json:"podStatus,omitempty"`
 }
