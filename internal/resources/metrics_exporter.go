@@ -28,14 +28,14 @@ func GetMetricsExporterPod(metricsExporter *robotv1alpha1.MetricsExporter, podNa
 	if metricsExporter.Spec.GPU.Track {
 		pod.Spec.Containers = append(pod.Spec.Containers, corev1.Container{
 			Name:    "gpu-util",
-			Image:   "robolaunchio/custom-metrics-dev:v0.0.01",
+			Image:   "robolaunchio/custom-metrics-dev:v0.0.02",
 			Command: internal.Bash("./gpu-util.sh"),
 			Env: []corev1.EnvVar{
 				internal.Env("GPU_LATENCY", strconv.Itoa(metricsExporter.Spec.GPU.Interval)),
 			},
 			Resources: corev1.ResourceRequirements{
 				Limits: getResourceLimits(robotv1alpha1.Resources{
-					GPUCore: 0,
+					GPUCore: 1,
 				}),
 			},
 			SecurityContext: &corev1.SecurityContext{
@@ -44,7 +44,7 @@ func GetMetricsExporterPod(metricsExporter *robotv1alpha1.MetricsExporter, podNa
 		})
 	}
 
-	configure.InjectRuntimeClassWithoutRobot(&pod, node)
+	configure.InjectRuntimeClassForMetricsExporter(&pod, node)
 
 	return &pod
 }
