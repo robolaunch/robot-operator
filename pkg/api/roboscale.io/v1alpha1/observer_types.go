@@ -72,6 +72,18 @@ type MetricsExporterPodStatus struct {
 	Phase   corev1.PodPhase `json:"phase,omitempty"`
 }
 
+type MetricsExporterRoleStatus struct {
+	Created bool `json:"created,omitempty"`
+}
+
+type MetricsExporterRoleBindingStatus struct {
+	Created bool `json:"created,omitempty"`
+}
+
+type MetricsExporterServiceAccountStatus struct {
+	Created bool `json:"created,omitempty"`
+}
+
 type MetricsExporterPhase string
 
 const (

@@ -14,3 +14,24 @@ func (metricseexporter *MetricsExporter) GetMetricsExporterPodMetadata() *types.
 		Name:      metricseexporter.Name,
 	}
 }
+
+func (metricseexporter *MetricsExporter) GetMetricsExporterRoleMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Namespace: metricseexporter.Namespace,
+		Name:      metricseexporter.Name + "-role",
+	}
+}
+
+func (metricseexporter *MetricsExporter) GetMetricsExporterRoleBindingMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Namespace: metricseexporter.Namespace,
+		Name:      metricseexporter.Name + "-rb",
+	}
+}
+
+func (metricseexporter *MetricsExporter) GetMetricsExporterServiceAccountMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Namespace: metricseexporter.Namespace,
+		Name:      metricseexporter.Name + "-sa",
+	}
+}
