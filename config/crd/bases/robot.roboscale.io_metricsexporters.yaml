@@ -68,6 +68,31 @@ spec:
                       the current time.
                     type: string
                 type: object
+              roleBindingStatus:
+                properties:
+                  created:
+                    type: boolean
+                type: object
+              roleStatus:
+                properties:
+                  created:
+                    type: boolean
+                type: object
+              saStatus:
+                properties:
+                  created:
+                    type: boolean
+                type: object
+              usage:
+                properties:
+                  gpu:
+                    properties:
+                      lastUpdateTimestamp:
+                        type: string
+                      utilization:
+                        type: string
+                    type: object
+                type: object
             type: object
         type: object
     served: true

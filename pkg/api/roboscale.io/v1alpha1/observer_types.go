@@ -84,6 +84,15 @@ type MetricsExporterServiceAccountStatus struct {
 	Created bool `json:"created,omitempty"`
 }
 
+type GPUUtilizationStatus struct {
+	Utilization         string `json:"utilization,omitempty"`
+	LastUpdateTimestamp string `json:"lastUpdateTimestamp,omitempty"`
+}
+
+type Usage struct {
+	GPU GPUUtilizationStatus `json:"gpu,omitempty"`
+}
+
 type MetricsExporterPhase string
 
 const (
@@ -101,4 +110,5 @@ type MetricsExporterStatus struct {
 	RoleBindingStatus    MetricsExporterRoleBindingStatus    `json:"roleBindingStatus,omitempty"`
 	ServiceAccountStatus MetricsExporterServiceAccountStatus `json:"saStatus,omitempty"`
 	PodStatus            MetricsExporterPodStatus            `json:"podStatus,omitempty"`
+	Usage                Usage                               `json:"usage,omitempty"`
 }
