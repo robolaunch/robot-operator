@@ -14,8 +14,6 @@ import (
 
 func GetMetricsExporterPod(metricsExporter *robotv1alpha1.MetricsExporter, podNamespacedName *types.NamespacedName, node corev1.Node) *corev1.Pod {
 
-	privileged := true
-
 	pod := corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      podNamespacedName.Name,
@@ -24,26 +22,38 @@ func GetMetricsExporterPod(metricsExporter *robotv1alpha1.MetricsExporter, podNa
 		Spec: corev1.PodSpec{
 			RestartPolicy:      corev1.RestartPolicyNever,
 			ServiceAccountName: metricsExporter.GetMetricsExporterServiceAccountMetadata().Name,
+			HostNetwork:        true,
 		},
 	}
 
 	if metricsExporter.Spec.GPU.Track {
 		pod.Spec.Containers = append(pod.Spec.Containers, corev1.Container{
 			Name:    "gpu-util",
-			Image:   "robolaunchio/custom-metrics-dev:v0.0.03",
+			Image:   "robolaunchio/custom-metrics-patcher:focal-v1.24.10",
 			Command: internal.Bash("./gpu-util.sh"),
 			Env: []corev1.EnvVar{
-				internal.Env("GPU_LATENCY", strconv.Itoa(metricsExporter.Spec.GPU.Interval)),
 				internal.Env("METRICS_EXPORTER_NAME", metricsExporter.Name),
 				internal.Env("METRICS_EXPORTER_NAMESPACE", metricsExporter.Namespace),
+				internal.Env("INTERVAL", strconv.Itoa(metricsExporter.Spec.GPU.Interval)),
 			},
 			Resources: corev1.ResourceRequirements{
 				Limits: getResourceLimits(robotv1alpha1.Resources{
 					GPUCore: 1,
 				}),
 			},
-			SecurityContext: &corev1.SecurityContext{
-				Privileged: &privileged,
+		})
+	}
+
+	if metricsExporter.Spec.Network.Track {
+		pod.Spec.Containers = append(pod.Spec.Containers, corev1.Container{
+			Name:    "network-load",
+			Image:   "robolaunchio/custom-metrics-patcher:focal-v1.24.10",
+			Command: internal.Bash("./network-load.sh"),
+			Env: []corev1.EnvVar{
+				internal.Env("METRICS_EXPORTER_NAME", metricsExporter.Name),
+				internal.Env("METRICS_EXPORTER_NAMESPACE", metricsExporter.Namespace),
+				internal.Env("INTERVAL", strconv.Itoa(metricsExporter.Spec.Network.Interval)),
+				internal.Env("NETWORK_INTERFACES", formatNetworkInterfaces(metricsExporter.Spec.Network.Interfaces)),
 			},
 		})
 	}
@@ -51,6 +61,17 @@ func GetMetricsExporterPod(metricsExporter *robotv1alpha1.MetricsExporter, podNa
 	configure.InjectRuntimeClassForMetricsExporter(&pod, node)
 
 	return &pod
+}
+
+func formatNetworkInterfaces(interfaces []string) string {
+	formatted := ""
+	for k, v := range interfaces {
+		if k != 0 {
+			formatted += ","
+		}
+		formatted += v
+	}
+	return formatted
 }
 
 func GetMetricsExporterRole(metricsExporter *robotv1alpha1.MetricsExporter, roleNamespacedName *types.NamespacedName) *rbacv1.Role {

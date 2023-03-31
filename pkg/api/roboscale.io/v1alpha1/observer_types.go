@@ -89,8 +89,19 @@ type GPUUtilizationStatus struct {
 	LastUpdateTimestamp string `json:"lastUpdateTimestamp,omitempty"`
 }
 
+type NetworkInterfaceLoad struct {
+	IncomingLoad string `json:"in,omitempty"`
+	OutgoingLoad string `json:"out,omitempty"`
+}
+
+type NetworkLoadStatus struct {
+	Load                map[string]NetworkInterfaceLoad `json:"load,omitempty"`
+	LastUpdateTimestamp string                          `json:"lastUpdateTimestamp,omitempty"`
+}
+
 type Usage struct {
-	GPU GPUUtilizationStatus `json:"gpu,omitempty"`
+	GPU     GPUUtilizationStatus `json:"gpu,omitempty"`
+	Network NetworkLoadStatus    `json:"network,omitempty"`
 }
 
 type MetricsExporterPhase string
