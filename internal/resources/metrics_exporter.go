@@ -29,7 +29,7 @@ func GetMetricsExporterPod(metricsExporter *robotv1alpha1.MetricsExporter, podNa
 	if metricsExporter.Spec.GPU.Track {
 		pod.Spec.Containers = append(pod.Spec.Containers, corev1.Container{
 			Name:    "gpu-util",
-			Image:   "robolaunchio/custom-metrics-dev:v0.0.06",
+			Image:   "robolaunchio/custom-metrics-patcher:focal-v1.24.10",
 			Command: internal.Bash("./gpu-util.sh"),
 			Env: []corev1.EnvVar{
 				internal.Env("METRICS_EXPORTER_NAME", metricsExporter.Name),
@@ -47,8 +47,8 @@ func GetMetricsExporterPod(metricsExporter *robotv1alpha1.MetricsExporter, podNa
 	if metricsExporter.Spec.Network.Track {
 		pod.Spec.Containers = append(pod.Spec.Containers, corev1.Container{
 			Name:    "network-load",
-			Image:   "robolaunchio/custom-metrics-dev:v0.0.06",
-			Command: internal.Bash("sleep infinity"),
+			Image:   "robolaunchio/custom-metrics-patcher:focal-v1.24.10",
+			Command: internal.Bash("./network-load.sh"),
 			Env: []corev1.EnvVar{
 				internal.Env("METRICS_EXPORTER_NAME", metricsExporter.Name),
 				internal.Env("METRICS_EXPORTER_NAMESPACE", metricsExporter.Namespace),
