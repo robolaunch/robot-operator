@@ -1,0 +1,115 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.9.2
+  creationTimestamp: null
+  name: metricsexporters.robot.roboscale.io
+spec:
+  group: robot.roboscale.io
+  names:
+    kind: MetricsExporter
+    listKind: MetricsExporterList
+    plural: metricsexporters
+    singular: metricsexporter
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: MetricsExporter is the Schema for the metricsexporters API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: MetricsExporterSpec defines the desired state of MetricsExporter
+            properties:
+              gpu:
+                properties:
+                  interval:
+                    type: integer
+                  track:
+                    type: boolean
+                type: object
+              network:
+                properties:
+                  interfaces:
+                    items:
+                      type: string
+                    type: array
+                  interval:
+                    type: integer
+                  track:
+                    type: boolean
+                type: object
+            type: object
+          status:
+            description: MetricsExporterStatus defines the observed state of MetricsExporter
+            properties:
+              phase:
+                type: string
+              podStatus:
+                properties:
+                  created:
+                    type: boolean
+                  phase:
+                    description: PodPhase is a label for the condition of a pod at
+                      the current time.
+                    type: string
+                type: object
+              roleBindingStatus:
+                properties:
+                  created:
+                    type: boolean
+                type: object
+              roleStatus:
+                properties:
+                  created:
+                    type: boolean
+                type: object
+              saStatus:
+                properties:
+                  created:
+                    type: boolean
+                type: object
+              usage:
+                properties:
+                  gpu:
+                    properties:
+                      lastUpdateTimestamp:
+                        type: string
+                      utilization:
+                        type: string
+                    type: object
+                  network:
+                    properties:
+                      lastUpdateTimestamp:
+                        type: string
+                      load:
+                        additionalProperties:
+                          properties:
+                            in:
+                              type: string
+                            out:
+                              type: string
+                          type: object
+                        type: object
+                    type: object
+                type: object
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

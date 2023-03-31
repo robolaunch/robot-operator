@@ -22,97 +22,104 @@ import (
 )
 
 func init() {
-	SchemeBuilder.Register(&MetricsCollector{}, &MetricsCollectorList{})
+	SchemeBuilder.Register(&MetricsExporter{}, &MetricsExporterList{})
 }
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 
-// MetricsCollector is the Schema for the metricscollectors API
-type MetricsCollector struct {
+// MetricsExporter is the Schema for the metricsexporters API
+type MetricsExporter struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   MetricsCollectorSpec   `json:"spec,omitempty"`
-	Status MetricsCollectorStatus `json:"status,omitempty"`
+	Spec   MetricsExporterSpec   `json:"spec,omitempty"`
+	Status MetricsExporterStatus `json:"status,omitempty"`
 }
 
 //+kubebuilder:object:root=true
 
-// MetricsCollectorList contains a list of MetricsCollector
-type MetricsCollectorList struct {
+// MetricsExporterList contains a list of MetricsExporter
+type MetricsExporterList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []MetricsCollector `json:"items"`
+	Items           []MetricsExporter `json:"items"`
 }
 
 // ********************************
-// MetricsCollector types
+// MetricsExporter types
 // ********************************
 
-type MetricType string
+type GPUMetrics struct {
+	Track    bool `json:"track,omitempty"`
+	Interval int  `json:"interval,omitempty"`
+}
+
+type NetworkMetrics struct {
+	Track      bool     `json:"track,omitempty"`
+	Interval   int      `json:"interval,omitempty"`
+	Interfaces []string `json:"interfaces,omitempty"`
+}
+
+// MetricsExporterSpec defines the desired state of MetricsExporter
+type MetricsExporterSpec struct {
+	GPU     GPUMetrics     `json:"gpu,omitempty"`
+	Network NetworkMetrics `json:"network,omitempty"`
+}
+
+type MetricsExporterPodStatus struct {
+	Created bool            `json:"created,omitempty"`
+	Phase   corev1.PodPhase `json:"phase,omitempty"`
+}
+
+type MetricsExporterRoleStatus struct {
+	Created bool `json:"created,omitempty"`
+}
+
+type MetricsExporterRoleBindingStatus struct {
+	Created bool `json:"created,omitempty"`
+}
+
+type MetricsExporterServiceAccountStatus struct {
+	Created bool `json:"created,omitempty"`
+}
+
+type GPUUtilizationStatus struct {
+	Utilization         string `json:"utilization,omitempty"`
+	LastUpdateTimestamp string `json:"lastUpdateTimestamp,omitempty"`
+}
+
+type NetworkInterfaceLoad struct {
+	IncomingLoad string `json:"in,omitempty"`
+	OutgoingLoad string `json:"out,omitempty"`
+}
+
+type NetworkLoadStatus struct {
+	Load                map[string]NetworkInterfaceLoad `json:"load,omitempty"`
+	LastUpdateTimestamp string                          `json:"lastUpdateTimestamp,omitempty"`
+}
+
+type Usage struct {
+	GPU     GPUUtilizationStatus `json:"gpu,omitempty"`
+	Network NetworkLoadStatus    `json:"network,omitempty"`
+}
+
+type MetricsExporterPhase string
 
 const (
-	MetricTypeCPU         MetricType = "CPU"
-	MetricTypeMemory      MetricType = "Memory"
-	MetricTypeGPU         MetricType = "GPU"
-	MetricTypeNetworkLoad MetricType = "NetworkLoad"
+	MetricsExporterPhaseCreatingRole           MetricsExporterPhase = "CreatingRole"
+	MetricsExporterPhaseCreatingServiceAccount MetricsExporterPhase = "CreatingServiceAccount"
+	MetricsExporterPhaseCreatingRoleBinding    MetricsExporterPhase = "CreatingRoleBinding"
+	MetricsExporterPhaseCreatingPod            MetricsExporterPhase = "CreatingPod"
+	MetricsExporterPhaseReady                  MetricsExporterPhase = "Ready"
 )
 
-// MetricsCollectorSpec defines the desired state of MetricsCollector
-type MetricsCollectorSpec struct {
-	// TODO: Add default value
-	// +kubebuilder:default=10
-	WaitSeconds int64 `json:"waitSeconds"`
-	CPU         bool  `json:"cpu"`
-	Memory      bool  `json:"memory"`
-	GPU         bool  `json:"gpu"`
-	NetworkLoad bool  `json:"networkLoad"`
-}
-
-type CPUUtilization struct {
-	Value          string `json:"value,omitempty"`
-	HostPercentage string `json:"hostPercentage,omitempty"`
-	CorePercentage string `json:"corePercentage,omitempty"`
-	Message        string `json:"message,omitempty"`
-}
-
-type MemoryUtilization struct {
-	Value          string `json:"value,omitempty"`
-	HostPercentage string `json:"hostPercentage,omitempty"`
-	Message        string `json:"message,omitempty"`
-}
-
-type NetworkLoad struct {
-	Value    string `json:"value,omitempty"`
-	Load     string `json:"load,omitempty"`
-	LoadKBit string `json:"loadKBit,omitempty"`
-}
-
-type NetworkInterfaceUtilization struct {
-	Name     string      `json:"name,omitempty"`
-	Transmit NetworkLoad `json:"transmit,omitempty"`
-	Receive  NetworkLoad `json:"receive,omitempty"`
-}
-
-type NetworkLoadUtilization struct {
-	Interfaces []NetworkInterfaceUtilization `json:"interfaces,omitempty"`
-	Message    string                        `json:"message,omitempty"`
-}
-
-type ComponentMetricStatus struct {
-	OwnerResourceReference metav1.OwnerReference  `json:"ownerReference,omitempty"`
-	PodReference           corev1.ObjectReference `json:"podReference,omitempty"`
-	ContainerName          string                 `json:"containerName,omitempty"`
-	CPUUtilization         CPUUtilization         `json:"cpuUtilization,omitempty"`
-	MemoryUtilization      MemoryUtilization      `json:"memoryUtilization,omitempty"`
-	NetworkLoadUtilization NetworkLoadUtilization `json:"networkLoadUtilization,omitempty"`
-	Message                string                 `json:"message,omitempty"`
-}
-
-// MetricsCollectorStatus defines the observed state of MetricsCollector
-type MetricsCollectorStatus struct {
-	LastUpdateTimestamp metav1.Time             `json:"lastUpdateTimestamp,omitempty"`
-	ComponentMetrics    []ComponentMetricStatus `json:"componentMetrics,omitempty"`
-	Allocatable         corev1.ResourceList     `json:"allocatable,omitempty"`
+// MetricsExporterStatus defines the observed state of MetricsExporter
+type MetricsExporterStatus struct {
+	Phase                MetricsExporterPhase                `json:"phase,omitempty"`
+	RoleStatus           MetricsExporterRoleStatus           `json:"roleStatus,omitempty"`
+	RoleBindingStatus    MetricsExporterRoleBindingStatus    `json:"roleBindingStatus,omitempty"`
+	ServiceAccountStatus MetricsExporterServiceAccountStatus `json:"saStatus,omitempty"`
+	PodStatus            MetricsExporterPodStatus            `json:"podStatus,omitempty"`
+	Usage                Usage                               `json:"usage,omitempty"`
 }
