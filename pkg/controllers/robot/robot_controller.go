@@ -111,7 +111,7 @@ func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *ro
 			switch instance.Status.DiscoveryServerStatus.Status.Phase {
 			case robotv1alpha1.DiscoveryServerPhaseReady:
 
-				switch instance.Status.LoaderJobStatus.Created {
+				switch instance.Status.LoaderJobStatus.Resource.Created {
 				case true:
 
 					switch instance.Status.LoaderJobStatus.Phase {
@@ -250,7 +250,7 @@ func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *ro
 					if err != nil {
 						return err
 					}
-					instance.Status.LoaderJobStatus.Created = true
+					instance.Status.LoaderJobStatus.Resource.Created = true
 				}
 
 			}

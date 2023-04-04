@@ -95,7 +95,7 @@ func (r *ROSBridgeReconciler) reconcileCheckStatus(ctx context.Context, instance
 	switch instance.Status.ServiceStatus.Created {
 	case true:
 
-		switch instance.Status.PodStatus.Created {
+		switch instance.Status.PodStatus.Resource.Created {
 		case true:
 
 			switch instance.Status.PodStatus.Phase {
@@ -114,7 +114,7 @@ func (r *ROSBridgeReconciler) reconcileCheckStatus(ctx context.Context, instance
 			if err != nil {
 				return err
 			}
-			instance.Status.PodStatus.Created = true
+			instance.Status.PodStatus.Resource.Created = true
 
 		}
 

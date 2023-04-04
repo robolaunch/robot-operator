@@ -44,7 +44,7 @@ func (r *RobotIDEReconciler) reconcileCheckPod(ctx context.Context, instance *ro
 			return err
 		}
 
-		instance.Status.PodStatus.Created = true
+		instance.Status.PodStatus.Resource.Created = true
 		instance.Status.PodStatus.Phase = podQuery.Status.Phase
 		instance.Status.PodStatus.IP = podQuery.Status.PodIP
 	}

@@ -48,7 +48,7 @@ func (r *DiscoveryServerReconciler) reconcileCheckPod(ctx context.Context, insta
 	discoveryServerPodQuery := &corev1.Pod{}
 	err := r.Get(ctx, *instance.GetDiscoveryServerPodMetadata(), discoveryServerPodQuery)
 	if err != nil && errors.IsNotFound(err) {
-		instance.Status.PodStatus.Created = false
+		instance.Status.PodStatus.Resource.Created = false
 	} else if err != nil {
 		return err
 	} else {
@@ -70,7 +70,7 @@ func (r *DiscoveryServerReconciler) reconcileCheckPod(ctx context.Context, insta
 
 		} else {
 
-			instance.Status.PodStatus.Created = true
+			instance.Status.PodStatus.Resource.Created = true
 			instance.Status.PodStatus.IP = discoveryServerPodQuery.Status.PodIP
 			instance.Status.PodStatus.Phase = discoveryServerPodQuery.Status.Phase
 

@@ -33,7 +33,7 @@ func (r *LaunchManagerReconciler) reconcileCheckLaunchPod(ctx context.Context, i
 			return err
 		}
 
-		instance.Status.LaunchPodStatus.Status.Created = true
+		instance.Status.LaunchPodStatus.Status.Resource.Created = true
 		instance.Status.LaunchPodStatus.Status.IP = launchPodQuery.Status.PodIP
 		instance.Status.LaunchPodStatus.Status.Phase = launchPodQuery.Status.Phase
 

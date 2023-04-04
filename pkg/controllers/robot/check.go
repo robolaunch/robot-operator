@@ -102,7 +102,7 @@ func (r *RobotReconciler) reconcileCheckLoaderJob(ctx context.Context, instance 
 		loaderJobQuery := &batchv1.Job{}
 		err := r.Get(ctx, *instance.GetLoaderJobMetadata(), loaderJobQuery)
 		if err != nil && errors.IsNotFound(err) {
-			instance.Status.LoaderJobStatus.Created = false
+			instance.Status.LoaderJobStatus.Resource.Created = false
 		} else if err != nil {
 			return err
 		} else {

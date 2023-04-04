@@ -110,7 +110,7 @@ func (r *LaunchManagerReconciler) reconcileCheckStatus(ctx context.Context, inst
 		switch resources.HasLaunchInThisInstance(*instance, *robot) {
 		case true:
 
-			switch instance.Status.LaunchPodStatus.Status.Created {
+			switch instance.Status.LaunchPodStatus.Status.Resource.Created {
 			case true:
 
 				switch instance.Status.LaunchPodStatus.Status.Phase {
@@ -127,7 +127,7 @@ func (r *LaunchManagerReconciler) reconcileCheckStatus(ctx context.Context, inst
 				if err != nil {
 					return err
 				}
-				instance.Status.LaunchPodStatus.Status.Created = true
+				instance.Status.LaunchPodStatus.Status.Resource.Created = true
 				instance.Status.Phase = robotv1alpha1.LaunchManagerPhaseLaunching
 
 			}

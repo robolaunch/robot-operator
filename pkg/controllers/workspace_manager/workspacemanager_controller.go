@@ -101,7 +101,7 @@ func (r *WorkspaceManagerReconciler) Reconcile(ctx context.Context, req ctrl.Req
 
 func (r *WorkspaceManagerReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.WorkspaceManager) error {
 
-	switch instance.Status.ClonerJobStatus.Created {
+	switch instance.Status.ClonerJobStatus.Resource.Created {
 	case true:
 
 		switch instance.Status.ClonerJobStatus.Phase {
@@ -126,7 +126,7 @@ func (r *WorkspaceManagerReconciler) reconcileCheckStatus(ctx context.Context, i
 		if err != nil {
 			return err
 		}
-		instance.Status.ClonerJobStatus.Created = true
+		instance.Status.ClonerJobStatus.Resource.Created = true
 
 	}
 

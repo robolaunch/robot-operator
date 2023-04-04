@@ -19,7 +19,7 @@ func (r *WorkspaceManagerReconciler) reconcileCheckClonerJob(ctx context.Context
 	clonerJobQuery := &batchv1.Job{}
 	err := r.Get(ctx, *instance.GetClonerJobMetadata(), clonerJobQuery)
 	if err != nil && errors.IsNotFound(err) {
-		instance.Status.ClonerJobStatus.Created = false
+		instance.Status.ClonerJobStatus.Resource.Created = false
 	} else if err != nil {
 		return err
 	} else {
@@ -44,7 +44,7 @@ func (r *WorkspaceManagerReconciler) reconcileCheckCleanupJob(ctx context.Contex
 		cleanupJobQuery := &batchv1.Job{}
 		err := r.Get(ctx, *instance.GetCleanupJobMetadata(), cleanupJobQuery)
 		if err != nil && errors.IsNotFound(err) {
-			instance.Status.CleanupJobStatus.Created = false
+			instance.Status.CleanupJobStatus.Resource.Created = false
 		} else if err != nil {
 			return err
 		} else {

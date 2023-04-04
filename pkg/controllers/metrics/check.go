@@ -27,7 +27,7 @@ func (r *MetricsExporterReconciler) reconcileCheckPod(ctx context.Context, insta
 			return err
 		}
 
-		instance.Status.PodStatus.Created = true
+		instance.Status.PodStatus.Resource.Created = true
 		instance.Status.PodStatus.Phase = podQuery.Status.Phase
 	}
 

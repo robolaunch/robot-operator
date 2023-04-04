@@ -67,7 +67,7 @@ func (r *ROSBridgeReconciler) reconcileCheckPod(ctx context.Context, instance *r
 			return nil
 		}
 
-		instance.Status.PodStatus.Created = true
+		instance.Status.PodStatus.Resource.Created = true
 		instance.Status.PodStatus.Phase = bridgePodQuery.Status.Phase
 	}
 
