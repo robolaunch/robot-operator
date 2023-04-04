@@ -126,6 +126,8 @@ spec:
                         type: string
                     type: object
                     x-kubernetes-map-type: atomic
+                required:
+                - created
                 type: object
               roleBindingStatus:
                 properties:
@@ -194,6 +196,8 @@ spec:
                         type: string
                     type: object
                     x-kubernetes-map-type: atomic
+                required:
+                - created
                 type: object
               roleStatus:
                 properties:
@@ -262,6 +266,8 @@ spec:
                         type: string
                     type: object
                     x-kubernetes-map-type: atomic
+                required:
+                - created
                 type: object
               saStatus:
                 properties:
@@ -330,6 +336,8 @@ spec:
                         type: string
                     type: object
                     x-kubernetes-map-type: atomic
+                required:
+                - created
                 type: object
               usage:
                 properties:

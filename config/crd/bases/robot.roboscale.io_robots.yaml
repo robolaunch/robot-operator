@@ -1043,6 +1043,8 @@ spec:
                                 type: string
                             type: object
                             x-kubernetes-map-type: atomic
+                        required:
+                        - created
                         type: object
                       steps:
                         items:
@@ -1130,6 +1132,8 @@ spec:
                                       type: string
                                   type: object
                                   x-kubernetes-map-type: atomic
+                              required:
+                              - created
                               type: object
                             step:
                               description: Step is a command or script to execute
@@ -1437,6 +1441,8 @@ spec:
                                   type: string
                               type: object
                               x-kubernetes-map-type: atomic
+                          required:
+                          - created
                           type: object
                         robotVDIStatus:
                           properties:
@@ -1514,6 +1520,8 @@ spec:
                                   type: string
                               type: object
                               x-kubernetes-map-type: atomic
+                          required:
+                          - created
                           type: object
                       type: object
                   type: object
@@ -1865,6 +1873,8 @@ spec:
                                           type: string
                                       type: object
                                       x-kubernetes-map-type: atomic
+                                  required:
+                                  - created
                                   type: object
                               type: object
                           type: object
@@ -1946,6 +1956,8 @@ spec:
                             type: string
                         type: object
                         x-kubernetes-map-type: atomic
+                    required:
+                    - created
                     type: object
                   status:
                     description: DiscoveryServerStatus defines the observed state
@@ -2024,6 +2036,8 @@ spec:
                                 type: string
                             type: object
                             x-kubernetes-map-type: atomic
+                        required:
+                        - created
                         type: object
                       connectionInfo:
                         properties:
@@ -2119,6 +2133,8 @@ spec:
                                     type: string
                                 type: object
                                 x-kubernetes-map-type: atomic
+                            required:
+                            - created
                             type: object
                         type: object
                       serviceExportStatus:
@@ -2194,6 +2210,8 @@ spec:
                                 type: string
                             type: object
                             x-kubernetes-map-type: atomic
+                        required:
+                        - created
                         type: object
                       serviceStatus:
                         properties:
@@ -2268,6 +2286,8 @@ spec:
                                 type: string
                             type: object
                             x-kubernetes-map-type: atomic
+                        required:
+                        - created
                         type: object
                     type: object
                 type: object
@@ -2342,6 +2362,8 @@ spec:
                         type: string
                     type: object
                     x-kubernetes-map-type: atomic
+                required:
+                - created
                 type: object
               initialLaunchManagerStatuses:
                 description: Initial launch manager creation status
@@ -2414,6 +2436,8 @@ spec:
                           type: string
                       type: object
                       x-kubernetes-map-type: atomic
+                  required:
+                  - created
                   type: object
                 type: array
               loaderJobStatus:
@@ -2484,6 +2508,8 @@ spec:
                         type: string
                     type: object
                     x-kubernetes-map-type: atomic
+                required:
+                - created
                 type: object
               nodeName:
                 description: Node name
@@ -2564,6 +2590,8 @@ spec:
                             type: string
                         type: object
                         x-kubernetes-map-type: atomic
+                    required:
+                    - created
                     type: object
                   status:
                     description: RobotDevSuiteStatus defines the observed state of
@@ -2646,6 +2674,8 @@ spec:
                                 type: string
                             type: object
                             x-kubernetes-map-type: atomic
+                        required:
+                        - created
                         type: object
                       robotVDIStatus:
                         properties:
@@ -2720,6 +2750,8 @@ spec:
                                 type: string
                             type: object
                             x-kubernetes-map-type: atomic
+                        required:
+                        - created
                         type: object
                     type: object
                 type: object
@@ -2796,6 +2828,8 @@ spec:
                             type: string
                         type: object
                         x-kubernetes-map-type: atomic
+                    required:
+                    - created
                     type: object
                   status:
                     description: ROSBridgeStatus defines the observed state of ROSBridge
@@ -2875,6 +2909,8 @@ spec:
                                 type: string
                             type: object
                             x-kubernetes-map-type: atomic
+                        required:
+                        - created
                         type: object
                       serviceStatus:
                         properties:
@@ -2949,6 +2985,8 @@ spec:
                                 type: string
                             type: object
                             x-kubernetes-map-type: atomic
+                        required:
+                        - created
                         type: object
                     type: object
                 type: object
@@ -3025,6 +3063,8 @@ spec:
                             type: string
                         type: object
                         x-kubernetes-map-type: atomic
+                    required:
+                    - created
                     type: object
                   opt:
                     properties:
@@ -3096,6 +3136,8 @@ spec:
                             type: string
                         type: object
                         x-kubernetes-map-type: atomic
+                    required:
+                    - created
                     type: object
                   usr:
                     properties:
@@ -3167,6 +3209,8 @@ spec:
                             type: string
                         type: object
                         x-kubernetes-map-type: atomic
+                    required:
+                    - created
                     type: object
                   var:
                     properties:
@@ -3238,6 +3282,8 @@ spec:
                             type: string
                         type: object
                         x-kubernetes-map-type: atomic
+                    required:
+                    - created
                     type: object
                   workspace:
                     properties:
@@ -3309,6 +3355,8 @@ spec:
                             type: string
                         type: object
                         x-kubernetes-map-type: atomic
+                    required:
+                    - created
                     type: object
                 type: object
               workspaceManagerStatus:
@@ -3384,6 +3432,8 @@ spec:
                             type: string
                         type: object
                         x-kubernetes-map-type: atomic
+                    required:
+                    - created
                     type: object
                   status:
                     description: WorkspaceManagerStatus defines the observed state
@@ -3462,6 +3512,8 @@ spec:
                                 type: string
                             type: object
                             x-kubernetes-map-type: atomic
+                        required:
+                        - created
                         type: object
                       clonerJobStatus:
                         properties:
@@ -3536,6 +3588,8 @@ spec:
                                 type: string
                             type: object
                             x-kubernetes-map-type: atomic
+                        required:
+                        - created
                         type: object
                       phase:
                         type: string

@@ -180,6 +180,8 @@ spec:
                         type: string
                     type: object
                     x-kubernetes-map-type: atomic
+                required:
+                - created
                 type: object
               connectionInfo:
                 properties:
@@ -264,6 +266,8 @@ spec:
                             type: string
                         type: object
                         x-kubernetes-map-type: atomic
+                    required:
+                    - created
                     type: object
                 type: object
               serviceExportStatus:
@@ -333,6 +337,8 @@ spec:
                         type: string
                     type: object
                     x-kubernetes-map-type: atomic
+                required:
+                - created
                 type: object
               serviceStatus:
                 properties:
@@ -401,6 +407,8 @@ spec:
                         type: string
                     type: object
                     x-kubernetes-map-type: atomic
+                required:
+                - created
                 type: object
             type: object
         type: object

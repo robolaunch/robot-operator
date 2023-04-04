@@ -172,6 +172,8 @@ spec:
                         type: string
                     type: object
                     x-kubernetes-map-type: atomic
+                required:
+                - created
                 type: object
               clonerJobStatus:
                 properties:
@@ -240,6 +242,8 @@ spec:
                         type: string
                     type: object
                     x-kubernetes-map-type: atomic
+                required:
+                - created
                 type: object
               phase:
                 type: string

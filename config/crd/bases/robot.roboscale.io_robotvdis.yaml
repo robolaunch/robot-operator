@@ -143,6 +143,8 @@ spec:
                         type: string
                     type: object
                     x-kubernetes-map-type: atomic
+                required:
+                - created
                 type: object
               phase:
                 type: string
@@ -220,6 +222,8 @@ spec:
                             type: string
                         type: object
                         x-kubernetes-map-type: atomic
+                    required:
+                    - created
                     type: object
                 type: object
               pvcStatus:
@@ -289,6 +293,8 @@ spec:
                         type: string
                     type: object
                     x-kubernetes-map-type: atomic
+                required:
+                - created
                 type: object
               serviceTCPStatus:
                 properties:
@@ -357,6 +363,8 @@ spec:
                         type: string
                     type: object
                     x-kubernetes-map-type: atomic
+                required:
+                - created
                 type: object
               serviceUDPStatus:
                 properties:
@@ -425,6 +433,8 @@ spec:
                         type: string
                     type: object
                     x-kubernetes-map-type: atomic
+                required:
+                - created
                 type: object
             type: object
         type: object

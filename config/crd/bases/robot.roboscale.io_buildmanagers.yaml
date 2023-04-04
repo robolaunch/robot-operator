@@ -256,6 +256,8 @@ spec:
                         type: string
                     type: object
                     x-kubernetes-map-type: atomic
+                required:
+                - created
                 type: object
               steps:
                 items:
@@ -332,6 +334,8 @@ spec:
                               type: string
                           type: object
                           x-kubernetes-map-type: atomic
+                      required:
+                      - created
                       type: object
                     step:
                       description: Step is a command or script to execute when building

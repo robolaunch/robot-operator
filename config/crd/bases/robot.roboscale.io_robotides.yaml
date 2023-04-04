@@ -132,6 +132,8 @@ spec:
                         type: string
                     type: object
                     x-kubernetes-map-type: atomic
+                required:
+                - created
                 type: object
               phase:
                 type: string
@@ -209,6 +211,8 @@ spec:
                             type: string
                         type: object
                         x-kubernetes-map-type: atomic
+                    required:
+                    - created
                     type: object
                 type: object
               serviceStatus:
@@ -278,6 +282,8 @@ spec:
                         type: string
                     type: object
                     x-kubernetes-map-type: atomic
+                required:
+                - created
                 type: object
             type: object
         type: object
