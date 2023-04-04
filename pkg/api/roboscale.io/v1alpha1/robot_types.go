@@ -236,7 +236,7 @@ const (
 	JobFailed    JobPhase = "Failed"
 )
 
-type LoaderJobStatus struct {
+type OwnedJobStatus struct {
 	Created bool     `json:"created,omitempty"`
 	Phase   JobPhase `json:"phase,omitempty"`
 }
@@ -283,7 +283,7 @@ type RobotStatus struct {
 	// Robot development suite instance status
 	RobotDevSuiteStatus RobotDevSuiteInstanceStatus `json:"robotDevSuiteStatus,omitempty"`
 	// Loader job status that configures environment
-	LoaderJobStatus LoaderJobStatus `json:"loaderJobStatus,omitempty"`
+	LoaderJobStatus OwnedJobStatus `json:"loaderJobStatus,omitempty"`
 	// Workspace manager status
 	WorkspaceManagerStatus WorkspaceManagerInstanceStatus `json:"workspaceManagerStatus,omitempty"`
 	// Initial build manager creation status

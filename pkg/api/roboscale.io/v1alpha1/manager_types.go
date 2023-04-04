@@ -137,21 +137,11 @@ type WorkspaceManagerSpec struct {
 	UpdateNeeded bool `json:"updateNeeded,omitempty"`
 }
 
-type ClonerJobStatus struct {
-	Created bool     `json:"created,omitempty"`
-	Phase   JobPhase `json:"phase,omitempty"`
-}
-
-type CleanupJobStatus struct {
-	Created bool     `json:"created,omitempty"`
-	Phase   JobPhase `json:"phase,omitempty"`
-}
-
 // WorkspaceManagerStatus defines the observed state of WorkspaceManager
 type WorkspaceManagerStatus struct {
 	Phase            WorkspaceManagerPhase `json:"phase,omitempty"`
-	ClonerJobStatus  ClonerJobStatus       `json:"clonerJobStatus,omitempty"`
-	CleanupJobStatus CleanupJobStatus      `json:"cleanupJobStatus,omitempty"`
+	ClonerJobStatus  OwnedJobStatus        `json:"clonerJobStatus,omitempty"`
+	CleanupJobStatus OwnedJobStatus        `json:"cleanupJobStatus,omitempty"`
 	Version          int                   `json:"version,omitempty"`
 }
 

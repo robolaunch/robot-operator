@@ -173,8 +173,8 @@ func (r *WorkspaceManagerReconciler) reconcileCheckUpdates(ctx context.Context, 
 
 		instance.Status.Version++
 		instance.Status.Phase = robotv1alpha1.WorkspaceManagerPhaseConfiguringWorkspaces
-		instance.Status.CleanupJobStatus = robotv1alpha1.CleanupJobStatus{}
-		instance.Status.ClonerJobStatus = robotv1alpha1.ClonerJobStatus{}
+		instance.Status.CleanupJobStatus = robotv1alpha1.OwnedJobStatus{}
+		instance.Status.ClonerJobStatus = robotv1alpha1.OwnedJobStatus{}
 
 		err = r.reconcileUpdateInstanceStatus(ctx, instance)
 		if err != nil {

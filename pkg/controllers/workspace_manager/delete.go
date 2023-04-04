@@ -17,7 +17,7 @@ func (r *WorkspaceManagerReconciler) reconcileDeleteClonerJob(ctx context.Contex
 	err := r.Get(ctx, *instance.GetClonerJobMetadata(), clonerJobQuery)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			instance.Status.ClonerJobStatus = robotv1alpha1.ClonerJobStatus{}
+			instance.Status.ClonerJobStatus = robotv1alpha1.OwnedJobStatus{}
 		} else {
 			return err
 		}
@@ -43,7 +43,7 @@ func (r *WorkspaceManagerReconciler) reconcileDeleteClonerJob(ctx context.Contex
 			time.Sleep(time.Second * 1)
 		}
 
-		instance.Status.ClonerJobStatus = robotv1alpha1.ClonerJobStatus{}
+		instance.Status.ClonerJobStatus = robotv1alpha1.OwnedJobStatus{}
 	}
 
 	return nil
@@ -55,7 +55,7 @@ func (r *WorkspaceManagerReconciler) reconcileDeleteCleanupJob(ctx context.Conte
 	err := r.Get(ctx, *instance.GetCleanupJobMetadata(), cleanupJobQuery)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			instance.Status.CleanupJobStatus = robotv1alpha1.CleanupJobStatus{}
+			instance.Status.CleanupJobStatus = robotv1alpha1.OwnedJobStatus{}
 		} else {
 			return err
 		}
@@ -81,7 +81,7 @@ func (r *WorkspaceManagerReconciler) reconcileDeleteCleanupJob(ctx context.Conte
 			time.Sleep(time.Second * 1)
 		}
 
-		instance.Status.CleanupJobStatus = robotv1alpha1.CleanupJobStatus{}
+		instance.Status.CleanupJobStatus = robotv1alpha1.OwnedJobStatus{}
 	}
 
 	return nil
