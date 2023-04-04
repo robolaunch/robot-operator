@@ -6,6 +6,7 @@ import (
 	"github.com/robolaunch/robot-operator/internal"
 	"github.com/robolaunch/robot-operator/internal/handle"
 	"github.com/robolaunch/robot-operator/internal/label"
+	"github.com/robolaunch/robot-operator/internal/reference"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -36,6 +37,7 @@ func (r *LaunchManagerReconciler) reconcileCheckLaunchPod(ctx context.Context, i
 		instance.Status.LaunchPodStatus.Status.Resource.Created = true
 		instance.Status.LaunchPodStatus.Status.IP = launchPodQuery.Status.PodIP
 		instance.Status.LaunchPodStatus.Status.Resource.Phase = string(launchPodQuery.Status.Phase)
+		reference.SetReference(&instance.Status.LaunchPodStatus.Status.Resource.Reference, launchPodQuery.TypeMeta, launchPodQuery.ObjectMeta)
 
 		launchStatus := make(map[string]robotv1alpha1.LaunchStatus)
 		instance.Status.LaunchPodStatus.LaunchStatus = launchStatus

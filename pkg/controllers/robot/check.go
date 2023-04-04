@@ -4,6 +4,7 @@ import (
 	"context"
 	"reflect"
 
+	"github.com/robolaunch/robot-operator/internal/reference"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -21,7 +22,7 @@ func (r *RobotReconciler) reconcileCheckPVCs(ctx context.Context, instance *robo
 		return err
 	} else {
 		instance.Status.VolumeStatuses.Var.Created = true
-		instance.Status.VolumeStatuses.Var.Reference.Name = pvcVarQuery.Name
+		reference.SetReference(&instance.Status.VolumeStatuses.Var.Reference, pvcVarQuery.TypeMeta, pvcVarQuery.ObjectMeta)
 	}
 
 	pvcOptQuery := &corev1.PersistentVolumeClaim{}
@@ -32,7 +33,7 @@ func (r *RobotReconciler) reconcileCheckPVCs(ctx context.Context, instance *robo
 		return err
 	} else {
 		instance.Status.VolumeStatuses.Opt.Created = true
-		instance.Status.VolumeStatuses.Opt.Reference.Name = pvcOptQuery.Name
+		reference.SetReference(&instance.Status.VolumeStatuses.Opt.Reference, pvcOptQuery.TypeMeta, pvcOptQuery.ObjectMeta)
 	}
 
 	pvcEtcQuery := &corev1.PersistentVolumeClaim{}
@@ -43,7 +44,7 @@ func (r *RobotReconciler) reconcileCheckPVCs(ctx context.Context, instance *robo
 		return err
 	} else {
 		instance.Status.VolumeStatuses.Etc.Created = true
-		instance.Status.VolumeStatuses.Etc.Reference.Name = pvcEtcQuery.Name
+		reference.SetReference(&instance.Status.VolumeStatuses.Etc.Reference, pvcEtcQuery.TypeMeta, pvcEtcQuery.ObjectMeta)
 	}
 
 	pvcUsrQuery := &corev1.PersistentVolumeClaim{}
@@ -54,7 +55,7 @@ func (r *RobotReconciler) reconcileCheckPVCs(ctx context.Context, instance *robo
 		return err
 	} else {
 		instance.Status.VolumeStatuses.Usr.Created = true
-		instance.Status.VolumeStatuses.Usr.Reference.Name = pvcUsrQuery.Name
+		reference.SetReference(&instance.Status.VolumeStatuses.Usr.Reference, pvcUsrQuery.TypeMeta, pvcUsrQuery.ObjectMeta)
 	}
 
 	pvcWorkspaceQuery := &corev1.PersistentVolumeClaim{}
@@ -65,7 +66,7 @@ func (r *RobotReconciler) reconcileCheckPVCs(ctx context.Context, instance *robo
 		return err
 	} else {
 		instance.Status.VolumeStatuses.Workspace.Created = true
-		instance.Status.VolumeStatuses.Workspace.Reference.Name = pvcWorkspaceQuery.Name
+		reference.SetReference(&instance.Status.VolumeStatuses.Workspace.Reference, pvcWorkspaceQuery.TypeMeta, pvcWorkspaceQuery.ObjectMeta)
 	}
 
 	return nil
@@ -90,6 +91,7 @@ func (r *RobotReconciler) reconcileCheckDiscoveryServer(ctx context.Context, ins
 		}
 
 		instance.Status.DiscoveryServerStatus.Resource.Created = true
+		reference.SetReference(&instance.Status.DiscoveryServerStatus.Resource.Reference, discoverServerQuery.TypeMeta, discoverServerQuery.ObjectMeta)
 		instance.Status.DiscoveryServerStatus.Status = discoverServerQuery.Status
 	}
 
@@ -106,6 +108,7 @@ func (r *RobotReconciler) reconcileCheckLoaderJob(ctx context.Context, instance 
 		} else if err != nil {
 			return err
 		} else {
+			reference.SetReference(&instance.Status.LoaderJobStatus.Reference, loaderJobQuery.TypeMeta, loaderJobQuery.ObjectMeta)
 			switch 1 {
 			case int(loaderJobQuery.Status.Succeeded):
 				instance.Status.LoaderJobStatus.Phase = string(robotv1alpha1.JobSucceeded)
@@ -140,6 +143,7 @@ func (r *RobotReconciler) reconcileCheckROSBridge(ctx context.Context, instance 
 			}
 
 			instance.Status.ROSBridgeStatus.Resource.Created = true
+			reference.SetReference(&instance.Status.ROSBridgeStatus.Resource.Reference, rosBridgeQuery.TypeMeta, rosBridgeQuery.ObjectMeta)
 			instance.Status.ROSBridgeStatus.Status = rosBridgeQuery.Status
 		}
 	}
@@ -168,6 +172,7 @@ func (r *RobotReconciler) reconcileCheckRobotDevSuite(ctx context.Context, insta
 			}
 
 			instance.Status.RobotDevSuiteStatus.Resource.Created = true
+			reference.SetReference(&instance.Status.RobotDevSuiteStatus.Resource.Reference, robotDevSuiteQuery.TypeMeta, robotDevSuiteQuery.ObjectMeta)
 			instance.Status.RobotDevSuiteStatus.Status = robotDevSuiteQuery.Status
 
 		} else {
@@ -195,6 +200,7 @@ func (r *RobotReconciler) reconcileCheckWorkspaceManager(ctx context.Context, in
 	} else {
 
 		instance.Status.WorkspaceManagerStatus.Resource.Created = true
+		reference.SetReference(&instance.Status.WorkspaceManagerStatus.Resource.Reference, workspaceManagerQuery.TypeMeta, workspaceManagerQuery.ObjectMeta)
 		instance.Status.WorkspaceManagerStatus.Status = workspaceManagerQuery.Status
 
 		if !reflect.DeepEqual(instance.Spec.WorkspaceManagerTemplate.Workspaces, workspaceManagerQuery.Spec.Workspaces) {

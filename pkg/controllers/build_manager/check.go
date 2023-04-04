@@ -5,6 +5,7 @@ import (
 
 	"github.com/robolaunch/robot-operator/internal"
 	"github.com/robolaunch/robot-operator/internal/label"
+	"github.com/robolaunch/robot-operator/internal/reference"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -24,6 +25,7 @@ func (r *BuildManagerReconciler) reconcileCheckConfigMap(ctx context.Context, in
 		}
 	} else {
 		instance.Status.ScriptConfigMapStatus.Created = true
+		reference.SetReference(&instance.Status.ScriptConfigMapStatus.Reference, configMapQuery.TypeMeta, configMapQuery.ObjectMeta)
 	}
 
 	return nil
@@ -66,9 +68,6 @@ func (r *BuildManagerReconciler) reconcileCheckBuilderJobs(ctx context.Context, 
 					stepStatus := robotv1alpha1.StepStatus{
 						Step: step,
 						Resource: robotv1alpha1.OwnedResourceStatus{
-							Reference: corev1.ObjectReference{
-								Name: jobMetadata.Name,
-							},
 							Created: false,
 						},
 					}
@@ -91,13 +90,11 @@ func (r *BuildManagerReconciler) reconcileCheckBuilderJobs(ctx context.Context, 
 				stepStatus := robotv1alpha1.StepStatus{
 					Step: step,
 					Resource: robotv1alpha1.OwnedResourceStatus{
-						Reference: corev1.ObjectReference{
-							Name: jobMetadata.Name,
-						},
 						Created: true,
 						Phase:   string(jobPhase),
 					},
 				}
+				reference.SetReference(&stepStatus.Resource.Reference, jobQuery.TypeMeta, jobQuery.ObjectMeta)
 
 				stepStatuses = append(stepStatuses, stepStatus)
 			}
