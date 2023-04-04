@@ -12,3 +12,23 @@ type DetailedOwnedPodStatus struct {
 	Resource OwnedResourceStatus `json:"resource,omitempty"`
 	IP       string              `json:"ip,omitempty"`
 }
+
+type DiscoveryServerInstanceStatus struct {
+	Resource OwnedResourceStatus   `json:"resource,omitempty"`
+	Status   DiscoveryServerStatus `json:"status,omitempty"`
+}
+
+type ROSBridgeInstanceStatus struct {
+	Resource OwnedResourceStatus `json:"resource,omitempty"`
+	Status   ROSBridgeStatus     `json:"status,omitempty"`
+}
+
+type RobotDevSuiteInstanceStatus struct {
+	Resource OwnedResourceStatus `json:"resource,omitempty"`
+	Status   RobotDevSuiteStatus `json:"status,omitempty"`
+}
+
+type WorkspaceManagerInstanceStatus struct {
+	Resource OwnedResourceStatus    `json:"resource,omitempty"`
+	Status   WorkspaceManagerStatus `json:"status,omitempty"`
+}

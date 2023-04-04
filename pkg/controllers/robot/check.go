@@ -21,7 +21,7 @@ func (r *RobotReconciler) reconcileCheckPVCs(ctx context.Context, instance *robo
 		return err
 	} else {
 		instance.Status.VolumeStatuses.Var.Created = true
-		instance.Status.VolumeStatuses.Var.PersistentVolumeClaimName = pvcVarQuery.Name
+		instance.Status.VolumeStatuses.Var.Reference.Name = pvcVarQuery.Name
 	}
 
 	pvcOptQuery := &corev1.PersistentVolumeClaim{}
@@ -32,7 +32,7 @@ func (r *RobotReconciler) reconcileCheckPVCs(ctx context.Context, instance *robo
 		return err
 	} else {
 		instance.Status.VolumeStatuses.Opt.Created = true
-		instance.Status.VolumeStatuses.Opt.PersistentVolumeClaimName = pvcOptQuery.Name
+		instance.Status.VolumeStatuses.Opt.Reference.Name = pvcOptQuery.Name
 	}
 
 	pvcEtcQuery := &corev1.PersistentVolumeClaim{}
@@ -43,7 +43,7 @@ func (r *RobotReconciler) reconcileCheckPVCs(ctx context.Context, instance *robo
 		return err
 	} else {
 		instance.Status.VolumeStatuses.Etc.Created = true
-		instance.Status.VolumeStatuses.Etc.PersistentVolumeClaimName = pvcEtcQuery.Name
+		instance.Status.VolumeStatuses.Etc.Reference.Name = pvcEtcQuery.Name
 	}
 
 	pvcUsrQuery := &corev1.PersistentVolumeClaim{}
@@ -54,7 +54,7 @@ func (r *RobotReconciler) reconcileCheckPVCs(ctx context.Context, instance *robo
 		return err
 	} else {
 		instance.Status.VolumeStatuses.Usr.Created = true
-		instance.Status.VolumeStatuses.Usr.PersistentVolumeClaimName = pvcUsrQuery.Name
+		instance.Status.VolumeStatuses.Usr.Reference.Name = pvcUsrQuery.Name
 	}
 
 	pvcWorkspaceQuery := &corev1.PersistentVolumeClaim{}
@@ -65,7 +65,7 @@ func (r *RobotReconciler) reconcileCheckPVCs(ctx context.Context, instance *robo
 		return err
 	} else {
 		instance.Status.VolumeStatuses.Workspace.Created = true
-		instance.Status.VolumeStatuses.Workspace.PersistentVolumeClaimName = pvcWorkspaceQuery.Name
+		instance.Status.VolumeStatuses.Workspace.Reference.Name = pvcWorkspaceQuery.Name
 	}
 
 	return nil
@@ -89,7 +89,7 @@ func (r *RobotReconciler) reconcileCheckDiscoveryServer(ctx context.Context, ins
 			}
 		}
 
-		instance.Status.DiscoveryServerStatus.Created = true
+		instance.Status.DiscoveryServerStatus.Resource.Created = true
 		instance.Status.DiscoveryServerStatus.Status = discoverServerQuery.Status
 	}
 
@@ -139,7 +139,7 @@ func (r *RobotReconciler) reconcileCheckROSBridge(ctx context.Context, instance 
 				}
 			}
 
-			instance.Status.ROSBridgeStatus.Created = true
+			instance.Status.ROSBridgeStatus.Resource.Created = true
 			instance.Status.ROSBridgeStatus.Status = rosBridgeQuery.Status
 		}
 	}
@@ -167,7 +167,7 @@ func (r *RobotReconciler) reconcileCheckRobotDevSuite(ctx context.Context, insta
 				}
 			}
 
-			instance.Status.RobotDevSuiteStatus.Created = true
+			instance.Status.RobotDevSuiteStatus.Resource.Created = true
 			instance.Status.RobotDevSuiteStatus.Status = robotDevSuiteQuery.Status
 
 		} else {
@@ -194,7 +194,7 @@ func (r *RobotReconciler) reconcileCheckWorkspaceManager(ctx context.Context, in
 		return err
 	} else {
 
-		instance.Status.WorkspaceManagerStatus.Created = true
+		instance.Status.WorkspaceManagerStatus.Resource.Created = true
 		instance.Status.WorkspaceManagerStatus.Status = workspaceManagerQuery.Status
 
 		if !reflect.DeepEqual(instance.Spec.WorkspaceManagerTemplate.Workspaces, workspaceManagerQuery.Spec.Workspaces) {
@@ -206,7 +206,7 @@ func (r *RobotReconciler) reconcileCheckWorkspaceManager(ctx context.Context, in
 			}
 
 			// set phase configuring
-			instance.Status.WorkspaceManagerStatus.Created = true
+			instance.Status.WorkspaceManagerStatus.Resource.Created = true
 			instance.Status.WorkspaceManagerStatus.Status = robotv1alpha1.WorkspaceManagerStatus{}
 			instance.Status.WorkspaceManagerStatus.Status.Phase = robotv1alpha1.WorkspaceManagerPhaseConfiguringWorkspaces
 		}

@@ -200,32 +200,12 @@ type RobotSpec struct {
 	TLSSecretReference TLSSecretReference `json:"tlsSecretRef,omitempty"`
 }
 
-type VolumeStatus struct {
-	Created                   bool   `json:"created,omitempty"`
-	PersistentVolumeClaimName string `json:"persistentVolumeClaimName,omitempty"`
-}
-
 type VolumeStatuses struct {
-	Var       VolumeStatus `json:"var,omitempty"`
-	Etc       VolumeStatus `json:"etc,omitempty"`
-	Usr       VolumeStatus `json:"usr,omitempty"`
-	Opt       VolumeStatus `json:"opt,omitempty"`
-	Workspace VolumeStatus `json:"workspace,omitempty"`
-}
-
-type DiscoveryServerInstanceStatus struct {
-	Created bool                  `json:"created,omitempty"`
-	Status  DiscoveryServerStatus `json:"status,omitempty"`
-}
-
-type ROSBridgeInstanceStatus struct {
-	Created bool            `json:"created,omitempty"`
-	Status  ROSBridgeStatus `json:"status,omitempty"`
-}
-
-type RobotDevSuiteInstanceStatus struct {
-	Created bool                `json:"created,omitempty"`
-	Status  RobotDevSuiteStatus `json:"status,omitempty"`
+	Var       OwnedResourceStatus `json:"var,omitempty"`
+	Etc       OwnedResourceStatus `json:"etc,omitempty"`
+	Usr       OwnedResourceStatus `json:"usr,omitempty"`
+	Opt       OwnedResourceStatus `json:"opt,omitempty"`
+	Workspace OwnedResourceStatus `json:"workspace,omitempty"`
 }
 
 type JobPhase string
@@ -235,16 +215,6 @@ const (
 	JobSucceeded JobPhase = "Succeeded"
 	JobFailed    JobPhase = "Failed"
 )
-
-type WorkspaceManagerInstanceStatus struct {
-	Created bool                   `json:"created,omitempty"`
-	Status  WorkspaceManagerStatus `json:"status,omitempty"`
-}
-
-type ManagerStatus struct {
-	Name    string `json:"name,omitempty"`
-	Created bool   `json:"created,omitempty"`
-}
 
 type AttachedBuildObject struct {
 	Reference corev1.ObjectReference `json:"reference,omitempty"`
@@ -282,9 +252,9 @@ type RobotStatus struct {
 	// Workspace manager status
 	WorkspaceManagerStatus WorkspaceManagerInstanceStatus `json:"workspaceManagerStatus,omitempty"`
 	// Initial build manager creation status
-	InitialBuildManagerStatus ManagerStatus `json:"initialBuildManagerStatus,omitempty"`
+	InitialBuildManagerStatus OwnedResourceStatus `json:"initialBuildManagerStatus,omitempty"`
 	// Initial launch manager creation status
-	InitialLaunchManagerStatuses []ManagerStatus `json:"initialLaunchManagerStatuses,omitempty"`
+	InitialLaunchManagerStatuses []OwnedResourceStatus `json:"initialLaunchManagerStatuses,omitempty"`
 	// Attached build object information
 	AttachedBuildObject AttachedBuildObject `json:"attachedBuildObject,omitempty"`
 	// Attached launch object information

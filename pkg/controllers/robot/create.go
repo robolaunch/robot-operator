@@ -8,6 +8,7 @@ import (
 	"github.com/robolaunch/robot-operator/internal/node"
 	"github.com/robolaunch/robot-operator/internal/resources"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -140,7 +141,7 @@ func (r *RobotReconciler) createWorkspaceManager(ctx context.Context, instance *
 
 func (r *RobotReconciler) createBuildManager(ctx context.Context, instance *robotv1alpha1.Robot) error {
 
-	if reflect.DeepEqual(instance.Status.InitialBuildManagerStatus, robotv1alpha1.ManagerStatus{}) && !reflect.DeepEqual(instance.Spec.BuildManagerTemplate, robotv1alpha1.BuildManagerSpec{}) {
+	if reflect.DeepEqual(instance.Status.InitialBuildManagerStatus, robotv1alpha1.OwnedResourceStatus{}) && !reflect.DeepEqual(instance.Spec.BuildManagerTemplate, robotv1alpha1.BuildManagerSpec{}) {
 		buildManager := resources.GetBuildManager(instance, &types.NamespacedName{Namespace: instance.Namespace, Name: instance.Name + "-build"})
 
 		err := ctrl.SetControllerReference(instance, buildManager, r.Scheme)
@@ -158,7 +159,7 @@ func (r *RobotReconciler) createBuildManager(ctx context.Context, instance *robo
 		logger.Info("STATUS: Build manager " + buildManager.Name + " is created.")
 
 		instance.Status.InitialBuildManagerStatus.Created = true
-		instance.Status.InitialBuildManagerStatus.Name = instance.Name + "-build"
+		instance.Status.InitialBuildManagerStatus.Reference.Name = instance.Name + "-build"
 	}
 
 	return nil
@@ -188,14 +189,16 @@ func (r *RobotReconciler) createLaunchManagers(ctx context.Context, instance *ro
 
 	if len(instance.Status.InitialLaunchManagerStatuses) == 0 {
 		for key := range instance.Spec.LaunchManagerTemplates {
-			instance.Status.InitialLaunchManagerStatuses = append(instance.Status.InitialLaunchManagerStatuses, robotv1alpha1.ManagerStatus{
-				Name: instance.Name + "-launch-" + strconv.Itoa(key),
+			instance.Status.InitialLaunchManagerStatuses = append(instance.Status.InitialLaunchManagerStatuses, robotv1alpha1.OwnedResourceStatus{
+				Reference: v1.ObjectReference{
+					Name: instance.Name + "-launch-" + strconv.Itoa(key),
+				},
 			})
 		}
 
 		for key, lm := range instance.Status.InitialLaunchManagerStatuses {
 			if !lm.Created {
-				err := r.createLaunchManager(ctx, instance, &types.NamespacedName{Namespace: instance.Namespace, Name: lm.Name}, key)
+				err := r.createLaunchManager(ctx, instance, &types.NamespacedName{Namespace: instance.Namespace, Name: lm.Reference.Name}, key)
 				if err != nil {
 					return err
 				}
