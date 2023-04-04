@@ -108,6 +108,7 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 						internal.Env("NEKO_UDP_PORT", robotVDI.Spec.WebRTCPortRange),
 						internal.Env("NEKO_ICELITE", icelite),
 						internal.Env("NEKO_NAT1TO1", robotVDI.Spec.NAT1TO1),
+						internal.Env("RESOLUTION", robotVDI.Spec.Resolution),
 					},
 					Stdin: true,
 					TTY:   true,

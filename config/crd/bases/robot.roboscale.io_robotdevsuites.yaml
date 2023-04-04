@@ -77,6 +77,14 @@ spec:
                     type: string
                   privileged:
                     type: boolean
+                  resolution:
+                    default: 1920x1080
+                    description: VDI screen resolution options.
+                    enum:
+                    - 2048x1152
+                    - 1920x1080
+                    - 1600x1200
+                    type: string
                   resources:
                     description: VDI resource limits.
                     properties:
