@@ -105,22 +105,12 @@ type RobotDevSuiteSpec struct {
 	RobotIDETemplate RobotIDESpec `json:"robotIDETemplate,omitempty"`
 }
 
-type RobotVDIInstanceStatus struct {
-	Created bool          `json:"created,omitempty"`
-	Phase   RobotVDIPhase `json:"phase,omitempty"`
-}
-
-type RobotIDEInstanceStatus struct {
-	Created bool          `json:"created,omitempty"`
-	Phase   RobotIDEPhase `json:"phase,omitempty"`
-}
-
 // RobotDevSuiteStatus defines the observed state of RobotDevSuite
 type RobotDevSuiteStatus struct {
-	Phase          RobotDevSuitePhase     `json:"phase,omitempty"`
-	Active         bool                   `json:"active,omitempty"`
-	RobotVDIStatus RobotVDIInstanceStatus `json:"robotVDIStatus,omitempty"`
-	RobotIDEStatus RobotIDEInstanceStatus `json:"robotIDEStatus,omitempty"`
+	Phase          RobotDevSuitePhase  `json:"phase,omitempty"`
+	Active         bool                `json:"active,omitempty"`
+	RobotVDIStatus OwnedResourceStatus `json:"robotVDIStatus,omitempty"`
+	RobotIDEStatus OwnedResourceStatus `json:"robotIDEStatus,omitempty"`
 }
 
 // ********************************

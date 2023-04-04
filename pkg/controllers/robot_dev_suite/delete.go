@@ -16,7 +16,7 @@ func (r *RobotDevSuiteReconciler) reconcileDeleteRobotVDI(ctx context.Context, i
 	err := r.Get(ctx, *instance.GetRobotVDIMetadata(), robotVDIQuery)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			instance.Status.RobotVDIStatus = robotv1alpha1.RobotVDIInstanceStatus{}
+			instance.Status.RobotVDIStatus = robotv1alpha1.OwnedResourceStatus{}
 		} else {
 			return err
 		}
@@ -41,7 +41,7 @@ func (r *RobotDevSuiteReconciler) reconcileDeleteRobotVDI(ctx context.Context, i
 			time.Sleep(time.Second * 1)
 		}
 
-		instance.Status.RobotVDIStatus = robotv1alpha1.RobotVDIInstanceStatus{}
+		instance.Status.RobotVDIStatus = robotv1alpha1.OwnedResourceStatus{}
 	}
 
 	return nil
@@ -53,7 +53,7 @@ func (r *RobotDevSuiteReconciler) reconcileDeleteRobotIDE(ctx context.Context, i
 	err := r.Get(ctx, *instance.GetRobotIDEMetadata(), robotIDEQuery)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			instance.Status.RobotIDEStatus = robotv1alpha1.RobotIDEInstanceStatus{}
+			instance.Status.RobotIDEStatus = robotv1alpha1.OwnedResourceStatus{}
 		} else {
 			return err
 		}
@@ -78,7 +78,7 @@ func (r *RobotDevSuiteReconciler) reconcileDeleteRobotIDE(ctx context.Context, i
 			time.Sleep(time.Second * 1)
 		}
 
-		instance.Status.RobotIDEStatus = robotv1alpha1.RobotIDEInstanceStatus{}
+		instance.Status.RobotIDEStatus = robotv1alpha1.OwnedResourceStatus{}
 	}
 
 	return nil

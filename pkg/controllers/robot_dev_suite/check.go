@@ -14,7 +14,7 @@ func (r *RobotDevSuiteReconciler) reconcileCheckRobotVDI(ctx context.Context, in
 	err := r.Get(ctx, *instance.GetRobotVDIMetadata(), robotVDIQuery)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			instance.Status.RobotVDIStatus = robotv1alpha1.RobotVDIInstanceStatus{}
+			instance.Status.RobotVDIStatus = robotv1alpha1.OwnedResourceStatus{}
 		} else {
 			return err
 		}
@@ -31,7 +31,7 @@ func (r *RobotDevSuiteReconciler) reconcileCheckRobotVDI(ctx context.Context, in
 			}
 
 			instance.Status.RobotVDIStatus.Created = true
-			instance.Status.RobotVDIStatus.Phase = robotVDIQuery.Status.Phase
+			instance.Status.RobotVDIStatus.Phase = string(robotVDIQuery.Status.Phase)
 
 		} else {
 
@@ -53,7 +53,7 @@ func (r *RobotDevSuiteReconciler) reconcileCheckRobotIDE(ctx context.Context, in
 	err := r.Get(ctx, *instance.GetRobotIDEMetadata(), robotIDEQuery)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			instance.Status.RobotIDEStatus = robotv1alpha1.RobotIDEInstanceStatus{}
+			instance.Status.RobotIDEStatus = robotv1alpha1.OwnedResourceStatus{}
 		} else {
 			return err
 		}
@@ -70,7 +70,7 @@ func (r *RobotDevSuiteReconciler) reconcileCheckRobotIDE(ctx context.Context, in
 			}
 
 			instance.Status.RobotIDEStatus.Created = true
-			instance.Status.RobotIDEStatus.Phase = robotIDEQuery.Status.Phase
+			instance.Status.RobotIDEStatus.Phase = string(robotIDEQuery.Status.Phase)
 
 		} else {
 
