@@ -48,9 +48,13 @@ func (r *BuildManagerReconciler) reconcileDeleteBuilderJobs(ctx context.Context,
 		if err != nil {
 			if errors.IsNotFound(err) {
 				stepStatus := robotv1alpha1.StepStatus{
-					Step:       step,
-					JobName:    jobMetadata.Name,
-					JobCreated: false,
+					Step: step,
+					Resource: robotv1alpha1.OwnedResourceStatus{
+						Reference: corev1.ObjectReference{
+							Name: jobMetadata.Name,
+						},
+						Created: false,
+					},
 				}
 
 				stepStatuses = append(stepStatuses, stepStatus)
@@ -80,10 +84,14 @@ func (r *BuildManagerReconciler) reconcileDeleteBuilderJobs(ctx context.Context,
 			}
 
 			stepStatus := robotv1alpha1.StepStatus{
-				Step:       step,
-				JobName:    jobMetadata.Name,
-				JobCreated: false,
-				JobPhase:   "",
+				Step: step,
+				Resource: robotv1alpha1.OwnedResourceStatus{
+					Reference: corev1.ObjectReference{
+						Name: jobMetadata.Name,
+					},
+					Created: false,
+					Phase:   "",
+				},
 			}
 
 			stepStatuses = append(stepStatuses, stepStatus)

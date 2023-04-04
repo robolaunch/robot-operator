@@ -140,10 +140,10 @@ type RobotIDEIngressStatus struct {
 
 // RobotIDEStatus defines the observed state of RobotIDE
 type RobotIDEStatus struct {
-	Phase         RobotIDEPhase          `json:"phase,omitempty"`
-	PodStatus     DetailedOwnedPodStatus `json:"podStatus,omitempty"`
-	ServiceStatus RobotIDEServiceStatus  `json:"serviceStatus,omitempty"`
-	IngressStatus RobotIDEIngressStatus  `json:"ingressStatus,omitempty"`
+	Phase         RobotIDEPhase         `json:"phase,omitempty"`
+	PodStatus     OwnedPodStatus        `json:"podStatus,omitempty"`
+	ServiceStatus RobotIDEServiceStatus `json:"serviceStatus,omitempty"`
+	IngressStatus RobotIDEIngressStatus `json:"ingressStatus,omitempty"`
 }
 
 // ********************************
@@ -198,7 +198,7 @@ type RobotVDIIngressStatus struct {
 // RobotVDIStatus defines the observed state of RobotVDI
 type RobotVDIStatus struct {
 	Phase            RobotVDIPhase            `json:"phase,omitempty"`
-	PodStatus        DetailedOwnedPodStatus   `json:"podStatus,omitempty"`
+	PodStatus        OwnedPodStatus           `json:"podStatus,omitempty"`
 	ServiceTCPStatus RobotVDIServiceTCPStatus `json:"serviceTCPStatus,omitempty"`
 	ServiceUDPStatus RobotVDIServiceUDPStatus `json:"serviceUDPStatus,omitempty"`
 	IngressStatus    RobotVDIIngressStatus    `json:"ingressStatus,omitempty"`

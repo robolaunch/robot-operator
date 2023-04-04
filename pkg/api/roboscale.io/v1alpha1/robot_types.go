@@ -307,7 +307,7 @@ type DiscoveryServerStatus struct {
 	Phase               DiscoveryServerPhase               `json:"phase,omitempty"`
 	ServiceStatus       DiscoveryServerServiceStatus       `json:"serviceStatus,omitempty"`
 	ServiceExportStatus DiscoveryServerServiceExportStatus `json:"serviceExportStatus,omitempty"`
-	PodStatus           DetailedOwnedPodStatus             `json:"podStatus,omitempty"`
+	PodStatus           OwnedPodStatus                     `json:"podStatus,omitempty"`
 	ConfigMapStatus     DiscoveryServerConfigMapStatus     `json:"configMapStatus,omitempty"`
 	ConnectionInfo      ConnectionInfo                     `json:"connectionInfo,omitempty"`
 }

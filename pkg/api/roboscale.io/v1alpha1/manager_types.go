@@ -171,13 +171,6 @@ type BuildManagerSpec struct {
 	Steps []Step `json:"steps,omitempty"`
 }
 
-type StepStatus struct {
-	Step       Step     `json:"step,omitempty"`
-	JobName    string   `json:"jobName,omitempty"`
-	JobCreated bool     `json:"created,omitempty"`
-	JobPhase   JobPhase `json:"jobPhase,omitempty"`
-}
-
 type ScriptConfigMapStatus struct {
 	Created bool `json:"created,omitempty"`
 }
@@ -271,7 +264,7 @@ type LaunchStatus struct {
 }
 
 type LaunchPodStatus struct {
-	Status       DetailedOwnedPodStatus  `json:"status,omitempty"`
+	Status       OwnedPodStatus          `json:"status,omitempty"`
 	LaunchStatus map[string]LaunchStatus `json:"launchStatus,omitempty"`
 }
 

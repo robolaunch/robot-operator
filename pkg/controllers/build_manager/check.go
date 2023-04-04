@@ -64,9 +64,13 @@ func (r *BuildManagerReconciler) reconcileCheckBuilderJobs(ctx context.Context, 
 			if err != nil {
 				if errors.IsNotFound(err) {
 					stepStatus := robotv1alpha1.StepStatus{
-						Step:       step,
-						JobName:    jobMetadata.Name,
-						JobCreated: false,
+						Step: step,
+						Resource: robotv1alpha1.OwnedResourceStatus{
+							Reference: corev1.ObjectReference{
+								Name: jobMetadata.Name,
+							},
+							Created: false,
+						},
 					}
 
 					stepStatuses = append(stepStatuses, stepStatus)
@@ -85,10 +89,14 @@ func (r *BuildManagerReconciler) reconcileCheckBuilderJobs(ctx context.Context, 
 				}
 
 				stepStatus := robotv1alpha1.StepStatus{
-					Step:       step,
-					JobName:    jobMetadata.Name,
-					JobCreated: true,
-					JobPhase:   jobPhase,
+					Step: step,
+					Resource: robotv1alpha1.OwnedResourceStatus{
+						Reference: corev1.ObjectReference{
+							Name: jobMetadata.Name,
+						},
+						Created: true,
+						Phase:   string(jobPhase),
+					},
 				}
 
 				stepStatuses = append(stepStatuses, stepStatus)

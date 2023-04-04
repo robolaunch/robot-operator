@@ -8,7 +8,7 @@ type OwnedResourceStatus struct {
 	Phase     string                 `json:"phase,omitempty"`
 }
 
-type DetailedOwnedPodStatus struct {
+type OwnedPodStatus struct {
 	Resource OwnedResourceStatus `json:"resource,omitempty"`
 	IP       string              `json:"ip,omitempty"`
 }
@@ -31,4 +31,9 @@ type RobotDevSuiteInstanceStatus struct {
 type WorkspaceManagerInstanceStatus struct {
 	Resource OwnedResourceStatus    `json:"resource,omitempty"`
 	Status   WorkspaceManagerStatus `json:"status,omitempty"`
+}
+
+type StepStatus struct {
+	Resource OwnedResourceStatus `json:"resource,omitempty"`
+	Step     Step                `json:"step,omitempty"`
 }
