@@ -105,7 +105,7 @@ func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *ro
 		instance.Status.VolumeStatuses.Workspace.Created {
 	case true:
 
-		switch instance.Status.DiscoveryServerStatus.Created {
+		switch instance.Status.DiscoveryServerStatus.Resource.Created {
 		case true:
 
 			switch instance.Status.DiscoveryServerStatus.Status.Phase {
@@ -115,12 +115,12 @@ func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *ro
 				case true:
 
 					switch instance.Status.LoaderJobStatus.Phase {
-					case robotv1alpha1.JobSucceeded:
+					case string(robotv1alpha1.JobSucceeded):
 
 						switch instance.Spec.ROSBridgeTemplate.ROS.Enabled || instance.Spec.ROSBridgeTemplate.ROS2.Enabled {
 						case true:
 
-							switch instance.Status.ROSBridgeStatus.Created {
+							switch instance.Status.ROSBridgeStatus.Resource.Created {
 							case true:
 
 								switch instance.Status.ROSBridgeStatus.Status.Phase {
@@ -129,7 +129,7 @@ func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *ro
 									switch instance.Spec.RobotDevSuiteTemplate.IDEEnabled || instance.Spec.RobotDevSuiteTemplate.VDIEnabled {
 									case true:
 
-										switch instance.Status.RobotDevSuiteStatus.Created {
+										switch instance.Status.RobotDevSuiteStatus.Resource.Created {
 										case true:
 
 											switch instance.Status.RobotDevSuiteStatus.Status.Phase {
@@ -151,7 +151,7 @@ func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *ro
 											if err != nil {
 												return err
 											}
-											instance.Status.RobotDevSuiteStatus.Created = true
+											instance.Status.RobotDevSuiteStatus.Resource.Created = true
 
 										}
 
@@ -175,7 +175,7 @@ func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *ro
 								if err != nil {
 									return err
 								}
-								instance.Status.ROSBridgeStatus.Created = true
+								instance.Status.ROSBridgeStatus.Resource.Created = true
 
 							}
 
@@ -184,7 +184,7 @@ func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *ro
 							switch instance.Spec.RobotDevSuiteTemplate.IDEEnabled || instance.Spec.RobotDevSuiteTemplate.VDIEnabled {
 							case true:
 
-								switch instance.Status.RobotDevSuiteStatus.Created {
+								switch instance.Status.RobotDevSuiteStatus.Resource.Created {
 								case true:
 
 									switch instance.Status.RobotDevSuiteStatus.Status.Phase {
@@ -206,7 +206,7 @@ func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *ro
 									if err != nil {
 										return err
 									}
-									instance.Status.RobotDevSuiteStatus.Created = true
+									instance.Status.RobotDevSuiteStatus.Resource.Created = true
 
 								}
 
@@ -232,11 +232,11 @@ func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *ro
 
 						}
 
-					case robotv1alpha1.JobActive:
+					case string(robotv1alpha1.JobActive):
 
 						instance.Status.Phase = robotv1alpha1.RobotPhaseConfiguringEnvironment
 
-					case robotv1alpha1.JobFailed:
+					case string(robotv1alpha1.JobFailed):
 
 						// TODO: add reason
 						instance.Status.Phase = robotv1alpha1.RobotPhaseFailed
@@ -262,7 +262,7 @@ func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *ro
 			if err != nil {
 				return err
 			}
-			instance.Status.DiscoveryServerStatus.Created = true
+			instance.Status.DiscoveryServerStatus.Resource.Created = true
 
 		}
 

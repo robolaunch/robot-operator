@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/robolaunch/robot-operator/internal/handle"
+	"github.com/robolaunch/robot-operator/internal/reference"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
@@ -16,7 +17,7 @@ func (r *MetricsExporterReconciler) reconcileCheckPod(ctx context.Context, insta
 	err := r.Get(ctx, *instance.GetMetricsExporterPodMetadata(), podQuery)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			instance.Status.PodStatus = robotv1alpha1.MetricsExporterPodStatus{}
+			instance.Status.PodStatus = robotv1alpha1.OwnedResourceStatus{}
 		} else {
 			return err
 		}
@@ -28,7 +29,8 @@ func (r *MetricsExporterReconciler) reconcileCheckPod(ctx context.Context, insta
 		}
 
 		instance.Status.PodStatus.Created = true
-		instance.Status.PodStatus.Phase = podQuery.Status.Phase
+		instance.Status.PodStatus.Phase = string(podQuery.Status.Phase)
+		reference.SetReference(&instance.Status.PodStatus.Reference, podQuery.TypeMeta, podQuery.ObjectMeta)
 	}
 
 	return nil
@@ -40,12 +42,13 @@ func (r *MetricsExporterReconciler) reconcileCheckRole(ctx context.Context, inst
 	err := r.Get(ctx, *instance.GetMetricsExporterRoleMetadata(), roleQuery)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			instance.Status.RoleStatus = robotv1alpha1.MetricsExporterRoleStatus{}
+			instance.Status.RoleStatus = robotv1alpha1.OwnedResourceStatus{}
 		} else {
 			return err
 		}
 	} else {
 		instance.Status.RoleStatus.Created = true
+		reference.SetReference(&instance.Status.RoleStatus.Reference, roleQuery.TypeMeta, roleQuery.ObjectMeta)
 	}
 
 	return nil
@@ -57,12 +60,13 @@ func (r *MetricsExporterReconciler) reconcileCheckRoleBinding(ctx context.Contex
 	err := r.Get(ctx, *instance.GetMetricsExporterRoleBindingMetadata(), roleBindingQuery)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			instance.Status.RoleBindingStatus = robotv1alpha1.MetricsExporterRoleBindingStatus{}
+			instance.Status.RoleBindingStatus = robotv1alpha1.OwnedResourceStatus{}
 		} else {
 			return err
 		}
 	} else {
 		instance.Status.RoleBindingStatus.Created = true
+		reference.SetReference(&instance.Status.RoleBindingStatus.Reference, roleBindingQuery.TypeMeta, roleBindingQuery.ObjectMeta)
 	}
 
 	return nil
@@ -74,12 +78,13 @@ func (r *MetricsExporterReconciler) reconcileCheckServiceAccount(ctx context.Con
 	err := r.Get(ctx, *instance.GetMetricsExporterServiceAccountMetadata(), serviceAccountQuery)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			instance.Status.ServiceAccountStatus = robotv1alpha1.MetricsExporterServiceAccountStatus{}
+			instance.Status.ServiceAccountStatus = robotv1alpha1.OwnedResourceStatus{}
 		} else {
 			return err
 		}
 	} else {
 		instance.Status.ServiceAccountStatus.Created = true
+		reference.SetReference(&instance.Status.ServiceAccountStatus.Reference, serviceAccountQuery.TypeMeta, serviceAccountQuery.ObjectMeta)
 	}
 
 	return nil

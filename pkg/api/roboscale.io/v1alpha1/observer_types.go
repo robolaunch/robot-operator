@@ -17,7 +17,6 @@ limitations under the License.
 package v1alpha1
 
 import (
-	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -67,23 +66,6 @@ type MetricsExporterSpec struct {
 	Network NetworkMetrics `json:"network,omitempty"`
 }
 
-type MetricsExporterPodStatus struct {
-	Created bool            `json:"created,omitempty"`
-	Phase   corev1.PodPhase `json:"phase,omitempty"`
-}
-
-type MetricsExporterRoleStatus struct {
-	Created bool `json:"created,omitempty"`
-}
-
-type MetricsExporterRoleBindingStatus struct {
-	Created bool `json:"created,omitempty"`
-}
-
-type MetricsExporterServiceAccountStatus struct {
-	Created bool `json:"created,omitempty"`
-}
-
 type GPUUtilizationStatus struct {
 	Utilization         string `json:"utilization,omitempty"`
 	LastUpdateTimestamp string `json:"lastUpdateTimestamp,omitempty"`
@@ -116,10 +98,10 @@ const (
 
 // MetricsExporterStatus defines the observed state of MetricsExporter
 type MetricsExporterStatus struct {
-	Phase                MetricsExporterPhase                `json:"phase,omitempty"`
-	RoleStatus           MetricsExporterRoleStatus           `json:"roleStatus,omitempty"`
-	RoleBindingStatus    MetricsExporterRoleBindingStatus    `json:"roleBindingStatus,omitempty"`
-	ServiceAccountStatus MetricsExporterServiceAccountStatus `json:"saStatus,omitempty"`
-	PodStatus            MetricsExporterPodStatus            `json:"podStatus,omitempty"`
-	Usage                Usage                               `json:"usage,omitempty"`
+	Phase                MetricsExporterPhase `json:"phase,omitempty"`
+	RoleStatus           OwnedResourceStatus  `json:"roleStatus,omitempty"`
+	RoleBindingStatus    OwnedResourceStatus  `json:"roleBindingStatus,omitempty"`
+	ServiceAccountStatus OwnedResourceStatus  `json:"saStatus,omitempty"`
+	PodStatus            OwnedResourceStatus  `json:"podStatus,omitempty"`
+	Usage                Usage                `json:"usage,omitempty"`
 }

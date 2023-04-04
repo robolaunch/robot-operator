@@ -6,6 +6,7 @@ import (
 	"github.com/robolaunch/robot-operator/internal"
 	robotErr "github.com/robolaunch/robot-operator/internal/error"
 	"github.com/robolaunch/robot-operator/internal/label"
+	"github.com/robolaunch/robot-operator/internal/reference"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	batchv1 "k8s.io/api/batch/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -19,17 +20,18 @@ func (r *WorkspaceManagerReconciler) reconcileCheckClonerJob(ctx context.Context
 	clonerJobQuery := &batchv1.Job{}
 	err := r.Get(ctx, *instance.GetClonerJobMetadata(), clonerJobQuery)
 	if err != nil && errors.IsNotFound(err) {
-		instance.Status.ClonerJobStatus.Created = false
+		instance.Status.ClonerJobStatus = robotv1alpha1.OwnedResourceStatus{}
 	} else if err != nil {
 		return err
 	} else {
+		reference.SetReference(&instance.Status.ClonerJobStatus.Reference, clonerJobQuery.TypeMeta, clonerJobQuery.ObjectMeta)
 		switch 1 {
 		case int(clonerJobQuery.Status.Succeeded):
-			instance.Status.ClonerJobStatus.Phase = robotv1alpha1.JobSucceeded
+			instance.Status.ClonerJobStatus.Phase = string(robotv1alpha1.JobSucceeded)
 		case int(clonerJobQuery.Status.Active):
-			instance.Status.ClonerJobStatus.Phase = robotv1alpha1.JobActive
+			instance.Status.ClonerJobStatus.Phase = string(robotv1alpha1.JobActive)
 		case int(clonerJobQuery.Status.Failed):
-			instance.Status.ClonerJobStatus.Phase = robotv1alpha1.JobFailed
+			instance.Status.ClonerJobStatus.Phase = string(robotv1alpha1.JobFailed)
 		}
 	}
 
@@ -44,18 +46,19 @@ func (r *WorkspaceManagerReconciler) reconcileCheckCleanupJob(ctx context.Contex
 		cleanupJobQuery := &batchv1.Job{}
 		err := r.Get(ctx, *instance.GetCleanupJobMetadata(), cleanupJobQuery)
 		if err != nil && errors.IsNotFound(err) {
-			instance.Status.CleanupJobStatus.Created = false
+			instance.Status.CleanupJobStatus = robotv1alpha1.OwnedResourceStatus{}
 		} else if err != nil {
 			return err
 		} else {
+			reference.SetReference(&instance.Status.CleanupJobStatus.Reference, cleanupJobQuery.TypeMeta, cleanupJobQuery.ObjectMeta)
 			switch 1 {
 			case int(cleanupJobQuery.Status.Succeeded):
-				instance.Status.CleanupJobStatus.Phase = robotv1alpha1.JobSucceeded
+				instance.Status.CleanupJobStatus.Phase = string(robotv1alpha1.JobSucceeded)
 				isActive = false
 			case int(cleanupJobQuery.Status.Active):
-				instance.Status.CleanupJobStatus.Phase = robotv1alpha1.JobActive
+				instance.Status.CleanupJobStatus.Phase = string(robotv1alpha1.JobActive)
 			case int(cleanupJobQuery.Status.Failed):
-				instance.Status.CleanupJobStatus.Phase = robotv1alpha1.JobFailed
+				instance.Status.CleanupJobStatus.Phase = string(robotv1alpha1.JobFailed)
 				isActive = false
 			}
 		}
@@ -90,7 +93,7 @@ func (r *WorkspaceManagerReconciler) reconcileCheckOtherAttachedResources(ctx co
 
 	for _, rds := range robotDevSuiteList.Items {
 
-		if rds.Status.Active == true {
+		if rds.Status.Active {
 			return &robotErr.RobotResourcesHasNotBeenReleasedError{
 				ResourceKind:      instance.Kind,
 				ResourceName:      instance.Name,
@@ -115,7 +118,7 @@ func (r *WorkspaceManagerReconciler) reconcileCheckOtherAttachedResources(ctx co
 
 	for _, lm := range launchManagerList.Items {
 
-		if lm.Status.Active == true {
+		if lm.Status.Active {
 			return &robotErr.RobotResourcesHasNotBeenReleasedError{
 				ResourceKind:      instance.Kind,
 				ResourceName:      instance.Name,
@@ -140,7 +143,7 @@ func (r *WorkspaceManagerReconciler) reconcileCheckOtherAttachedResources(ctx co
 
 	for _, bm := range buildManagerList.Items {
 
-		if bm.Status.Active == true {
+		if bm.Status.Active {
 			return &robotErr.RobotResourcesHasNotBeenReleasedError{
 				ResourceKind:      instance.Kind,
 				ResourceName:      instance.Name,
@@ -173,8 +176,8 @@ func (r *WorkspaceManagerReconciler) reconcileCheckUpdates(ctx context.Context, 
 
 		instance.Status.Version++
 		instance.Status.Phase = robotv1alpha1.WorkspaceManagerPhaseConfiguringWorkspaces
-		instance.Status.CleanupJobStatus = robotv1alpha1.CleanupJobStatus{}
-		instance.Status.ClonerJobStatus = robotv1alpha1.ClonerJobStatus{}
+		instance.Status.CleanupJobStatus = robotv1alpha1.OwnedResourceStatus{}
+		instance.Status.ClonerJobStatus = robotv1alpha1.OwnedResourceStatus{}
 
 		err = r.reconcileUpdateInstanceStatus(ctx, instance)
 		if err != nil {

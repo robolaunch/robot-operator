@@ -4,6 +4,7 @@ import (
 	"context"
 	"reflect"
 
+	"github.com/robolaunch/robot-operator/internal/reference"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	"k8s.io/apimachinery/pkg/api/errors"
 )
@@ -14,7 +15,7 @@ func (r *RobotDevSuiteReconciler) reconcileCheckRobotVDI(ctx context.Context, in
 	err := r.Get(ctx, *instance.GetRobotVDIMetadata(), robotVDIQuery)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			instance.Status.RobotVDIStatus = robotv1alpha1.RobotVDIInstanceStatus{}
+			instance.Status.RobotVDIStatus = robotv1alpha1.OwnedResourceStatus{}
 		} else {
 			return err
 		}
@@ -31,7 +32,8 @@ func (r *RobotDevSuiteReconciler) reconcileCheckRobotVDI(ctx context.Context, in
 			}
 
 			instance.Status.RobotVDIStatus.Created = true
-			instance.Status.RobotVDIStatus.Phase = robotVDIQuery.Status.Phase
+			reference.SetReference(&instance.Status.RobotVDIStatus.Reference, robotVDIQuery.TypeMeta, robotVDIQuery.ObjectMeta)
+			instance.Status.RobotVDIStatus.Phase = string(robotVDIQuery.Status.Phase)
 
 		} else {
 
@@ -53,7 +55,7 @@ func (r *RobotDevSuiteReconciler) reconcileCheckRobotIDE(ctx context.Context, in
 	err := r.Get(ctx, *instance.GetRobotIDEMetadata(), robotIDEQuery)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			instance.Status.RobotIDEStatus = robotv1alpha1.RobotIDEInstanceStatus{}
+			instance.Status.RobotIDEStatus = robotv1alpha1.OwnedResourceStatus{}
 		} else {
 			return err
 		}
@@ -70,7 +72,8 @@ func (r *RobotDevSuiteReconciler) reconcileCheckRobotIDE(ctx context.Context, in
 			}
 
 			instance.Status.RobotIDEStatus.Created = true
-			instance.Status.RobotIDEStatus.Phase = robotIDEQuery.Status.Phase
+			reference.SetReference(&instance.Status.RobotIDEStatus.Reference, robotIDEQuery.TypeMeta, robotIDEQuery.ObjectMeta)
+			instance.Status.RobotIDEStatus.Phase = string(robotIDEQuery.Status.Phase)
 
 		} else {
 

@@ -139,14 +139,14 @@ func (r *BuildManagerReconciler) reconcileCheckStatus(ctx context.Context, insta
 			instance.Status.Phase = robotv1alpha1.BuildManagerBuildingRobot
 
 			for k := range instance.Status.Steps {
-				if instance.Status.Steps[k].JobCreated {
+				if instance.Status.Steps[k].Resource.Created {
 
-					if instance.Status.Steps[k].JobPhase == robotv1alpha1.JobSucceeded {
+					if instance.Status.Steps[k].Resource.Phase == string(robotv1alpha1.JobSucceeded) {
 						continue
-					} else if instance.Status.Steps[k].JobPhase == robotv1alpha1.JobActive {
+					} else if instance.Status.Steps[k].Resource.Phase == string(robotv1alpha1.JobActive) {
 						Requeue(&defaultReturnResult)
 						break
-					} else if instance.Status.Steps[k].JobPhase == robotv1alpha1.JobFailed {
+					} else if instance.Status.Steps[k].Resource.Phase == string(robotv1alpha1.JobFailed) {
 						Requeue(&defaultReturnResult)
 						break
 					} else {
@@ -162,7 +162,7 @@ func (r *BuildManagerReconciler) reconcileCheckStatus(ctx context.Context, insta
 					}
 
 					stepStatus := instance.Status.Steps[k]
-					stepStatus.JobCreated = true
+					stepStatus.Resource.Created = true
 					instance.Status.Steps[k] = stepStatus
 
 					break
@@ -172,7 +172,7 @@ func (r *BuildManagerReconciler) reconcileCheckStatus(ctx context.Context, insta
 			areJobsSucceeded := false
 
 			for key := range instance.Status.Steps {
-				if instance.Status.Steps[key].JobPhase == robotv1alpha1.JobSucceeded {
+				if instance.Status.Steps[key].Resource.Phase == string(robotv1alpha1.JobSucceeded) {
 					areJobsSucceeded = true
 				} else {
 					areJobsSucceeded = false

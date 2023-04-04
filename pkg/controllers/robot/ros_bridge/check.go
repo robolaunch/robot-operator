@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/robolaunch/robot-operator/internal/handle"
+	"github.com/robolaunch/robot-operator/internal/reference"
 	"github.com/robolaunch/robot-operator/internal/resources"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
@@ -15,11 +16,12 @@ func (r *ROSBridgeReconciler) reconcileCheckService(ctx context.Context, instanc
 	bridgeServiceQuery := &corev1.Service{}
 	err := r.Get(ctx, *instance.GetBridgeServiceMetadata(), bridgeServiceQuery)
 	if err != nil && errors.IsNotFound(err) {
-		instance.Status.ServiceStatus = robotv1alpha1.BridgeServiceStatus{}
+		instance.Status.ServiceStatus = robotv1alpha1.OwnedResourceStatus{}
 	} else if err != nil {
 		return err
 	} else {
 		instance.Status.ServiceStatus.Created = true
+		reference.SetReference(&instance.Status.ServiceStatus.Reference, bridgeServiceQuery.TypeMeta, bridgeServiceQuery.ObjectMeta)
 	}
 
 	return nil
@@ -30,7 +32,7 @@ func (r *ROSBridgeReconciler) reconcileCheckPod(ctx context.Context, instance *r
 	bridgePodQuery := &corev1.Pod{}
 	err := r.Get(ctx, *instance.GetBridgePodMetadata(), bridgePodQuery)
 	if err != nil && errors.IsNotFound(err) {
-		instance.Status.PodStatus = robotv1alpha1.BridgePodStatus{}
+		instance.Status.PodStatus = robotv1alpha1.OwnedResourceStatus{}
 	} else if err != nil {
 		return err
 	} else {
@@ -68,7 +70,8 @@ func (r *ROSBridgeReconciler) reconcileCheckPod(ctx context.Context, instance *r
 		}
 
 		instance.Status.PodStatus.Created = true
-		instance.Status.PodStatus.Phase = bridgePodQuery.Status.Phase
+		reference.SetReference(&instance.Status.PodStatus.Reference, bridgePodQuery.TypeMeta, bridgePodQuery.ObjectMeta)
+		instance.Status.PodStatus.Phase = string(bridgePodQuery.Status.Phase)
 	}
 
 	return nil

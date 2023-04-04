@@ -99,11 +99,11 @@ func (r *RobotVDIReconciler) reconcileCheckStatus(ctx context.Context, instance 
 			switch instance.Status.ServiceUDPStatus.Created {
 			case true:
 
-				switch instance.Status.PodStatus.Created {
+				switch instance.Status.PodStatus.Resource.Created {
 				case true:
 
-					switch instance.Status.PodStatus.Phase {
-					case corev1.PodRunning:
+					switch instance.Status.PodStatus.Resource.Phase {
+					case string(corev1.PodRunning):
 
 						switch instance.Spec.Ingress {
 						case true:
@@ -139,7 +139,7 @@ func (r *RobotVDIReconciler) reconcileCheckStatus(ctx context.Context, instance 
 					if err != nil {
 						return err
 					}
-					instance.Status.PodStatus.Created = true
+					instance.Status.PodStatus.Resource.Created = true
 
 				}
 

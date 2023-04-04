@@ -4,6 +4,7 @@ import (
 	"context"
 	"reflect"
 
+	"github.com/robolaunch/robot-operator/internal/reference"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -16,56 +17,56 @@ func (r *RobotReconciler) reconcileCheckPVCs(ctx context.Context, instance *robo
 	pvcVarQuery := &corev1.PersistentVolumeClaim{}
 	err := r.Get(ctx, *instance.GetPVCVarMetadata(), pvcVarQuery)
 	if err != nil && errors.IsNotFound(err) {
-		instance.Status.VolumeStatuses.Var.Created = false
+		instance.Status.VolumeStatuses.Var = robotv1alpha1.OwnedResourceStatus{}
 	} else if err != nil {
 		return err
 	} else {
 		instance.Status.VolumeStatuses.Var.Created = true
-		instance.Status.VolumeStatuses.Var.PersistentVolumeClaimName = pvcVarQuery.Name
+		reference.SetReference(&instance.Status.VolumeStatuses.Var.Reference, pvcVarQuery.TypeMeta, pvcVarQuery.ObjectMeta)
 	}
 
 	pvcOptQuery := &corev1.PersistentVolumeClaim{}
 	err = r.Get(ctx, *instance.GetPVCOptMetadata(), pvcOptQuery)
 	if err != nil && errors.IsNotFound(err) {
-		instance.Status.VolumeStatuses.Opt.Created = false
+		instance.Status.VolumeStatuses.Opt = robotv1alpha1.OwnedResourceStatus{}
 	} else if err != nil {
 		return err
 	} else {
 		instance.Status.VolumeStatuses.Opt.Created = true
-		instance.Status.VolumeStatuses.Opt.PersistentVolumeClaimName = pvcOptQuery.Name
+		reference.SetReference(&instance.Status.VolumeStatuses.Opt.Reference, pvcOptQuery.TypeMeta, pvcOptQuery.ObjectMeta)
 	}
 
 	pvcEtcQuery := &corev1.PersistentVolumeClaim{}
 	err = r.Get(ctx, *instance.GetPVCEtcMetadata(), pvcEtcQuery)
 	if err != nil && errors.IsNotFound(err) {
-		instance.Status.VolumeStatuses.Etc.Created = false
+		instance.Status.VolumeStatuses.Etc = robotv1alpha1.OwnedResourceStatus{}
 	} else if err != nil {
 		return err
 	} else {
 		instance.Status.VolumeStatuses.Etc.Created = true
-		instance.Status.VolumeStatuses.Etc.PersistentVolumeClaimName = pvcEtcQuery.Name
+		reference.SetReference(&instance.Status.VolumeStatuses.Etc.Reference, pvcEtcQuery.TypeMeta, pvcEtcQuery.ObjectMeta)
 	}
 
 	pvcUsrQuery := &corev1.PersistentVolumeClaim{}
 	err = r.Get(ctx, *instance.GetPVCUsrMetadata(), pvcUsrQuery)
 	if err != nil && errors.IsNotFound(err) {
-		instance.Status.VolumeStatuses.Usr.Created = false
+		instance.Status.VolumeStatuses.Usr = robotv1alpha1.OwnedResourceStatus{}
 	} else if err != nil {
 		return err
 	} else {
 		instance.Status.VolumeStatuses.Usr.Created = true
-		instance.Status.VolumeStatuses.Usr.PersistentVolumeClaimName = pvcUsrQuery.Name
+		reference.SetReference(&instance.Status.VolumeStatuses.Usr.Reference, pvcUsrQuery.TypeMeta, pvcUsrQuery.ObjectMeta)
 	}
 
 	pvcWorkspaceQuery := &corev1.PersistentVolumeClaim{}
 	err = r.Get(ctx, *instance.GetPVCWorkspaceMetadata(), pvcWorkspaceQuery)
 	if err != nil && errors.IsNotFound(err) {
-		instance.Status.VolumeStatuses.Workspace.Created = false
+		instance.Status.VolumeStatuses.Workspace = robotv1alpha1.OwnedResourceStatus{}
 	} else if err != nil {
 		return err
 	} else {
 		instance.Status.VolumeStatuses.Workspace.Created = true
-		instance.Status.VolumeStatuses.Workspace.PersistentVolumeClaimName = pvcWorkspaceQuery.Name
+		reference.SetReference(&instance.Status.VolumeStatuses.Workspace.Reference, pvcWorkspaceQuery.TypeMeta, pvcWorkspaceQuery.ObjectMeta)
 	}
 
 	return nil
@@ -89,7 +90,8 @@ func (r *RobotReconciler) reconcileCheckDiscoveryServer(ctx context.Context, ins
 			}
 		}
 
-		instance.Status.DiscoveryServerStatus.Created = true
+		instance.Status.DiscoveryServerStatus.Resource.Created = true
+		reference.SetReference(&instance.Status.DiscoveryServerStatus.Resource.Reference, discoverServerQuery.TypeMeta, discoverServerQuery.ObjectMeta)
 		instance.Status.DiscoveryServerStatus.Status = discoverServerQuery.Status
 	}
 
@@ -102,17 +104,18 @@ func (r *RobotReconciler) reconcileCheckLoaderJob(ctx context.Context, instance 
 		loaderJobQuery := &batchv1.Job{}
 		err := r.Get(ctx, *instance.GetLoaderJobMetadata(), loaderJobQuery)
 		if err != nil && errors.IsNotFound(err) {
-			instance.Status.LoaderJobStatus.Created = false
+			instance.Status.LoaderJobStatus = robotv1alpha1.OwnedResourceStatus{}
 		} else if err != nil {
 			return err
 		} else {
+			reference.SetReference(&instance.Status.LoaderJobStatus.Reference, loaderJobQuery.TypeMeta, loaderJobQuery.ObjectMeta)
 			switch 1 {
 			case int(loaderJobQuery.Status.Succeeded):
-				instance.Status.LoaderJobStatus.Phase = robotv1alpha1.JobSucceeded
+				instance.Status.LoaderJobStatus.Phase = string(robotv1alpha1.JobSucceeded)
 			case int(loaderJobQuery.Status.Active):
-				instance.Status.LoaderJobStatus.Phase = robotv1alpha1.JobActive
+				instance.Status.LoaderJobStatus.Phase = string(robotv1alpha1.JobActive)
 			case int(loaderJobQuery.Status.Failed):
-				instance.Status.LoaderJobStatus.Phase = robotv1alpha1.JobFailed
+				instance.Status.LoaderJobStatus.Phase = string(robotv1alpha1.JobFailed)
 			}
 		}
 	}
@@ -139,7 +142,8 @@ func (r *RobotReconciler) reconcileCheckROSBridge(ctx context.Context, instance 
 				}
 			}
 
-			instance.Status.ROSBridgeStatus.Created = true
+			instance.Status.ROSBridgeStatus.Resource.Created = true
+			reference.SetReference(&instance.Status.ROSBridgeStatus.Resource.Reference, rosBridgeQuery.TypeMeta, rosBridgeQuery.ObjectMeta)
 			instance.Status.ROSBridgeStatus.Status = rosBridgeQuery.Status
 		}
 	}
@@ -167,7 +171,8 @@ func (r *RobotReconciler) reconcileCheckRobotDevSuite(ctx context.Context, insta
 				}
 			}
 
-			instance.Status.RobotDevSuiteStatus.Created = true
+			instance.Status.RobotDevSuiteStatus.Resource.Created = true
+			reference.SetReference(&instance.Status.RobotDevSuiteStatus.Resource.Reference, robotDevSuiteQuery.TypeMeta, robotDevSuiteQuery.ObjectMeta)
 			instance.Status.RobotDevSuiteStatus.Status = robotDevSuiteQuery.Status
 
 		} else {
@@ -194,7 +199,8 @@ func (r *RobotReconciler) reconcileCheckWorkspaceManager(ctx context.Context, in
 		return err
 	} else {
 
-		instance.Status.WorkspaceManagerStatus.Created = true
+		instance.Status.WorkspaceManagerStatus.Resource.Created = true
+		reference.SetReference(&instance.Status.WorkspaceManagerStatus.Resource.Reference, workspaceManagerQuery.TypeMeta, workspaceManagerQuery.ObjectMeta)
 		instance.Status.WorkspaceManagerStatus.Status = workspaceManagerQuery.Status
 
 		if !reflect.DeepEqual(instance.Spec.WorkspaceManagerTemplate.Workspaces, workspaceManagerQuery.Spec.Workspaces) {
@@ -206,7 +212,7 @@ func (r *RobotReconciler) reconcileCheckWorkspaceManager(ctx context.Context, in
 			}
 
 			// set phase configuring
-			instance.Status.WorkspaceManagerStatus.Created = true
+			instance.Status.WorkspaceManagerStatus.Resource.Created = true
 			instance.Status.WorkspaceManagerStatus.Status = robotv1alpha1.WorkspaceManagerStatus{}
 			instance.Status.WorkspaceManagerStatus.Status.Phase = robotv1alpha1.WorkspaceManagerPhaseConfiguringWorkspaces
 		}

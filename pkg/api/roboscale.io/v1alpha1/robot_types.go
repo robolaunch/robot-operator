@@ -200,32 +200,12 @@ type RobotSpec struct {
 	TLSSecretReference TLSSecretReference `json:"tlsSecretRef,omitempty"`
 }
 
-type VolumeStatus struct {
-	Created                   bool   `json:"created,omitempty"`
-	PersistentVolumeClaimName string `json:"persistentVolumeClaimName,omitempty"`
-}
-
 type VolumeStatuses struct {
-	Var       VolumeStatus `json:"var,omitempty"`
-	Etc       VolumeStatus `json:"etc,omitempty"`
-	Usr       VolumeStatus `json:"usr,omitempty"`
-	Opt       VolumeStatus `json:"opt,omitempty"`
-	Workspace VolumeStatus `json:"workspace,omitempty"`
-}
-
-type DiscoveryServerInstanceStatus struct {
-	Created bool                  `json:"created,omitempty"`
-	Status  DiscoveryServerStatus `json:"status,omitempty"`
-}
-
-type ROSBridgeInstanceStatus struct {
-	Created bool            `json:"created,omitempty"`
-	Status  ROSBridgeStatus `json:"status,omitempty"`
-}
-
-type RobotDevSuiteInstanceStatus struct {
-	Created bool                `json:"created,omitempty"`
-	Status  RobotDevSuiteStatus `json:"status,omitempty"`
+	Var       OwnedResourceStatus `json:"var,omitempty"`
+	Etc       OwnedResourceStatus `json:"etc,omitempty"`
+	Usr       OwnedResourceStatus `json:"usr,omitempty"`
+	Opt       OwnedResourceStatus `json:"opt,omitempty"`
+	Workspace OwnedResourceStatus `json:"workspace,omitempty"`
 }
 
 type JobPhase string
@@ -235,21 +215,6 @@ const (
 	JobSucceeded JobPhase = "Succeeded"
 	JobFailed    JobPhase = "Failed"
 )
-
-type LoaderJobStatus struct {
-	Created bool     `json:"created,omitempty"`
-	Phase   JobPhase `json:"phase,omitempty"`
-}
-
-type WorkspaceManagerInstanceStatus struct {
-	Created bool                   `json:"created,omitempty"`
-	Status  WorkspaceManagerStatus `json:"status,omitempty"`
-}
-
-type ManagerStatus struct {
-	Name    string `json:"name,omitempty"`
-	Created bool   `json:"created,omitempty"`
-}
 
 type AttachedBuildObject struct {
 	Reference corev1.ObjectReference `json:"reference,omitempty"`
@@ -283,13 +248,13 @@ type RobotStatus struct {
 	// Robot development suite instance status
 	RobotDevSuiteStatus RobotDevSuiteInstanceStatus `json:"robotDevSuiteStatus,omitempty"`
 	// Loader job status that configures environment
-	LoaderJobStatus LoaderJobStatus `json:"loaderJobStatus,omitempty"`
+	LoaderJobStatus OwnedResourceStatus `json:"loaderJobStatus,omitempty"`
 	// Workspace manager status
 	WorkspaceManagerStatus WorkspaceManagerInstanceStatus `json:"workspaceManagerStatus,omitempty"`
 	// Initial build manager creation status
-	InitialBuildManagerStatus ManagerStatus `json:"initialBuildManagerStatus,omitempty"`
+	InitialBuildManagerStatus OwnedResourceStatus `json:"initialBuildManagerStatus,omitempty"`
 	// Initial launch manager creation status
-	InitialLaunchManagerStatuses []ManagerStatus `json:"initialLaunchManagerStatuses,omitempty"`
+	InitialLaunchManagerStatuses []OwnedResourceStatus `json:"initialLaunchManagerStatuses,omitempty"`
 	// Attached build object information
 	AttachedBuildObject AttachedBuildObject `json:"attachedBuildObject,omitempty"`
 	// Attached launch object information
@@ -320,24 +285,6 @@ type DiscoveryServerSpec struct {
 	Args      []string                    `json:"args,omitempty"`
 }
 
-type DiscoveryServerServiceStatus struct {
-	Created bool `json:"created,omitempty"`
-}
-
-type DiscoveryServerPodStatus struct {
-	Created bool            `json:"created,omitempty"`
-	Phase   corev1.PodPhase `json:"phase,omitempty"`
-	IP      string          `json:"ip,omitempty"`
-}
-
-type DiscoveryServerServiceExportStatus struct {
-	Created bool `json:"created,omitempty"`
-}
-
-type DiscoveryServerConfigMapStatus struct {
-	Created bool `json:"created,omitempty"`
-}
-
 type ConnectionInfo struct {
 	IP            string `json:"ip,omitempty"`
 	ConfigMapName string `json:"configMapName,omitempty"`
@@ -345,12 +292,12 @@ type ConnectionInfo struct {
 
 // DiscoveryServerStatus defines the observed state of DiscoveryServer
 type DiscoveryServerStatus struct {
-	Phase               DiscoveryServerPhase               `json:"phase,omitempty"`
-	ServiceStatus       DiscoveryServerServiceStatus       `json:"serviceStatus,omitempty"`
-	ServiceExportStatus DiscoveryServerServiceExportStatus `json:"serviceExportStatus,omitempty"`
-	PodStatus           DiscoveryServerPodStatus           `json:"podStatus,omitempty"`
-	ConfigMapStatus     DiscoveryServerConfigMapStatus     `json:"configMapStatus,omitempty"`
-	ConnectionInfo      ConnectionInfo                     `json:"connectionInfo,omitempty"`
+	Phase               DiscoveryServerPhase `json:"phase,omitempty"`
+	ServiceStatus       OwnedResourceStatus  `json:"serviceStatus,omitempty"`
+	ServiceExportStatus OwnedResourceStatus  `json:"serviceExportStatus,omitempty"`
+	PodStatus           OwnedPodStatus       `json:"podStatus,omitempty"`
+	ConfigMapStatus     OwnedResourceStatus  `json:"configMapStatus,omitempty"`
+	ConnectionInfo      ConnectionInfo       `json:"connectionInfo,omitempty"`
 }
 
 // ********************************
@@ -369,20 +316,11 @@ type ROSBridgeSpec struct {
 	Image string       `json:"image,omitempty"`
 }
 
-type BridgePodStatus struct {
-	Created bool            `json:"created,omitempty"`
-	Phase   corev1.PodPhase `json:"phase,omitempty"`
-}
-
-type BridgeServiceStatus struct {
-	Created bool `json:"created,omitempty"`
-}
-
 // ROSBridgeStatus defines the observed state of ROSBridge
 type ROSBridgeStatus struct {
 	Phase         BridgePhase         `json:"phase,omitempty"`
-	PodStatus     BridgePodStatus     `json:"podStatus,omitempty"`
-	ServiceStatus BridgeServiceStatus `json:"serviceStatus,omitempty"`
+	PodStatus     OwnedResourceStatus `json:"podStatus,omitempty"`
+	ServiceStatus OwnedResourceStatus `json:"serviceStatus,omitempty"`
 }
 
 // ********************************

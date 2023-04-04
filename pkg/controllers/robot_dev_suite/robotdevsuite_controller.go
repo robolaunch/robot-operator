@@ -123,7 +123,7 @@ func (r *RobotDevSuiteReconciler) reconcileCheckStatus(ctx context.Context, inst
 			case true:
 
 				switch instance.Status.RobotVDIStatus.Phase {
-				case robotv1alpha1.RobotVDIPhaseRunning:
+				case string(robotv1alpha1.RobotVDIPhaseRunning):
 
 					switch instance.Spec.IDEEnabled {
 					case true:
@@ -132,7 +132,7 @@ func (r *RobotDevSuiteReconciler) reconcileCheckStatus(ctx context.Context, inst
 						case true:
 
 							switch instance.Status.RobotIDEStatus.Phase {
-							case robotv1alpha1.RobotIDEPhaseRunning:
+							case string(robotv1alpha1.RobotIDEPhaseRunning):
 
 								instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseRunning
 
@@ -177,7 +177,7 @@ func (r *RobotDevSuiteReconciler) reconcileCheckStatus(ctx context.Context, inst
 				case true:
 
 					switch instance.Status.RobotIDEStatus.Phase {
-					case robotv1alpha1.RobotIDEPhaseRunning:
+					case string(robotv1alpha1.RobotIDEPhaseRunning):
 
 						instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseRunning
 

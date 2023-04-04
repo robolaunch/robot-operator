@@ -137,21 +137,11 @@ type WorkspaceManagerSpec struct {
 	UpdateNeeded bool `json:"updateNeeded,omitempty"`
 }
 
-type ClonerJobStatus struct {
-	Created bool     `json:"created,omitempty"`
-	Phase   JobPhase `json:"phase,omitempty"`
-}
-
-type CleanupJobStatus struct {
-	Created bool     `json:"created,omitempty"`
-	Phase   JobPhase `json:"phase,omitempty"`
-}
-
 // WorkspaceManagerStatus defines the observed state of WorkspaceManager
 type WorkspaceManagerStatus struct {
 	Phase            WorkspaceManagerPhase `json:"phase,omitempty"`
-	ClonerJobStatus  ClonerJobStatus       `json:"clonerJobStatus,omitempty"`
-	CleanupJobStatus CleanupJobStatus      `json:"cleanupJobStatus,omitempty"`
+	ClonerJobStatus  OwnedResourceStatus   `json:"clonerJobStatus,omitempty"`
+	CleanupJobStatus OwnedResourceStatus   `json:"cleanupJobStatus,omitempty"`
 	Version          int                   `json:"version,omitempty"`
 }
 
@@ -181,23 +171,12 @@ type BuildManagerSpec struct {
 	Steps []Step `json:"steps,omitempty"`
 }
 
-type StepStatus struct {
-	Step       Step     `json:"step,omitempty"`
-	JobName    string   `json:"jobName,omitempty"`
-	JobCreated bool     `json:"created,omitempty"`
-	JobPhase   JobPhase `json:"jobPhase,omitempty"`
-}
-
-type ScriptConfigMapStatus struct {
-	Created bool `json:"created,omitempty"`
-}
-
 // BuildManagerStatus defines the observed state of BuildManager
 type BuildManagerStatus struct {
-	Phase                 BuildManagerPhase     `json:"phase,omitempty"`
-	Active                bool                  `json:"active,omitempty"`
-	ScriptConfigMapStatus ScriptConfigMapStatus `json:"scriptConfigMapStatus,omitempty"`
-	Steps                 []StepStatus          `json:"steps,omitempty"`
+	Phase                 BuildManagerPhase   `json:"phase,omitempty"`
+	Active                bool                `json:"active,omitempty"`
+	ScriptConfigMapStatus OwnedResourceStatus `json:"scriptConfigMapStatus,omitempty"`
+	Steps                 []StepStatus        `json:"steps,omitempty"`
 }
 
 // ********************************
@@ -281,9 +260,7 @@ type LaunchStatus struct {
 }
 
 type LaunchPodStatus struct {
-	Created      bool                    `json:"created,omitempty"`
-	Phase        corev1.PodPhase         `json:"phase,omitempty"`
-	IP           string                  `json:"ip,omitempty"`
+	Status       OwnedPodStatus          `json:"status,omitempty"`
 	LaunchStatus map[string]LaunchStatus `json:"launchStatus,omitempty"`
 }
 
