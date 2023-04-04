@@ -49,7 +49,7 @@ func (r *DiscoveryServerReconciler) reconcileCheckPod(ctx context.Context, insta
 	discoveryServerPodQuery := &corev1.Pod{}
 	err := r.Get(ctx, *instance.GetDiscoveryServerPodMetadata(), discoveryServerPodQuery)
 	if err != nil && errors.IsNotFound(err) {
-		instance.Status.PodStatus.Resource.Created = false
+		instance.Status.PodStatus.Resource = robotv1alpha1.OwnedResourceStatus{}
 	} else if err != nil {
 		return err
 	} else {
@@ -93,7 +93,7 @@ func (r *DiscoveryServerReconciler) reconcileCheckService(ctx context.Context, i
 	discoveryServerServiceQuery := &corev1.Service{}
 	err = r.Get(ctx, *instance.GetDiscoveryServerServiceMetadata(), discoveryServerServiceQuery)
 	if err != nil && errors.IsNotFound(err) {
-		instance.Status.ServiceStatus.Created = false
+		instance.Status.ServiceStatus = robotv1alpha1.OwnedResourceStatus{}
 	} else if err != nil {
 		return err
 	} else {
@@ -109,7 +109,7 @@ func (r *DiscoveryServerReconciler) reconcileCheckServiceExport(ctx context.Cont
 	discoveryServerServiceExportQuery := &mcsv1alpha1.ServiceExport{}
 	err := r.Get(ctx, *instance.GetDiscoveryServerServiceMetadata(), discoveryServerServiceExportQuery)
 	if err != nil && errors.IsNotFound(err) {
-		instance.Status.ServiceExportStatus.Created = false
+		instance.Status.ServiceExportStatus = robotv1alpha1.OwnedResourceStatus{}
 	} else if err != nil {
 		return err
 	} else {
@@ -148,7 +148,7 @@ func (r *DiscoveryServerReconciler) reconcileCheckConfigMap(ctx context.Context,
 	discoveryServerConfigMapQuery := &corev1.ConfigMap{}
 	err := r.Get(ctx, *instance.GetDiscoveryServerConfigMapMetadata(), discoveryServerConfigMapQuery)
 	if err != nil && errors.IsNotFound(err) {
-		instance.Status.ConfigMapStatus.Created = false
+		instance.Status.ConfigMapStatus = robotv1alpha1.OwnedResourceStatus{}
 	} else if err != nil {
 		return err
 	} else {

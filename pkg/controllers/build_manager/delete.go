@@ -19,7 +19,7 @@ func (r *BuildManagerReconciler) reconcileDeleteConfigMap(ctx context.Context, i
 	err := r.Get(ctx, *instance.GetConfigMapMetadata(), configMapQuery)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			instance.Status.ScriptConfigMapStatus.Created = false
+			instance.Status.ScriptConfigMapStatus = robotv1alpha1.OwnedResourceStatus{}
 		} else {
 			return err
 		}
@@ -28,7 +28,7 @@ func (r *BuildManagerReconciler) reconcileDeleteConfigMap(ctx context.Context, i
 		if err != nil {
 			return err
 		}
-		instance.Status.ScriptConfigMapStatus.Created = false
+		instance.Status.ScriptConfigMapStatus = robotv1alpha1.OwnedResourceStatus{}
 	}
 
 	return nil

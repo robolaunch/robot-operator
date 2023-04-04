@@ -17,7 +17,7 @@ func (r *RobotIDEReconciler) reconcileCheckService(ctx context.Context, instance
 	err := r.Get(ctx, *instance.GetRobotIDEServiceMetadata(), serviceQuery)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			instance.Status.ServiceStatus.Created = false
+			instance.Status.ServiceStatus = robotv1alpha1.OwnedResourceStatus{}
 		} else {
 			return err
 		}
@@ -62,7 +62,7 @@ func (r *RobotIDEReconciler) reconcileCheckIngress(ctx context.Context, instance
 		err := r.Get(ctx, *instance.GetRobotIDEIngressMetadata(), ingressQuery)
 		if err != nil {
 			if errors.IsNotFound(err) {
-				instance.Status.IngressStatus.Created = false
+				instance.Status.IngressStatus = robotv1alpha1.OwnedResourceStatus{}
 			} else {
 				return err
 			}

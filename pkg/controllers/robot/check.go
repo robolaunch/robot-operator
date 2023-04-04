@@ -17,7 +17,7 @@ func (r *RobotReconciler) reconcileCheckPVCs(ctx context.Context, instance *robo
 	pvcVarQuery := &corev1.PersistentVolumeClaim{}
 	err := r.Get(ctx, *instance.GetPVCVarMetadata(), pvcVarQuery)
 	if err != nil && errors.IsNotFound(err) {
-		instance.Status.VolumeStatuses.Var.Created = false
+		instance.Status.VolumeStatuses.Var = robotv1alpha1.OwnedResourceStatus{}
 	} else if err != nil {
 		return err
 	} else {
@@ -28,7 +28,7 @@ func (r *RobotReconciler) reconcileCheckPVCs(ctx context.Context, instance *robo
 	pvcOptQuery := &corev1.PersistentVolumeClaim{}
 	err = r.Get(ctx, *instance.GetPVCOptMetadata(), pvcOptQuery)
 	if err != nil && errors.IsNotFound(err) {
-		instance.Status.VolumeStatuses.Opt.Created = false
+		instance.Status.VolumeStatuses.Opt = robotv1alpha1.OwnedResourceStatus{}
 	} else if err != nil {
 		return err
 	} else {
@@ -39,7 +39,7 @@ func (r *RobotReconciler) reconcileCheckPVCs(ctx context.Context, instance *robo
 	pvcEtcQuery := &corev1.PersistentVolumeClaim{}
 	err = r.Get(ctx, *instance.GetPVCEtcMetadata(), pvcEtcQuery)
 	if err != nil && errors.IsNotFound(err) {
-		instance.Status.VolumeStatuses.Etc.Created = false
+		instance.Status.VolumeStatuses.Etc = robotv1alpha1.OwnedResourceStatus{}
 	} else if err != nil {
 		return err
 	} else {
@@ -50,7 +50,7 @@ func (r *RobotReconciler) reconcileCheckPVCs(ctx context.Context, instance *robo
 	pvcUsrQuery := &corev1.PersistentVolumeClaim{}
 	err = r.Get(ctx, *instance.GetPVCUsrMetadata(), pvcUsrQuery)
 	if err != nil && errors.IsNotFound(err) {
-		instance.Status.VolumeStatuses.Usr.Created = false
+		instance.Status.VolumeStatuses.Usr = robotv1alpha1.OwnedResourceStatus{}
 	} else if err != nil {
 		return err
 	} else {
@@ -61,7 +61,7 @@ func (r *RobotReconciler) reconcileCheckPVCs(ctx context.Context, instance *robo
 	pvcWorkspaceQuery := &corev1.PersistentVolumeClaim{}
 	err = r.Get(ctx, *instance.GetPVCWorkspaceMetadata(), pvcWorkspaceQuery)
 	if err != nil && errors.IsNotFound(err) {
-		instance.Status.VolumeStatuses.Workspace.Created = false
+		instance.Status.VolumeStatuses.Workspace = robotv1alpha1.OwnedResourceStatus{}
 	} else if err != nil {
 		return err
 	} else {
@@ -104,7 +104,7 @@ func (r *RobotReconciler) reconcileCheckLoaderJob(ctx context.Context, instance 
 		loaderJobQuery := &batchv1.Job{}
 		err := r.Get(ctx, *instance.GetLoaderJobMetadata(), loaderJobQuery)
 		if err != nil && errors.IsNotFound(err) {
-			instance.Status.LoaderJobStatus.Created = false
+			instance.Status.LoaderJobStatus = robotv1alpha1.OwnedResourceStatus{}
 		} else if err != nil {
 			return err
 		} else {

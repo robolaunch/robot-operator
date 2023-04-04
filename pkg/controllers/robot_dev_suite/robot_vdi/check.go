@@ -17,7 +17,7 @@ func (r *RobotVDIReconciler) reconcileCheckPVC(ctx context.Context, instance *ro
 	err := r.Get(ctx, *instance.GetRobotVDIPVCMetadata(), pvcQuery)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			instance.Status.PVCStatus.Created = false
+			instance.Status.PVCStatus = robotv1alpha1.OwnedResourceStatus{}
 		} else {
 			return err
 		}
@@ -35,7 +35,7 @@ func (r *RobotVDIReconciler) reconcileCheckServices(ctx context.Context, instanc
 	err := r.Get(ctx, *instance.GetRobotVDIServiceTCPMetadata(), serviceTCPQuery)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			instance.Status.ServiceTCPStatus.Created = false
+			instance.Status.ServiceTCPStatus = robotv1alpha1.OwnedResourceStatus{}
 		} else {
 			return err
 		}
@@ -48,7 +48,7 @@ func (r *RobotVDIReconciler) reconcileCheckServices(ctx context.Context, instanc
 	err = r.Get(ctx, *instance.GetRobotVDIServiceUDPMetadata(), serviceUDPQuery)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			instance.Status.ServiceUDPStatus.Created = false
+			instance.Status.ServiceUDPStatus = robotv1alpha1.OwnedResourceStatus{}
 		} else {
 			return err
 		}
@@ -93,7 +93,7 @@ func (r *RobotVDIReconciler) reconcileCheckIngress(ctx context.Context, instance
 		err := r.Get(ctx, *instance.GetRobotVDIIngressMetadata(), ingressQuery)
 		if err != nil {
 			if errors.IsNotFound(err) {
-				instance.Status.IngressStatus.Created = false
+				instance.Status.IngressStatus = robotv1alpha1.OwnedResourceStatus{}
 			} else {
 				return err
 			}
