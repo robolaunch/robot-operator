@@ -114,6 +114,6 @@ type MetricsExporterStatus struct {
 	RoleStatus           MetricsExporterRoleStatus           `json:"roleStatus,omitempty"`
 	RoleBindingStatus    MetricsExporterRoleBindingStatus    `json:"roleBindingStatus,omitempty"`
 	ServiceAccountStatus MetricsExporterServiceAccountStatus `json:"saStatus,omitempty"`
-	PodStatus            OwnedPodStatus                      `json:"podStatus,omitempty"`
+	PodStatus            OwnedResourceStatus                 `json:"podStatus,omitempty"`
 	Usage                Usage                               `json:"usage,omitempty"`
 }

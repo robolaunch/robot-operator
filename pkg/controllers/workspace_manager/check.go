@@ -19,17 +19,17 @@ func (r *WorkspaceManagerReconciler) reconcileCheckClonerJob(ctx context.Context
 	clonerJobQuery := &batchv1.Job{}
 	err := r.Get(ctx, *instance.GetClonerJobMetadata(), clonerJobQuery)
 	if err != nil && errors.IsNotFound(err) {
-		instance.Status.ClonerJobStatus.Resource.Created = false
+		instance.Status.ClonerJobStatus.Created = false
 	} else if err != nil {
 		return err
 	} else {
 		switch 1 {
 		case int(clonerJobQuery.Status.Succeeded):
-			instance.Status.ClonerJobStatus.Phase = robotv1alpha1.JobSucceeded
+			instance.Status.ClonerJobStatus.Phase = string(robotv1alpha1.JobSucceeded)
 		case int(clonerJobQuery.Status.Active):
-			instance.Status.ClonerJobStatus.Phase = robotv1alpha1.JobActive
+			instance.Status.ClonerJobStatus.Phase = string(robotv1alpha1.JobActive)
 		case int(clonerJobQuery.Status.Failed):
-			instance.Status.ClonerJobStatus.Phase = robotv1alpha1.JobFailed
+			instance.Status.ClonerJobStatus.Phase = string(robotv1alpha1.JobFailed)
 		}
 	}
 
@@ -44,18 +44,18 @@ func (r *WorkspaceManagerReconciler) reconcileCheckCleanupJob(ctx context.Contex
 		cleanupJobQuery := &batchv1.Job{}
 		err := r.Get(ctx, *instance.GetCleanupJobMetadata(), cleanupJobQuery)
 		if err != nil && errors.IsNotFound(err) {
-			instance.Status.CleanupJobStatus.Resource.Created = false
+			instance.Status.CleanupJobStatus.Created = false
 		} else if err != nil {
 			return err
 		} else {
 			switch 1 {
 			case int(cleanupJobQuery.Status.Succeeded):
-				instance.Status.CleanupJobStatus.Phase = robotv1alpha1.JobSucceeded
+				instance.Status.CleanupJobStatus.Phase = string(robotv1alpha1.JobSucceeded)
 				isActive = false
 			case int(cleanupJobQuery.Status.Active):
-				instance.Status.CleanupJobStatus.Phase = robotv1alpha1.JobActive
+				instance.Status.CleanupJobStatus.Phase = string(robotv1alpha1.JobActive)
 			case int(cleanupJobQuery.Status.Failed):
-				instance.Status.CleanupJobStatus.Phase = robotv1alpha1.JobFailed
+				instance.Status.CleanupJobStatus.Phase = string(robotv1alpha1.JobFailed)
 				isActive = false
 			}
 		}
@@ -173,8 +173,8 @@ func (r *WorkspaceManagerReconciler) reconcileCheckUpdates(ctx context.Context, 
 
 		instance.Status.Version++
 		instance.Status.Phase = robotv1alpha1.WorkspaceManagerPhaseConfiguringWorkspaces
-		instance.Status.CleanupJobStatus = robotv1alpha1.OwnedJobStatus{}
-		instance.Status.ClonerJobStatus = robotv1alpha1.OwnedJobStatus{}
+		instance.Status.CleanupJobStatus = robotv1alpha1.OwnedResourceStatus{}
+		instance.Status.ClonerJobStatus = robotv1alpha1.OwnedResourceStatus{}
 
 		err = r.reconcileUpdateInstanceStatus(ctx, instance)
 		if err != nil {

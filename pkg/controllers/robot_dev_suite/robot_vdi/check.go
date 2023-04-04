@@ -74,7 +74,7 @@ func (r *RobotVDIReconciler) reconcileCheckPod(ctx context.Context, instance *ro
 		}
 
 		instance.Status.PodStatus.Resource.Created = true
-		instance.Status.PodStatus.Phase = vdiPodQuery.Status.Phase
+		instance.Status.PodStatus.Resource.Phase = string(vdiPodQuery.Status.Phase)
 		instance.Status.PodStatus.IP = vdiPodQuery.Status.PodIP
 	}
 

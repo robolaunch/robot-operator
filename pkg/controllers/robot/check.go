@@ -102,17 +102,17 @@ func (r *RobotReconciler) reconcileCheckLoaderJob(ctx context.Context, instance 
 		loaderJobQuery := &batchv1.Job{}
 		err := r.Get(ctx, *instance.GetLoaderJobMetadata(), loaderJobQuery)
 		if err != nil && errors.IsNotFound(err) {
-			instance.Status.LoaderJobStatus.Resource.Created = false
+			instance.Status.LoaderJobStatus.Created = false
 		} else if err != nil {
 			return err
 		} else {
 			switch 1 {
 			case int(loaderJobQuery.Status.Succeeded):
-				instance.Status.LoaderJobStatus.Phase = robotv1alpha1.JobSucceeded
+				instance.Status.LoaderJobStatus.Phase = string(robotv1alpha1.JobSucceeded)
 			case int(loaderJobQuery.Status.Active):
-				instance.Status.LoaderJobStatus.Phase = robotv1alpha1.JobActive
+				instance.Status.LoaderJobStatus.Phase = string(robotv1alpha1.JobActive)
 			case int(loaderJobQuery.Status.Failed):
-				instance.Status.LoaderJobStatus.Phase = robotv1alpha1.JobFailed
+				instance.Status.LoaderJobStatus.Phase = string(robotv1alpha1.JobFailed)
 			}
 		}
 	}

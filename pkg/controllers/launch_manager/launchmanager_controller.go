@@ -113,8 +113,8 @@ func (r *LaunchManagerReconciler) reconcileCheckStatus(ctx context.Context, inst
 			switch instance.Status.LaunchPodStatus.Status.Resource.Created {
 			case true:
 
-				switch instance.Status.LaunchPodStatus.Status.Phase {
-				case corev1.PodRunning:
+				switch instance.Status.LaunchPodStatus.Status.Resource.Phase {
+				case string(corev1.PodRunning):
 
 					instance.Status.Phase = robotv1alpha1.LaunchManagerPhaseReady
 

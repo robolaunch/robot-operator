@@ -126,8 +126,8 @@ func (r *DiscoveryServerReconciler) reconcileCheckStatus(ctx context.Context, in
 			switch instance.Status.PodStatus.Resource.Created {
 			case true:
 
-				switch instance.Status.PodStatus.Phase {
-				case corev1.PodRunning:
+				switch instance.Status.PodStatus.Resource.Phase {
+				case string(corev1.PodRunning):
 
 					// TODO: Cover other pod phases
 

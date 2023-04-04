@@ -140,8 +140,8 @@ type WorkspaceManagerSpec struct {
 // WorkspaceManagerStatus defines the observed state of WorkspaceManager
 type WorkspaceManagerStatus struct {
 	Phase            WorkspaceManagerPhase `json:"phase,omitempty"`
-	ClonerJobStatus  OwnedJobStatus        `json:"clonerJobStatus,omitempty"`
-	CleanupJobStatus OwnedJobStatus        `json:"cleanupJobStatus,omitempty"`
+	ClonerJobStatus  OwnedResourceStatus   `json:"clonerJobStatus,omitempty"`
+	CleanupJobStatus OwnedResourceStatus   `json:"cleanupJobStatus,omitempty"`
 	Version          int                   `json:"version,omitempty"`
 }
 

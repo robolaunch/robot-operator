@@ -16,7 +16,7 @@ import (
 
 func (r *DiscoveryServerReconciler) reconcileUpdateConnectionInfo(ctx context.Context, instance *robotv1alpha1.DiscoveryServer) error {
 
-	if instance.Spec.Type == robotv1alpha1.DiscoveryServerInstanceTypeClient || instance.Status.PodStatus.Phase == corev1.PodRunning {
+	if instance.Spec.Type == robotv1alpha1.DiscoveryServerInstanceTypeClient || instance.Status.PodStatus.Resource.Phase == string(corev1.PodRunning) {
 		dnsName := resources.GetDiscoveryServerDNS(*instance)
 
 		ips, err := net.LookupIP(dnsName)
@@ -65,14 +65,14 @@ func (r *DiscoveryServerReconciler) reconcileCheckPod(ctx context.Context, insta
 			}
 
 			instance.Status.PodStatus.IP = ""
-			instance.Status.PodStatus.Phase = ""
+			instance.Status.PodStatus.Resource.Phase = ""
 			instance.Status.Phase = ""
 
 		} else {
 
 			instance.Status.PodStatus.Resource.Created = true
 			instance.Status.PodStatus.IP = discoveryServerPodQuery.Status.PodIP
-			instance.Status.PodStatus.Phase = discoveryServerPodQuery.Status.Phase
+			instance.Status.PodStatus.Resource.Phase = string(discoveryServerPodQuery.Status.Phase)
 
 		}
 

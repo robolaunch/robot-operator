@@ -35,7 +35,7 @@ func (r *LaunchManagerReconciler) reconcileCheckLaunchPod(ctx context.Context, i
 
 		instance.Status.LaunchPodStatus.Status.Resource.Created = true
 		instance.Status.LaunchPodStatus.Status.IP = launchPodQuery.Status.PodIP
-		instance.Status.LaunchPodStatus.Status.Phase = launchPodQuery.Status.Phase
+		instance.Status.LaunchPodStatus.Status.Resource.Phase = string(launchPodQuery.Status.Phase)
 
 		launchStatus := make(map[string]robotv1alpha1.LaunchStatus)
 		instance.Status.LaunchPodStatus.LaunchStatus = launchStatus

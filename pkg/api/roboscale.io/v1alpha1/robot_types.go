@@ -278,7 +278,7 @@ type RobotStatus struct {
 	// Robot development suite instance status
 	RobotDevSuiteStatus RobotDevSuiteInstanceStatus `json:"robotDevSuiteStatus,omitempty"`
 	// Loader job status that configures environment
-	LoaderJobStatus OwnedJobStatus `json:"loaderJobStatus,omitempty"`
+	LoaderJobStatus OwnedResourceStatus `json:"loaderJobStatus,omitempty"`
 	// Workspace manager status
 	WorkspaceManagerStatus WorkspaceManagerInstanceStatus `json:"workspaceManagerStatus,omitempty"`
 	// Initial build manager creation status
@@ -365,7 +365,7 @@ type BridgeServiceStatus struct {
 // ROSBridgeStatus defines the observed state of ROSBridge
 type ROSBridgeStatus struct {
 	Phase         BridgePhase         `json:"phase,omitempty"`
-	PodStatus     OwnedPodStatus      `json:"podStatus,omitempty"`
+	PodStatus     OwnedResourceStatus `json:"podStatus,omitempty"`
 	ServiceStatus BridgeServiceStatus `json:"serviceStatus,omitempty"`
 }
 

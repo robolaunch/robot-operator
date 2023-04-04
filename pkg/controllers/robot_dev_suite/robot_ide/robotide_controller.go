@@ -20,7 +20,6 @@ import (
 	"context"
 
 	corev1 "k8s.io/api/core/v1"
-	v1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -99,8 +98,8 @@ func (r *RobotIDEReconciler) reconcileCheckStatus(ctx context.Context, instance 
 			switch instance.Status.IngressStatus.Created || !instance.Spec.Ingress {
 			case true:
 
-				switch instance.Status.PodStatus.Phase {
-				case v1.PodRunning:
+				switch instance.Status.PodStatus.Resource.Phase {
+				case string(corev1.PodRunning):
 
 					instance.Status.Phase = robotv1alpha1.RobotIDEPhaseRunning
 
