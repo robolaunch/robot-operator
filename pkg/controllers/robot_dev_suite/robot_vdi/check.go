@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/robolaunch/robot-operator/internal/handle"
+	"github.com/robolaunch/robot-operator/internal/reference"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1"
@@ -22,6 +23,7 @@ func (r *RobotVDIReconciler) reconcileCheckPVC(ctx context.Context, instance *ro
 		}
 	} else {
 		instance.Status.PVCStatus.Created = true
+		reference.SetReference(&instance.Status.PVCStatus.Reference, pvcQuery.TypeMeta, pvcQuery.ObjectMeta)
 	}
 
 	return nil
@@ -39,6 +41,7 @@ func (r *RobotVDIReconciler) reconcileCheckServices(ctx context.Context, instanc
 		}
 	} else {
 		instance.Status.ServiceTCPStatus.Created = true
+		reference.SetReference(&instance.Status.ServiceTCPStatus.Reference, serviceTCPQuery.TypeMeta, serviceTCPQuery.ObjectMeta)
 	}
 
 	serviceUDPQuery := &corev1.Service{}
@@ -51,6 +54,7 @@ func (r *RobotVDIReconciler) reconcileCheckServices(ctx context.Context, instanc
 		}
 	} else {
 		instance.Status.ServiceUDPStatus.Created = true
+		reference.SetReference(&instance.Status.ServiceUDPStatus.Reference, serviceUDPQuery.TypeMeta, serviceUDPQuery.ObjectMeta)
 	}
 
 	return nil
@@ -74,6 +78,7 @@ func (r *RobotVDIReconciler) reconcileCheckPod(ctx context.Context, instance *ro
 		}
 
 		instance.Status.PodStatus.Resource.Created = true
+		reference.SetReference(&instance.Status.PodStatus.Resource.Reference, vdiPodQuery.TypeMeta, vdiPodQuery.ObjectMeta)
 		instance.Status.PodStatus.Resource.Phase = string(vdiPodQuery.Status.Phase)
 		instance.Status.PodStatus.IP = vdiPodQuery.Status.PodIP
 	}
@@ -94,6 +99,7 @@ func (r *RobotVDIReconciler) reconcileCheckIngress(ctx context.Context, instance
 			}
 		} else {
 			instance.Status.IngressStatus.Created = true
+			reference.SetReference(&instance.Status.IngressStatus.Reference, ingressQuery.TypeMeta, ingressQuery.ObjectMeta)
 		}
 	}
 

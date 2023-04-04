@@ -6,6 +6,7 @@ import (
 	"github.com/robolaunch/robot-operator/internal"
 	robotErr "github.com/robolaunch/robot-operator/internal/error"
 	"github.com/robolaunch/robot-operator/internal/label"
+	"github.com/robolaunch/robot-operator/internal/reference"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	batchv1 "k8s.io/api/batch/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -23,6 +24,7 @@ func (r *WorkspaceManagerReconciler) reconcileCheckClonerJob(ctx context.Context
 	} else if err != nil {
 		return err
 	} else {
+		reference.SetReference(&instance.Status.ClonerJobStatus.Reference, clonerJobQuery.TypeMeta, clonerJobQuery.ObjectMeta)
 		switch 1 {
 		case int(clonerJobQuery.Status.Succeeded):
 			instance.Status.ClonerJobStatus.Phase = string(robotv1alpha1.JobSucceeded)
@@ -48,6 +50,7 @@ func (r *WorkspaceManagerReconciler) reconcileCheckCleanupJob(ctx context.Contex
 		} else if err != nil {
 			return err
 		} else {
+			reference.SetReference(&instance.Status.CleanupJobStatus.Reference, cleanupJobQuery.TypeMeta, cleanupJobQuery.ObjectMeta)
 			switch 1 {
 			case int(cleanupJobQuery.Status.Succeeded):
 				instance.Status.CleanupJobStatus.Phase = string(robotv1alpha1.JobSucceeded)
@@ -90,7 +93,7 @@ func (r *WorkspaceManagerReconciler) reconcileCheckOtherAttachedResources(ctx co
 
 	for _, rds := range robotDevSuiteList.Items {
 
-		if rds.Status.Active == true {
+		if rds.Status.Active {
 			return &robotErr.RobotResourcesHasNotBeenReleasedError{
 				ResourceKind:      instance.Kind,
 				ResourceName:      instance.Name,
@@ -115,7 +118,7 @@ func (r *WorkspaceManagerReconciler) reconcileCheckOtherAttachedResources(ctx co
 
 	for _, lm := range launchManagerList.Items {
 
-		if lm.Status.Active == true {
+		if lm.Status.Active {
 			return &robotErr.RobotResourcesHasNotBeenReleasedError{
 				ResourceKind:      instance.Kind,
 				ResourceName:      instance.Name,
@@ -140,7 +143,7 @@ func (r *WorkspaceManagerReconciler) reconcileCheckOtherAttachedResources(ctx co
 
 	for _, bm := range buildManagerList.Items {
 
-		if bm.Status.Active == true {
+		if bm.Status.Active {
 			return &robotErr.RobotResourcesHasNotBeenReleasedError{
 				ResourceKind:      instance.Kind,
 				ResourceName:      instance.Name,

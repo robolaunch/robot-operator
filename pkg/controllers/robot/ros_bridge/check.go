@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/robolaunch/robot-operator/internal/handle"
+	"github.com/robolaunch/robot-operator/internal/reference"
 	"github.com/robolaunch/robot-operator/internal/resources"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
@@ -20,6 +21,7 @@ func (r *ROSBridgeReconciler) reconcileCheckService(ctx context.Context, instanc
 		return err
 	} else {
 		instance.Status.ServiceStatus.Created = true
+		reference.SetReference(&instance.Status.ServiceStatus.Reference, bridgeServiceQuery.TypeMeta, bridgeServiceQuery.ObjectMeta)
 	}
 
 	return nil
@@ -68,6 +70,7 @@ func (r *ROSBridgeReconciler) reconcileCheckPod(ctx context.Context, instance *r
 		}
 
 		instance.Status.PodStatus.Created = true
+		reference.SetReference(&instance.Status.PodStatus.Reference, bridgePodQuery.TypeMeta, bridgePodQuery.ObjectMeta)
 		instance.Status.PodStatus.Phase = string(bridgePodQuery.Status.Phase)
 	}
 

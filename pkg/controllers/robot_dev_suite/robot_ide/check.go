@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/robolaunch/robot-operator/internal/handle"
+	"github.com/robolaunch/robot-operator/internal/reference"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1"
@@ -22,6 +23,7 @@ func (r *RobotIDEReconciler) reconcileCheckService(ctx context.Context, instance
 		}
 	} else {
 		instance.Status.ServiceStatus.Created = true
+		reference.SetReference(&instance.Status.ServiceStatus.Reference, serviceQuery.TypeMeta, serviceQuery.ObjectMeta)
 	}
 
 	return nil
@@ -45,6 +47,7 @@ func (r *RobotIDEReconciler) reconcileCheckPod(ctx context.Context, instance *ro
 		}
 
 		instance.Status.PodStatus.Resource.Created = true
+		reference.SetReference(&instance.Status.PodStatus.Resource.Reference, podQuery.TypeMeta, podQuery.ObjectMeta)
 		instance.Status.PodStatus.Resource.Phase = string(podQuery.Status.Phase)
 		instance.Status.PodStatus.IP = podQuery.Status.PodIP
 	}
@@ -65,6 +68,7 @@ func (r *RobotIDEReconciler) reconcileCheckIngress(ctx context.Context, instance
 			}
 		} else {
 			instance.Status.IngressStatus.Created = true
+			reference.SetReference(&instance.Status.IngressStatus.Reference, ingressQuery.TypeMeta, ingressQuery.ObjectMeta)
 		}
 	}
 

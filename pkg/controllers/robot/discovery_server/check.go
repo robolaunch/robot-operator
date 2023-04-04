@@ -6,6 +6,7 @@ import (
 
 	robotErr "github.com/robolaunch/robot-operator/internal/error"
 	"github.com/robolaunch/robot-operator/internal/handle"
+	"github.com/robolaunch/robot-operator/internal/reference"
 	"github.com/robolaunch/robot-operator/internal/resources"
 	mcsv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/external/apis/mcsv1alpha1/v1alpha1"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
@@ -71,6 +72,7 @@ func (r *DiscoveryServerReconciler) reconcileCheckPod(ctx context.Context, insta
 		} else {
 
 			instance.Status.PodStatus.Resource.Created = true
+			reference.SetReference(&instance.Status.PodStatus.Resource.Reference, discoveryServerPodQuery.TypeMeta, discoveryServerPodQuery.ObjectMeta)
 			instance.Status.PodStatus.IP = discoveryServerPodQuery.Status.PodIP
 			instance.Status.PodStatus.Resource.Phase = string(discoveryServerPodQuery.Status.Phase)
 
@@ -96,6 +98,7 @@ func (r *DiscoveryServerReconciler) reconcileCheckService(ctx context.Context, i
 		return err
 	} else {
 		instance.Status.ServiceStatus.Created = true
+		reference.SetReference(&instance.Status.ServiceStatus.Reference, discoveryServerServiceQuery.TypeMeta, discoveryServerServiceQuery.ObjectMeta)
 	}
 
 	return nil
@@ -111,6 +114,7 @@ func (r *DiscoveryServerReconciler) reconcileCheckServiceExport(ctx context.Cont
 		return err
 	} else {
 		instance.Status.ServiceExportStatus.Created = true
+		reference.SetReference(&instance.Status.ServiceExportStatus.Reference, discoveryServerServiceExportQuery.TypeMeta, discoveryServerServiceExportQuery.ObjectMeta)
 	}
 
 	return nil
@@ -164,6 +168,8 @@ func (r *DiscoveryServerReconciler) reconcileCheckConfigMap(ctx context.Context,
 		}
 
 		instance.Status.ConfigMapStatus.Created = true
+		reference.SetReference(&instance.Status.ConfigMapStatus.Reference, discoveryServerConfigMapQuery.TypeMeta, discoveryServerConfigMapQuery.ObjectMeta)
+
 	}
 
 	return nil
