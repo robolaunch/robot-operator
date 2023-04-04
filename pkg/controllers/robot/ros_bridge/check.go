@@ -15,7 +15,7 @@ func (r *ROSBridgeReconciler) reconcileCheckService(ctx context.Context, instanc
 	bridgeServiceQuery := &corev1.Service{}
 	err := r.Get(ctx, *instance.GetBridgeServiceMetadata(), bridgeServiceQuery)
 	if err != nil && errors.IsNotFound(err) {
-		instance.Status.ServiceStatus = robotv1alpha1.BridgeServiceStatus{}
+		instance.Status.ServiceStatus = robotv1alpha1.OwnedResourceStatus{}
 	} else if err != nil {
 		return err
 	} else {

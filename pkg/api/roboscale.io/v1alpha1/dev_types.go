@@ -130,20 +130,12 @@ type RobotIDESpec struct {
 	Display bool `json:"display,omitempty"`
 }
 
-type RobotIDEServiceStatus struct {
-	Created bool `json:"created,omitempty"`
-}
-
-type RobotIDEIngressStatus struct {
-	Created bool `json:"created,omitempty"`
-}
-
 // RobotIDEStatus defines the observed state of RobotIDE
 type RobotIDEStatus struct {
-	Phase         RobotIDEPhase         `json:"phase,omitempty"`
-	PodStatus     OwnedPodStatus        `json:"podStatus,omitempty"`
-	ServiceStatus RobotIDEServiceStatus `json:"serviceStatus,omitempty"`
-	IngressStatus RobotIDEIngressStatus `json:"ingressStatus,omitempty"`
+	Phase         RobotIDEPhase       `json:"phase,omitempty"`
+	PodStatus     OwnedPodStatus      `json:"podStatus,omitempty"`
+	ServiceStatus OwnedResourceStatus `json:"serviceStatus,omitempty"`
+	IngressStatus OwnedResourceStatus `json:"ingressStatus,omitempty"`
 }
 
 // ********************************
@@ -179,28 +171,12 @@ type RobotVDISpec struct {
 	Resolution string `json:"resolution,omitempty"`
 }
 
-type RobotVDIPVCStatus struct {
-	Created bool `json:"created,omitempty"`
-}
-
-type RobotVDIServiceTCPStatus struct {
-	Created bool `json:"created,omitempty"`
-}
-
-type RobotVDIServiceUDPStatus struct {
-	Created bool `json:"created,omitempty"`
-}
-
-type RobotVDIIngressStatus struct {
-	Created bool `json:"created,omitempty"`
-}
-
 // RobotVDIStatus defines the observed state of RobotVDI
 type RobotVDIStatus struct {
-	Phase            RobotVDIPhase            `json:"phase,omitempty"`
-	PodStatus        OwnedPodStatus           `json:"podStatus,omitempty"`
-	ServiceTCPStatus RobotVDIServiceTCPStatus `json:"serviceTCPStatus,omitempty"`
-	ServiceUDPStatus RobotVDIServiceUDPStatus `json:"serviceUDPStatus,omitempty"`
-	IngressStatus    RobotVDIIngressStatus    `json:"ingressStatus,omitempty"`
-	PVCStatus        RobotVDIPVCStatus        `json:"pvcStatus,omitempty"`
+	Phase            RobotVDIPhase       `json:"phase,omitempty"`
+	PodStatus        OwnedPodStatus      `json:"podStatus,omitempty"`
+	ServiceTCPStatus OwnedResourceStatus `json:"serviceTCPStatus,omitempty"`
+	ServiceUDPStatus OwnedResourceStatus `json:"serviceUDPStatus,omitempty"`
+	IngressStatus    OwnedResourceStatus `json:"ingressStatus,omitempty"`
+	PVCStatus        OwnedResourceStatus `json:"pvcStatus,omitempty"`
 }

@@ -285,18 +285,6 @@ type DiscoveryServerSpec struct {
 	Args      []string                    `json:"args,omitempty"`
 }
 
-type DiscoveryServerServiceStatus struct {
-	Created bool `json:"created,omitempty"`
-}
-
-type DiscoveryServerServiceExportStatus struct {
-	Created bool `json:"created,omitempty"`
-}
-
-type DiscoveryServerConfigMapStatus struct {
-	Created bool `json:"created,omitempty"`
-}
-
 type ConnectionInfo struct {
 	IP            string `json:"ip,omitempty"`
 	ConfigMapName string `json:"configMapName,omitempty"`
@@ -304,12 +292,12 @@ type ConnectionInfo struct {
 
 // DiscoveryServerStatus defines the observed state of DiscoveryServer
 type DiscoveryServerStatus struct {
-	Phase               DiscoveryServerPhase               `json:"phase,omitempty"`
-	ServiceStatus       DiscoveryServerServiceStatus       `json:"serviceStatus,omitempty"`
-	ServiceExportStatus DiscoveryServerServiceExportStatus `json:"serviceExportStatus,omitempty"`
-	PodStatus           OwnedPodStatus                     `json:"podStatus,omitempty"`
-	ConfigMapStatus     DiscoveryServerConfigMapStatus     `json:"configMapStatus,omitempty"`
-	ConnectionInfo      ConnectionInfo                     `json:"connectionInfo,omitempty"`
+	Phase               DiscoveryServerPhase `json:"phase,omitempty"`
+	ServiceStatus       OwnedResourceStatus  `json:"serviceStatus,omitempty"`
+	ServiceExportStatus OwnedResourceStatus  `json:"serviceExportStatus,omitempty"`
+	PodStatus           OwnedPodStatus       `json:"podStatus,omitempty"`
+	ConfigMapStatus     OwnedResourceStatus  `json:"configMapStatus,omitempty"`
+	ConnectionInfo      ConnectionInfo       `json:"connectionInfo,omitempty"`
 }
 
 // ********************************
@@ -328,15 +316,11 @@ type ROSBridgeSpec struct {
 	Image string       `json:"image,omitempty"`
 }
 
-type BridgeServiceStatus struct {
-	Created bool `json:"created,omitempty"`
-}
-
 // ROSBridgeStatus defines the observed state of ROSBridge
 type ROSBridgeStatus struct {
 	Phase         BridgePhase         `json:"phase,omitempty"`
 	PodStatus     OwnedResourceStatus `json:"podStatus,omitempty"`
-	ServiceStatus BridgeServiceStatus `json:"serviceStatus,omitempty"`
+	ServiceStatus OwnedResourceStatus `json:"serviceStatus,omitempty"`
 }
 
 // ********************************

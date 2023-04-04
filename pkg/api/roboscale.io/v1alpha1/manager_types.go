@@ -171,16 +171,12 @@ type BuildManagerSpec struct {
 	Steps []Step `json:"steps,omitempty"`
 }
 
-type ScriptConfigMapStatus struct {
-	Created bool `json:"created,omitempty"`
-}
-
 // BuildManagerStatus defines the observed state of BuildManager
 type BuildManagerStatus struct {
-	Phase                 BuildManagerPhase     `json:"phase,omitempty"`
-	Active                bool                  `json:"active,omitempty"`
-	ScriptConfigMapStatus ScriptConfigMapStatus `json:"scriptConfigMapStatus,omitempty"`
-	Steps                 []StepStatus          `json:"steps,omitempty"`
+	Phase                 BuildManagerPhase   `json:"phase,omitempty"`
+	Active                bool                `json:"active,omitempty"`
+	ScriptConfigMapStatus OwnedResourceStatus `json:"scriptConfigMapStatus,omitempty"`
+	Steps                 []StepStatus        `json:"steps,omitempty"`
 }
 
 // ********************************

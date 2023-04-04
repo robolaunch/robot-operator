@@ -40,7 +40,7 @@ func (r *MetricsExporterReconciler) reconcileCheckRole(ctx context.Context, inst
 	err := r.Get(ctx, *instance.GetMetricsExporterRoleMetadata(), roleQuery)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			instance.Status.RoleStatus = robotv1alpha1.MetricsExporterRoleStatus{}
+			instance.Status.RoleStatus = robotv1alpha1.OwnedResourceStatus{}
 		} else {
 			return err
 		}
@@ -57,7 +57,7 @@ func (r *MetricsExporterReconciler) reconcileCheckRoleBinding(ctx context.Contex
 	err := r.Get(ctx, *instance.GetMetricsExporterRoleBindingMetadata(), roleBindingQuery)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			instance.Status.RoleBindingStatus = robotv1alpha1.MetricsExporterRoleBindingStatus{}
+			instance.Status.RoleBindingStatus = robotv1alpha1.OwnedResourceStatus{}
 		} else {
 			return err
 		}
@@ -74,7 +74,7 @@ func (r *MetricsExporterReconciler) reconcileCheckServiceAccount(ctx context.Con
 	err := r.Get(ctx, *instance.GetMetricsExporterServiceAccountMetadata(), serviceAccountQuery)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			instance.Status.ServiceAccountStatus = robotv1alpha1.MetricsExporterServiceAccountStatus{}
+			instance.Status.ServiceAccountStatus = robotv1alpha1.OwnedResourceStatus{}
 		} else {
 			return err
 		}
