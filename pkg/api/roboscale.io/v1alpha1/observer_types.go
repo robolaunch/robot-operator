@@ -17,7 +17,6 @@ limitations under the License.
 package v1alpha1
 
 import (
-	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -65,11 +64,6 @@ type NetworkMetrics struct {
 type MetricsExporterSpec struct {
 	GPU     GPUMetrics     `json:"gpu,omitempty"`
 	Network NetworkMetrics `json:"network,omitempty"`
-}
-
-type MetricsExporterPodStatus struct {
-	Created bool            `json:"created,omitempty"`
-	Phase   corev1.PodPhase `json:"phase,omitempty"`
 }
 
 type MetricsExporterRoleStatus struct {
@@ -120,6 +114,6 @@ type MetricsExporterStatus struct {
 	RoleStatus           MetricsExporterRoleStatus           `json:"roleStatus,omitempty"`
 	RoleBindingStatus    MetricsExporterRoleBindingStatus    `json:"roleBindingStatus,omitempty"`
 	ServiceAccountStatus MetricsExporterServiceAccountStatus `json:"saStatus,omitempty"`
-	PodStatus            MetricsExporterPodStatus            `json:"podStatus,omitempty"`
+	PodStatus            OwnedPodStatus                      `json:"podStatus,omitempty"`
 	Usage                Usage                               `json:"usage,omitempty"`
 }

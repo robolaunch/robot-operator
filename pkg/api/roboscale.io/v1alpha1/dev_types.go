@@ -140,12 +140,6 @@ type RobotIDESpec struct {
 	Display bool `json:"display,omitempty"`
 }
 
-type RobotIDEPodStatus struct {
-	Created bool            `json:"created,omitempty"`
-	Phase   corev1.PodPhase `json:"phase,omitempty"`
-	IP      string          `json:"ip,omitempty"`
-}
-
 type RobotIDEServiceStatus struct {
 	Created bool `json:"created,omitempty"`
 }
@@ -156,10 +150,10 @@ type RobotIDEIngressStatus struct {
 
 // RobotIDEStatus defines the observed state of RobotIDE
 type RobotIDEStatus struct {
-	Phase         RobotIDEPhase         `json:"phase,omitempty"`
-	PodStatus     RobotIDEPodStatus     `json:"podStatus,omitempty"`
-	ServiceStatus RobotIDEServiceStatus `json:"serviceStatus,omitempty"`
-	IngressStatus RobotIDEIngressStatus `json:"ingressStatus,omitempty"`
+	Phase         RobotIDEPhase          `json:"phase,omitempty"`
+	PodStatus     DetailedOwnedPodStatus `json:"podStatus,omitempty"`
+	ServiceStatus RobotIDEServiceStatus  `json:"serviceStatus,omitempty"`
+	IngressStatus RobotIDEIngressStatus  `json:"ingressStatus,omitempty"`
 }
 
 // ********************************
@@ -195,12 +189,6 @@ type RobotVDISpec struct {
 	Resolution string `json:"resolution,omitempty"`
 }
 
-type RobotVDIPodStatus struct {
-	Created bool            `json:"created,omitempty"`
-	Phase   corev1.PodPhase `json:"phase,omitempty"`
-	IP      string          `json:"ip,omitempty"`
-}
-
 type RobotVDIPVCStatus struct {
 	Created bool `json:"created,omitempty"`
 }
@@ -220,7 +208,7 @@ type RobotVDIIngressStatus struct {
 // RobotVDIStatus defines the observed state of RobotVDI
 type RobotVDIStatus struct {
 	Phase            RobotVDIPhase            `json:"phase,omitempty"`
-	PodStatus        RobotVDIPodStatus        `json:"podStatus,omitempty"`
+	PodStatus        DetailedOwnedPodStatus   `json:"podStatus,omitempty"`
 	ServiceTCPStatus RobotVDIServiceTCPStatus `json:"serviceTCPStatus,omitempty"`
 	ServiceUDPStatus RobotVDIServiceUDPStatus `json:"serviceUDPStatus,omitempty"`
 	IngressStatus    RobotVDIIngressStatus    `json:"ingressStatus,omitempty"`

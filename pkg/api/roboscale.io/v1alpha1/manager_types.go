@@ -271,9 +271,7 @@ type LaunchStatus struct {
 }
 
 type LaunchPodStatus struct {
-	Created      bool                    `json:"created,omitempty"`
-	Phase        corev1.PodPhase         `json:"phase,omitempty"`
-	IP           string                  `json:"ip,omitempty"`
+	Status       DetailedOwnedPodStatus  `json:"status,omitempty"`
 	LaunchStatus map[string]LaunchStatus `json:"launchStatus,omitempty"`
 }
 

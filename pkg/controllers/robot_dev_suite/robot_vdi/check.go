@@ -62,7 +62,7 @@ func (r *RobotVDIReconciler) reconcileCheckPod(ctx context.Context, instance *ro
 	err := r.Get(ctx, *instance.GetRobotVDIPodMetadata(), vdiPodQuery)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			instance.Status.PodStatus = robotv1alpha1.RobotVDIPodStatus{}
+			instance.Status.PodStatus = robotv1alpha1.DetailedOwnedPodStatus{}
 		} else {
 			return err
 		}

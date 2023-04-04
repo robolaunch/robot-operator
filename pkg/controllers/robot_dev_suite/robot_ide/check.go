@@ -33,7 +33,7 @@ func (r *RobotIDEReconciler) reconcileCheckPod(ctx context.Context, instance *ro
 	err := r.Get(ctx, *instance.GetRobotIDEPodMetadata(), podQuery)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			instance.Status.PodStatus = robotv1alpha1.RobotIDEPodStatus{}
+			instance.Status.PodStatus = robotv1alpha1.DetailedOwnedPodStatus{}
 		} else {
 			return err
 		}

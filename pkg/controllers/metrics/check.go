@@ -16,7 +16,7 @@ func (r *MetricsExporterReconciler) reconcileCheckPod(ctx context.Context, insta
 	err := r.Get(ctx, *instance.GetMetricsExporterPodMetadata(), podQuery)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			instance.Status.PodStatus = robotv1alpha1.MetricsExporterPodStatus{}
+			instance.Status.PodStatus = robotv1alpha1.OwnedPodStatus{}
 		} else {
 			return err
 		}

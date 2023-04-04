@@ -30,7 +30,7 @@ func (r *ROSBridgeReconciler) reconcileCheckPod(ctx context.Context, instance *r
 	bridgePodQuery := &corev1.Pod{}
 	err := r.Get(ctx, *instance.GetBridgePodMetadata(), bridgePodQuery)
 	if err != nil && errors.IsNotFound(err) {
-		instance.Status.PodStatus = robotv1alpha1.BridgePodStatus{}
+		instance.Status.PodStatus = robotv1alpha1.OwnedPodStatus{}
 	} else if err != nil {
 		return err
 	} else {
