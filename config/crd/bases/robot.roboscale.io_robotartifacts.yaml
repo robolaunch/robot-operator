@@ -703,7 +703,7 @@ spec:
                       privileged:
                         type: boolean
                       resolution:
-                        default: 1920x1080
+                        default: 2048x1152
                         description: VDI screen resolution options.
                         enum:
                         - 2048x1152

@@ -56,10 +56,10 @@ func (r *BuildManagerReconciler) createBuilderJob(ctx context.Context, instance 
 		return err
 	}
 
-	logger.Info("STATUS: Builder job " + instance.Status.Steps[jobKey].JobName + " is started.")
+	logger.Info("STATUS: Builder job " + instance.Status.Steps[jobKey].Resource.Reference.Name + " is started.")
 
 	step := instance.Status.Steps[jobKey]
-	step.JobCreated = true
+	step.Resource.Created = true
 	instance.Status.Steps[jobKey] = step
 
 	return nil

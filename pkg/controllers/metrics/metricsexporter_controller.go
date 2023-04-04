@@ -103,7 +103,7 @@ func (r *MetricsExporterReconciler) reconcileCheckStatus(ctx context.Context, in
 					case true:
 
 						switch instance.Status.PodStatus.Phase {
-						case corev1.PodRunning:
+						case string(corev1.PodRunning):
 
 							instance.Status.Phase = robotv1alpha1.MetricsExporterPhaseReady
 

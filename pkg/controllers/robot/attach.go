@@ -36,7 +36,7 @@ func (r *RobotReconciler) reconcileHandleAttachments(ctx context.Context, instan
 	case false:
 
 		// create workspace manager
-		switch instance.Status.WorkspaceManagerStatus.Created {
+		switch instance.Status.WorkspaceManagerStatus.Resource.Created {
 		case true:
 
 			switch instance.Status.WorkspaceManagerStatus.Status.Phase {
@@ -73,7 +73,7 @@ func (r *RobotReconciler) reconcileHandleAttachments(ctx context.Context, instan
 			if err != nil {
 				return err
 			}
-			instance.Status.WorkspaceManagerStatus.Created = true
+			instance.Status.WorkspaceManagerStatus.Resource.Created = true
 
 		}
 

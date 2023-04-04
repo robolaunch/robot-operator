@@ -710,7 +710,7 @@ spec:
                       privileged:
                         type: boolean
                       resolution:
-                        default: 1920x1080
+                        default: 2048x1152
                         description: VDI screen resolution options.
                         enum:
                         - 2048x1152
@@ -974,16 +974,167 @@ spec:
                         properties:
                           created:
                             type: boolean
+                          phase:
+                            type: string
+                          reference:
+                            description: "ObjectReference contains enough information
+                              to let you inspect or modify the referred object. ---
+                              New uses of this type are discouraged because of difficulty
+                              describing its usage when embedded in APIs. 1. Ignored
+                              fields.  It includes many fields which are not generally
+                              honored.  For instance, ResourceVersion and FieldPath
+                              are both very rarely valid in actual usage. 2. Invalid
+                              usage help.  It is impossible to add specific help for
+                              individual usage.  In most embedded usages, there are
+                              particular restrictions like, \"must refer only to types
+                              A and B\" or \"UID not honored\" or \"name must be restricted\".
+                              Those cannot be well described when embedded. 3. Inconsistent
+                              validation.  Because the usages are different, the validation
+                              rules are different by usage, which makes it hard for
+                              users to predict what will happen. 4. The fields are
+                              both imprecise and overly precise.  Kind is not a precise
+                              mapping to a URL. This can produce ambiguity during
+                              interpretation and require a REST mapping.  In most
+                              cases, the dependency is on the group,resource tuple
+                              and the version of the actual struct is irrelevant.
+                              5. We cannot easily change it.  Because this type is
+                              embedded in many locations, updates to this type will
+                              affect numerous schemas.  Don't make new APIs embed
+                              an underspecified API type they do not control. \n Instead
+                              of using this type, create a locally provided and used
+                              type that is well-focused on your reference. For example,
+                              ServiceReferences for admission registration: https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go#L533
+                              ."
+                            properties:
+                              apiVersion:
+                                description: API version of the referent.
+                                type: string
+                              fieldPath:
+                                description: 'If referring to a piece of an object
+                                  instead of an entire object, this string should
+                                  contain a valid JSON/Go field access statement,
+                                  such as desiredState.manifest.containers[2]. For
+                                  example, if the object reference is to a container
+                                  within a pod, this would take on a value like: "spec.containers{name}"
+                                  (where "name" refers to the name of the container
+                                  that triggered the event) or if no container name
+                                  is specified "spec.containers[2]" (container with
+                                  index 2 in this pod). This syntax is chosen only
+                                  to have some well-defined way of referencing a part
+                                  of an object. TODO: this design is not final and
+                                  this field is subject to change in the future.'
+                                type: string
+                              kind:
+                                description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                                type: string
+                              name:
+                                description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                                type: string
+                              namespace:
+                                description: 'Namespace of the referent. More info:
+                                  https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                                type: string
+                              resourceVersion:
+                                description: 'Specific resourceVersion to which this
+                                  reference is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                                type: string
+                              uid:
+                                description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                                type: string
+                            type: object
+                            x-kubernetes-map-type: atomic
+                        required:
+                        - created
                         type: object
                       steps:
                         items:
                           properties:
-                            created:
-                              type: boolean
-                            jobName:
-                              type: string
-                            jobPhase:
-                              type: string
+                            resource:
+                              properties:
+                                created:
+                                  type: boolean
+                                phase:
+                                  type: string
+                                reference:
+                                  description: "ObjectReference contains enough information
+                                    to let you inspect or modify the referred object.
+                                    --- New uses of this type are discouraged because
+                                    of difficulty describing its usage when embedded
+                                    in APIs. 1. Ignored fields.  It includes many
+                                    fields which are not generally honored.  For instance,
+                                    ResourceVersion and FieldPath are both very rarely
+                                    valid in actual usage. 2. Invalid usage help.
+                                    \ It is impossible to add specific help for individual
+                                    usage.  In most embedded usages, there are particular
+                                    restrictions like, \"must refer only to types
+                                    A and B\" or \"UID not honored\" or \"name must
+                                    be restricted\". Those cannot be well described
+                                    when embedded. 3. Inconsistent validation.  Because
+                                    the usages are different, the validation rules
+                                    are different by usage, which makes it hard for
+                                    users to predict what will happen. 4. The fields
+                                    are both imprecise and overly precise.  Kind is
+                                    not a precise mapping to a URL. This can produce
+                                    ambiguity during interpretation and require a
+                                    REST mapping.  In most cases, the dependency is
+                                    on the group,resource tuple and the version of
+                                    the actual struct is irrelevant. 5. We cannot
+                                    easily change it.  Because this type is embedded
+                                    in many locations, updates to this type will affect
+                                    numerous schemas.  Don't make new APIs embed an
+                                    underspecified API type they do not control. \n
+                                    Instead of using this type, create a locally provided
+                                    and used type that is well-focused on your reference.
+                                    For example, ServiceReferences for admission registration:
+                                    https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go#L533
+                                    ."
+                                  properties:
+                                    apiVersion:
+                                      description: API version of the referent.
+                                      type: string
+                                    fieldPath:
+                                      description: 'If referring to a piece of an
+                                        object instead of an entire object, this string
+                                        should contain a valid JSON/Go field access
+                                        statement, such as desiredState.manifest.containers[2].
+                                        For example, if the object reference is to
+                                        a container within a pod, this would take
+                                        on a value like: "spec.containers{name}" (where
+                                        "name" refers to the name of the container
+                                        that triggered the event) or if no container
+                                        name is specified "spec.containers[2]" (container
+                                        with index 2 in this pod). This syntax is
+                                        chosen only to have some well-defined way
+                                        of referencing a part of an object. TODO:
+                                        this design is not final and this field is
+                                        subject to change in the future.'
+                                      type: string
+                                    kind:
+                                      description: 'Kind of the referent. More info:
+                                        https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                                      type: string
+                                    name:
+                                      description: 'Name of the referent. More info:
+                                        https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                                      type: string
+                                    namespace:
+                                      description: 'Namespace of the referent. More
+                                        info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                                      type: string
+                                    resourceVersion:
+                                      description: 'Specific resourceVersion to which
+                                        this reference is made, if any. More info:
+                                        https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                                      type: string
+                                    uid:
+                                      description: 'UID of the referent. More info:
+                                        https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                                      type: string
+                                  type: object
+                                  x-kubernetes-map-type: atomic
+                              required:
+                              - created
+                              type: object
                             step:
                               description: Step is a command or script to execute
                                 when building a robot. Either `command` or `script`
@@ -1220,6 +1371,78 @@ spec:
                               type: boolean
                             phase:
                               type: string
+                            reference:
+                              description: "ObjectReference contains enough information
+                                to let you inspect or modify the referred object.
+                                --- New uses of this type are discouraged because
+                                of difficulty describing its usage when embedded in
+                                APIs. 1. Ignored fields.  It includes many fields
+                                which are not generally honored.  For instance, ResourceVersion
+                                and FieldPath are both very rarely valid in actual
+                                usage. 2. Invalid usage help.  It is impossible to
+                                add specific help for individual usage.  In most embedded
+                                usages, there are particular restrictions like, \"must
+                                refer only to types A and B\" or \"UID not honored\"
+                                or \"name must be restricted\". Those cannot be well
+                                described when embedded. 3. Inconsistent validation.
+                                \ Because the usages are different, the validation
+                                rules are different by usage, which makes it hard
+                                for users to predict what will happen. 4. The fields
+                                are both imprecise and overly precise.  Kind is not
+                                a precise mapping to a URL. This can produce ambiguity
+                                during interpretation and require a REST mapping.
+                                \ In most cases, the dependency is on the group,resource
+                                tuple and the version of the actual struct is irrelevant.
+                                5. We cannot easily change it.  Because this type
+                                is embedded in many locations, updates to this type
+                                will affect numerous schemas.  Don't make new APIs
+                                embed an underspecified API type they do not control.
+                                \n Instead of using this type, create a locally provided
+                                and used type that is well-focused on your reference.
+                                For example, ServiceReferences for admission registration:
+                                https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go#L533
+                                ."
+                              properties:
+                                apiVersion:
+                                  description: API version of the referent.
+                                  type: string
+                                fieldPath:
+                                  description: 'If referring to a piece of an object
+                                    instead of an entire object, this string should
+                                    contain a valid JSON/Go field access statement,
+                                    such as desiredState.manifest.containers[2]. For
+                                    example, if the object reference is to a container
+                                    within a pod, this would take on a value like:
+                                    "spec.containers{name}" (where "name" refers to
+                                    the name of the container that triggered the event)
+                                    or if no container name is specified "spec.containers[2]"
+                                    (container with index 2 in this pod). This syntax
+                                    is chosen only to have some well-defined way of
+                                    referencing a part of an object. TODO: this design
+                                    is not final and this field is subject to change
+                                    in the future.'
+                                  type: string
+                                kind:
+                                  description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                                  type: string
+                                name:
+                                  description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                                  type: string
+                                namespace:
+                                  description: 'Namespace of the referent. More info:
+                                    https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                                  type: string
+                                resourceVersion:
+                                  description: 'Specific resourceVersion to which
+                                    this reference is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                                  type: string
+                                uid:
+                                  description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                                  type: string
+                              type: object
+                              x-kubernetes-map-type: atomic
+                          required:
+                          - created
                           type: object
                         robotVDIStatus:
                           properties:
@@ -1227,6 +1450,78 @@ spec:
                               type: boolean
                             phase:
                               type: string
+                            reference:
+                              description: "ObjectReference contains enough information
+                                to let you inspect or modify the referred object.
+                                --- New uses of this type are discouraged because
+                                of difficulty describing its usage when embedded in
+                                APIs. 1. Ignored fields.  It includes many fields
+                                which are not generally honored.  For instance, ResourceVersion
+                                and FieldPath are both very rarely valid in actual
+                                usage. 2. Invalid usage help.  It is impossible to
+                                add specific help for individual usage.  In most embedded
+                                usages, there are particular restrictions like, \"must
+                                refer only to types A and B\" or \"UID not honored\"
+                                or \"name must be restricted\". Those cannot be well
+                                described when embedded. 3. Inconsistent validation.
+                                \ Because the usages are different, the validation
+                                rules are different by usage, which makes it hard
+                                for users to predict what will happen. 4. The fields
+                                are both imprecise and overly precise.  Kind is not
+                                a precise mapping to a URL. This can produce ambiguity
+                                during interpretation and require a REST mapping.
+                                \ In most cases, the dependency is on the group,resource
+                                tuple and the version of the actual struct is irrelevant.
+                                5. We cannot easily change it.  Because this type
+                                is embedded in many locations, updates to this type
+                                will affect numerous schemas.  Don't make new APIs
+                                embed an underspecified API type they do not control.
+                                \n Instead of using this type, create a locally provided
+                                and used type that is well-focused on your reference.
+                                For example, ServiceReferences for admission registration:
+                                https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go#L533
+                                ."
+                              properties:
+                                apiVersion:
+                                  description: API version of the referent.
+                                  type: string
+                                fieldPath:
+                                  description: 'If referring to a piece of an object
+                                    instead of an entire object, this string should
+                                    contain a valid JSON/Go field access statement,
+                                    such as desiredState.manifest.containers[2]. For
+                                    example, if the object reference is to a container
+                                    within a pod, this would take on a value like:
+                                    "spec.containers{name}" (where "name" refers to
+                                    the name of the container that triggered the event)
+                                    or if no container name is specified "spec.containers[2]"
+                                    (container with index 2 in this pod). This syntax
+                                    is chosen only to have some well-defined way of
+                                    referencing a part of an object. TODO: this design
+                                    is not final and this field is subject to change
+                                    in the future.'
+                                  type: string
+                                kind:
+                                  description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                                  type: string
+                                name:
+                                  description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                                  type: string
+                                namespace:
+                                  description: 'Namespace of the referent. More info:
+                                    https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                                  type: string
+                                resourceVersion:
+                                  description: 'Specific resourceVersion to which
+                                    this reference is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                                  type: string
+                                uid:
+                                  description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                                  type: string
+                              type: object
+                              x-kubernetes-map-type: atomic
+                          required:
+                          - created
                           type: object
                       type: object
                   type: object
@@ -1306,10 +1601,6 @@ spec:
                           type: boolean
                         launchPodStatus:
                           properties:
-                            created:
-                              type: boolean
-                            ip:
-                              type: string
                             launchStatus:
                               additionalProperties:
                                 properties:
@@ -1492,10 +1783,100 @@ spec:
                                     type: object
                                 type: object
                               type: object
-                            phase:
-                              description: PodPhase is a label for the condition of
-                                a pod at the current time.
-                              type: string
+                            status:
+                              properties:
+                                ip:
+                                  type: string
+                                resource:
+                                  properties:
+                                    created:
+                                      type: boolean
+                                    phase:
+                                      type: string
+                                    reference:
+                                      description: "ObjectReference contains enough
+                                        information to let you inspect or modify the
+                                        referred object. --- New uses of this type
+                                        are discouraged because of difficulty describing
+                                        its usage when embedded in APIs. 1. Ignored
+                                        fields.  It includes many fields which are
+                                        not generally honored.  For instance, ResourceVersion
+                                        and FieldPath are both very rarely valid in
+                                        actual usage. 2. Invalid usage help.  It is
+                                        impossible to add specific help for individual
+                                        usage.  In most embedded usages, there are
+                                        particular restrictions like, \"must refer
+                                        only to types A and B\" or \"UID not honored\"
+                                        or \"name must be restricted\". Those cannot
+                                        be well described when embedded. 3. Inconsistent
+                                        validation.  Because the usages are different,
+                                        the validation rules are different by usage,
+                                        which makes it hard for users to predict what
+                                        will happen. 4. The fields are both imprecise
+                                        and overly precise.  Kind is not a precise
+                                        mapping to a URL. This can produce ambiguity
+                                        during interpretation and require a REST mapping.
+                                        \ In most cases, the dependency is on the
+                                        group,resource tuple and the version of the
+                                        actual struct is irrelevant. 5. We cannot
+                                        easily change it.  Because this type is embedded
+                                        in many locations, updates to this type will
+                                        affect numerous schemas.  Don't make new APIs
+                                        embed an underspecified API type they do not
+                                        control. \n Instead of using this type, create
+                                        a locally provided and used type that is well-focused
+                                        on your reference. For example, ServiceReferences
+                                        for admission registration: https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go#L533
+                                        ."
+                                      properties:
+                                        apiVersion:
+                                          description: API version of the referent.
+                                          type: string
+                                        fieldPath:
+                                          description: 'If referring to a piece of
+                                            an object instead of an entire object,
+                                            this string should contain a valid JSON/Go
+                                            field access statement, such as desiredState.manifest.containers[2].
+                                            For example, if the object reference is
+                                            to a container within a pod, this would
+                                            take on a value like: "spec.containers{name}"
+                                            (where "name" refers to the name of the
+                                            container that triggered the event) or
+                                            if no container name is specified "spec.containers[2]"
+                                            (container with index 2 in this pod).
+                                            This syntax is chosen only to have some
+                                            well-defined way of referencing a part
+                                            of an object. TODO: this design is not
+                                            final and this field is subject to change
+                                            in the future.'
+                                          type: string
+                                        kind:
+                                          description: 'Kind of the referent. More
+                                            info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                                          type: string
+                                        name:
+                                          description: 'Name of the referent. More
+                                            info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                                          type: string
+                                        namespace:
+                                          description: 'Namespace of the referent.
+                                            More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                                          type: string
+                                        resourceVersion:
+                                          description: 'Specific resourceVersion to
+                                            which this reference is made, if any.
+                                            More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                                          type: string
+                                        uid:
+                                          description: 'UID of the referent. More
+                                            info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                                          type: string
+                                      type: object
+                                      x-kubernetes-map-type: atomic
+                                  required:
+                                  - created
+                                  type: object
+                              type: object
                           type: object
                         phase:
                           type: string
@@ -1505,8 +1886,79 @@ spec:
               discoveryServerStatus:
                 description: Discovery server instance status
                 properties:
-                  created:
-                    type: boolean
+                  resource:
+                    properties:
+                      created:
+                        type: boolean
+                      phase:
+                        type: string
+                      reference:
+                        description: "ObjectReference contains enough information
+                          to let you inspect or modify the referred object. --- New
+                          uses of this type are discouraged because of difficulty
+                          describing its usage when embedded in APIs. 1. Ignored fields.
+                          \ It includes many fields which are not generally honored.
+                          \ For instance, ResourceVersion and FieldPath are both very
+                          rarely valid in actual usage. 2. Invalid usage help.  It
+                          is impossible to add specific help for individual usage.
+                          \ In most embedded usages, there are particular restrictions
+                          like, \"must refer only to types A and B\" or \"UID not
+                          honored\" or \"name must be restricted\". Those cannot be
+                          well described when embedded. 3. Inconsistent validation.
+                          \ Because the usages are different, the validation rules
+                          are different by usage, which makes it hard for users to
+                          predict what will happen. 4. The fields are both imprecise
+                          and overly precise.  Kind is not a precise mapping to a
+                          URL. This can produce ambiguity during interpretation and
+                          require a REST mapping.  In most cases, the dependency is
+                          on the group,resource tuple and the version of the actual
+                          struct is irrelevant. 5. We cannot easily change it.  Because
+                          this type is embedded in many locations, updates to this
+                          type will affect numerous schemas.  Don't make new APIs
+                          embed an underspecified API type they do not control. \n
+                          Instead of using this type, create a locally provided and
+                          used type that is well-focused on your reference. For example,
+                          ServiceReferences for admission registration: https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go#L533
+                          ."
+                        properties:
+                          apiVersion:
+                            description: API version of the referent.
+                            type: string
+                          fieldPath:
+                            description: 'If referring to a piece of an object instead
+                              of an entire object, this string should contain a valid
+                              JSON/Go field access statement, such as desiredState.manifest.containers[2].
+                              For example, if the object reference is to a container
+                              within a pod, this would take on a value like: "spec.containers{name}"
+                              (where "name" refers to the name of the container that
+                              triggered the event) or if no container name is specified
+                              "spec.containers[2]" (container with index 2 in this
+                              pod). This syntax is chosen only to have some well-defined
+                              way of referencing a part of an object. TODO: this design
+                              is not final and this field is subject to change in
+                              the future.'
+                            type: string
+                          kind:
+                            description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                            type: string
+                          name:
+                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                            type: string
+                          namespace:
+                            description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                            type: string
+                          resourceVersion:
+                            description: 'Specific resourceVersion to which this reference
+                              is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                            type: string
+                          uid:
+                            description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                            type: string
+                        type: object
+                        x-kubernetes-map-type: atomic
+                    required:
+                    - created
+                    type: object
                   status:
                     description: DiscoveryServerStatus defines the observed state
                       of DiscoveryServer
@@ -1515,6 +1967,77 @@ spec:
                         properties:
                           created:
                             type: boolean
+                          phase:
+                            type: string
+                          reference:
+                            description: "ObjectReference contains enough information
+                              to let you inspect or modify the referred object. ---
+                              New uses of this type are discouraged because of difficulty
+                              describing its usage when embedded in APIs. 1. Ignored
+                              fields.  It includes many fields which are not generally
+                              honored.  For instance, ResourceVersion and FieldPath
+                              are both very rarely valid in actual usage. 2. Invalid
+                              usage help.  It is impossible to add specific help for
+                              individual usage.  In most embedded usages, there are
+                              particular restrictions like, \"must refer only to types
+                              A and B\" or \"UID not honored\" or \"name must be restricted\".
+                              Those cannot be well described when embedded. 3. Inconsistent
+                              validation.  Because the usages are different, the validation
+                              rules are different by usage, which makes it hard for
+                              users to predict what will happen. 4. The fields are
+                              both imprecise and overly precise.  Kind is not a precise
+                              mapping to a URL. This can produce ambiguity during
+                              interpretation and require a REST mapping.  In most
+                              cases, the dependency is on the group,resource tuple
+                              and the version of the actual struct is irrelevant.
+                              5. We cannot easily change it.  Because this type is
+                              embedded in many locations, updates to this type will
+                              affect numerous schemas.  Don't make new APIs embed
+                              an underspecified API type they do not control. \n Instead
+                              of using this type, create a locally provided and used
+                              type that is well-focused on your reference. For example,
+                              ServiceReferences for admission registration: https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go#L533
+                              ."
+                            properties:
+                              apiVersion:
+                                description: API version of the referent.
+                                type: string
+                              fieldPath:
+                                description: 'If referring to a piece of an object
+                                  instead of an entire object, this string should
+                                  contain a valid JSON/Go field access statement,
+                                  such as desiredState.manifest.containers[2]. For
+                                  example, if the object reference is to a container
+                                  within a pod, this would take on a value like: "spec.containers{name}"
+                                  (where "name" refers to the name of the container
+                                  that triggered the event) or if no container name
+                                  is specified "spec.containers[2]" (container with
+                                  index 2 in this pod). This syntax is chosen only
+                                  to have some well-defined way of referencing a part
+                                  of an object. TODO: this design is not final and
+                                  this field is subject to change in the future.'
+                                type: string
+                              kind:
+                                description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                                type: string
+                              name:
+                                description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                                type: string
+                              namespace:
+                                description: 'Namespace of the referent. More info:
+                                  https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                                type: string
+                              resourceVersion:
+                                description: 'Specific resourceVersion to which this
+                                  reference is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                                type: string
+                              uid:
+                                description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                                type: string
+                            type: object
+                            x-kubernetes-map-type: atomic
+                        required:
+                        - created
                         type: object
                       connectionInfo:
                         properties:
@@ -1527,24 +2050,244 @@ spec:
                         type: string
                       podStatus:
                         properties:
-                          created:
-                            type: boolean
                           ip:
                             type: string
-                          phase:
-                            description: PodPhase is a label for the condition of
-                              a pod at the current time.
-                            type: string
+                          resource:
+                            properties:
+                              created:
+                                type: boolean
+                              phase:
+                                type: string
+                              reference:
+                                description: "ObjectReference contains enough information
+                                  to let you inspect or modify the referred object.
+                                  --- New uses of this type are discouraged because
+                                  of difficulty describing its usage when embedded
+                                  in APIs. 1. Ignored fields.  It includes many fields
+                                  which are not generally honored.  For instance,
+                                  ResourceVersion and FieldPath are both very rarely
+                                  valid in actual usage. 2. Invalid usage help.  It
+                                  is impossible to add specific help for individual
+                                  usage.  In most embedded usages, there are particular
+                                  restrictions like, \"must refer only to types A
+                                  and B\" or \"UID not honored\" or \"name must be
+                                  restricted\". Those cannot be well described when
+                                  embedded. 3. Inconsistent validation.  Because the
+                                  usages are different, the validation rules are different
+                                  by usage, which makes it hard for users to predict
+                                  what will happen. 4. The fields are both imprecise
+                                  and overly precise.  Kind is not a precise mapping
+                                  to a URL. This can produce ambiguity during interpretation
+                                  and require a REST mapping.  In most cases, the
+                                  dependency is on the group,resource tuple and the
+                                  version of the actual struct is irrelevant. 5. We
+                                  cannot easily change it.  Because this type is embedded
+                                  in many locations, updates to this type will affect
+                                  numerous schemas.  Don't make new APIs embed an
+                                  underspecified API type they do not control. \n
+                                  Instead of using this type, create a locally provided
+                                  and used type that is well-focused on your reference.
+                                  For example, ServiceReferences for admission registration:
+                                  https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go#L533
+                                  ."
+                                properties:
+                                  apiVersion:
+                                    description: API version of the referent.
+                                    type: string
+                                  fieldPath:
+                                    description: 'If referring to a piece of an object
+                                      instead of an entire object, this string should
+                                      contain a valid JSON/Go field access statement,
+                                      such as desiredState.manifest.containers[2].
+                                      For example, if the object reference is to a
+                                      container within a pod, this would take on a
+                                      value like: "spec.containers{name}" (where "name"
+                                      refers to the name of the container that triggered
+                                      the event) or if no container name is specified
+                                      "spec.containers[2]" (container with index 2
+                                      in this pod). This syntax is chosen only to
+                                      have some well-defined way of referencing a
+                                      part of an object. TODO: this design is not
+                                      final and this field is subject to change in
+                                      the future.'
+                                    type: string
+                                  kind:
+                                    description: 'Kind of the referent. More info:
+                                      https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                                    type: string
+                                  name:
+                                    description: 'Name of the referent. More info:
+                                      https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                                    type: string
+                                  namespace:
+                                    description: 'Namespace of the referent. More
+                                      info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                                    type: string
+                                  resourceVersion:
+                                    description: 'Specific resourceVersion to which
+                                      this reference is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                                    type: string
+                                  uid:
+                                    description: 'UID of the referent. More info:
+                                      https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                                    type: string
+                                type: object
+                                x-kubernetes-map-type: atomic
+                            required:
+                            - created
+                            type: object
                         type: object
                       serviceExportStatus:
                         properties:
                           created:
                             type: boolean
+                          phase:
+                            type: string
+                          reference:
+                            description: "ObjectReference contains enough information
+                              to let you inspect or modify the referred object. ---
+                              New uses of this type are discouraged because of difficulty
+                              describing its usage when embedded in APIs. 1. Ignored
+                              fields.  It includes many fields which are not generally
+                              honored.  For instance, ResourceVersion and FieldPath
+                              are both very rarely valid in actual usage. 2. Invalid
+                              usage help.  It is impossible to add specific help for
+                              individual usage.  In most embedded usages, there are
+                              particular restrictions like, \"must refer only to types
+                              A and B\" or \"UID not honored\" or \"name must be restricted\".
+                              Those cannot be well described when embedded. 3. Inconsistent
+                              validation.  Because the usages are different, the validation
+                              rules are different by usage, which makes it hard for
+                              users to predict what will happen. 4. The fields are
+                              both imprecise and overly precise.  Kind is not a precise
+                              mapping to a URL. This can produce ambiguity during
+                              interpretation and require a REST mapping.  In most
+                              cases, the dependency is on the group,resource tuple
+                              and the version of the actual struct is irrelevant.
+                              5. We cannot easily change it.  Because this type is
+                              embedded in many locations, updates to this type will
+                              affect numerous schemas.  Don't make new APIs embed
+                              an underspecified API type they do not control. \n Instead
+                              of using this type, create a locally provided and used
+                              type that is well-focused on your reference. For example,
+                              ServiceReferences for admission registration: https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go#L533
+                              ."
+                            properties:
+                              apiVersion:
+                                description: API version of the referent.
+                                type: string
+                              fieldPath:
+                                description: 'If referring to a piece of an object
+                                  instead of an entire object, this string should
+                                  contain a valid JSON/Go field access statement,
+                                  such as desiredState.manifest.containers[2]. For
+                                  example, if the object reference is to a container
+                                  within a pod, this would take on a value like: "spec.containers{name}"
+                                  (where "name" refers to the name of the container
+                                  that triggered the event) or if no container name
+                                  is specified "spec.containers[2]" (container with
+                                  index 2 in this pod). This syntax is chosen only
+                                  to have some well-defined way of referencing a part
+                                  of an object. TODO: this design is not final and
+                                  this field is subject to change in the future.'
+                                type: string
+                              kind:
+                                description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                                type: string
+                              name:
+                                description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                                type: string
+                              namespace:
+                                description: 'Namespace of the referent. More info:
+                                  https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                                type: string
+                              resourceVersion:
+                                description: 'Specific resourceVersion to which this
+                                  reference is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                                type: string
+                              uid:
+                                description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                                type: string
+                            type: object
+                            x-kubernetes-map-type: atomic
+                        required:
+                        - created
                         type: object
                       serviceStatus:
                         properties:
                           created:
                             type: boolean
+                          phase:
+                            type: string
+                          reference:
+                            description: "ObjectReference contains enough information
+                              to let you inspect or modify the referred object. ---
+                              New uses of this type are discouraged because of difficulty
+                              describing its usage when embedded in APIs. 1. Ignored
+                              fields.  It includes many fields which are not generally
+                              honored.  For instance, ResourceVersion and FieldPath
+                              are both very rarely valid in actual usage. 2. Invalid
+                              usage help.  It is impossible to add specific help for
+                              individual usage.  In most embedded usages, there are
+                              particular restrictions like, \"must refer only to types
+                              A and B\" or \"UID not honored\" or \"name must be restricted\".
+                              Those cannot be well described when embedded. 3. Inconsistent
+                              validation.  Because the usages are different, the validation
+                              rules are different by usage, which makes it hard for
+                              users to predict what will happen. 4. The fields are
+                              both imprecise and overly precise.  Kind is not a precise
+                              mapping to a URL. This can produce ambiguity during
+                              interpretation and require a REST mapping.  In most
+                              cases, the dependency is on the group,resource tuple
+                              and the version of the actual struct is irrelevant.
+                              5. We cannot easily change it.  Because this type is
+                              embedded in many locations, updates to this type will
+                              affect numerous schemas.  Don't make new APIs embed
+                              an underspecified API type they do not control. \n Instead
+                              of using this type, create a locally provided and used
+                              type that is well-focused on your reference. For example,
+                              ServiceReferences for admission registration: https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go#L533
+                              ."
+                            properties:
+                              apiVersion:
+                                description: API version of the referent.
+                                type: string
+                              fieldPath:
+                                description: 'If referring to a piece of an object
+                                  instead of an entire object, this string should
+                                  contain a valid JSON/Go field access statement,
+                                  such as desiredState.manifest.containers[2]. For
+                                  example, if the object reference is to a container
+                                  within a pod, this would take on a value like: "spec.containers{name}"
+                                  (where "name" refers to the name of the container
+                                  that triggered the event) or if no container name
+                                  is specified "spec.containers[2]" (container with
+                                  index 2 in this pod). This syntax is chosen only
+                                  to have some well-defined way of referencing a part
+                                  of an object. TODO: this design is not final and
+                                  this field is subject to change in the future.'
+                                type: string
+                              kind:
+                                description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                                type: string
+                              name:
+                                description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                                type: string
+                              namespace:
+                                description: 'Namespace of the referent. More info:
+                                  https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                                type: string
+                              resourceVersion:
+                                description: 'Specific resourceVersion to which this
+                                  reference is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                                type: string
+                              uid:
+                                description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                                type: string
+                            type: object
+                            x-kubernetes-map-type: atomic
+                        required:
+                        - created
                         type: object
                     type: object
                 type: object
@@ -1556,8 +2299,71 @@ spec:
                 properties:
                   created:
                     type: boolean
-                  name:
+                  phase:
                     type: string
+                  reference:
+                    description: "ObjectReference contains enough information to let
+                      you inspect or modify the referred object. --- New uses of this
+                      type are discouraged because of difficulty describing its usage
+                      when embedded in APIs. 1. Ignored fields.  It includes many
+                      fields which are not generally honored.  For instance, ResourceVersion
+                      and FieldPath are both very rarely valid in actual usage. 2.
+                      Invalid usage help.  It is impossible to add specific help for
+                      individual usage.  In most embedded usages, there are particular
+                      restrictions like, \"must refer only to types A and B\" or \"UID
+                      not honored\" or \"name must be restricted\". Those cannot be
+                      well described when embedded. 3. Inconsistent validation.  Because
+                      the usages are different, the validation rules are different
+                      by usage, which makes it hard for users to predict what will
+                      happen. 4. The fields are both imprecise and overly precise.
+                      \ Kind is not a precise mapping to a URL. This can produce ambiguity
+                      during interpretation and require a REST mapping.  In most cases,
+                      the dependency is on the group,resource tuple and the version
+                      of the actual struct is irrelevant. 5. We cannot easily change
+                      it.  Because this type is embedded in many locations, updates
+                      to this type will affect numerous schemas.  Don't make new APIs
+                      embed an underspecified API type they do not control. \n Instead
+                      of using this type, create a locally provided and used type
+                      that is well-focused on your reference. For example, ServiceReferences
+                      for admission registration: https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go#L533
+                      ."
+                    properties:
+                      apiVersion:
+                        description: API version of the referent.
+                        type: string
+                      fieldPath:
+                        description: 'If referring to a piece of an object instead
+                          of an entire object, this string should contain a valid
+                          JSON/Go field access statement, such as desiredState.manifest.containers[2].
+                          For example, if the object reference is to a container within
+                          a pod, this would take on a value like: "spec.containers{name}"
+                          (where "name" refers to the name of the container that triggered
+                          the event) or if no container name is specified "spec.containers[2]"
+                          (container with index 2 in this pod). This syntax is chosen
+                          only to have some well-defined way of referencing a part
+                          of an object. TODO: this design is not final and this field
+                          is subject to change in the future.'
+                        type: string
+                      kind:
+                        description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                        type: string
+                      name:
+                        description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                        type: string
+                      namespace:
+                        description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                        type: string
+                      resourceVersion:
+                        description: 'Specific resourceVersion to which this reference
+                          is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                        type: string
+                      uid:
+                        description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                        type: string
+                    type: object
+                    x-kubernetes-map-type: atomic
+                required:
+                - created
                 type: object
               initialLaunchManagerStatuses:
                 description: Initial launch manager creation status
@@ -1565,8 +2371,73 @@ spec:
                   properties:
                     created:
                       type: boolean
-                    name:
+                    phase:
                       type: string
+                    reference:
+                      description: "ObjectReference contains enough information to
+                        let you inspect or modify the referred object. --- New uses
+                        of this type are discouraged because of difficulty describing
+                        its usage when embedded in APIs. 1. Ignored fields.  It includes
+                        many fields which are not generally honored.  For instance,
+                        ResourceVersion and FieldPath are both very rarely valid in
+                        actual usage. 2. Invalid usage help.  It is impossible to
+                        add specific help for individual usage.  In most embedded
+                        usages, there are particular restrictions like, \"must refer
+                        only to types A and B\" or \"UID not honored\" or \"name must
+                        be restricted\". Those cannot be well described when embedded.
+                        3. Inconsistent validation.  Because the usages are different,
+                        the validation rules are different by usage, which makes it
+                        hard for users to predict what will happen. 4. The fields
+                        are both imprecise and overly precise.  Kind is not a precise
+                        mapping to a URL. This can produce ambiguity during interpretation
+                        and require a REST mapping.  In most cases, the dependency
+                        is on the group,resource tuple and the version of the actual
+                        struct is irrelevant. 5. We cannot easily change it.  Because
+                        this type is embedded in many locations, updates to this type
+                        will affect numerous schemas.  Don't make new APIs embed an
+                        underspecified API type they do not control. \n Instead of
+                        using this type, create a locally provided and used type that
+                        is well-focused on your reference. For example, ServiceReferences
+                        for admission registration: https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go#L533
+                        ."
+                      properties:
+                        apiVersion:
+                          description: API version of the referent.
+                          type: string
+                        fieldPath:
+                          description: 'If referring to a piece of an object instead
+                            of an entire object, this string should contain a valid
+                            JSON/Go field access statement, such as desiredState.manifest.containers[2].
+                            For example, if the object reference is to a container
+                            within a pod, this would take on a value like: "spec.containers{name}"
+                            (where "name" refers to the name of the container that
+                            triggered the event) or if no container name is specified
+                            "spec.containers[2]" (container with index 2 in this pod).
+                            This syntax is chosen only to have some well-defined way
+                            of referencing a part of an object. TODO: this design
+                            is not final and this field is subject to change in the
+                            future.'
+                          type: string
+                        kind:
+                          description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                          type: string
+                        name:
+                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                          type: string
+                        namespace:
+                          description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                          type: string
+                        resourceVersion:
+                          description: 'Specific resourceVersion to which this reference
+                            is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                          type: string
+                        uid:
+                          description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                          type: string
+                      type: object
+                      x-kubernetes-map-type: atomic
+                  required:
+                  - created
                   type: object
                 type: array
               loaderJobStatus:
@@ -1576,6 +2447,69 @@ spec:
                     type: boolean
                   phase:
                     type: string
+                  reference:
+                    description: "ObjectReference contains enough information to let
+                      you inspect or modify the referred object. --- New uses of this
+                      type are discouraged because of difficulty describing its usage
+                      when embedded in APIs. 1. Ignored fields.  It includes many
+                      fields which are not generally honored.  For instance, ResourceVersion
+                      and FieldPath are both very rarely valid in actual usage. 2.
+                      Invalid usage help.  It is impossible to add specific help for
+                      individual usage.  In most embedded usages, there are particular
+                      restrictions like, \"must refer only to types A and B\" or \"UID
+                      not honored\" or \"name must be restricted\". Those cannot be
+                      well described when embedded. 3. Inconsistent validation.  Because
+                      the usages are different, the validation rules are different
+                      by usage, which makes it hard for users to predict what will
+                      happen. 4. The fields are both imprecise and overly precise.
+                      \ Kind is not a precise mapping to a URL. This can produce ambiguity
+                      during interpretation and require a REST mapping.  In most cases,
+                      the dependency is on the group,resource tuple and the version
+                      of the actual struct is irrelevant. 5. We cannot easily change
+                      it.  Because this type is embedded in many locations, updates
+                      to this type will affect numerous schemas.  Don't make new APIs
+                      embed an underspecified API type they do not control. \n Instead
+                      of using this type, create a locally provided and used type
+                      that is well-focused on your reference. For example, ServiceReferences
+                      for admission registration: https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go#L533
+                      ."
+                    properties:
+                      apiVersion:
+                        description: API version of the referent.
+                        type: string
+                      fieldPath:
+                        description: 'If referring to a piece of an object instead
+                          of an entire object, this string should contain a valid
+                          JSON/Go field access statement, such as desiredState.manifest.containers[2].
+                          For example, if the object reference is to a container within
+                          a pod, this would take on a value like: "spec.containers{name}"
+                          (where "name" refers to the name of the container that triggered
+                          the event) or if no container name is specified "spec.containers[2]"
+                          (container with index 2 in this pod). This syntax is chosen
+                          only to have some well-defined way of referencing a part
+                          of an object. TODO: this design is not final and this field
+                          is subject to change in the future.'
+                        type: string
+                      kind:
+                        description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                        type: string
+                      name:
+                        description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                        type: string
+                      namespace:
+                        description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                        type: string
+                      resourceVersion:
+                        description: 'Specific resourceVersion to which this reference
+                          is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                        type: string
+                      uid:
+                        description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                        type: string
+                    type: object
+                    x-kubernetes-map-type: atomic
+                required:
+                - created
                 type: object
               nodeName:
                 description: Node name
@@ -1586,8 +2520,79 @@ spec:
               robotDevSuiteStatus:
                 description: Robot development suite instance status
                 properties:
-                  created:
-                    type: boolean
+                  resource:
+                    properties:
+                      created:
+                        type: boolean
+                      phase:
+                        type: string
+                      reference:
+                        description: "ObjectReference contains enough information
+                          to let you inspect or modify the referred object. --- New
+                          uses of this type are discouraged because of difficulty
+                          describing its usage when embedded in APIs. 1. Ignored fields.
+                          \ It includes many fields which are not generally honored.
+                          \ For instance, ResourceVersion and FieldPath are both very
+                          rarely valid in actual usage. 2. Invalid usage help.  It
+                          is impossible to add specific help for individual usage.
+                          \ In most embedded usages, there are particular restrictions
+                          like, \"must refer only to types A and B\" or \"UID not
+                          honored\" or \"name must be restricted\". Those cannot be
+                          well described when embedded. 3. Inconsistent validation.
+                          \ Because the usages are different, the validation rules
+                          are different by usage, which makes it hard for users to
+                          predict what will happen. 4. The fields are both imprecise
+                          and overly precise.  Kind is not a precise mapping to a
+                          URL. This can produce ambiguity during interpretation and
+                          require a REST mapping.  In most cases, the dependency is
+                          on the group,resource tuple and the version of the actual
+                          struct is irrelevant. 5. We cannot easily change it.  Because
+                          this type is embedded in many locations, updates to this
+                          type will affect numerous schemas.  Don't make new APIs
+                          embed an underspecified API type they do not control. \n
+                          Instead of using this type, create a locally provided and
+                          used type that is well-focused on your reference. For example,
+                          ServiceReferences for admission registration: https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go#L533
+                          ."
+                        properties:
+                          apiVersion:
+                            description: API version of the referent.
+                            type: string
+                          fieldPath:
+                            description: 'If referring to a piece of an object instead
+                              of an entire object, this string should contain a valid
+                              JSON/Go field access statement, such as desiredState.manifest.containers[2].
+                              For example, if the object reference is to a container
+                              within a pod, this would take on a value like: "spec.containers{name}"
+                              (where "name" refers to the name of the container that
+                              triggered the event) or if no container name is specified
+                              "spec.containers[2]" (container with index 2 in this
+                              pod). This syntax is chosen only to have some well-defined
+                              way of referencing a part of an object. TODO: this design
+                              is not final and this field is subject to change in
+                              the future.'
+                            type: string
+                          kind:
+                            description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                            type: string
+                          name:
+                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                            type: string
+                          namespace:
+                            description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                            type: string
+                          resourceVersion:
+                            description: 'Specific resourceVersion to which this reference
+                              is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                            type: string
+                          uid:
+                            description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                            type: string
+                        type: object
+                        x-kubernetes-map-type: atomic
+                    required:
+                    - created
+                    type: object
                   status:
                     description: RobotDevSuiteStatus defines the observed state of
                       RobotDevSuite
@@ -1602,6 +2607,75 @@ spec:
                             type: boolean
                           phase:
                             type: string
+                          reference:
+                            description: "ObjectReference contains enough information
+                              to let you inspect or modify the referred object. ---
+                              New uses of this type are discouraged because of difficulty
+                              describing its usage when embedded in APIs. 1. Ignored
+                              fields.  It includes many fields which are not generally
+                              honored.  For instance, ResourceVersion and FieldPath
+                              are both very rarely valid in actual usage. 2. Invalid
+                              usage help.  It is impossible to add specific help for
+                              individual usage.  In most embedded usages, there are
+                              particular restrictions like, \"must refer only to types
+                              A and B\" or \"UID not honored\" or \"name must be restricted\".
+                              Those cannot be well described when embedded. 3. Inconsistent
+                              validation.  Because the usages are different, the validation
+                              rules are different by usage, which makes it hard for
+                              users to predict what will happen. 4. The fields are
+                              both imprecise and overly precise.  Kind is not a precise
+                              mapping to a URL. This can produce ambiguity during
+                              interpretation and require a REST mapping.  In most
+                              cases, the dependency is on the group,resource tuple
+                              and the version of the actual struct is irrelevant.
+                              5. We cannot easily change it.  Because this type is
+                              embedded in many locations, updates to this type will
+                              affect numerous schemas.  Don't make new APIs embed
+                              an underspecified API type they do not control. \n Instead
+                              of using this type, create a locally provided and used
+                              type that is well-focused on your reference. For example,
+                              ServiceReferences for admission registration: https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go#L533
+                              ."
+                            properties:
+                              apiVersion:
+                                description: API version of the referent.
+                                type: string
+                              fieldPath:
+                                description: 'If referring to a piece of an object
+                                  instead of an entire object, this string should
+                                  contain a valid JSON/Go field access statement,
+                                  such as desiredState.manifest.containers[2]. For
+                                  example, if the object reference is to a container
+                                  within a pod, this would take on a value like: "spec.containers{name}"
+                                  (where "name" refers to the name of the container
+                                  that triggered the event) or if no container name
+                                  is specified "spec.containers[2]" (container with
+                                  index 2 in this pod). This syntax is chosen only
+                                  to have some well-defined way of referencing a part
+                                  of an object. TODO: this design is not final and
+                                  this field is subject to change in the future.'
+                                type: string
+                              kind:
+                                description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                                type: string
+                              name:
+                                description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                                type: string
+                              namespace:
+                                description: 'Namespace of the referent. More info:
+                                  https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                                type: string
+                              resourceVersion:
+                                description: 'Specific resourceVersion to which this
+                                  reference is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                                type: string
+                              uid:
+                                description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                                type: string
+                            type: object
+                            x-kubernetes-map-type: atomic
+                        required:
+                        - created
                         type: object
                       robotVDIStatus:
                         properties:
@@ -1609,14 +2683,154 @@ spec:
                             type: boolean
                           phase:
                             type: string
+                          reference:
+                            description: "ObjectReference contains enough information
+                              to let you inspect or modify the referred object. ---
+                              New uses of this type are discouraged because of difficulty
+                              describing its usage when embedded in APIs. 1. Ignored
+                              fields.  It includes many fields which are not generally
+                              honored.  For instance, ResourceVersion and FieldPath
+                              are both very rarely valid in actual usage. 2. Invalid
+                              usage help.  It is impossible to add specific help for
+                              individual usage.  In most embedded usages, there are
+                              particular restrictions like, \"must refer only to types
+                              A and B\" or \"UID not honored\" or \"name must be restricted\".
+                              Those cannot be well described when embedded. 3. Inconsistent
+                              validation.  Because the usages are different, the validation
+                              rules are different by usage, which makes it hard for
+                              users to predict what will happen. 4. The fields are
+                              both imprecise and overly precise.  Kind is not a precise
+                              mapping to a URL. This can produce ambiguity during
+                              interpretation and require a REST mapping.  In most
+                              cases, the dependency is on the group,resource tuple
+                              and the version of the actual struct is irrelevant.
+                              5. We cannot easily change it.  Because this type is
+                              embedded in many locations, updates to this type will
+                              affect numerous schemas.  Don't make new APIs embed
+                              an underspecified API type they do not control. \n Instead
+                              of using this type, create a locally provided and used
+                              type that is well-focused on your reference. For example,
+                              ServiceReferences for admission registration: https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go#L533
+                              ."
+                            properties:
+                              apiVersion:
+                                description: API version of the referent.
+                                type: string
+                              fieldPath:
+                                description: 'If referring to a piece of an object
+                                  instead of an entire object, this string should
+                                  contain a valid JSON/Go field access statement,
+                                  such as desiredState.manifest.containers[2]. For
+                                  example, if the object reference is to a container
+                                  within a pod, this would take on a value like: "spec.containers{name}"
+                                  (where "name" refers to the name of the container
+                                  that triggered the event) or if no container name
+                                  is specified "spec.containers[2]" (container with
+                                  index 2 in this pod). This syntax is chosen only
+                                  to have some well-defined way of referencing a part
+                                  of an object. TODO: this design is not final and
+                                  this field is subject to change in the future.'
+                                type: string
+                              kind:
+                                description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                                type: string
+                              name:
+                                description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                                type: string
+                              namespace:
+                                description: 'Namespace of the referent. More info:
+                                  https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                                type: string
+                              resourceVersion:
+                                description: 'Specific resourceVersion to which this
+                                  reference is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                                type: string
+                              uid:
+                                description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                                type: string
+                            type: object
+                            x-kubernetes-map-type: atomic
+                        required:
+                        - created
                         type: object
                     type: object
                 type: object
               rosBridgeStatus:
                 description: ROS bridge instance status
                 properties:
-                  created:
-                    type: boolean
+                  resource:
+                    properties:
+                      created:
+                        type: boolean
+                      phase:
+                        type: string
+                      reference:
+                        description: "ObjectReference contains enough information
+                          to let you inspect or modify the referred object. --- New
+                          uses of this type are discouraged because of difficulty
+                          describing its usage when embedded in APIs. 1. Ignored fields.
+                          \ It includes many fields which are not generally honored.
+                          \ For instance, ResourceVersion and FieldPath are both very
+                          rarely valid in actual usage. 2. Invalid usage help.  It
+                          is impossible to add specific help for individual usage.
+                          \ In most embedded usages, there are particular restrictions
+                          like, \"must refer only to types A and B\" or \"UID not
+                          honored\" or \"name must be restricted\". Those cannot be
+                          well described when embedded. 3. Inconsistent validation.
+                          \ Because the usages are different, the validation rules
+                          are different by usage, which makes it hard for users to
+                          predict what will happen. 4. The fields are both imprecise
+                          and overly precise.  Kind is not a precise mapping to a
+                          URL. This can produce ambiguity during interpretation and
+                          require a REST mapping.  In most cases, the dependency is
+                          on the group,resource tuple and the version of the actual
+                          struct is irrelevant. 5. We cannot easily change it.  Because
+                          this type is embedded in many locations, updates to this
+                          type will affect numerous schemas.  Don't make new APIs
+                          embed an underspecified API type they do not control. \n
+                          Instead of using this type, create a locally provided and
+                          used type that is well-focused on your reference. For example,
+                          ServiceReferences for admission registration: https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go#L533
+                          ."
+                        properties:
+                          apiVersion:
+                            description: API version of the referent.
+                            type: string
+                          fieldPath:
+                            description: 'If referring to a piece of an object instead
+                              of an entire object, this string should contain a valid
+                              JSON/Go field access statement, such as desiredState.manifest.containers[2].
+                              For example, if the object reference is to a container
+                              within a pod, this would take on a value like: "spec.containers{name}"
+                              (where "name" refers to the name of the container that
+                              triggered the event) or if no container name is specified
+                              "spec.containers[2]" (container with index 2 in this
+                              pod). This syntax is chosen only to have some well-defined
+                              way of referencing a part of an object. TODO: this design
+                              is not final and this field is subject to change in
+                              the future.'
+                            type: string
+                          kind:
+                            description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                            type: string
+                          name:
+                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                            type: string
+                          namespace:
+                            description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                            type: string
+                          resourceVersion:
+                            description: 'Specific resourceVersion to which this reference
+                              is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                            type: string
+                          uid:
+                            description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                            type: string
+                        type: object
+                        x-kubernetes-map-type: atomic
+                    required:
+                    - created
+                    type: object
                   status:
                     description: ROSBridgeStatus defines the observed state of ROSBridge
                     properties:
@@ -1627,14 +2841,152 @@ spec:
                           created:
                             type: boolean
                           phase:
-                            description: PodPhase is a label for the condition of
-                              a pod at the current time.
                             type: string
+                          reference:
+                            description: "ObjectReference contains enough information
+                              to let you inspect or modify the referred object. ---
+                              New uses of this type are discouraged because of difficulty
+                              describing its usage when embedded in APIs. 1. Ignored
+                              fields.  It includes many fields which are not generally
+                              honored.  For instance, ResourceVersion and FieldPath
+                              are both very rarely valid in actual usage. 2. Invalid
+                              usage help.  It is impossible to add specific help for
+                              individual usage.  In most embedded usages, there are
+                              particular restrictions like, \"must refer only to types
+                              A and B\" or \"UID not honored\" or \"name must be restricted\".
+                              Those cannot be well described when embedded. 3. Inconsistent
+                              validation.  Because the usages are different, the validation
+                              rules are different by usage, which makes it hard for
+                              users to predict what will happen. 4. The fields are
+                              both imprecise and overly precise.  Kind is not a precise
+                              mapping to a URL. This can produce ambiguity during
+                              interpretation and require a REST mapping.  In most
+                              cases, the dependency is on the group,resource tuple
+                              and the version of the actual struct is irrelevant.
+                              5. We cannot easily change it.  Because this type is
+                              embedded in many locations, updates to this type will
+                              affect numerous schemas.  Don't make new APIs embed
+                              an underspecified API type they do not control. \n Instead
+                              of using this type, create a locally provided and used
+                              type that is well-focused on your reference. For example,
+                              ServiceReferences for admission registration: https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go#L533
+                              ."
+                            properties:
+                              apiVersion:
+                                description: API version of the referent.
+                                type: string
+                              fieldPath:
+                                description: 'If referring to a piece of an object
+                                  instead of an entire object, this string should
+                                  contain a valid JSON/Go field access statement,
+                                  such as desiredState.manifest.containers[2]. For
+                                  example, if the object reference is to a container
+                                  within a pod, this would take on a value like: "spec.containers{name}"
+                                  (where "name" refers to the name of the container
+                                  that triggered the event) or if no container name
+                                  is specified "spec.containers[2]" (container with
+                                  index 2 in this pod). This syntax is chosen only
+                                  to have some well-defined way of referencing a part
+                                  of an object. TODO: this design is not final and
+                                  this field is subject to change in the future.'
+                                type: string
+                              kind:
+                                description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                                type: string
+                              name:
+                                description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                                type: string
+                              namespace:
+                                description: 'Namespace of the referent. More info:
+                                  https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                                type: string
+                              resourceVersion:
+                                description: 'Specific resourceVersion to which this
+                                  reference is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                                type: string
+                              uid:
+                                description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                                type: string
+                            type: object
+                            x-kubernetes-map-type: atomic
+                        required:
+                        - created
                         type: object
                       serviceStatus:
                         properties:
                           created:
                             type: boolean
+                          phase:
+                            type: string
+                          reference:
+                            description: "ObjectReference contains enough information
+                              to let you inspect or modify the referred object. ---
+                              New uses of this type are discouraged because of difficulty
+                              describing its usage when embedded in APIs. 1. Ignored
+                              fields.  It includes many fields which are not generally
+                              honored.  For instance, ResourceVersion and FieldPath
+                              are both very rarely valid in actual usage. 2. Invalid
+                              usage help.  It is impossible to add specific help for
+                              individual usage.  In most embedded usages, there are
+                              particular restrictions like, \"must refer only to types
+                              A and B\" or \"UID not honored\" or \"name must be restricted\".
+                              Those cannot be well described when embedded. 3. Inconsistent
+                              validation.  Because the usages are different, the validation
+                              rules are different by usage, which makes it hard for
+                              users to predict what will happen. 4. The fields are
+                              both imprecise and overly precise.  Kind is not a precise
+                              mapping to a URL. This can produce ambiguity during
+                              interpretation and require a REST mapping.  In most
+                              cases, the dependency is on the group,resource tuple
+                              and the version of the actual struct is irrelevant.
+                              5. We cannot easily change it.  Because this type is
+                              embedded in many locations, updates to this type will
+                              affect numerous schemas.  Don't make new APIs embed
+                              an underspecified API type they do not control. \n Instead
+                              of using this type, create a locally provided and used
+                              type that is well-focused on your reference. For example,
+                              ServiceReferences for admission registration: https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go#L533
+                              ."
+                            properties:
+                              apiVersion:
+                                description: API version of the referent.
+                                type: string
+                              fieldPath:
+                                description: 'If referring to a piece of an object
+                                  instead of an entire object, this string should
+                                  contain a valid JSON/Go field access statement,
+                                  such as desiredState.manifest.containers[2]. For
+                                  example, if the object reference is to a container
+                                  within a pod, this would take on a value like: "spec.containers{name}"
+                                  (where "name" refers to the name of the container
+                                  that triggered the event) or if no container name
+                                  is specified "spec.containers[2]" (container with
+                                  index 2 in this pod). This syntax is chosen only
+                                  to have some well-defined way of referencing a part
+                                  of an object. TODO: this design is not final and
+                                  this field is subject to change in the future.'
+                                type: string
+                              kind:
+                                description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                                type: string
+                              name:
+                                description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                                type: string
+                              namespace:
+                                description: 'Namespace of the referent. More info:
+                                  https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                                type: string
+                              resourceVersion:
+                                description: 'Specific resourceVersion to which this
+                                  reference is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                                type: string
+                              uid:
+                                description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                                type: string
+                            type: object
+                            x-kubernetes-map-type: atomic
+                        required:
+                        - created
                         type: object
                     type: object
                 type: object
@@ -1645,43 +2997,444 @@ spec:
                     properties:
                       created:
                         type: boolean
-                      persistentVolumeClaimName:
+                      phase:
                         type: string
+                      reference:
+                        description: "ObjectReference contains enough information
+                          to let you inspect or modify the referred object. --- New
+                          uses of this type are discouraged because of difficulty
+                          describing its usage when embedded in APIs. 1. Ignored fields.
+                          \ It includes many fields which are not generally honored.
+                          \ For instance, ResourceVersion and FieldPath are both very
+                          rarely valid in actual usage. 2. Invalid usage help.  It
+                          is impossible to add specific help for individual usage.
+                          \ In most embedded usages, there are particular restrictions
+                          like, \"must refer only to types A and B\" or \"UID not
+                          honored\" or \"name must be restricted\". Those cannot be
+                          well described when embedded. 3. Inconsistent validation.
+                          \ Because the usages are different, the validation rules
+                          are different by usage, which makes it hard for users to
+                          predict what will happen. 4. The fields are both imprecise
+                          and overly precise.  Kind is not a precise mapping to a
+                          URL. This can produce ambiguity during interpretation and
+                          require a REST mapping.  In most cases, the dependency is
+                          on the group,resource tuple and the version of the actual
+                          struct is irrelevant. 5. We cannot easily change it.  Because
+                          this type is embedded in many locations, updates to this
+                          type will affect numerous schemas.  Don't make new APIs
+                          embed an underspecified API type they do not control. \n
+                          Instead of using this type, create a locally provided and
+                          used type that is well-focused on your reference. For example,
+                          ServiceReferences for admission registration: https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go#L533
+                          ."
+                        properties:
+                          apiVersion:
+                            description: API version of the referent.
+                            type: string
+                          fieldPath:
+                            description: 'If referring to a piece of an object instead
+                              of an entire object, this string should contain a valid
+                              JSON/Go field access statement, such as desiredState.manifest.containers[2].
+                              For example, if the object reference is to a container
+                              within a pod, this would take on a value like: "spec.containers{name}"
+                              (where "name" refers to the name of the container that
+                              triggered the event) or if no container name is specified
+                              "spec.containers[2]" (container with index 2 in this
+                              pod). This syntax is chosen only to have some well-defined
+                              way of referencing a part of an object. TODO: this design
+                              is not final and this field is subject to change in
+                              the future.'
+                            type: string
+                          kind:
+                            description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                            type: string
+                          name:
+                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                            type: string
+                          namespace:
+                            description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                            type: string
+                          resourceVersion:
+                            description: 'Specific resourceVersion to which this reference
+                              is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                            type: string
+                          uid:
+                            description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                            type: string
+                        type: object
+                        x-kubernetes-map-type: atomic
+                    required:
+                    - created
                     type: object
                   opt:
                     properties:
                       created:
                         type: boolean
-                      persistentVolumeClaimName:
+                      phase:
                         type: string
+                      reference:
+                        description: "ObjectReference contains enough information
+                          to let you inspect or modify the referred object. --- New
+                          uses of this type are discouraged because of difficulty
+                          describing its usage when embedded in APIs. 1. Ignored fields.
+                          \ It includes many fields which are not generally honored.
+                          \ For instance, ResourceVersion and FieldPath are both very
+                          rarely valid in actual usage. 2. Invalid usage help.  It
+                          is impossible to add specific help for individual usage.
+                          \ In most embedded usages, there are particular restrictions
+                          like, \"must refer only to types A and B\" or \"UID not
+                          honored\" or \"name must be restricted\". Those cannot be
+                          well described when embedded. 3. Inconsistent validation.
+                          \ Because the usages are different, the validation rules
+                          are different by usage, which makes it hard for users to
+                          predict what will happen. 4. The fields are both imprecise
+                          and overly precise.  Kind is not a precise mapping to a
+                          URL. This can produce ambiguity during interpretation and
+                          require a REST mapping.  In most cases, the dependency is
+                          on the group,resource tuple and the version of the actual
+                          struct is irrelevant. 5. We cannot easily change it.  Because
+                          this type is embedded in many locations, updates to this
+                          type will affect numerous schemas.  Don't make new APIs
+                          embed an underspecified API type they do not control. \n
+                          Instead of using this type, create a locally provided and
+                          used type that is well-focused on your reference. For example,
+                          ServiceReferences for admission registration: https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go#L533
+                          ."
+                        properties:
+                          apiVersion:
+                            description: API version of the referent.
+                            type: string
+                          fieldPath:
+                            description: 'If referring to a piece of an object instead
+                              of an entire object, this string should contain a valid
+                              JSON/Go field access statement, such as desiredState.manifest.containers[2].
+                              For example, if the object reference is to a container
+                              within a pod, this would take on a value like: "spec.containers{name}"
+                              (where "name" refers to the name of the container that
+                              triggered the event) or if no container name is specified
+                              "spec.containers[2]" (container with index 2 in this
+                              pod). This syntax is chosen only to have some well-defined
+                              way of referencing a part of an object. TODO: this design
+                              is not final and this field is subject to change in
+                              the future.'
+                            type: string
+                          kind:
+                            description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                            type: string
+                          name:
+                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                            type: string
+                          namespace:
+                            description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                            type: string
+                          resourceVersion:
+                            description: 'Specific resourceVersion to which this reference
+                              is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                            type: string
+                          uid:
+                            description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                            type: string
+                        type: object
+                        x-kubernetes-map-type: atomic
+                    required:
+                    - created
                     type: object
                   usr:
                     properties:
                       created:
                         type: boolean
-                      persistentVolumeClaimName:
+                      phase:
                         type: string
+                      reference:
+                        description: "ObjectReference contains enough information
+                          to let you inspect or modify the referred object. --- New
+                          uses of this type are discouraged because of difficulty
+                          describing its usage when embedded in APIs. 1. Ignored fields.
+                          \ It includes many fields which are not generally honored.
+                          \ For instance, ResourceVersion and FieldPath are both very
+                          rarely valid in actual usage. 2. Invalid usage help.  It
+                          is impossible to add specific help for individual usage.
+                          \ In most embedded usages, there are particular restrictions
+                          like, \"must refer only to types A and B\" or \"UID not
+                          honored\" or \"name must be restricted\". Those cannot be
+                          well described when embedded. 3. Inconsistent validation.
+                          \ Because the usages are different, the validation rules
+                          are different by usage, which makes it hard for users to
+                          predict what will happen. 4. The fields are both imprecise
+                          and overly precise.  Kind is not a precise mapping to a
+                          URL. This can produce ambiguity during interpretation and
+                          require a REST mapping.  In most cases, the dependency is
+                          on the group,resource tuple and the version of the actual
+                          struct is irrelevant. 5. We cannot easily change it.  Because
+                          this type is embedded in many locations, updates to this
+                          type will affect numerous schemas.  Don't make new APIs
+                          embed an underspecified API type they do not control. \n
+                          Instead of using this type, create a locally provided and
+                          used type that is well-focused on your reference. For example,
+                          ServiceReferences for admission registration: https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go#L533
+                          ."
+                        properties:
+                          apiVersion:
+                            description: API version of the referent.
+                            type: string
+                          fieldPath:
+                            description: 'If referring to a piece of an object instead
+                              of an entire object, this string should contain a valid
+                              JSON/Go field access statement, such as desiredState.manifest.containers[2].
+                              For example, if the object reference is to a container
+                              within a pod, this would take on a value like: "spec.containers{name}"
+                              (where "name" refers to the name of the container that
+                              triggered the event) or if no container name is specified
+                              "spec.containers[2]" (container with index 2 in this
+                              pod). This syntax is chosen only to have some well-defined
+                              way of referencing a part of an object. TODO: this design
+                              is not final and this field is subject to change in
+                              the future.'
+                            type: string
+                          kind:
+                            description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                            type: string
+                          name:
+                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                            type: string
+                          namespace:
+                            description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                            type: string
+                          resourceVersion:
+                            description: 'Specific resourceVersion to which this reference
+                              is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                            type: string
+                          uid:
+                            description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                            type: string
+                        type: object
+                        x-kubernetes-map-type: atomic
+                    required:
+                    - created
                     type: object
                   var:
                     properties:
                       created:
                         type: boolean
-                      persistentVolumeClaimName:
+                      phase:
                         type: string
+                      reference:
+                        description: "ObjectReference contains enough information
+                          to let you inspect or modify the referred object. --- New
+                          uses of this type are discouraged because of difficulty
+                          describing its usage when embedded in APIs. 1. Ignored fields.
+                          \ It includes many fields which are not generally honored.
+                          \ For instance, ResourceVersion and FieldPath are both very
+                          rarely valid in actual usage. 2. Invalid usage help.  It
+                          is impossible to add specific help for individual usage.
+                          \ In most embedded usages, there are particular restrictions
+                          like, \"must refer only to types A and B\" or \"UID not
+                          honored\" or \"name must be restricted\". Those cannot be
+                          well described when embedded. 3. Inconsistent validation.
+                          \ Because the usages are different, the validation rules
+                          are different by usage, which makes it hard for users to
+                          predict what will happen. 4. The fields are both imprecise
+                          and overly precise.  Kind is not a precise mapping to a
+                          URL. This can produce ambiguity during interpretation and
+                          require a REST mapping.  In most cases, the dependency is
+                          on the group,resource tuple and the version of the actual
+                          struct is irrelevant. 5. We cannot easily change it.  Because
+                          this type is embedded in many locations, updates to this
+                          type will affect numerous schemas.  Don't make new APIs
+                          embed an underspecified API type they do not control. \n
+                          Instead of using this type, create a locally provided and
+                          used type that is well-focused on your reference. For example,
+                          ServiceReferences for admission registration: https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go#L533
+                          ."
+                        properties:
+                          apiVersion:
+                            description: API version of the referent.
+                            type: string
+                          fieldPath:
+                            description: 'If referring to a piece of an object instead
+                              of an entire object, this string should contain a valid
+                              JSON/Go field access statement, such as desiredState.manifest.containers[2].
+                              For example, if the object reference is to a container
+                              within a pod, this would take on a value like: "spec.containers{name}"
+                              (where "name" refers to the name of the container that
+                              triggered the event) or if no container name is specified
+                              "spec.containers[2]" (container with index 2 in this
+                              pod). This syntax is chosen only to have some well-defined
+                              way of referencing a part of an object. TODO: this design
+                              is not final and this field is subject to change in
+                              the future.'
+                            type: string
+                          kind:
+                            description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                            type: string
+                          name:
+                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                            type: string
+                          namespace:
+                            description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                            type: string
+                          resourceVersion:
+                            description: 'Specific resourceVersion to which this reference
+                              is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                            type: string
+                          uid:
+                            description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                            type: string
+                        type: object
+                        x-kubernetes-map-type: atomic
+                    required:
+                    - created
                     type: object
                   workspace:
                     properties:
                       created:
                         type: boolean
-                      persistentVolumeClaimName:
+                      phase:
                         type: string
+                      reference:
+                        description: "ObjectReference contains enough information
+                          to let you inspect or modify the referred object. --- New
+                          uses of this type are discouraged because of difficulty
+                          describing its usage when embedded in APIs. 1. Ignored fields.
+                          \ It includes many fields which are not generally honored.
+                          \ For instance, ResourceVersion and FieldPath are both very
+                          rarely valid in actual usage. 2. Invalid usage help.  It
+                          is impossible to add specific help for individual usage.
+                          \ In most embedded usages, there are particular restrictions
+                          like, \"must refer only to types A and B\" or \"UID not
+                          honored\" or \"name must be restricted\". Those cannot be
+                          well described when embedded. 3. Inconsistent validation.
+                          \ Because the usages are different, the validation rules
+                          are different by usage, which makes it hard for users to
+                          predict what will happen. 4. The fields are both imprecise
+                          and overly precise.  Kind is not a precise mapping to a
+                          URL. This can produce ambiguity during interpretation and
+                          require a REST mapping.  In most cases, the dependency is
+                          on the group,resource tuple and the version of the actual
+                          struct is irrelevant. 5. We cannot easily change it.  Because
+                          this type is embedded in many locations, updates to this
+                          type will affect numerous schemas.  Don't make new APIs
+                          embed an underspecified API type they do not control. \n
+                          Instead of using this type, create a locally provided and
+                          used type that is well-focused on your reference. For example,
+                          ServiceReferences for admission registration: https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go#L533
+                          ."
+                        properties:
+                          apiVersion:
+                            description: API version of the referent.
+                            type: string
+                          fieldPath:
+                            description: 'If referring to a piece of an object instead
+                              of an entire object, this string should contain a valid
+                              JSON/Go field access statement, such as desiredState.manifest.containers[2].
+                              For example, if the object reference is to a container
+                              within a pod, this would take on a value like: "spec.containers{name}"
+                              (where "name" refers to the name of the container that
+                              triggered the event) or if no container name is specified
+                              "spec.containers[2]" (container with index 2 in this
+                              pod). This syntax is chosen only to have some well-defined
+                              way of referencing a part of an object. TODO: this design
+                              is not final and this field is subject to change in
+                              the future.'
+                            type: string
+                          kind:
+                            description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                            type: string
+                          name:
+                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                            type: string
+                          namespace:
+                            description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                            type: string
+                          resourceVersion:
+                            description: 'Specific resourceVersion to which this reference
+                              is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                            type: string
+                          uid:
+                            description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                            type: string
+                        type: object
+                        x-kubernetes-map-type: atomic
+                    required:
+                    - created
                     type: object
                 type: object
               workspaceManagerStatus:
                 description: Workspace manager status
                 properties:
-                  created:
-                    type: boolean
+                  resource:
+                    properties:
+                      created:
+                        type: boolean
+                      phase:
+                        type: string
+                      reference:
+                        description: "ObjectReference contains enough information
+                          to let you inspect or modify the referred object. --- New
+                          uses of this type are discouraged because of difficulty
+                          describing its usage when embedded in APIs. 1. Ignored fields.
+                          \ It includes many fields which are not generally honored.
+                          \ For instance, ResourceVersion and FieldPath are both very
+                          rarely valid in actual usage. 2. Invalid usage help.  It
+                          is impossible to add specific help for individual usage.
+                          \ In most embedded usages, there are particular restrictions
+                          like, \"must refer only to types A and B\" or \"UID not
+                          honored\" or \"name must be restricted\". Those cannot be
+                          well described when embedded. 3. Inconsistent validation.
+                          \ Because the usages are different, the validation rules
+                          are different by usage, which makes it hard for users to
+                          predict what will happen. 4. The fields are both imprecise
+                          and overly precise.  Kind is not a precise mapping to a
+                          URL. This can produce ambiguity during interpretation and
+                          require a REST mapping.  In most cases, the dependency is
+                          on the group,resource tuple and the version of the actual
+                          struct is irrelevant. 5. We cannot easily change it.  Because
+                          this type is embedded in many locations, updates to this
+                          type will affect numerous schemas.  Don't make new APIs
+                          embed an underspecified API type they do not control. \n
+                          Instead of using this type, create a locally provided and
+                          used type that is well-focused on your reference. For example,
+                          ServiceReferences for admission registration: https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go#L533
+                          ."
+                        properties:
+                          apiVersion:
+                            description: API version of the referent.
+                            type: string
+                          fieldPath:
+                            description: 'If referring to a piece of an object instead
+                              of an entire object, this string should contain a valid
+                              JSON/Go field access statement, such as desiredState.manifest.containers[2].
+                              For example, if the object reference is to a container
+                              within a pod, this would take on a value like: "spec.containers{name}"
+                              (where "name" refers to the name of the container that
+                              triggered the event) or if no container name is specified
+                              "spec.containers[2]" (container with index 2 in this
+                              pod). This syntax is chosen only to have some well-defined
+                              way of referencing a part of an object. TODO: this design
+                              is not final and this field is subject to change in
+                              the future.'
+                            type: string
+                          kind:
+                            description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                            type: string
+                          name:
+                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                            type: string
+                          namespace:
+                            description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                            type: string
+                          resourceVersion:
+                            description: 'Specific resourceVersion to which this reference
+                              is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                            type: string
+                          uid:
+                            description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                            type: string
+                        type: object
+                        x-kubernetes-map-type: atomic
+                    required:
+                    - created
+                    type: object
                   status:
                     description: WorkspaceManagerStatus defines the observed state
                       of WorkspaceManager
@@ -1692,6 +3445,75 @@ spec:
                             type: boolean
                           phase:
                             type: string
+                          reference:
+                            description: "ObjectReference contains enough information
+                              to let you inspect or modify the referred object. ---
+                              New uses of this type are discouraged because of difficulty
+                              describing its usage when embedded in APIs. 1. Ignored
+                              fields.  It includes many fields which are not generally
+                              honored.  For instance, ResourceVersion and FieldPath
+                              are both very rarely valid in actual usage. 2. Invalid
+                              usage help.  It is impossible to add specific help for
+                              individual usage.  In most embedded usages, there are
+                              particular restrictions like, \"must refer only to types
+                              A and B\" or \"UID not honored\" or \"name must be restricted\".
+                              Those cannot be well described when embedded. 3. Inconsistent
+                              validation.  Because the usages are different, the validation
+                              rules are different by usage, which makes it hard for
+                              users to predict what will happen. 4. The fields are
+                              both imprecise and overly precise.  Kind is not a precise
+                              mapping to a URL. This can produce ambiguity during
+                              interpretation and require a REST mapping.  In most
+                              cases, the dependency is on the group,resource tuple
+                              and the version of the actual struct is irrelevant.
+                              5. We cannot easily change it.  Because this type is
+                              embedded in many locations, updates to this type will
+                              affect numerous schemas.  Don't make new APIs embed
+                              an underspecified API type they do not control. \n Instead
+                              of using this type, create a locally provided and used
+                              type that is well-focused on your reference. For example,
+                              ServiceReferences for admission registration: https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go#L533
+                              ."
+                            properties:
+                              apiVersion:
+                                description: API version of the referent.
+                                type: string
+                              fieldPath:
+                                description: 'If referring to a piece of an object
+                                  instead of an entire object, this string should
+                                  contain a valid JSON/Go field access statement,
+                                  such as desiredState.manifest.containers[2]. For
+                                  example, if the object reference is to a container
+                                  within a pod, this would take on a value like: "spec.containers{name}"
+                                  (where "name" refers to the name of the container
+                                  that triggered the event) or if no container name
+                                  is specified "spec.containers[2]" (container with
+                                  index 2 in this pod). This syntax is chosen only
+                                  to have some well-defined way of referencing a part
+                                  of an object. TODO: this design is not final and
+                                  this field is subject to change in the future.'
+                                type: string
+                              kind:
+                                description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                                type: string
+                              name:
+                                description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                                type: string
+                              namespace:
+                                description: 'Namespace of the referent. More info:
+                                  https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                                type: string
+                              resourceVersion:
+                                description: 'Specific resourceVersion to which this
+                                  reference is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                                type: string
+                              uid:
+                                description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                                type: string
+                            type: object
+                            x-kubernetes-map-type: atomic
+                        required:
+                        - created
                         type: object
                       clonerJobStatus:
                         properties:
@@ -1699,6 +3521,75 @@ spec:
                             type: boolean
                           phase:
                             type: string
+                          reference:
+                            description: "ObjectReference contains enough information
+                              to let you inspect or modify the referred object. ---
+                              New uses of this type are discouraged because of difficulty
+                              describing its usage when embedded in APIs. 1. Ignored
+                              fields.  It includes many fields which are not generally
+                              honored.  For instance, ResourceVersion and FieldPath
+                              are both very rarely valid in actual usage. 2. Invalid
+                              usage help.  It is impossible to add specific help for
+                              individual usage.  In most embedded usages, there are
+                              particular restrictions like, \"must refer only to types
+                              A and B\" or \"UID not honored\" or \"name must be restricted\".
+                              Those cannot be well described when embedded. 3. Inconsistent
+                              validation.  Because the usages are different, the validation
+                              rules are different by usage, which makes it hard for
+                              users to predict what will happen. 4. The fields are
+                              both imprecise and overly precise.  Kind is not a precise
+                              mapping to a URL. This can produce ambiguity during
+                              interpretation and require a REST mapping.  In most
+                              cases, the dependency is on the group,resource tuple
+                              and the version of the actual struct is irrelevant.
+                              5. We cannot easily change it.  Because this type is
+                              embedded in many locations, updates to this type will
+                              affect numerous schemas.  Don't make new APIs embed
+                              an underspecified API type they do not control. \n Instead
+                              of using this type, create a locally provided and used
+                              type that is well-focused on your reference. For example,
+                              ServiceReferences for admission registration: https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go#L533
+                              ."
+                            properties:
+                              apiVersion:
+                                description: API version of the referent.
+                                type: string
+                              fieldPath:
+                                description: 'If referring to a piece of an object
+                                  instead of an entire object, this string should
+                                  contain a valid JSON/Go field access statement,
+                                  such as desiredState.manifest.containers[2]. For
+                                  example, if the object reference is to a container
+                                  within a pod, this would take on a value like: "spec.containers{name}"
+                                  (where "name" refers to the name of the container
+                                  that triggered the event) or if no container name
+                                  is specified "spec.containers[2]" (container with
+                                  index 2 in this pod). This syntax is chosen only
+                                  to have some well-defined way of referencing a part
+                                  of an object. TODO: this design is not final and
+                                  this field is subject to change in the future.'
+                                type: string
+                              kind:
+                                description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                                type: string
+                              name:
+                                description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                                type: string
+                              namespace:
+                                description: 'Namespace of the referent. More info:
+                                  https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                                type: string
+                              resourceVersion:
+                                description: 'Specific resourceVersion to which this
+                                  reference is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                                type: string
+                              uid:
+                                description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                                type: string
+                            type: object
+                            x-kubernetes-map-type: atomic
+                        required:
+                        - created
                         type: object
                       phase:
                         type: string

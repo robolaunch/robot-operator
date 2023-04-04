@@ -140,8 +140,8 @@ type WorkspaceManagerSpec struct {
 // WorkspaceManagerStatus defines the observed state of WorkspaceManager
 type WorkspaceManagerStatus struct {
 	Phase            WorkspaceManagerPhase `json:"phase,omitempty"`
-	ClonerJobStatus  OwnedJobStatus        `json:"clonerJobStatus,omitempty"`
-	CleanupJobStatus OwnedJobStatus        `json:"cleanupJobStatus,omitempty"`
+	ClonerJobStatus  OwnedResourceStatus   `json:"clonerJobStatus,omitempty"`
+	CleanupJobStatus OwnedResourceStatus   `json:"cleanupJobStatus,omitempty"`
 	Version          int                   `json:"version,omitempty"`
 }
 
@@ -171,23 +171,12 @@ type BuildManagerSpec struct {
 	Steps []Step `json:"steps,omitempty"`
 }
 
-type StepStatus struct {
-	Step       Step     `json:"step,omitempty"`
-	JobName    string   `json:"jobName,omitempty"`
-	JobCreated bool     `json:"created,omitempty"`
-	JobPhase   JobPhase `json:"jobPhase,omitempty"`
-}
-
-type ScriptConfigMapStatus struct {
-	Created bool `json:"created,omitempty"`
-}
-
 // BuildManagerStatus defines the observed state of BuildManager
 type BuildManagerStatus struct {
-	Phase                 BuildManagerPhase     `json:"phase,omitempty"`
-	Active                bool                  `json:"active,omitempty"`
-	ScriptConfigMapStatus ScriptConfigMapStatus `json:"scriptConfigMapStatus,omitempty"`
-	Steps                 []StepStatus          `json:"steps,omitempty"`
+	Phase                 BuildManagerPhase   `json:"phase,omitempty"`
+	Active                bool                `json:"active,omitempty"`
+	ScriptConfigMapStatus OwnedResourceStatus `json:"scriptConfigMapStatus,omitempty"`
+	Steps                 []StepStatus        `json:"steps,omitempty"`
 }
 
 // ********************************
@@ -271,7 +260,7 @@ type LaunchStatus struct {
 }
 
 type LaunchPodStatus struct {
-	Status       DetailedOwnedPodStatus  `json:"status,omitempty"`
+	Status       OwnedPodStatus          `json:"status,omitempty"`
 	LaunchStatus map[string]LaunchStatus `json:"launchStatus,omitempty"`
 }
 

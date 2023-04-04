@@ -99,7 +99,7 @@ func (r *ROSBridgeReconciler) reconcileCheckStatus(ctx context.Context, instance
 		case true:
 
 			switch instance.Status.PodStatus.Phase {
-			case corev1.PodRunning:
+			case string(corev1.PodRunning):
 
 				// TODO: handle other pod phases
 

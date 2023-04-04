@@ -6,6 +6,7 @@ import (
 
 	robotErr "github.com/robolaunch/robot-operator/internal/error"
 	"github.com/robolaunch/robot-operator/internal/handle"
+	"github.com/robolaunch/robot-operator/internal/reference"
 	"github.com/robolaunch/robot-operator/internal/resources"
 	mcsv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/external/apis/mcsv1alpha1/v1alpha1"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
@@ -16,7 +17,7 @@ import (
 
 func (r *DiscoveryServerReconciler) reconcileUpdateConnectionInfo(ctx context.Context, instance *robotv1alpha1.DiscoveryServer) error {
 
-	if instance.Spec.Type == robotv1alpha1.DiscoveryServerInstanceTypeClient || instance.Status.PodStatus.Phase == corev1.PodRunning {
+	if instance.Spec.Type == robotv1alpha1.DiscoveryServerInstanceTypeClient || instance.Status.PodStatus.Resource.Phase == string(corev1.PodRunning) {
 		dnsName := resources.GetDiscoveryServerDNS(*instance)
 
 		ips, err := net.LookupIP(dnsName)
@@ -48,7 +49,7 @@ func (r *DiscoveryServerReconciler) reconcileCheckPod(ctx context.Context, insta
 	discoveryServerPodQuery := &corev1.Pod{}
 	err := r.Get(ctx, *instance.GetDiscoveryServerPodMetadata(), discoveryServerPodQuery)
 	if err != nil && errors.IsNotFound(err) {
-		instance.Status.PodStatus.Created = false
+		instance.Status.PodStatus.Resource = robotv1alpha1.OwnedResourceStatus{}
 	} else if err != nil {
 		return err
 	} else {
@@ -65,14 +66,15 @@ func (r *DiscoveryServerReconciler) reconcileCheckPod(ctx context.Context, insta
 			}
 
 			instance.Status.PodStatus.IP = ""
-			instance.Status.PodStatus.Phase = ""
+			instance.Status.PodStatus.Resource.Phase = ""
 			instance.Status.Phase = ""
 
 		} else {
 
-			instance.Status.PodStatus.Created = true
+			instance.Status.PodStatus.Resource.Created = true
+			reference.SetReference(&instance.Status.PodStatus.Resource.Reference, discoveryServerPodQuery.TypeMeta, discoveryServerPodQuery.ObjectMeta)
 			instance.Status.PodStatus.IP = discoveryServerPodQuery.Status.PodIP
-			instance.Status.PodStatus.Phase = discoveryServerPodQuery.Status.Phase
+			instance.Status.PodStatus.Resource.Phase = string(discoveryServerPodQuery.Status.Phase)
 
 		}
 
@@ -91,11 +93,12 @@ func (r *DiscoveryServerReconciler) reconcileCheckService(ctx context.Context, i
 	discoveryServerServiceQuery := &corev1.Service{}
 	err = r.Get(ctx, *instance.GetDiscoveryServerServiceMetadata(), discoveryServerServiceQuery)
 	if err != nil && errors.IsNotFound(err) {
-		instance.Status.ServiceStatus.Created = false
+		instance.Status.ServiceStatus = robotv1alpha1.OwnedResourceStatus{}
 	} else if err != nil {
 		return err
 	} else {
 		instance.Status.ServiceStatus.Created = true
+		reference.SetReference(&instance.Status.ServiceStatus.Reference, discoveryServerServiceQuery.TypeMeta, discoveryServerServiceQuery.ObjectMeta)
 	}
 
 	return nil
@@ -106,11 +109,12 @@ func (r *DiscoveryServerReconciler) reconcileCheckServiceExport(ctx context.Cont
 	discoveryServerServiceExportQuery := &mcsv1alpha1.ServiceExport{}
 	err := r.Get(ctx, *instance.GetDiscoveryServerServiceMetadata(), discoveryServerServiceExportQuery)
 	if err != nil && errors.IsNotFound(err) {
-		instance.Status.ServiceExportStatus.Created = false
+		instance.Status.ServiceExportStatus = robotv1alpha1.OwnedResourceStatus{}
 	} else if err != nil {
 		return err
 	} else {
 		instance.Status.ServiceExportStatus.Created = true
+		reference.SetReference(&instance.Status.ServiceExportStatus.Reference, discoveryServerServiceExportQuery.TypeMeta, discoveryServerServiceExportQuery.ObjectMeta)
 	}
 
 	return nil
@@ -144,7 +148,7 @@ func (r *DiscoveryServerReconciler) reconcileCheckConfigMap(ctx context.Context,
 	discoveryServerConfigMapQuery := &corev1.ConfigMap{}
 	err := r.Get(ctx, *instance.GetDiscoveryServerConfigMapMetadata(), discoveryServerConfigMapQuery)
 	if err != nil && errors.IsNotFound(err) {
-		instance.Status.ConfigMapStatus.Created = false
+		instance.Status.ConfigMapStatus = robotv1alpha1.OwnedResourceStatus{}
 	} else if err != nil {
 		return err
 	} else {
@@ -164,6 +168,8 @@ func (r *DiscoveryServerReconciler) reconcileCheckConfigMap(ctx context.Context,
 		}
 
 		instance.Status.ConfigMapStatus.Created = true
+		reference.SetReference(&instance.Status.ConfigMapStatus.Reference, discoveryServerConfigMapQuery.TypeMeta, discoveryServerConfigMapQuery.ObjectMeta)
+
 	}
 
 	return nil
