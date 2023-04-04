@@ -190,7 +190,8 @@ type RobotVDISpec struct {
 	// +kubebuilder:validation:Required
 	WebRTCPortRange string `json:"webrtcPortRange,omitempty"`
 	// VDI screen resolution options.
-	// +kubebuilder:validation:Enum=2048x1152;1920x1080;1600x1200
+	// +kubebuilder:validation:Enum="2048x1152";"1920x1080";"1600x1200"
+	// +kubebuilder:default="2048x1152"
 	Resolution string `json:"resolution,omitempty"`
 }
 
