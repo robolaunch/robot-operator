@@ -201,11 +201,11 @@ type RobotSpec struct {
 }
 
 type VolumeStatuses struct {
-	Var       OwnedResourceStatus `json:"var,omitempty"`
-	Etc       OwnedResourceStatus `json:"etc,omitempty"`
-	Usr       OwnedResourceStatus `json:"usr,omitempty"`
-	Opt       OwnedResourceStatus `json:"opt,omitempty"`
-	Workspace OwnedResourceStatus `json:"workspace,omitempty"`
+	Var       OwnedResourceStatus `json:"varDir,omitempty"`
+	Etc       OwnedResourceStatus `json:"etcDir,omitempty"`
+	Usr       OwnedResourceStatus `json:"usrDir,omitempty"`
+	Opt       OwnedResourceStatus `json:"optDir,omitempty"`
+	Workspace OwnedResourceStatus `json:"workspaceDir,omitempty"`
 }
 
 type JobPhase string
