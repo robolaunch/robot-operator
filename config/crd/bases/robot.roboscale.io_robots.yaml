@@ -2993,7 +2993,7 @@ spec:
               volumeStatuses:
                 description: Volume status
                 properties:
-                  etc:
+                  etcDir:
                     properties:
                       created:
                         type: boolean
@@ -3066,7 +3066,7 @@ spec:
                     required:
                     - created
                     type: object
-                  opt:
+                  optDir:
                     properties:
                       created:
                         type: boolean
@@ -3139,7 +3139,7 @@ spec:
                     required:
                     - created
                     type: object
-                  usr:
+                  usrDir:
                     properties:
                       created:
                         type: boolean
@@ -3212,7 +3212,7 @@ spec:
                     required:
                     - created
                     type: object
-                  var:
+                  varDir:
                     properties:
                       created:
                         type: boolean
@@ -3285,7 +3285,7 @@ spec:
                     required:
                     - created
                     type: object
-                  workspace:
+                  workspaceDir:
                     properties:
                       created:
                         type: boolean
