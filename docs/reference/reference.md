@@ -1,8 +1,5 @@
 # API Reference
 
-## Packages
-- [robot.roboscale.io/v1alpha1](#robotroboscaleiov1alpha1)
-
 
 ## robot.roboscale.io/v1alpha1
 
@@ -10,13 +7,15 @@ Package v1alpha1 contains API Schema definitions for the robot v1alpha1 API grou
 
 ### Resource Types
 - [Robot](#robot)
+- [WorkspaceManager](#workspacemanager)
 - [BuildManager](#buildmanager)
 - [LaunchManager](#launchmanager)
 - [RobotDevSuite](#robotdevsuite)
-- [DiscoveryServer](#discoveryserver)
-- [ROSBridge](#rosbridge)
+- [MetricsExporter](#metricsexporter)
 - [RobotVDI](#robotvdi)
 - [RobotIDE](#robotide)
+- [DiscoveryServer](#discoveryserver)
+- [ROSBridge](#rosbridge)
 - [RobotArtifact](#robotartifact)
 
 
@@ -33,7 +32,7 @@ Robot is the Schema for the robots API
 | --- | --- |
 | `apiVersion` _string_ | `robot.roboscale.io/v1alpha1`
 | `kind` _string_ | `Robot`
-| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |
+| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |
 | `spec` _[RobotSpec](#robotspec)_ |  |
 | `status` _[RobotStatus](#robotstatus)_ |  |
 
@@ -50,15 +49,15 @@ _Appears in:_
 
 | Field | Description |
 | --- | --- |
-| `distro` _ROSDistro_ | ROS distro to be used. |
+| `distributions` _[ROSDistro](#rosdistro) array_ | ROS distro to be used. |
+| `rmwImplementation` _[RMWImplementation](#rmwimplementation)_ |  |
 | `storage` _[Storage](#storage)_ | Resource limitations of robot containers. |
 | `discoveryServerTemplate` _[DiscoveryServerSpec](#discoveryserverspec)_ | Discovery server template |
 | `rosBridgeTemplate` _[ROSBridgeSpec](#rosbridgespec)_ | ROS bridge template |
+| `workspaceManagerTemplate` _[WorkspaceManagerSpec](#workspacemanagerspec)_ | Workspace manager template |
 | `buildManagerTemplate` _[BuildManagerSpec](#buildmanagerspec)_ | Build manager template for initial configuration |
 | `launchManagerTemplates` _[LaunchManagerSpec](#launchmanagerspec) array_ | Launch manager template for initial configuration |
 | `robotDevSuiteTemplate` _[RobotDevSuiteSpec](#robotdevsuitespec)_ | Robot development suite template |
-| `workspacesPath` _string_ | Global path of workspaces. It's fixed to `/home/workspaces` path. |
-| `workspaces` _[Workspace](#workspace) array_ | Workspace definitions of robot. |
 | `development` _boolean_ | Development enabled |
 | `rootDNSConfig` _[RootDNSConfig](#rootdnsconfig)_ | Root DNS configuration. |
 | `tlsSecretRef` _[TLSSecretReference](#tlssecretreference)_ | TLS secret reference. |
@@ -82,12 +81,65 @@ _Appears in:_
 | `discoveryServerStatus` _[DiscoveryServerInstanceStatus](#discoveryserverinstancestatus)_ | Discovery server instance status |
 | `rosBridgeStatus` _[ROSBridgeInstanceStatus](#rosbridgeinstancestatus)_ | ROS bridge instance status |
 | `robotDevSuiteStatus` _[RobotDevSuiteInstanceStatus](#robotdevsuiteinstancestatus)_ | Robot development suite instance status |
-| `loaderJobStatus` _[LoaderJobStatus](#loaderjobstatus)_ | Loader job status that configures environment |
-| `initialBuildManagerStatus` _[ManagerStatus](#managerstatus)_ | Initial build manager creation status |
-| `initialLaunchManagerStatuses` _[ManagerStatus](#managerstatus) array_ | Initial launch manager creation status |
+| `loaderJobStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ | Loader job status that configures environment |
+| `workspaceManagerStatus` _[WorkspaceManagerInstanceStatus](#workspacemanagerinstancestatus)_ | Workspace manager status |
+| `initialBuildManagerStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ | Initial build manager creation status |
+| `initialLaunchManagerStatuses` _[OwnedResourceStatus](#ownedresourcestatus) array_ | Initial launch manager creation status |
 | `attachedBuildObject` _[AttachedBuildObject](#attachedbuildobject)_ | Attached build object information |
 | `attachedLaunchObjects` _[AttachedLaunchObject](#attachedlaunchobject) array_ | Attached launch object information |
 | `attachedDevObjects` _[AttachedDevObject](#attacheddevobject) array_ | Attached dev object information |
+
+
+#### WorkspaceManager
+
+
+
+WorkspaceManager is the Schema for the workspacemanagers API
+
+
+
+| Field | Description |
+| --- | --- |
+| `apiVersion` _string_ | `robot.roboscale.io/v1alpha1`
+| `kind` _string_ | `WorkspaceManager`
+| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |
+| `spec` _[WorkspaceManagerSpec](#workspacemanagerspec)_ |  |
+| `status` _[WorkspaceManagerStatus](#workspacemanagerstatus)_ |  |
+
+
+#### WorkspaceManagerSpec
+
+
+
+WorkspaceManagerSpec defines the desired state of WorkspaceManager
+
+_Appears in:_
+- [RobotSpec](#robotspec)
+- [WorkspaceManager](#workspacemanager)
+
+| Field | Description |
+| --- | --- |
+| `workspacesPath` _string_ | Global path of workspaces. It's fixed to `/home/workspaces` path. |
+| `workspaces` _[Workspace](#workspace) array_ | Workspace definitions of robot. |
+| `updateNeeded` _boolean_ | Need update |
+
+
+#### WorkspaceManagerStatus
+
+
+
+WorkspaceManagerStatus defines the observed state of WorkspaceManager
+
+_Appears in:_
+- [WorkspaceManager](#workspacemanager)
+- [WorkspaceManagerInstanceStatus](#workspacemanagerinstancestatus)
+
+| Field | Description |
+| --- | --- |
+| `phase` _[WorkspaceManagerPhase](#workspacemanagerphase)_ |  |
+| `clonerJobStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ |  |
+| `cleanupJobStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ |  |
+| `version` _integer_ |  |
 
 
 #### BuildManager
@@ -102,7 +154,7 @@ BuildManager is the Schema for the buildmanagers API
 | --- | --- |
 | `apiVersion` _string_ | `robot.roboscale.io/v1alpha1`
 | `kind` _string_ | `BuildManager`
-| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |
+| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |
 | `spec` _[BuildManagerSpec](#buildmanagerspec)_ |  |
 | `status` _[BuildManagerStatus](#buildmanagerstatus)_ |  |
 
@@ -134,9 +186,9 @@ _Appears in:_
 
 | Field | Description |
 | --- | --- |
-| `phase` _BuildManagerPhase_ |  |
+| `phase` _[BuildManagerPhase](#buildmanagerphase)_ |  |
 | `active` _boolean_ |  |
-| `scriptConfigMapStatus` _[ScriptConfigMapStatus](#scriptconfigmapstatus)_ |  |
+| `scriptConfigMapStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ |  |
 | `steps` _[StepStatus](#stepstatus) array_ |  |
 
 
@@ -152,7 +204,7 @@ LaunchManager is the Schema for the launchmanagers API
 | --- | --- |
 | `apiVersion` _string_ | `robot.roboscale.io/v1alpha1`
 | `kind` _string_ | `LaunchManager`
-| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |
+| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |
 | `spec` _[LaunchManagerSpec](#launchmanagerspec)_ |  |
 | `status` _[LaunchManagerStatus](#launchmanagerstatus)_ |  |
 
@@ -169,7 +221,9 @@ _Appears in:_
 
 | Field | Description |
 | --- | --- |
+| `display` _boolean_ | Display connection. |
 | `launch` _object (keys:string, values:[Launch](#launch))_ |  |
+| `run` _object (keys:string, values:[Run](#run))_ |  |
 
 
 #### LaunchManagerStatus
@@ -184,7 +238,7 @@ _Appears in:_
 
 | Field | Description |
 | --- | --- |
-| `phase` _LaunchManagerPhase_ |  |
+| `phase` _[LaunchManagerPhase](#launchmanagerphase)_ |  |
 | `active` _boolean_ |  |
 | `launchPodStatus` _[LaunchPodStatus](#launchpodstatus)_ |  |
 
@@ -201,7 +255,7 @@ RobotDevSuite is the Schema for the robotdevsuites API
 | --- | --- |
 | `apiVersion` _string_ | `robot.roboscale.io/v1alpha1`
 | `kind` _string_ | `RobotDevSuite`
-| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |
+| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |
 | `spec` _[RobotDevSuiteSpec](#robotdevsuitespec)_ |  |
 | `status` _[RobotDevSuiteStatus](#robotdevsuitestatus)_ |  |
 
@@ -239,8 +293,169 @@ _Appears in:_
 | --- | --- |
 | `phase` _[RobotDevSuitePhase](#robotdevsuitephase)_ |  |
 | `active` _boolean_ |  |
-| `robotVDIStatus` _[RobotVDIInstanceStatus](#robotvdiinstancestatus)_ |  |
-| `robotIDEStatus` _[RobotIDEInstanceStatus](#robotideinstancestatus)_ |  |
+| `robotVDIStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ |  |
+| `robotIDEStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ |  |
+
+
+#### MetricsExporter
+
+
+
+MetricsExporter is the Schema for the metricsexporters API
+
+
+
+| Field | Description |
+| --- | --- |
+| `apiVersion` _string_ | `robot.roboscale.io/v1alpha1`
+| `kind` _string_ | `MetricsExporter`
+| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |
+| `spec` _[MetricsExporterSpec](#metricsexporterspec)_ |  |
+| `status` _[MetricsExporterStatus](#metricsexporterstatus)_ |  |
+
+
+#### MetricsExporterSpec
+
+
+
+MetricsExporterSpec defines the desired state of MetricsExporter
+
+_Appears in:_
+- [MetricsExporter](#metricsexporter)
+
+| Field | Description |
+| --- | --- |
+| `gpu` _[GPUMetrics](#gpumetrics)_ |  |
+| `network` _[NetworkMetrics](#networkmetrics)_ |  |
+
+
+#### MetricsExporterStatus
+
+
+
+MetricsExporterStatus defines the observed state of MetricsExporter
+
+_Appears in:_
+- [MetricsExporter](#metricsexporter)
+
+| Field | Description |
+| --- | --- |
+| `phase` _[MetricsExporterPhase](#metricsexporterphase)_ |  |
+| `roleStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ |  |
+| `roleBindingStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ |  |
+| `saStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ |  |
+| `podStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ |  |
+| `usage` _[Usage](#usage)_ |  |
+
+
+#### RobotVDI
+
+
+
+RobotVDI is the Schema for the robotvdis API
+
+
+
+| Field | Description |
+| --- | --- |
+| `apiVersion` _string_ | `robot.roboscale.io/v1alpha1`
+| `kind` _string_ | `RobotVDI`
+| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |
+| `spec` _[RobotVDISpec](#robotvdispec)_ |  |
+| `status` _[RobotVDIStatus](#robotvdistatus)_ |  |
+
+
+#### RobotVDISpec
+
+
+
+RobotVDISpec defines the desired state of RobotVDI
+
+_Appears in:_
+- [RobotDevSuiteSpec](#robotdevsuitespec)
+- [RobotVDI](#robotvdi)
+
+| Field | Description |
+| --- | --- |
+| `resources` _[Resources](#resources)_ |  |
+| `serviceType` _[ServiceType](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#servicetype-v1-core)_ | ServiceType |
+| `ingress` _boolean_ |  |
+| `privileged` _boolean_ |  |
+| `nat1to1` _string_ | NAT1TO1 for Neko. |
+| `webrtcPortRange` _string_ |  |
+| `resolution` _string_ | VDI screen resolution options. |
+
+
+#### RobotVDIStatus
+
+
+
+RobotVDIStatus defines the observed state of RobotVDI
+
+_Appears in:_
+- [RobotVDI](#robotvdi)
+
+| Field | Description |
+| --- | --- |
+| `phase` _[RobotVDIPhase](#robotvdiphase)_ |  |
+| `podStatus` _[OwnedPodStatus](#ownedpodstatus)_ |  |
+| `serviceTCPStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ |  |
+| `serviceUDPStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ |  |
+| `ingressStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ |  |
+| `pvcStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ |  |
+
+
+#### RobotIDE
+
+
+
+RobotIDE is the Schema for the robotides API
+
+
+
+| Field | Description |
+| --- | --- |
+| `apiVersion` _string_ | `robot.roboscale.io/v1alpha1`
+| `kind` _string_ | `RobotIDE`
+| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |
+| `spec` _[RobotIDESpec](#robotidespec)_ |  |
+| `status` _[RobotIDEStatus](#robotidestatus)_ |  |
+
+
+#### RobotIDESpec
+
+
+
+RobotIDESpec defines the desired state of RobotIDE
+
+_Appears in:_
+- [RobotDevSuiteSpec](#robotdevsuitespec)
+- [RobotIDE](#robotide)
+
+| Field | Description |
+| --- | --- |
+| `resources` _[Resources](#resources)_ |  |
+| `serviceType` _[ServiceType](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#servicetype-v1-core)_ | ServiceType |
+| `ingress` _boolean_ |  |
+| `privileged` _boolean_ |  |
+| `display` _boolean_ | Display configuration. |
+
+
+#### RobotIDEStatus
+
+
+
+RobotIDEStatus defines the observed state of RobotIDE
+
+_Appears in:_
+- [RobotIDE](#robotide)
+
+| Field | Description |
+| --- | --- |
+| `phase` _[RobotIDEPhase](#robotidephase)_ |  |
+| `podStatus` _[OwnedPodStatus](#ownedpodstatus)_ |  |
+| `serviceStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ |  |
+| `ingressStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ |  |
 
 
 #### DiscoveryServer
@@ -255,7 +470,7 @@ DiscoveryServer is the Schema for the discoveryservers API
 | --- | --- |
 | `apiVersion` _string_ | `robot.roboscale.io/v1alpha1`
 | `kind` _string_ | `DiscoveryServer`
-| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |
+| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |
 | `spec` _[DiscoveryServerSpec](#discoveryserverspec)_ |  |
 | `status` _[DiscoveryServerStatus](#discoveryserverstatus)_ |  |
 
@@ -272,11 +487,13 @@ _Appears in:_
 
 | Field | Description |
 | --- | --- |
-| `type` _DiscoveryServerInstanceType_ |  |
-| `reference` _[ObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectreference-v1-core)_ |  |
+| `type` _[DiscoveryServerInstanceType](#discoveryserverinstancetype)_ |  |
+| `reference` _[ObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#objectreference-v1-core)_ |  |
 | `cluster` _string_ |  |
 | `hostname` _string_ |  |
 | `subdomain` _string_ |  |
+| `image` _string_ |  |
+| `args` _string array_ |  |
 
 
 #### DiscoveryServerStatus
@@ -292,9 +509,10 @@ _Appears in:_
 | Field | Description |
 | --- | --- |
 | `phase` _DiscoveryServerPhase_ |  |
-| `serviceStatus` _[DiscoveryServerServiceStatus](#discoveryserverservicestatus)_ |  |
-| `podStatus` _[DiscoveryServerPodStatus](#discoveryserverpodstatus)_ |  |
-| `configMapStatus` _[DiscoveryServerConfigMapStatus](#discoveryserverconfigmapstatus)_ |  |
+| `serviceStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ |  |
+| `serviceExportStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ |  |
+| `podStatus` _[OwnedPodStatus](#ownedpodstatus)_ |  |
+| `configMapStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ |  |
 | `connectionInfo` _[ConnectionInfo](#connectioninfo)_ |  |
 
 
@@ -310,7 +528,7 @@ ROSBridge is the Schema for the rosbridges API
 | --- | --- |
 | `apiVersion` _string_ | `robot.roboscale.io/v1alpha1`
 | `kind` _string_ | `ROSBridge`
-| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |
+| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |
 | `spec` _[ROSBridgeSpec](#rosbridgespec)_ |  |
 | `status` _[ROSBridgeStatus](#rosbridgestatus)_ |  |
 
@@ -344,117 +562,25 @@ _Appears in:_
 
 | Field | Description |
 | --- | --- |
-| `phase` _[BridgePhase](#bridgephase)_ |  |
-| `podStatus` _[BridgePodStatus](#bridgepodstatus)_ |  |
-| `serviceStatus` _[BridgeServiceStatus](#bridgeservicestatus)_ |  |
+| `phase` _BridgePhase_ |  |
+| `podStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ |  |
+| `serviceStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ |  |
 
 
-#### RobotVDI
-
-
-
-RobotVDI is the Schema for the robotvdis API
+#### RobotArtifact
 
 
 
-| Field | Description |
-| --- | --- |
-| `apiVersion` _string_ | `robot.roboscale.io/v1alpha1`
-| `kind` _string_ | `RobotVDI`
-| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |
-| `spec` _[RobotVDISpec](#robotvdispec)_ |  |
-| `status` _[RobotVDIStatus](#robotvdistatus)_ |  |
-
-
-#### RobotVDISpec
-
-
-
-RobotVDISpec defines the desired state of RobotVDI
-
-_Appears in:_
-- [RobotDevSuiteSpec](#robotdevsuitespec)
-- [RobotVDI](#robotvdi)
-
-| Field | Description |
-| --- | --- |
-| `resources` _[Resources](#resources)_ |  |
-| `serviceType` _[ServiceType](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#servicetype-v1-core)_ | ServiceType |
-| `ingress` _boolean_ |  |
-| `privileged` _boolean_ |  |
-| `nat1to1` _string_ | NAT1TO1 for Neko. |
-| `webrtcPortRange` _string_ |  |
-
-
-#### RobotVDIStatus
-
-
-
-RobotVDIStatus defines the observed state of RobotVDI
-
-_Appears in:_
-- [RobotVDI](#robotvdi)
-
-| Field | Description |
-| --- | --- |
-| `phase` _[RobotVDIPhase](#robotvdiphase)_ |  |
-| `podStatus` _[RobotVDIPodStatus](#robotvdipodstatus)_ |  |
-| `serviceTCPStatus` _[RobotVDIServiceTCPStatus](#robotvdiservicetcpstatus)_ |  |
-| `serviceUDPStatus` _[RobotVDIServiceUDPStatus](#robotvdiserviceudpstatus)_ |  |
-| `ingressStatus` _[RobotVDIIngressStatus](#robotvdiingressstatus)_ |  |
-| `pvcStatus` _[RobotVDIPVCStatus](#robotvdipvcstatus)_ |  |
-
-
-#### RobotIDE
-
-
-
-RobotIDE is the Schema for the robotides API
+RobotArtifact is the Schema for the robotartifacts API
 
 
 
 | Field | Description |
 | --- | --- |
 | `apiVersion` _string_ | `robot.roboscale.io/v1alpha1`
-| `kind` _string_ | `RobotIDE`
-| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |
-| `spec` _[RobotIDESpec](#robotidespec)_ |  |
-| `status` _[RobotIDEStatus](#robotidestatus)_ |  |
-
-
-#### RobotIDESpec
-
-
-
-RobotIDESpec defines the desired state of RobotIDE
-
-_Appears in:_
-- [RobotDevSuiteSpec](#robotdevsuitespec)
-- [RobotIDE](#robotide)
-
-| Field | Description |
-| --- | --- |
-| `resources` _[Resources](#resources)_ |  |
-| `serviceType` _[ServiceType](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#servicetype-v1-core)_ | ServiceType |
-| `ingress` _boolean_ |  |
-| `privileged` _boolean_ |  |
-
-
-#### RobotIDEStatus
-
-
-
-RobotIDEStatus defines the observed state of RobotIDE
-
-_Appears in:_
-- [RobotIDE](#robotide)
-
-| Field | Description |
-| --- | --- |
-| `phase` _[RobotIDEPhase](#robotidephase)_ |  |
-| `podStatus` _[RobotIDEPodStatus](#robotidepodstatus)_ |  |
-| `serviceStatus` _[RobotIDEServiceStatus](#robotideservicestatus)_ |  |
-| `ingressStatus` _[RobotIDEIngressStatus](#robotideingressstatus)_ |  |
+| `kind` _string_ | `RobotArtifact`
+| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |
+| `template` _[RobotSpec](#robotspec)_ |  |
 
 
 #### AttachedBuildObject
@@ -468,7 +594,7 @@ _Appears in:_
 
 | Field | Description |
 | --- | --- |
-| `reference` _[ObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectreference-v1-core)_ |  |
+| `reference` _[ObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#objectreference-v1-core)_ |  |
 | `status` _[BuildManagerStatus](#buildmanagerstatus)_ |  |
 
 
@@ -483,7 +609,7 @@ _Appears in:_
 
 | Field | Description |
 | --- | --- |
-| `reference` _[ObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectreference-v1-core)_ |  |
+| `reference` _[ObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#objectreference-v1-core)_ |  |
 | `status` _[RobotDevSuiteStatus](#robotdevsuitestatus)_ |  |
 
 
@@ -498,7 +624,7 @@ _Appears in:_
 
 | Field | Description |
 | --- | --- |
-| `reference` _[ObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectreference-v1-core)_ |  |
+| `reference` _[ObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#objectreference-v1-core)_ |  |
 | `status` _[LaunchManagerStatus](#launchmanagerstatus)_ |  |
 
 
@@ -514,47 +640,18 @@ _Appears in:_
 | Field | Description |
 | --- | --- |
 | `enabled` _boolean_ |  |
-| `distro` _ROSDistro_ |  |
+| `distro` _[ROSDistro](#rosdistro)_ |  |
 
 
-#### BridgePhase
+#### BuildManagerPhase
 
 _Underlying type:_ `string`
 
 
 
 _Appears in:_
-- [ROSBridgeStatus](#rosbridgestatus)
+- [BuildManagerStatus](#buildmanagerstatus)
 
-
-
-#### BridgePodStatus
-
-
-
-
-
-_Appears in:_
-- [ROSBridgeStatus](#rosbridgestatus)
-
-| Field | Description |
-| --- | --- |
-| `created` _boolean_ |  |
-| `phase` _[PodPhase](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#podphase-v1-core)_ |  |
-
-
-#### BridgeServiceStatus
-
-
-
-
-
-_Appears in:_
-- [ROSBridgeStatus](#rosbridgestatus)
-
-| Field | Description |
-| --- | --- |
-| `created` _boolean_ |  |
 
 
 #### ConnectionInfo
@@ -572,20 +669,6 @@ _Appears in:_
 | `configMapName` _string_ |  |
 
 
-#### DiscoveryServerConfigMapStatus
-
-
-
-
-
-_Appears in:_
-- [DiscoveryServerStatus](#discoveryserverstatus)
-
-| Field | Description |
-| --- | --- |
-| `created` _boolean_ |  |
-
-
 #### DiscoveryServerInstanceStatus
 
 
@@ -597,50 +680,49 @@ _Appears in:_
 
 | Field | Description |
 | --- | --- |
-| `created` _boolean_ |  |
+| `resource` _[OwnedResourceStatus](#ownedresourcestatus)_ |  |
 | `status` _[DiscoveryServerStatus](#discoveryserverstatus)_ |  |
 
 
-#### DiscoveryServerPodStatus
-
-
-
-
-
-_Appears in:_
-- [DiscoveryServerStatus](#discoveryserverstatus)
-
-| Field | Description |
-| --- | --- |
-| `created` _boolean_ |  |
-| `phase` _[PodPhase](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#podphase-v1-core)_ |  |
-| `ip` _string_ |  |
-
-
-#### DiscoveryServerServiceStatus
-
-
-
-
-
-_Appears in:_
-- [DiscoveryServerStatus](#discoveryserverstatus)
-
-| Field | Description |
-| --- | --- |
-| `created` _boolean_ |  |
-
-
-#### JobPhase
+#### DiscoveryServerInstanceType
 
 _Underlying type:_ `string`
 
 
 
 _Appears in:_
-- [LoaderJobStatus](#loaderjobstatus)
-- [StepStatus](#stepstatus)
+- [DiscoveryServerSpec](#discoveryserverspec)
 
+
+
+#### GPUMetrics
+
+
+
+
+
+_Appears in:_
+- [MetricsExporterSpec](#metricsexporterspec)
+
+| Field | Description |
+| --- | --- |
+| `track` _boolean_ |  |
+| `interval` _integer_ |  |
+
+
+#### GPUUtilizationStatus
+
+
+
+
+
+_Appears in:_
+- [Usage](#usage)
+
+| Field | Description |
+| --- | --- |
+| `utilization` _string_ |  |
+| `lastUpdateTimestamp` _string_ |  |
 
 
 #### Launch
@@ -658,11 +740,23 @@ _Appears in:_
 | `workspace` _string_ | Name of the workspace. |
 | `repository` _string_ | Name of the repository. |
 | `namespacing` _boolean_ | Name of the repository. |
-| `env` _[EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#envvar-v1-core) array_ | Additional environment variables to set when launching ROS nodes. |
+| `env` _[EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#envvar-v1-core) array_ | Additional environment variables to set when launching ROS nodes. |
 | `launchFilePath` _string_ | Path to launchfile in repository. (eg. `linorobot/linorobot_gazebo/launch.py`) |
 | `parameters` _object (keys:string, values:string)_ | Launch parameters. |
 | `prelaunch` _[Prelaunch](#prelaunch)_ | Command or script to run just before node's execution. |
 | `privileged` _boolean_ | Launch container privilege. |
+| `resources` _[Resources](#resources)_ | Launch container resource limits. |
+
+
+#### LaunchManagerPhase
+
+_Underlying type:_ `string`
+
+
+
+_Appears in:_
+- [LaunchManagerStatus](#launchmanagerstatus)
+
 
 
 #### LaunchPodStatus
@@ -676,9 +770,7 @@ _Appears in:_
 
 | Field | Description |
 | --- | --- |
-| `created` _boolean_ |  |
-| `phase` _[PodPhase](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#podphase-v1-core)_ |  |
-| `ip` _string_ |  |
+| `status` _[OwnedPodStatus](#ownedpodstatus)_ |  |
 | `launchStatus` _object (keys:string, values:[LaunchStatus](#launchstatus))_ |  |
 
 
@@ -694,37 +786,113 @@ _Appears in:_
 | Field | Description |
 | --- | --- |
 | `active` _boolean_ |  |
-| `containerStatus` _[ContainerStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#containerstatus-v1-core)_ |  |
+| `containerStatus` _[ContainerStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#containerstatus-v1-core)_ |  |
 
 
-#### LoaderJobStatus
+#### MetricsExporterPhase
+
+_Underlying type:_ `string`
+
+
+
+_Appears in:_
+- [MetricsExporterStatus](#metricsexporterstatus)
+
+
+
+#### NetworkInterfaceLoad
 
 
 
 
 
 _Appears in:_
-- [RobotStatus](#robotstatus)
+- [NetworkLoadStatus](#networkloadstatus)
 
 | Field | Description |
 | --- | --- |
-| `created` _boolean_ |  |
-| `phase` _[JobPhase](#jobphase)_ |  |
+| `in` _string_ |  |
+| `out` _string_ |  |
 
 
-#### ManagerStatus
+#### NetworkLoadStatus
 
 
 
 
 
 _Appears in:_
-- [RobotStatus](#robotstatus)
+- [Usage](#usage)
 
 | Field | Description |
 | --- | --- |
-| `name` _string_ |  |
+| `load` _object (keys:string, values:[NetworkInterfaceLoad](#networkinterfaceload))_ |  |
+| `lastUpdateTimestamp` _string_ |  |
+
+
+#### NetworkMetrics
+
+
+
+
+
+_Appears in:_
+- [MetricsExporterSpec](#metricsexporterspec)
+
+| Field | Description |
+| --- | --- |
+| `track` _boolean_ |  |
+| `interval` _integer_ |  |
+| `interfaces` _string array_ |  |
+
+
+#### OwnedPodStatus
+
+
+
+
+
+_Appears in:_
+- [DiscoveryServerStatus](#discoveryserverstatus)
+- [LaunchPodStatus](#launchpodstatus)
+- [RobotIDEStatus](#robotidestatus)
+- [RobotVDIStatus](#robotvdistatus)
+
+| Field | Description |
+| --- | --- |
+| `resource` _[OwnedResourceStatus](#ownedresourcestatus)_ |  |
+| `ip` _string_ |  |
+
+
+#### OwnedResourceStatus
+
+
+
+
+
+_Appears in:_
+- [BuildManagerStatus](#buildmanagerstatus)
+- [DiscoveryServerInstanceStatus](#discoveryserverinstancestatus)
+- [DiscoveryServerStatus](#discoveryserverstatus)
+- [MetricsExporterStatus](#metricsexporterstatus)
+- [OwnedPodStatus](#ownedpodstatus)
+- [ROSBridgeInstanceStatus](#rosbridgeinstancestatus)
+- [ROSBridgeStatus](#rosbridgestatus)
+- [RobotDevSuiteInstanceStatus](#robotdevsuiteinstancestatus)
+- [RobotDevSuiteStatus](#robotdevsuitestatus)
+- [RobotIDEStatus](#robotidestatus)
+- [RobotStatus](#robotstatus)
+- [RobotVDIStatus](#robotvdistatus)
+- [StepStatus](#stepstatus)
+- [VolumeStatuses](#volumestatuses)
+- [WorkspaceManagerInstanceStatus](#workspacemanagerinstancestatus)
+- [WorkspaceManagerStatus](#workspacemanagerstatus)
+
+| Field | Description |
+| --- | --- |
 | `created` _boolean_ |  |
+| `reference` _[ObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#objectreference-v1-core)_ |  |
+| `phase` _string_ |  |
 
 
 #### Prelaunch
@@ -735,10 +903,22 @@ Prelaunch command or script is applied just before the node is started.
 
 _Appears in:_
 - [Launch](#launch)
+- [Run](#run)
 
 | Field | Description |
 | --- | --- |
 | `command` _string_ | Bash command to run before ROS node execution. |
+
+
+#### RMWImplementation
+
+_Underlying type:_ `string`
+
+RMW implementation selection. Robot operator currently supports only FastRTPS. See https://docs.ros.org/en/foxy/How-To-Guides/Working-with-multiple-RMW-implementations.html.
+
+_Appears in:_
+- [RobotSpec](#robotspec)
+
 
 
 #### ROSBridgeInstanceStatus
@@ -752,8 +932,21 @@ _Appears in:_
 
 | Field | Description |
 | --- | --- |
-| `created` _boolean_ |  |
+| `resource` _[OwnedResourceStatus](#ownedresourcestatus)_ |  |
 | `status` _[ROSBridgeStatus](#rosbridgestatus)_ |  |
+
+
+#### ROSDistro
+
+_Underlying type:_ `string`
+
+ROS distro selection. Allowed distros are Foxy and Galactic. It is aimed to support Humble, Melodic and Noetic in further versions.
+
+_Appears in:_
+- [BridgeDistro](#bridgedistro)
+- [RobotSpec](#robotspec)
+- [Workspace](#workspace)
+
 
 
 #### Repository
@@ -770,6 +963,9 @@ _Appears in:_
 | `url` _string_ | Base URL of the repository. |
 | `branch` _string_ | Branch of the repository to clone. |
 | `path` _string_ | [Autofilled] Absolute path of repository |
+| `owner` _string_ | [Autofilled] User or organization, maintainer of repository |
+| `repo` _string_ | [Autofilled] Repository name |
+| `hash` _string_ | [Autofilled] Hash of last commit |
 
 
 #### Resources
@@ -779,30 +975,16 @@ _Appears in:_
 VDI resource limits.
 
 _Appears in:_
+- [Launch](#launch)
 - [RobotIDESpec](#robotidespec)
 - [RobotVDISpec](#robotvdispec)
+- [Run](#run)
 
 | Field | Description |
 | --- | --- |
 | `gpuCore` _integer_ |  |
 | `cpu` _string_ |  |
 | `memory` _string_ |  |
-
-
-#### RobotArtifact
-
-
-
-RobotArtifact is the Schema for the robotartifacts API
-
-
-
-| Field | Description |
-| --- | --- |
-| `apiVersion` _string_ | `robot.roboscale.io/v1alpha1`
-| `kind` _string_ | `RobotArtifact`
-| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |
-| `template` _[RobotSpec](#robotspec)_ |  |
 
 
 #### RobotDevSuiteInstanceStatus
@@ -816,7 +998,7 @@ _Appears in:_
 
 | Field | Description |
 | --- | --- |
-| `created` _boolean_ |  |
+| `resource` _[OwnedResourceStatus](#ownedresourcestatus)_ |  |
 | `status` _[RobotDevSuiteStatus](#robotdevsuitestatus)_ |  |
 
 
@@ -831,35 +1013,6 @@ _Appears in:_
 
 
 
-#### RobotIDEIngressStatus
-
-
-
-
-
-_Appears in:_
-- [RobotIDEStatus](#robotidestatus)
-
-| Field | Description |
-| --- | --- |
-| `created` _boolean_ |  |
-
-
-#### RobotIDEInstanceStatus
-
-
-
-
-
-_Appears in:_
-- [RobotDevSuiteStatus](#robotdevsuitestatus)
-
-| Field | Description |
-| --- | --- |
-| `created` _boolean_ |  |
-| `phase` _[RobotIDEPhase](#robotidephase)_ |  |
-
-
 #### RobotIDEPhase
 
 _Underlying type:_ `string`
@@ -867,82 +1020,8 @@ _Underlying type:_ `string`
 
 
 _Appears in:_
-- [RobotIDEInstanceStatus](#robotideinstancestatus)
 - [RobotIDEStatus](#robotidestatus)
 
-
-
-#### RobotIDEPodStatus
-
-
-
-
-
-_Appears in:_
-- [RobotIDEStatus](#robotidestatus)
-
-| Field | Description |
-| --- | --- |
-| `created` _boolean_ |  |
-| `phase` _[PodPhase](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#podphase-v1-core)_ |  |
-| `ip` _string_ |  |
-
-
-#### RobotIDEServiceStatus
-
-
-
-
-
-_Appears in:_
-- [RobotIDEStatus](#robotidestatus)
-
-| Field | Description |
-| --- | --- |
-| `created` _boolean_ |  |
-
-
-#### RobotVDIIngressStatus
-
-
-
-
-
-_Appears in:_
-- [RobotVDIStatus](#robotvdistatus)
-
-| Field | Description |
-| --- | --- |
-| `created` _boolean_ |  |
-
-
-#### RobotVDIInstanceStatus
-
-
-
-
-
-_Appears in:_
-- [RobotDevSuiteStatus](#robotdevsuitestatus)
-
-| Field | Description |
-| --- | --- |
-| `created` _boolean_ |  |
-| `phase` _[RobotVDIPhase](#robotvdiphase)_ |  |
-
-
-#### RobotVDIPVCStatus
-
-
-
-
-
-_Appears in:_
-- [RobotVDIStatus](#robotvdistatus)
-
-| Field | Description |
-| --- | --- |
-| `created` _boolean_ |  |
 
 
 #### RobotVDIPhase
@@ -952,53 +1031,8 @@ _Underlying type:_ `string`
 
 
 _Appears in:_
-- [RobotVDIInstanceStatus](#robotvdiinstancestatus)
 - [RobotVDIStatus](#robotvdistatus)
 
-
-
-#### RobotVDIPodStatus
-
-
-
-
-
-_Appears in:_
-- [RobotVDIStatus](#robotvdistatus)
-
-| Field | Description |
-| --- | --- |
-| `created` _boolean_ |  |
-| `phase` _[PodPhase](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#podphase-v1-core)_ |  |
-| `ip` _string_ |  |
-
-
-#### RobotVDIServiceTCPStatus
-
-
-
-
-
-_Appears in:_
-- [RobotVDIStatus](#robotvdistatus)
-
-| Field | Description |
-| --- | --- |
-| `created` _boolean_ |  |
-
-
-#### RobotVDIServiceUDPStatus
-
-
-
-
-
-_Appears in:_
-- [RobotVDIStatus](#robotvdistatus)
-
-| Field | Description |
-| --- | --- |
-| `created` _boolean_ |  |
 
 
 #### RootDNSConfig
@@ -1013,21 +1047,29 @@ _Appears in:_
 | Field | Description |
 | --- | --- |
 | `host` _string_ | DNS host. |
-| `port` _string_ | DNS host. |
 
 
-#### ScriptConfigMapStatus
-
+#### Run
 
 
 
+Run description.
 
 _Appears in:_
-- [BuildManagerStatus](#buildmanagerstatus)
+- [LaunchManagerSpec](#launchmanagerspec)
 
 | Field | Description |
 | --- | --- |
-| `created` _boolean_ |  |
+| `selector` _object (keys:string, values:string)_ | Cluster selector. |
+| `workspace` _string_ | Name of the workspace. |
+| `namespacing` _boolean_ | Name of the repository. |
+| `env` _[EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#envvar-v1-core) array_ | Additional environment variables to set when launching ROS nodes. |
+| `package` _string_ | Package name in `ros2 run <package> <executable>`. |
+| `executable` _string_ | Executable name in `ros2 run <package> <executable>`. |
+| `parameters` _object (keys:string, values:string)_ | Launch parameters. |
+| `prelaunch` _[Prelaunch](#prelaunch)_ | Command or script to run just before node's execution. |
+| `privileged` _boolean_ | Launch container privilege. |
+| `resources` _[Resources](#resources)_ | Launch container resource limits. |
 
 
 #### Step
@@ -1042,11 +1084,12 @@ _Appears in:_
 
 | Field | Description |
 | --- | --- |
+| `selector` _object (keys:string, values:string)_ | Cluster selector. |
 | `name` _string_ | Name of the step. |
 | `workspace` _string_ | Name of the workspace. |
 | `command` _string_ | Bash command to run. |
 | `script` _string_ | Bash script to run. |
-| `env` _[EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#envvar-v1-core) array_ | Environment variables for step. |
+| `env` _[EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#envvar-v1-core) array_ | Environment variables for step. |
 
 
 #### StepStatus
@@ -1060,10 +1103,8 @@ _Appears in:_
 
 | Field | Description |
 | --- | --- |
+| `resource` _[OwnedResourceStatus](#ownedresourcestatus)_ |  |
 | `step` _[Step](#step)_ |  |
-| `jobName` _string_ |  |
-| `created` _boolean_ |  |
-| `jobPhase` _[JobPhase](#jobphase)_ |  |
 
 
 #### Storage
@@ -1093,7 +1134,7 @@ _Appears in:_
 | Field | Description |
 | --- | --- |
 | `name` _string_ | Storage class name |
-| `accessMode` _[PersistentVolumeAccessMode](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.25/#persistentvolumeaccessmode-v1-core)_ | PVC access mode |
+| `accessMode` _[PersistentVolumeAccessMode](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#persistentvolumeaccessmode-v1-core)_ | PVC access mode |
 
 
 #### TLSSecretReference
@@ -1111,19 +1152,19 @@ _Appears in:_
 | `namespace` _string_ | TLS secret object namespace. |
 
 
-#### VolumeStatus
+#### Usage
 
 
 
 
 
 _Appears in:_
-- [VolumeStatuses](#volumestatuses)
+- [MetricsExporterStatus](#metricsexporterstatus)
 
 | Field | Description |
 | --- | --- |
-| `created` _boolean_ |  |
-| `persistentVolumeClaimName` _string_ |  |
+| `gpu` _[GPUUtilizationStatus](#gpuutilizationstatus)_ |  |
+| `network` _[NetworkLoadStatus](#networkloadstatus)_ |  |
 
 
 #### VolumeStatuses
@@ -1137,11 +1178,11 @@ _Appears in:_
 
 | Field | Description |
 | --- | --- |
-| `var` _[VolumeStatus](#volumestatus)_ |  |
-| `etc` _[VolumeStatus](#volumestatus)_ |  |
-| `usr` _[VolumeStatus](#volumestatus)_ |  |
-| `opt` _[VolumeStatus](#volumestatus)_ |  |
-| `workspace` _[VolumeStatus](#volumestatus)_ |  |
+| `varDir` _[OwnedResourceStatus](#ownedresourcestatus)_ |  |
+| `etcDir` _[OwnedResourceStatus](#ownedresourcestatus)_ |  |
+| `usrDir` _[OwnedResourceStatus](#ownedresourcestatus)_ |  |
+| `optDir` _[OwnedResourceStatus](#ownedresourcestatus)_ |  |
+| `workspaceDir` _[OwnedResourceStatus](#ownedresourcestatus)_ |  |
 
 
 #### Workspace
@@ -1151,11 +1192,38 @@ _Appears in:_
 Workspace description. Each robot should contain at least one workspace. A workspace should contain at least one repository in it.
 
 _Appears in:_
-- [RobotSpec](#robotspec)
+- [WorkspaceManagerSpec](#workspacemanagerspec)
 
 | Field | Description |
 | --- | --- |
 | `name` _string_ | Name of workspace. If a workspace's name is `my_ws`, it's absolute path is `/home/workspaces/my_ws`. |
+| `distro` _[ROSDistro](#rosdistro)_ |  |
 | `repositories` _object (keys:string, values:[Repository](#repository))_ | Repositories to clone inside workspace's `src` directory. |
+
+
+#### WorkspaceManagerInstanceStatus
+
+
+
+
+
+_Appears in:_
+- [RobotStatus](#robotstatus)
+
+| Field | Description |
+| --- | --- |
+| `resource` _[OwnedResourceStatus](#ownedresourcestatus)_ |  |
+| `status` _[WorkspaceManagerStatus](#workspacemanagerstatus)_ |  |
+
+
+#### WorkspaceManagerPhase
+
+_Underlying type:_ `string`
+
+
+
+_Appears in:_
+- [WorkspaceManagerStatus](#workspacemanagerstatus)
+
 
 
