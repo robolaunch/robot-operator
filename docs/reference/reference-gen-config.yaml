@@ -1,0 +1,20 @@
+processor:
+  ignoreTypes:
+    - "List$"
+  sortKinds:
+    - "Robot"
+    - "WorkspaceManager"
+    - "BuildManager"
+    - "LaunchManager"
+    - "RobotDevSuite"
+    - "MetricsExporter"
+    - "RobotVDI"
+    - "RobotIDE"
+    - "DiscoveryServer"
+    - "ROSBridge"
+    - "RobotArtifact"
+  ignoreFields:
+    - "TypeMeta$"
+
+render:
+  kubernetesVersion: 1.22
