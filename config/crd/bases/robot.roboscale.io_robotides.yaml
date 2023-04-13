@@ -18,7 +18,7 @@ spec:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: RobotIDE is the Schema for the robotides API
+        description: RobotIDE creates and manages Cloud IDE resources and workloads.
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -33,70 +33,61 @@ spec:
           metadata:
             type: object
           spec:
-            description: RobotIDESpec defines the desired state of RobotIDE
+            description: Specification of the desired behavior of the RobotIDE.
             properties:
               display:
-                description: Display configuration.
+                description: Cloud IDE connects an X11 socket if it's set to `true`
+                  and a target RobotVDI resource is set in labels with key `robolaunch.io/target-vdi`.
+                  Applications that requires GUI can be executed such as rViz.
                 type: boolean
               ingress:
+                description: '[*alpha*] RobotIDE will create an Ingress resource if
+                  `true`.'
                 type: boolean
               privileged:
+                description: If `true`, containers of RobotIDE will be privileged
+                  containers. It can be used in physical instances where it's necessary
+                  to access I/O devices on the host machine. Not recommended to activate
+                  this field on cloud instances.
                 type: boolean
               resources:
-                description: VDI resource limits.
+                description: Resource limitations of Cloud IDE.
                 properties:
                   cpu:
+                    description: CPU resource limit.
                     pattern: ^([0-9])+(m)$
                     type: string
                   gpuCore:
+                    description: GPU core number that will be allocated.
                     type: integer
                   memory:
+                    description: Memory resource limit.
                     pattern: ^([0-9])+(Mi|Gi)$
                     type: string
                 type: object
               serviceType:
                 default: NodePort
-                description: ServiceType
+                description: Service type of Cloud IDE. `ClusterIP` and `NodePort`
+                  is supported.
                 enum:
                 - ClusterIP
                 - NodePort
                 type: string
             type: object
           status:
-            description: RobotIDEStatus defines the observed state of RobotIDE
+            description: Most recently observed status of the RobotIDE.
             properties:
               ingressStatus:
+                description: Status of Cloud IDE Ingress.
                 properties:
                   created:
+                    description: Shows if the owned resource is created.
                     type: boolean
                   phase:
+                    description: Phase of the owned resource.
                     type: string
                   reference:
-                    description: "ObjectReference contains enough information to let
-                      you inspect or modify the referred object. --- New uses of this
-                      type are discouraged because of difficulty describing its usage
-                      when embedded in APIs. 1. Ignored fields.  It includes many
-                      fields which are not generally honored.  For instance, ResourceVersion
-                      and FieldPath are both very rarely valid in actual usage. 2.
-                      Invalid usage help.  It is impossible to add specific help for
-                      individual usage.  In most embedded usages, there are particular
-                      restrictions like, \"must refer only to types A and B\" or \"UID
-                      not honored\" or \"name must be restricted\". Those cannot be
-                      well described when embedded. 3. Inconsistent validation.  Because
-                      the usages are different, the validation rules are different
-                      by usage, which makes it hard for users to predict what will
-                      happen. 4. The fields are both imprecise and overly precise.
-                      \ Kind is not a precise mapping to a URL. This can produce ambiguity
-                      during interpretation and require a REST mapping.  In most cases,
-                      the dependency is on the group,resource tuple and the version
-                      of the actual struct is irrelevant. 5. We cannot easily change
-                      it.  Because this type is embedded in many locations, updates
-                      to this type will affect numerous schemas.  Don't make new APIs
-                      embed an underspecified API type they do not control. \n Instead
-                      of using this type, create a locally provided and used type
-                      that is well-focused on your reference. For example, ServiceReferences
-                      for admission registration: https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go#L533
-                      ."
+                    description: Reference to the owned resource.
                     properties:
                       apiVersion:
                         description: API version of the referent.
@@ -136,45 +127,25 @@ spec:
                 - created
                 type: object
               phase:
+                description: Phase of RobotIDE.
                 type: string
               podStatus:
+                description: Status of Cloud IDE pod.
                 properties:
                   ip:
+                    description: IP of the pod.
                     type: string
                   resource:
+                    description: Generic status for any owned resource.
                     properties:
                       created:
+                        description: Shows if the owned resource is created.
                         type: boolean
                       phase:
+                        description: Phase of the owned resource.
                         type: string
                       reference:
-                        description: "ObjectReference contains enough information
-                          to let you inspect or modify the referred object. --- New
-                          uses of this type are discouraged because of difficulty
-                          describing its usage when embedded in APIs. 1. Ignored fields.
-                          \ It includes many fields which are not generally honored.
-                          \ For instance, ResourceVersion and FieldPath are both very
-                          rarely valid in actual usage. 2. Invalid usage help.  It
-                          is impossible to add specific help for individual usage.
-                          \ In most embedded usages, there are particular restrictions
-                          like, \"must refer only to types A and B\" or \"UID not
-                          honored\" or \"name must be restricted\". Those cannot be
-                          well described when embedded. 3. Inconsistent validation.
-                          \ Because the usages are different, the validation rules
-                          are different by usage, which makes it hard for users to
-                          predict what will happen. 4. The fields are both imprecise
-                          and overly precise.  Kind is not a precise mapping to a
-                          URL. This can produce ambiguity during interpretation and
-                          require a REST mapping.  In most cases, the dependency is
-                          on the group,resource tuple and the version of the actual
-                          struct is irrelevant. 5. We cannot easily change it.  Because
-                          this type is embedded in many locations, updates to this
-                          type will affect numerous schemas.  Don't make new APIs
-                          embed an underspecified API type they do not control. \n
-                          Instead of using this type, create a locally provided and
-                          used type that is well-focused on your reference. For example,
-                          ServiceReferences for admission registration: https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go#L533
-                          ."
+                        description: Reference to the owned resource.
                         properties:
                           apiVersion:
                             description: API version of the referent.
@@ -216,37 +187,16 @@ spec:
                     type: object
                 type: object
               serviceStatus:
+                description: Status of Cloud IDE service.
                 properties:
                   created:
+                    description: Shows if the owned resource is created.
                     type: boolean
                   phase:
+                    description: Phase of the owned resource.
                     type: string
                   reference:
-                    description: "ObjectReference contains enough information to let
-                      you inspect or modify the referred object. --- New uses of this
-                      type are discouraged because of difficulty describing its usage
-                      when embedded in APIs. 1. Ignored fields.  It includes many
-                      fields which are not generally honored.  For instance, ResourceVersion
-                      and FieldPath are both very rarely valid in actual usage. 2.
-                      Invalid usage help.  It is impossible to add specific help for
-                      individual usage.  In most embedded usages, there are particular
-                      restrictions like, \"must refer only to types A and B\" or \"UID
-                      not honored\" or \"name must be restricted\". Those cannot be
-                      well described when embedded. 3. Inconsistent validation.  Because
-                      the usages are different, the validation rules are different
-                      by usage, which makes it hard for users to predict what will
-                      happen. 4. The fields are both imprecise and overly precise.
-                      \ Kind is not a precise mapping to a URL. This can produce ambiguity
-                      during interpretation and require a REST mapping.  In most cases,
-                      the dependency is on the group,resource tuple and the version
-                      of the actual struct is irrelevant. 5. We cannot easily change
-                      it.  Because this type is embedded in many locations, updates
-                      to this type will affect numerous schemas.  Don't make new APIs
-                      embed an underspecified API type they do not control. \n Instead
-                      of using this type, create a locally provided and used type
-                      that is well-focused on your reference. For example, ServiceReferences
-                      for admission registration: https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go#L533
-                      ."
+                    description: Reference to the owned resource.
                     properties:
                       apiVersion:
                         description: API version of the referent.

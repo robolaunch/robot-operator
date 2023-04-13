@@ -1,6 +1,0 @@
-apiVersion: v2
-name: robot-operator
-description: Helm chart for the robolaunch Robot Operator
-type: application
-version: 0.1.0
-appVersion: "v0.2.5-alpha.2"
