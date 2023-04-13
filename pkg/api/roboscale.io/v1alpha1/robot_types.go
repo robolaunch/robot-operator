@@ -18,12 +18,14 @@ func init() {
 //+kubebuilder:printcolumn:name="Distributions",type=string,JSONPath=`.spec.distributions`
 //+kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
 
-// Robot is the Schema for the robots API
+// Robot is the custom resource that contains ROS 2 components (Workloads, Cloud VDI, Cloud IDE, ROS Bridge, Configurational Resources), robolaunch Robot instances can be decomposed and distributed to both cloud instances and physical instances using federation.
 type Robot struct {
-	metav1.TypeMeta   `json:",inline"`
+	metav1.TypeMeta `json:",inline"`
+	// Standard object's metadata.
 	metav1.ObjectMeta `json:"metadata,omitempty"`
-
-	Spec   RobotSpec   `json:"spec,omitempty"`
+	// Specification of the desired behavior of the Robot.
+	Spec RobotSpec `json:"spec,omitempty"`
+	// Most recently observed status of the Robot.
 	Status RobotStatus `json:"status,omitempty"`
 }
 
@@ -121,7 +123,6 @@ const (
 	ROSDistroHumble ROSDistro = "humble"
 )
 
-// RMW implementation selection. Robot operator currently supports only FastRTPS. See https://docs.ros.org/en/foxy/How-To-Guides/Working-with-multiple-RMW-implementations.html.
 // +kubebuilder:validation:Enum=rmw_fastrtps_cpp
 type RMWImplementation string
 
@@ -168,35 +169,38 @@ type RootDNSConfig struct {
 	Host string `json:"host"`
 }
 
-// RobotSpec defines the desired state of Robot
+// RobotSpec defines the desired state of Robot.
 type RobotSpec struct {
-	// ROS distro to be used.
+	// ROS 2 distributions to be used. You can select multiple distributions if they are supported in the same underlying OS.
+	// (eg. `foxy` and `galactic` are supported in Ubuntu Focal, so they can be used together but both cannot be used with `humble`)
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=2
 	Distributions []ROSDistro `json:"distributions"`
+	// RMW implementation selection. Robot operator currently supports only FastRTPS. See https://docs.ros.org/en/foxy/How-To-Guides/Working-with-multiple-RMW-implementations.html.
 	// +kubebuilder:validation:Required
 	// +kubebuilder:default=rmw_fastrtps_cpp
 	RMWImplementation RMWImplementation `json:"rmwImplementation"`
-	// Resource limitations of robot containers.
+	// Total storage amount to persist via Robot. Unit of measurement is MB. (eg. `10240` corresponds 10 GB)
+	// This amount is being shared between different components.
 	Storage Storage `json:"storage,omitempty"`
-	// Discovery server template
+	// Discovery server configurational parameters.
 	DiscoveryServerTemplate DiscoveryServerSpec `json:"discoveryServerTemplate,omitempty"`
-	// ROS bridge template
+	// ROS bridge configurational parameters.
 	ROSBridgeTemplate ROSBridgeSpec `json:"rosBridgeTemplate,omitempty"`
-	// Workspace manager template
-	WorkspaceManagerTemplate WorkspaceManagerSpec `json:"workspaceManagerTemplate,omitempty"`
-	// Build manager template for initial configuration
-	BuildManagerTemplate BuildManagerSpec `json:"buildManagerTemplate,omitempty"`
-	// Launch manager template for initial configuration
-	LaunchManagerTemplates []LaunchManagerSpec `json:"launchManagerTemplates,omitempty"`
 	// Robot development suite template
 	RobotDevSuiteTemplate RobotDevSuiteSpec `json:"robotDevSuiteTemplate,omitempty"`
-	// Development enabled
+	// Workspace manager template to configure ROS 2 workspaces.
+	WorkspaceManagerTemplate WorkspaceManagerSpec `json:"workspaceManagerTemplate,omitempty"`
+	// [*alpha*] Build manager template for initial configuration.
+	BuildManagerTemplate BuildManagerSpec `json:"buildManagerTemplate,omitempty"`
+	// [*alpha*] Launch manager template for initial configuration.
+	LaunchManagerTemplates []LaunchManagerSpec `json:"launchManagerTemplates,omitempty"`
+	// [*alpha*] Switch to development mode if `true`.
 	Development bool `json:"development,omitempty"`
-	// Root DNS configuration.
+	// [*alpha*] Root DNS configuration.
 	RootDNSConfig RootDNSConfig `json:"rootDNSConfig,omitempty"`
-	// TLS secret reference.
+	// [*alpha*] TLS secret reference.
 	TLSSecretReference TLSSecretReference `json:"tlsSecretRef,omitempty"`
 }
 
@@ -231,7 +235,7 @@ type AttachedDevObject struct {
 	Status    RobotDevSuiteStatus    `json:"status,omitempty"`
 }
 
-// RobotStatus defines the observed state of Robot
+// RobotStatus defines the observed state of Robot.
 type RobotStatus struct {
 	// Phase of robot
 	Phase RobotPhase `json:"phase,omitempty"`
