@@ -237,33 +237,40 @@ type AttachedDevObject struct {
 
 // RobotStatus defines the observed state of Robot.
 type RobotStatus struct {
-	// Phase of robot
+	// Phase of Robot. It sums the general status of Robot.
 	Phase RobotPhase `json:"phase,omitempty"`
-	// Image of robot
+	// Main image of Robot. It is derived either from the specifications or determined directly over labels.
 	Image string `json:"image,omitempty"`
-	// Node name
+	// Node that Robot uses. It is selected via tenancy labels.
 	NodeName string `json:"nodeName,omitempty"`
-	// Volume status
+	// Robot persists some of the directories of underlying OS inside persistent volumes.
+	// This field exposes persistent volume claims that dynamically provision PVs.
 	VolumeStatuses VolumeStatuses `json:"volumeStatuses,omitempty"`
-	// Discovery server instance status
+	// Discovery server instance status.
 	DiscoveryServerStatus DiscoveryServerInstanceStatus `json:"discoveryServerStatus,omitempty"`
-	// ROS bridge instance status
+	// ROS bridge instance status.
 	ROSBridgeStatus ROSBridgeInstanceStatus `json:"rosBridgeStatus,omitempty"`
-	// Robot development suite instance status
-	RobotDevSuiteStatus RobotDevSuiteInstanceStatus `json:"robotDevSuiteStatus,omitempty"`
-	// Loader job status that configures environment
+	// Status of loader job that configures environment.
 	LoaderJobStatus OwnedResourceStatus `json:"loaderJobStatus,omitempty"`
-	// Workspace manager status
+	// Workspace manager instance status if exists.
 	WorkspaceManagerStatus WorkspaceManagerInstanceStatus `json:"workspaceManagerStatus,omitempty"`
-	// Initial build manager creation status
-	InitialBuildManagerStatus OwnedResourceStatus `json:"initialBuildManagerStatus,omitempty"`
-	// Initial launch manager creation status
-	InitialLaunchManagerStatuses []OwnedResourceStatus `json:"initialLaunchManagerStatuses,omitempty"`
-	// Attached build object information
+	// Robot development suite instance status.
+	RobotDevSuiteStatus RobotDevSuiteInstanceStatus `json:"robotDevSuiteStatus,omitempty"`
+	// Attached build object information.
+	// A BuildManager can be attached with a label on it with key `robolaunch.io/target-robot`
+	// and value of the target robot's name.
+	// Robot sorts the BuildManagers targeted itself, and picks the last created object to process.
 	AttachedBuildObject AttachedBuildObject `json:"attachedBuildObject,omitempty"`
-	// Attached launch object information
+	// Attached launch object information.
+	// A LaunchManager can be attached with a label on it with key `robolaunch.io/target-robot`
+	// and value of the target robot's name.
+	// Multiple LaunchManager could work together if they targeted the same Robot.
 	AttachedLaunchObjects []AttachedLaunchObject `json:"attachedLaunchObjects,omitempty"`
-	// Attached dev object information
+	// [*alpha*] Initial build manager creation status if exists.
+	InitialBuildManagerStatus OwnedResourceStatus `json:"initialBuildManagerStatus,omitempty"`
+	// [*alpha*] Initial launch manager creation status if exists.
+	InitialLaunchManagerStatuses []OwnedResourceStatus `json:"initialLaunchManagerStatuses,omitempty"`
+	// [*alpha*] Attached dev object information.
 	AttachedDevObjects []AttachedDevObject `json:"attachedDevObjects,omitempty"`
 }
 
