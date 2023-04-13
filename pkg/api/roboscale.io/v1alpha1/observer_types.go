@@ -27,12 +27,15 @@ func init() {
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 
-// MetricsExporter is the Schema for the metricsexporters API
+// MetricsExporter collects metrics from host machine and expose them
+// from the Kubernetes API.
 type MetricsExporter struct {
-	metav1.TypeMeta   `json:",inline"`
+	metav1.TypeMeta `json:",inline"`
+	// Standard object's metadata.
 	metav1.ObjectMeta `json:"metadata,omitempty"`
-
-	Spec   MetricsExporterSpec   `json:"spec,omitempty"`
+	// Specification of the desired behavior of the MetricsExporter.
+	Spec MetricsExporterSpec `json:"spec,omitempty"`
+	// Most recently observed status of the MetricsExporter.
 	Status MetricsExporterStatus `json:"status,omitempty"`
 }
 
@@ -50,40 +53,57 @@ type MetricsExporterList struct {
 // ********************************
 
 type GPUMetrics struct {
-	Track    bool `json:"track,omitempty"`
-	Interval int  `json:"interval,omitempty"`
+	// MetricsExporter watches volatile GPU usage in the host machine
+	// if it's set to `true`.
+	Track bool `json:"track,omitempty"`
+	// Watching latency.
+	Interval int `json:"interval,omitempty"`
 }
 
 type NetworkMetrics struct {
-	Track      bool     `json:"track,omitempty"`
-	Interval   int      `json:"interval,omitempty"`
+	// MetricsExporter watches network loads in the host machine
+	// if it's set to `true`.
+	Track bool `json:"track,omitempty"`
+	// Watching latency.
+	Interval int `json:"interval,omitempty"`
+	// Network interfaces which are desired to being watched.
 	Interfaces []string `json:"interfaces,omitempty"`
 }
 
-// MetricsExporterSpec defines the desired state of MetricsExporter
+// MetricsExporterSpec defines the desired state of MetricsExporter.
 type MetricsExporterSpec struct {
-	GPU     GPUMetrics     `json:"gpu,omitempty"`
+	// Configurational parameters about GPU metrics collection.
+	GPU GPUMetrics `json:"gpu,omitempty"`
+	// Configurational parameters about network metrics collection.
 	Network NetworkMetrics `json:"network,omitempty"`
 }
 
 type GPUUtilizationStatus struct {
-	Utilization         string `json:"utilization,omitempty"`
+	// Volatile GPU utilization. Shows a percentage gathered from `nvidia-smi` command.
+	Utilization string `json:"utilization,omitempty"`
+	// Last update time.
 	LastUpdateTimestamp string `json:"lastUpdateTimestamp,omitempty"`
 }
 
 type NetworkInterfaceLoad struct {
+	// Average load of incoming packets.
 	IncomingLoad string `json:"in,omitempty"`
+	// Average load of outgoing packets.
 	OutgoingLoad string `json:"out,omitempty"`
 }
 
 type NetworkLoadStatus struct {
-	Load                map[string]NetworkInterfaceLoad `json:"load,omitempty"`
-	LastUpdateTimestamp string                          `json:"lastUpdateTimestamp,omitempty"`
+	// Loads values of network interfaces.
+	Load map[string]NetworkInterfaceLoad `json:"load,omitempty"`
+	// Last update time.
+	LastUpdateTimestamp string `json:"lastUpdateTimestamp,omitempty"`
 }
 
 type Usage struct {
-	GPU     GPUUtilizationStatus `json:"gpu,omitempty"`
-	Network NetworkLoadStatus    `json:"network,omitempty"`
+	// GPU usage information.
+	GPU GPUUtilizationStatus `json:"gpu,omitempty"`
+	// Network usage information.
+	Network NetworkLoadStatus `json:"network,omitempty"`
 }
 
 type MetricsExporterPhase string
@@ -96,12 +116,18 @@ const (
 	MetricsExporterPhaseReady                  MetricsExporterPhase = "Ready"
 )
 
-// MetricsExporterStatus defines the observed state of MetricsExporter
+// MetricsExporterStatus defines the observed state of MetricsExporter.
 type MetricsExporterStatus struct {
-	Phase                MetricsExporterPhase `json:"phase,omitempty"`
-	RoleStatus           OwnedResourceStatus  `json:"roleStatus,omitempty"`
-	RoleBindingStatus    OwnedResourceStatus  `json:"roleBindingStatus,omitempty"`
-	ServiceAccountStatus OwnedResourceStatus  `json:"saStatus,omitempty"`
-	PodStatus            OwnedResourceStatus  `json:"podStatus,omitempty"`
-	Usage                Usage                `json:"usage,omitempty"`
+	// Phase of MetricsExporter.
+	Phase MetricsExporterPhase `json:"phase,omitempty"`
+	// Status of role created for main and sidecar applications.
+	RoleStatus OwnedResourceStatus `json:"roleStatus,omitempty"`
+	// Status of role binding created for main and sidecar applications.
+	RoleBindingStatus OwnedResourceStatus `json:"roleBindingStatus,omitempty"`
+	// Status of service account created for main and sidecar applications.
+	ServiceAccountStatus OwnedResourceStatus `json:"saStatus,omitempty"`
+	// Status of MetricsExporter pod.
+	PodStatus OwnedResourceStatus `json:"podStatus,omitempty"`
+	// Usage metrics.
+	Usage Usage `json:"usage,omitempty"`
 }

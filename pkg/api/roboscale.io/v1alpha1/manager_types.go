@@ -30,12 +30,14 @@ func init() {
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 
-// WorkspaceManager is the Schema for the workspacemanagers API
+// WorkspaceManager configures the ROS 2 workspaces and repositories by executing Kubernetes jobs.
 type WorkspaceManager struct {
-	metav1.TypeMeta   `json:",inline"`
+	metav1.TypeMeta `json:",inline"`
+	// Standard object's metadata.
 	metav1.ObjectMeta `json:"metadata,omitempty"`
-
-	Spec   WorkspaceManagerSpec   `json:"spec,omitempty"`
+	// Specification of the desired behavior of the WorkspaceManager.
+	Spec WorkspaceManagerSpec `json:"spec,omitempty"`
+	// Most recently observed status of the WorkspaceManager.
 	Status WorkspaceManagerStatus `json:"status,omitempty"`
 }
 
@@ -54,10 +56,12 @@ type WorkspaceManagerList struct {
 
 // BuildManager is the Schema for the buildmanagers API
 type BuildManager struct {
-	metav1.TypeMeta   `json:",inline"`
+	metav1.TypeMeta `json:",inline"`
+	// Standard object's metadata.
 	metav1.ObjectMeta `json:"metadata,omitempty"`
-
-	Spec   BuildManagerSpec   `json:"spec,omitempty"`
+	// Specification of the desired behavior of the BuildManager.
+	Spec BuildManagerSpec `json:"spec,omitempty"`
+	// Most recently observed status of the BuildManager.
 	Status BuildManagerStatus `json:"status,omitempty"`
 }
 
@@ -76,10 +80,12 @@ type BuildManagerList struct {
 
 // LaunchManager is the Schema for the launchmanagers API
 type LaunchManager struct {
-	metav1.TypeMeta   `json:",inline"`
+	metav1.TypeMeta `json:",inline"`
+	// Standard object's metadata.
 	metav1.ObjectMeta `json:"metadata,omitempty"`
-
-	Spec   LaunchManagerSpec   `json:"spec,omitempty"`
+	// Specification of the desired behavior of the LaunchManager.
+	Spec LaunchManagerSpec `json:"spec,omitempty"`
+	// Most recently observed status of the LaunchManager.
 	Status LaunchManagerStatus `json:"status,omitempty"`
 }
 
@@ -104,13 +110,13 @@ type Repository struct {
 	// Branch of the repository to clone.
 	// +kubebuilder:validation:Required
 	Branch string `json:"branch"`
-	// [Autofilled] Absolute path of repository
+	// [*Autofilled*] Absolute path of repository
 	Path string `json:"path,omitempty"`
-	// [Autofilled] User or organization, maintainer of repository
+	// [*Autofilled*] User or organization, maintainer of repository
 	Owner string `json:"owner,omitempty"`
-	// [Autofilled] Repository name
+	// [*Autofilled*] Repository name
 	Repo string `json:"repo,omitempty"`
-	// [Autofilled] Hash of last commit
+	// [*Autofilled*] Hash of last commit
 	Hash string `json:"hash,omitempty"`
 }
 
@@ -126,23 +132,31 @@ type Workspace struct {
 	Repositories map[string]Repository `json:"repositories"`
 }
 
-// WorkspaceManagerSpec defines the desired state of WorkspaceManager
+// WorkspaceManagerSpec defines the desired state of WorkspaceManager.
 type WorkspaceManagerSpec struct {
-	// Global path of workspaces. It's fixed to `/home/workspaces` path.
+	// Global path of workspaces. It's fixed to `/root/workspaces` path.
 	WorkspacesPath string `json:"workspacesPath,omitempty"`
 	// Workspace definitions of robot.
+	// Multiple ROS 2 workspaces can be configured over this field.
 	// +kubebuilder:validation:MinItems=1
 	Workspaces []Workspace `json:"workspaces,omitempty"`
-	// Need update
+	// WorkspaceManager is triggered if this field is set to `true`.
+	// Then the workspaces are being configured again while backing up the old configurations.
+	// This field is often used by operator.
 	UpdateNeeded bool `json:"updateNeeded,omitempty"`
 }
 
-// WorkspaceManagerStatus defines the observed state of WorkspaceManager
+// WorkspaceManagerStatus defines the observed state of WorkspaceManager.
 type WorkspaceManagerStatus struct {
-	Phase            WorkspaceManagerPhase `json:"phase,omitempty"`
-	ClonerJobStatus  OwnedResourceStatus   `json:"clonerJobStatus,omitempty"`
-	CleanupJobStatus OwnedResourceStatus   `json:"cleanupJobStatus,omitempty"`
-	Version          int                   `json:"version,omitempty"`
+	// Phase of WorkspaceManager.
+	Phase WorkspaceManagerPhase `json:"phase,omitempty"`
+	// Status of cloner job.
+	ClonerJobStatus OwnedResourceStatus `json:"clonerJobStatus,omitempty"`
+	// Status of cleanup jobs that runs while reconfiguring workspaces.
+	CleanupJobStatus OwnedResourceStatus `json:"cleanupJobStatus,omitempty"`
+	// Incremental version of workspace configuration map.
+	// Used to determine changes in configuration.
+	Version int `json:"version,omitempty"`
 }
 
 // ********************************
@@ -152,13 +166,18 @@ type WorkspaceManagerStatus struct {
 // Step is a command or script to execute when building a robot. Either `command` or `script` should be specified
 // for each step.
 type Step struct {
-	// Cluster selector.
+	// Cluster selector. If empty, step will be executed.
+	// If `robolaunch.io/cloud-instance` is specified only, step will be running on the cloud instance.
+	// If `robolaunch.io/physical-instance` is specified only, step will be running on the physical instance.
 	Selector map[string]string `json:"selector,omitempty"`
 	// Name of the step.
 	Name string `json:"name"`
 	// Name of the workspace.
+	// Should be selected among the existing workspaces in WorkspaceManager's manifests.
 	Workspace string `json:"workspace"`
 	// Bash command to run.
+	// Assume that your command will be `/bin/bash -c <COMMAND>`.
+	// Use logical operators (eg. `&&`) and pipes if the multiple dependent commands will be executed.
 	Command string `json:"command,omitempty"`
 	// Bash script to run.
 	Script string `json:"script,omitempty"`
@@ -166,17 +185,23 @@ type Step struct {
 	Env []corev1.EnvVar `json:"env,omitempty"`
 }
 
-// BuildManagerSpec defines the desired state of BuildManager
+// BuildManagerSpec defines the desired state of BuildManager.
 type BuildManagerSpec struct {
+	// Defines the building steps.
 	Steps []Step `json:"steps,omitempty"`
 }
 
-// BuildManagerStatus defines the observed state of BuildManager
+// BuildManagerStatus defines the observed state of BuildManager.
 type BuildManagerStatus struct {
-	Phase                 BuildManagerPhase   `json:"phase,omitempty"`
-	Active                bool                `json:"active,omitempty"`
+	// Phase of BuildManager.
+	Phase BuildManagerPhase `json:"phase,omitempty"`
+	// Indicates if the BuildManager is currently executing it's jobs.
+	Active bool `json:"active,omitempty"`
+	// Status of the ConfigMap that holds scripts.
+	// If a script is specified inside `.spec.steps[k]`, they are mounted to the step jobs via this ConfigMap.
 	ScriptConfigMapStatus OwnedResourceStatus `json:"scriptConfigMapStatus,omitempty"`
-	Steps                 []StepStatus        `json:"steps,omitempty"`
+	// Statuses of the build steps.
+	Steps []StepStatus `json:"steps,omitempty"`
 }
 
 // ********************************
@@ -193,15 +218,20 @@ type Prelaunch struct {
 
 // Launch description of a repository.
 type Launch struct {
-	// Cluster selector.
+	// Cluster selector. If empty, launch pod will be created.
+	// If `robolaunch.io/cloud-instance` is specified only, launch will be running on the cloud instance.
+	// If `robolaunch.io/physical-instance` is specified only, launch will be running on the physical instance.
 	Selector map[string]string `json:"selector,omitempty"`
 	// Name of the workspace.
+	// Should be selected among the existing workspaces in WorkspaceManager's manifests.
 	// +kubebuilder:validation:Required
 	Workspace string `json:"workspace"`
-	// Name of the repository.
+	// Name of the repository which includes the launchfile.
 	// +kubebuilder:validation:Required
 	Repository string `json:"repository"`
-	// Name of the repository.
+	// ROS 2 namespacing. May not be suitable for all launchfiles.
+	// If used, all the node names and topic names should be defined relative, not absolute.
+	// (eg. `cmd_vel` instead of /cmd_vel``)
 	// +kubebuilder:validation:Required
 	Namespacing bool `json:"namespacing,omitempty"`
 	// Additional environment variables to set when launching ROS nodes.
@@ -221,12 +251,17 @@ type Launch struct {
 
 // Run description.
 type Run struct {
-	// Cluster selector.
+	// Cluster selector. If empty, run pod will be created.
+	// If `robolaunch.io/cloud-instance` is specified only, run process will be running on the cloud instance.
+	// If `robolaunch.io/physical-instance` is specified only, run process will be running on the physical instance.
 	Selector map[string]string `json:"selector,omitempty"`
 	// Name of the workspace.
+	// Should be selected among the existing workspaces in WorkspaceManager's manifests.
 	// +kubebuilder:validation:Required
 	Workspace string `json:"workspace"`
-	// Name of the repository.
+	// ROS 2 namespacing. May not be suitable for all executables.
+	// If used, all the node names and topic names should be defined relative, not absolute.
+	// (eg. `cmd_vel` instead of /cmd_vel``)
 	// +kubebuilder:validation:Required
 	Namespacing bool `json:"namespacing,omitempty"`
 	// Additional environment variables to set when launching ROS nodes.
@@ -236,7 +271,7 @@ type Run struct {
 	Package string `json:"package"`
 	// Executable name in `ros2 run <package> <executable>`.
 	Executable string `json:"executable"`
-	// Launch parameters.
+	// Run parameters.
 	Parameters map[string]string `json:"parameters,omitempty"`
 	// Command or script to run just before node's execution.
 	Prelaunch Prelaunch `json:"prelaunch,omitempty"`
@@ -246,27 +281,39 @@ type Run struct {
 	Resources Resources `json:"resources,omitempty"`
 }
 
-// LaunchManagerSpec defines the desired state of LaunchManager
+// LaunchManagerSpec defines the desired state of LaunchManager.
 type LaunchManagerSpec struct {
-	// Display connection.
-	Display bool              `json:"display,omitempty"`
-	Launch  map[string]Launch `json:"launch,omitempty"`
-	Run     map[string]Run    `json:"run,omitempty"`
+	// Launch processes connects an X11 socket if it's set to `true` and a target RobotVDI resource is set in labels with key `robolaunch.io/target-vdi`.
+	// Applications that requires GUI can be executed such as rViz.
+	Display bool `json:"display,omitempty"`
+	// Launch descriptions.
+	// Every object defined here generates a `ros2 launch` command in the specified workspace.
+	Launch map[string]Launch `json:"launch,omitempty"`
+	// Every object defined here generates a `ros2 run` command in the specified workspace.
+	Run map[string]Run `json:"run,omitempty"`
 }
 
 type LaunchStatus struct {
-	Active          bool                   `json:"active,omitempty"`
+	// Inditaces if the launch process are actively running on cluster.
+	// It may not be selected by launch cluster selectors.
+	Active bool `json:"active,omitempty"`
+	// Statuses of the containers of pods owned by LaunchManager.
 	ContainerStatus corev1.ContainerStatus `json:"containerStatus,omitempty"`
 }
 
 type LaunchPodStatus struct {
-	Status       OwnedPodStatus          `json:"status,omitempty"`
+	// Launch pod status. Every LaunchManager creates one pod if active.
+	Status OwnedPodStatus `json:"status,omitempty"`
+	// Status of launch objects. Every launch object generates a `ros2 launch` command that will run as an entrypoint in a container.
 	LaunchStatus map[string]LaunchStatus `json:"launchStatus,omitempty"`
 }
 
-// LaunchManagerStatus defines the observed state of LaunchManager
+// LaunchManagerStatus defines the observed state of LaunchManager.
 type LaunchManagerStatus struct {
-	Phase           LaunchManagerPhase `json:"phase,omitempty"`
-	Active          bool               `json:"active,omitempty"`
-	LaunchPodStatus LaunchPodStatus    `json:"launchPodStatus,omitempty"`
+	// Phase of LaunchManager.
+	Phase LaunchManagerPhase `json:"phase,omitempty"`
+	// Indicates if the LaunchManager is attached to a Robot and actively running.
+	Active bool `json:"active,omitempty"`
+	// Collective statuses of launch pod and launch objects.
+	LaunchPodStatus LaunchPodStatus `json:"launchPodStatus,omitempty"`
 }
