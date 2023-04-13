@@ -341,7 +341,7 @@ type ConnectionInfo struct {
 	ConfigMapName string `json:"configMapName,omitempty"`
 }
 
-// DiscoveryServerStatus defines the observed state of DiscoveryServer
+// DiscoveryServerStatus defines the observed state of DiscoveryServer.
 type DiscoveryServerStatus struct {
 	// Phase of the DiscoveryServer.
 	Phase DiscoveryServerPhase `json:"phase,omitempty"`
@@ -368,7 +368,7 @@ type BridgeDistro struct {
 	Distro ROSDistro `json:"distro,omitempty"`
 }
 
-// ROSBridgeSpec defines the desired state of ROSBridge
+// ROSBridgeSpec defines the desired state of ROSBridge.
 type ROSBridgeSpec struct {
 	// Configurational parameters for ROS bridge.
 	ROS BridgeDistro `json:"ros,omitempty"`
@@ -378,7 +378,7 @@ type ROSBridgeSpec struct {
 	Image string `json:"image,omitempty"`
 }
 
-// ROSBridgeStatus defines the observed state of ROSBridge
+// ROSBridgeStatus defines the observed state of ROSBridge.
 type ROSBridgeStatus struct {
 	// Phase of ROSBridge.
 	Phase BridgePhase `json:"phase,omitempty"`

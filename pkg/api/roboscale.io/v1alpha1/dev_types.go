@@ -116,7 +116,7 @@ type RobotDevSuiteSpec struct {
 	RobotIDETemplate RobotIDESpec `json:"robotIDETemplate,omitempty"`
 }
 
-// RobotDevSuiteStatus defines the observed state of RobotDevSuite
+// RobotDevSuiteStatus defines the observed state of RobotDevSuite.
 type RobotDevSuiteStatus struct {
 	// Phase of RobotDevSuite.
 	Phase RobotDevSuitePhase `json:"phase,omitempty"`
@@ -132,7 +132,7 @@ type RobotDevSuiteStatus struct {
 // RobotIDE types
 // ********************************
 
-// RobotIDESpec defines the desired state of RobotIDE
+// RobotIDESpec defines the desired state of RobotIDE.
 type RobotIDESpec struct {
 	// Resource limitations of Cloud IDE.
 	Resources Resources `json:"resources,omitempty"`
@@ -180,7 +180,7 @@ type Resources struct {
 	Memory string `json:"memory,omitempty"`
 }
 
-// RobotVDISpec defines the desired state of RobotVDI
+// RobotVDISpec defines the desired state of RobotVDI.
 type RobotVDISpec struct {
 	// Resource limitations of Cloud IDE.
 	Resources Resources `json:"resources,omitempty"`
@@ -207,7 +207,7 @@ type RobotVDISpec struct {
 	Ingress bool `json:"ingress,omitempty"`
 }
 
-// RobotVDIStatus defines the observed state of RobotVDI
+// RobotVDIStatus defines the observed state of RobotVDI.
 type RobotVDIStatus struct {
 	// Phase of RobotVDI.
 	Phase RobotVDIPhase `json:"phase,omitempty"`

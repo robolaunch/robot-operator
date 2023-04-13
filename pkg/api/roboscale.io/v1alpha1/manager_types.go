@@ -110,13 +110,13 @@ type Repository struct {
 	// Branch of the repository to clone.
 	// +kubebuilder:validation:Required
 	Branch string `json:"branch"`
-	// [Autofilled] Absolute path of repository
+	// [*Autofilled*] Absolute path of repository
 	Path string `json:"path,omitempty"`
-	// [Autofilled] User or organization, maintainer of repository
+	// [*Autofilled*] User or organization, maintainer of repository
 	Owner string `json:"owner,omitempty"`
-	// [Autofilled] Repository name
+	// [*Autofilled*] Repository name
 	Repo string `json:"repo,omitempty"`
-	// [Autofilled] Hash of last commit
+	// [*Autofilled*] Hash of last commit
 	Hash string `json:"hash,omitempty"`
 }
 
@@ -132,7 +132,7 @@ type Workspace struct {
 	Repositories map[string]Repository `json:"repositories"`
 }
 
-// WorkspaceManagerSpec defines the desired state of WorkspaceManager
+// WorkspaceManagerSpec defines the desired state of WorkspaceManager.
 type WorkspaceManagerSpec struct {
 	// Global path of workspaces. It's fixed to `/root/workspaces` path.
 	WorkspacesPath string `json:"workspacesPath,omitempty"`
