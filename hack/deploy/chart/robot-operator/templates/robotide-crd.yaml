@@ -1,24 +1,24 @@
----
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
+  name: robotides.robot.roboscale.io
   annotations:
     controller-gen.kubebuilder.io/version: v0.9.2
-  creationTimestamp: null
-  name: robotvdis.robot.roboscale.io
+  labels:
+  {{- include "robot-operator.labels" . | nindent 4 }}
 spec:
   group: robot.roboscale.io
   names:
-    kind: RobotVDI
-    listKind: RobotVDIList
-    plural: robotvdis
-    singular: robotvdi
+    kind: RobotIDE
+    listKind: RobotIDEList
+    plural: robotides
+    singular: robotide
   scope: Namespaced
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: RobotVDI creates and manages Cloud VDI resources and workloads.
+        description: RobotIDE creates and manages Cloud IDE resources and workloads.
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -33,29 +33,23 @@ spec:
           metadata:
             type: object
           spec:
-            description: Specification of the desired behavior of the RobotVDI.
+            description: Specification of the desired behavior of the RobotIDE.
             properties:
+              display:
+                description: Cloud IDE connects an X11 socket if it's set to `true`
+                  and a target RobotVDI resource is set in labels with key `robolaunch.io/target-vdi`.
+                  Applications that requires GUI can be executed such as rViz.
+                type: boolean
               ingress:
                 description: '[*alpha*] RobotIDE will create an Ingress resource if
                   `true`.'
                 type: boolean
-              nat1to1:
-                description: NAT1TO1 option for Cloud VDI.
-                type: string
               privileged:
-                description: If `true`, containers of RobotIDE will be privileged
-                  containers. It can be used in physical instances where it's necessary
-                  to access I/O devices on the host machine. Not recommended to activate
-                  this field on cloud instances.
+                description: If `true`, containers of RobotIDE will be privileged containers.
+                  It can be used in physical instances where it's necessary to access
+                  I/O devices on the host machine. Not recommended to activate this
+                  field on cloud instances.
                 type: boolean
-              resolution:
-                default: 2048x1152
-                description: VDI screen resolution options. Default is `2048x1152`.
-                enum:
-                - 2048x1152
-                - 1920x1080
-                - 1600x1200
-                type: string
               resources:
                 description: Resource limitations of Cloud IDE.
                 properties:
@@ -73,22 +67,18 @@ spec:
                 type: object
               serviceType:
                 default: NodePort
-                description: Service type of Cloud IDE. `ClusterIP` and `NodePort`
-                  is supported.
+                description: Service type of Cloud IDE. `ClusterIP` and `NodePort` is
+                  supported.
                 enum:
                 - ClusterIP
                 - NodePort
                 type: string
-              webrtcPortRange:
-                description: UDP port range to used in WebRTC connections.
-                pattern: ^([0-9])+-([0-9])+$
-                type: string
             type: object
           status:
-            description: Most recently observed status of the RobotVDI.
+            description: Most recently observed status of the RobotIDE.
             properties:
               ingressStatus:
-                description: Status of Cloud VDI Ingress.
+                description: Status of Cloud IDE Ingress.
                 properties:
                   created:
                     description: Shows if the owned resource is created.
@@ -103,17 +93,17 @@ spec:
                         description: API version of the referent.
                         type: string
                       fieldPath:
-                        description: 'If referring to a piece of an object instead
-                          of an entire object, this string should contain a valid
-                          JSON/Go field access statement, such as desiredState.manifest.containers[2].
+                        description: 'If referring to a piece of an object instead of
+                          an entire object, this string should contain a valid JSON/Go
+                          field access statement, such as desiredState.manifest.containers[2].
                           For example, if the object reference is to a container within
                           a pod, this would take on a value like: "spec.containers{name}"
                           (where "name" refers to the name of the container that triggered
                           the event) or if no container name is specified "spec.containers[2]"
                           (container with index 2 in this pod). This syntax is chosen
-                          only to have some well-defined way of referencing a part
-                          of an object. TODO: this design is not final and this field
-                          is subject to change in the future.'
+                          only to have some well-defined way of referencing a part of
+                          an object. TODO: this design is not final and this field is
+                          subject to change in the future.'
                         type: string
                       kind:
                         description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
@@ -137,10 +127,10 @@ spec:
                 - created
                 type: object
               phase:
-                description: Phase of RobotVDI.
+                description: Phase of RobotIDE.
                 type: string
               podStatus:
-                description: Status of Cloud VDI pod.
+                description: Status of Cloud IDE pod.
                 properties:
                   ip:
                     description: IP of the pod.
@@ -168,11 +158,11 @@ spec:
                               within a pod, this would take on a value like: "spec.containers{name}"
                               (where "name" refers to the name of the container that
                               triggered the event) or if no container name is specified
-                              "spec.containers[2]" (container with index 2 in this
-                              pod). This syntax is chosen only to have some well-defined
-                              way of referencing a part of an object. TODO: this design
-                              is not final and this field is subject to change in
-                              the future.'
+                              "spec.containers[2]" (container with index 2 in this pod).
+                              This syntax is chosen only to have some well-defined way
+                              of referencing a part of an object. TODO: this design
+                              is not final and this field is subject to change in the
+                              future.'
                             type: string
                           kind:
                             description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
@@ -196,10 +186,8 @@ spec:
                     - created
                     type: object
                 type: object
-              pvcStatus:
-                description: Status of Cloud VDI persistent volume claim. This PVC
-                  dynamically provisions a volume that is a shared between RobotVDI
-                  workloads and other workloads that requests display.
+              serviceStatus:
+                description: Status of Cloud IDE service.
                 properties:
                   created:
                     description: Shows if the owned resource is created.
@@ -214,115 +202,17 @@ spec:
                         description: API version of the referent.
                         type: string
                       fieldPath:
-                        description: 'If referring to a piece of an object instead
-                          of an entire object, this string should contain a valid
-                          JSON/Go field access statement, such as desiredState.manifest.containers[2].
+                        description: 'If referring to a piece of an object instead of
+                          an entire object, this string should contain a valid JSON/Go
+                          field access statement, such as desiredState.manifest.containers[2].
                           For example, if the object reference is to a container within
                           a pod, this would take on a value like: "spec.containers{name}"
                           (where "name" refers to the name of the container that triggered
                           the event) or if no container name is specified "spec.containers[2]"
                           (container with index 2 in this pod). This syntax is chosen
-                          only to have some well-defined way of referencing a part
-                          of an object. TODO: this design is not final and this field
-                          is subject to change in the future.'
-                        type: string
-                      kind:
-                        description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
-                        type: string
-                      name:
-                        description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
-                        type: string
-                      namespace:
-                        description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
-                        type: string
-                      resourceVersion:
-                        description: 'Specific resourceVersion to which this reference
-                          is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
-                        type: string
-                      uid:
-                        description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
-                        type: string
-                    type: object
-                    x-kubernetes-map-type: atomic
-                required:
-                - created
-                type: object
-              serviceTCPStatus:
-                description: Status of Cloud VDI TCP service.
-                properties:
-                  created:
-                    description: Shows if the owned resource is created.
-                    type: boolean
-                  phase:
-                    description: Phase of the owned resource.
-                    type: string
-                  reference:
-                    description: Reference to the owned resource.
-                    properties:
-                      apiVersion:
-                        description: API version of the referent.
-                        type: string
-                      fieldPath:
-                        description: 'If referring to a piece of an object instead
-                          of an entire object, this string should contain a valid
-                          JSON/Go field access statement, such as desiredState.manifest.containers[2].
-                          For example, if the object reference is to a container within
-                          a pod, this would take on a value like: "spec.containers{name}"
-                          (where "name" refers to the name of the container that triggered
-                          the event) or if no container name is specified "spec.containers[2]"
-                          (container with index 2 in this pod). This syntax is chosen
-                          only to have some well-defined way of referencing a part
-                          of an object. TODO: this design is not final and this field
-                          is subject to change in the future.'
-                        type: string
-                      kind:
-                        description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
-                        type: string
-                      name:
-                        description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
-                        type: string
-                      namespace:
-                        description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
-                        type: string
-                      resourceVersion:
-                        description: 'Specific resourceVersion to which this reference
-                          is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
-                        type: string
-                      uid:
-                        description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
-                        type: string
-                    type: object
-                    x-kubernetes-map-type: atomic
-                required:
-                - created
-                type: object
-              serviceUDPStatus:
-                description: Status of Cloud VDI UDP service.
-                properties:
-                  created:
-                    description: Shows if the owned resource is created.
-                    type: boolean
-                  phase:
-                    description: Phase of the owned resource.
-                    type: string
-                  reference:
-                    description: Reference to the owned resource.
-                    properties:
-                      apiVersion:
-                        description: API version of the referent.
-                        type: string
-                      fieldPath:
-                        description: 'If referring to a piece of an object instead
-                          of an entire object, this string should contain a valid
-                          JSON/Go field access statement, such as desiredState.manifest.containers[2].
-                          For example, if the object reference is to a container within
-                          a pod, this would take on a value like: "spec.containers{name}"
-                          (where "name" refers to the name of the container that triggered
-                          the event) or if no container name is specified "spec.containers[2]"
-                          (container with index 2 in this pod). This syntax is chosen
-                          only to have some well-defined way of referencing a part
-                          of an object. TODO: this design is not final and this field
-                          is subject to change in the future.'
+                          only to have some well-defined way of referencing a part of
+                          an object. TODO: this design is not final and this field is
+                          subject to change in the future.'
                         type: string
                       kind:
                         description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
@@ -351,3 +241,9 @@ spec:
     storage: true
     subresources:
       status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

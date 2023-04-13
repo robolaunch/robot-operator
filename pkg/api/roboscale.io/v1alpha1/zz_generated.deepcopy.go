@@ -1210,6 +1210,7 @@ func (in *RobotSpec) DeepCopyInto(out *RobotSpec) {
 	out.Storage = in.Storage
 	in.DiscoveryServerTemplate.DeepCopyInto(&out.DiscoveryServerTemplate)
 	out.ROSBridgeTemplate = in.ROSBridgeTemplate
+	out.RobotDevSuiteTemplate = in.RobotDevSuiteTemplate
 	in.WorkspaceManagerTemplate.DeepCopyInto(&out.WorkspaceManagerTemplate)
 	in.BuildManagerTemplate.DeepCopyInto(&out.BuildManagerTemplate)
 	if in.LaunchManagerTemplates != nil {
@@ -1219,7 +1220,6 @@ func (in *RobotSpec) DeepCopyInto(out *RobotSpec) {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
 	}
-	out.RobotDevSuiteTemplate = in.RobotDevSuiteTemplate
 	out.RootDNSConfig = in.RootDNSConfig
 	out.TLSSecretReference = in.TLSSecretReference
 }
@@ -1240,15 +1240,9 @@ func (in *RobotStatus) DeepCopyInto(out *RobotStatus) {
 	out.VolumeStatuses = in.VolumeStatuses
 	out.DiscoveryServerStatus = in.DiscoveryServerStatus
 	out.ROSBridgeStatus = in.ROSBridgeStatus
-	out.RobotDevSuiteStatus = in.RobotDevSuiteStatus
 	out.LoaderJobStatus = in.LoaderJobStatus
 	out.WorkspaceManagerStatus = in.WorkspaceManagerStatus
-	out.InitialBuildManagerStatus = in.InitialBuildManagerStatus
-	if in.InitialLaunchManagerStatuses != nil {
-		in, out := &in.InitialLaunchManagerStatuses, &out.InitialLaunchManagerStatuses
-		*out = make([]OwnedResourceStatus, len(*in))
-		copy(*out, *in)
-	}
+	out.RobotDevSuiteStatus = in.RobotDevSuiteStatus
 	in.AttachedBuildObject.DeepCopyInto(&out.AttachedBuildObject)
 	if in.AttachedLaunchObjects != nil {
 		in, out := &in.AttachedLaunchObjects, &out.AttachedLaunchObjects
@@ -1256,6 +1250,12 @@ func (in *RobotStatus) DeepCopyInto(out *RobotStatus) {
 		for i := range *in {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
+	}
+	out.InitialBuildManagerStatus = in.InitialBuildManagerStatus
+	if in.InitialLaunchManagerStatuses != nil {
+		in, out := &in.InitialLaunchManagerStatuses, &out.InitialLaunchManagerStatuses
+		*out = make([]OwnedResourceStatus, len(*in))
+		copy(*out, *in)
 	}
 	if in.AttachedDevObjects != nil {
 		in, out := &in.AttachedDevObjects, &out.AttachedDevObjects

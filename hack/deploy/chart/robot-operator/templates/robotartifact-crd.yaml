@@ -1,11 +1,11 @@
----
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
+  name: robotartifacts.robot.roboscale.io
   annotations:
     controller-gen.kubebuilder.io/version: v0.9.2
-  creationTimestamp: null
-  name: robotartifacts.robot.roboscale.io
+  labels:
+  {{- include "robot-operator.labels" . | nindent 4 }}
 spec:
   group: robot.roboscale.io
   names:
@@ -18,8 +18,8 @@ spec:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: RobotArtifact is a non-functional resource that holds Robot's
-          specifications. It is used to define Robot templates.
+        description: RobotArtifact is a non-functional resource that holds Robot's specifications.
+          It is used to define Robot templates.
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -43,8 +43,8 @@ spec:
                     description: Defines the building steps.
                     items:
                       description: Step is a command or script to execute when building
-                        a robot. Either `command` or `script` should be specified
-                        for each step.
+                        a robot. Either `command` or `script` should be specified for
+                        each step.
                       properties:
                         command:
                           description: Bash command to run. Assume that your command
@@ -55,29 +55,28 @@ spec:
                         env:
                           description: Environment variables for step.
                           items:
-                            description: EnvVar represents an environment variable
-                              present in a Container.
+                            description: EnvVar represents an environment variable present
+                              in a Container.
                             properties:
                               name:
                                 description: Name of the environment variable. Must
                                   be a C_IDENTIFIER.
                                 type: string
                               value:
-                                description: 'Variable references $(VAR_NAME) are
-                                  expanded using the previously defined environment
-                                  variables in the container and any service environment
-                                  variables. If a variable cannot be resolved, the
-                                  reference in the input string will be unchanged.
-                                  Double $$ are reduced to a single $, which allows
-                                  for escaping the $(VAR_NAME) syntax: i.e. "$$(VAR_NAME)"
-                                  will produce the string literal "$(VAR_NAME)". Escaped
-                                  references will never be expanded, regardless of
-                                  whether the variable exists or not. Defaults to
-                                  "".'
+                                description: 'Variable references $(VAR_NAME) are expanded
+                                  using the previously defined environment variables
+                                  in the container and any service environment variables.
+                                  If a variable cannot be resolved, the reference in
+                                  the input string will be unchanged. Double $$ are
+                                  reduced to a single $, which allows for escaping the
+                                  $(VAR_NAME) syntax: i.e. "$$(VAR_NAME)" will produce
+                                  the string literal "$(VAR_NAME)". Escaped references
+                                  will never be expanded, regardless of whether the
+                                  variable exists or not. Defaults to "".'
                                 type: string
                               valueFrom:
-                                description: Source for the environment variable's
-                                  value. Cannot be used if value is not empty.
+                                description: Source for the environment variable's value.
+                                  Cannot be used if value is not empty.
                                 properties:
                                   configMapKeyRef:
                                     description: Selects a key of a ConfigMap.
@@ -92,8 +91,8 @@ spec:
                                           kind, uid?'
                                         type: string
                                       optional:
-                                        description: Specify whether the ConfigMap
-                                          or its key must be defined
+                                        description: Specify whether the ConfigMap or
+                                          its key must be defined
                                         type: boolean
                                     required:
                                     - key
@@ -126,8 +125,8 @@ spec:
                                       are currently supported.'
                                     properties:
                                       containerName:
-                                        description: 'Container name: required for
-                                          volumes, optional for env vars'
+                                        description: 'Container name: required for volumes,
+                                          optional for env vars'
                                         type: string
                                       divisor:
                                         anyOf:
@@ -145,8 +144,8 @@ spec:
                                     type: object
                                     x-kubernetes-map-type: atomic
                                   secretKeyRef:
-                                    description: Selects a key of a secret in the
-                                      pod's namespace
+                                    description: Selects a key of a secret in the pod's
+                                      namespace
                                     properties:
                                       key:
                                         description: The key of the secret to select
@@ -159,8 +158,8 @@ spec:
                                           kind, uid?'
                                         type: string
                                       optional:
-                                        description: Specify whether the Secret or
-                                          its key must be defined
+                                        description: Specify whether the Secret or its
+                                          key must be defined
                                         type: boolean
                                     required:
                                     - key
@@ -203,8 +202,8 @@ spec:
                 description: Discovery server configurational parameters.
                 properties:
                   args:
-                    description: Entrypoint of the DiscoveryServer. Applied if the
-                      instance type is `Server`.
+                    description: Entrypoint of the DiscoveryServer. Applied if the instance
+                      type is `Server`.
                     items:
                       type: string
                     type: array
@@ -222,25 +221,24 @@ spec:
                       which has configured ROS 2.
                     type: string
                   reference:
-                    description: Reference to the `Server` instance. It is used if
-                      `.spec.type` is `Client`. Referenced object can be provisioned
-                      in another cluster.
+                    description: Reference to the `Server` instance. It is used if `.spec.type`
+                      is `Client`. Referenced object can be provisioned in another cluster.
                     properties:
                       apiVersion:
                         description: API version of the referent.
                         type: string
                       fieldPath:
-                        description: 'If referring to a piece of an object instead
-                          of an entire object, this string should contain a valid
-                          JSON/Go field access statement, such as desiredState.manifest.containers[2].
+                        description: 'If referring to a piece of an object instead of
+                          an entire object, this string should contain a valid JSON/Go
+                          field access statement, such as desiredState.manifest.containers[2].
                           For example, if the object reference is to a container within
                           a pod, this would take on a value like: "spec.containers{name}"
                           (where "name" refers to the name of the container that triggered
                           the event) or if no container name is specified "spec.containers[2]"
                           (container with index 2 in this pod). This syntax is chosen
-                          only to have some well-defined way of referencing a part
-                          of an object. TODO: this design is not final and this field
-                          is subject to change in the future.'
+                          only to have some well-defined way of referencing a part of
+                          an object. TODO: this design is not final and this field is
+                          subject to change in the future.'
                         type: string
                       kind:
                         description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
@@ -266,18 +264,18 @@ spec:
                       Server's subdomain. Used for getting Server's IP over DNS.
                     type: string
                   type:
-                    description: Instance type can be either `Server` or `Client`.
-                      If `Server`, instance creates discovery server resources and
-                      workloads. Other `Client` instances can connect to the `Server`
-                      instance. If `Client`, instance tries to connect a `Server`
-                      instance and hold `Server` configuration in a ConfigMap.
+                    description: Instance type can be either `Server` or `Client`. If
+                      `Server`, instance creates discovery server resources and workloads.
+                      Other `Client` instances can connect to the `Server` instance.
+                      If `Client`, instance tries to connect a `Server` instance and
+                      hold `Server` configuration in a ConfigMap.
                     type: string
                 type: object
               distributions:
                 description: ROS 2 distributions to be used. You can select multiple
                   distributions if they are supported in the same underlying OS. (eg.
-                  `foxy` and `galactic` are supported in Ubuntu Focal, so they can
-                  be used together but both cannot be used with `humble`)
+                  `foxy` and `galactic` are supported in Ubuntu Focal, so they can be
+                  used together but both cannot be used with `humble`)
                 items:
                   description: ROS 2 distribution selection. Currently supported distributions
                     are Humble, Foxy, Galactic.
@@ -295,10 +293,10 @@ spec:
                   description: LaunchManagerSpec defines the desired state of LaunchManager.
                   properties:
                     display:
-                      description: Launch processes connects an X11 socket if it's
-                        set to `true` and a target RobotVDI resource is set in labels
-                        with key `robolaunch.io/target-vdi`. Applications that requires
-                        GUI can be executed such as rViz.
+                      description: Launch processes connects an X11 socket if it's set
+                        to `true` and a target RobotVDI resource is set in labels with
+                        key `robolaunch.io/target-vdi`. Applications that requires GUI
+                        can be executed such as rViz.
                       type: boolean
                     launch:
                       additionalProperties:
@@ -323,10 +321,10 @@ spec:
                                     reference in the input string will be unchanged.
                                     Double $$ are reduced to a single $, which allows
                                     for escaping the $(VAR_NAME) syntax: i.e. "$$(VAR_NAME)"
-                                    will produce the string literal "$(VAR_NAME)".
-                                    Escaped references will never be expanded, regardless
-                                    of whether the variable exists or not. Defaults
-                                    to "".'
+                                    will produce the string literal "$(VAR_NAME)". Escaped
+                                    references will never be expanded, regardless of
+                                    whether the variable exists or not. Defaults to
+                                    "".'
                                   type: string
                                 valueFrom:
                                   description: Source for the environment variable's
@@ -339,8 +337,8 @@ spec:
                                           description: The key to select.
                                           type: string
                                         name:
-                                          description: 'Name of the referent. More
-                                            info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                          description: 'Name of the referent. More info:
+                                            https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                                             TODO: Add other useful fields. apiVersion,
                                             kind, uid?'
                                           type: string
@@ -364,8 +362,8 @@ spec:
                                             is written in terms of, defaults to "v1".
                                           type: string
                                         fieldPath:
-                                          description: Path of the field to select
-                                            in the specified API version.
+                                          description: Path of the field to select in
+                                            the specified API version.
                                           type: string
                                       required:
                                       - fieldPath
@@ -386,9 +384,8 @@ spec:
                                           anyOf:
                                           - type: integer
                                           - type: string
-                                          description: Specifies the output format
-                                            of the exposed resources, defaults to
-                                            "1"
+                                          description: Specifies the output format of
+                                            the exposed resources, defaults to "1"
                                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                                           x-kubernetes-int-or-string: true
                                         resource:
@@ -407,14 +404,14 @@ spec:
                                             from.  Must be a valid secret key.
                                           type: string
                                         name:
-                                          description: 'Name of the referent. More
-                                            info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                          description: 'Name of the referent. More info:
+                                            https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                                             TODO: Add other useful fields. apiVersion,
                                             kind, uid?'
                                           type: string
                                         optional:
-                                          description: Specify whether the Secret
-                                            or its key must be defined
+                                          description: Specify whether the Secret or
+                                            its key must be defined
                                           type: boolean
                                       required:
                                       - key
@@ -431,8 +428,8 @@ spec:
                           namespacing:
                             description: ROS 2 namespacing. May not be suitable for
                               all launchfiles. If used, all the node names and topic
-                              names should be defined relative, not absolute. (eg.
-                              `cmd_vel` instead of /cmd_vel``)
+                              names should be defined relative, not absolute. (eg. `cmd_vel`
+                              instead of /cmd_vel``)
                             type: boolean
                           parameters:
                             additionalProperties:
@@ -453,8 +450,7 @@ spec:
                             description: Launch container privilege.
                             type: boolean
                           repository:
-                            description: Name of the repository which includes the
-                              launchfile.
+                            description: Name of the repository which includes the launchfile.
                             type: string
                           resources:
                             description: Launch container resource limits.
@@ -476,22 +472,21 @@ spec:
                               type: string
                             description: Cluster selector. If empty, launch pod will
                               be created. If `robolaunch.io/cloud-instance` is specified
-                              only, launch will be running on the cloud instance.
-                              If `robolaunch.io/physical-instance` is specified only,
-                              launch will be running on the physical instance.
+                              only, launch will be running on the cloud instance. If
+                              `robolaunch.io/physical-instance` is specified only, launch
+                              will be running on the physical instance.
                             type: object
                           workspace:
-                            description: Name of the workspace. Should be selected
-                              among the existing workspaces in WorkspaceManager's
-                              manifests.
+                            description: Name of the workspace. Should be selected among
+                              the existing workspaces in WorkspaceManager's manifests.
                             type: string
                         required:
                         - launchFilePath
                         - repository
                         - workspace
                         type: object
-                      description: Launch descriptions. Every object defined here
-                        generates a `ros2 launch` command in the specified workspace.
+                      description: Launch descriptions. Every object defined here generates
+                        a `ros2 launch` command in the specified workspace.
                       type: object
                     run:
                       additionalProperties:
@@ -516,10 +511,10 @@ spec:
                                     reference in the input string will be unchanged.
                                     Double $$ are reduced to a single $, which allows
                                     for escaping the $(VAR_NAME) syntax: i.e. "$$(VAR_NAME)"
-                                    will produce the string literal "$(VAR_NAME)".
-                                    Escaped references will never be expanded, regardless
-                                    of whether the variable exists or not. Defaults
-                                    to "".'
+                                    will produce the string literal "$(VAR_NAME)". Escaped
+                                    references will never be expanded, regardless of
+                                    whether the variable exists or not. Defaults to
+                                    "".'
                                   type: string
                                 valueFrom:
                                   description: Source for the environment variable's
@@ -532,8 +527,8 @@ spec:
                                           description: The key to select.
                                           type: string
                                         name:
-                                          description: 'Name of the referent. More
-                                            info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                          description: 'Name of the referent. More info:
+                                            https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                                             TODO: Add other useful fields. apiVersion,
                                             kind, uid?'
                                           type: string
@@ -557,8 +552,8 @@ spec:
                                             is written in terms of, defaults to "v1".
                                           type: string
                                         fieldPath:
-                                          description: Path of the field to select
-                                            in the specified API version.
+                                          description: Path of the field to select in
+                                            the specified API version.
                                           type: string
                                       required:
                                       - fieldPath
@@ -579,9 +574,8 @@ spec:
                                           anyOf:
                                           - type: integer
                                           - type: string
-                                          description: Specifies the output format
-                                            of the exposed resources, defaults to
-                                            "1"
+                                          description: Specifies the output format of
+                                            the exposed resources, defaults to "1"
                                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                                           x-kubernetes-int-or-string: true
                                         resource:
@@ -600,14 +594,14 @@ spec:
                                             from.  Must be a valid secret key.
                                           type: string
                                         name:
-                                          description: 'Name of the referent. More
-                                            info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                          description: 'Name of the referent. More info:
+                                            https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                                             TODO: Add other useful fields. apiVersion,
                                             kind, uid?'
                                           type: string
                                         optional:
-                                          description: Specify whether the Secret
-                                            or its key must be defined
+                                          description: Specify whether the Secret or
+                                            its key must be defined
                                           type: boolean
                                       required:
                                       - key
@@ -624,8 +618,8 @@ spec:
                           namespacing:
                             description: ROS 2 namespacing. May not be suitable for
                               all executables. If used, all the node names and topic
-                              names should be defined relative, not absolute. (eg.
-                              `cmd_vel` instead of /cmd_vel``)
+                              names should be defined relative, not absolute. (eg. `cmd_vel`
+                              instead of /cmd_vel``)
                             type: boolean
                           package:
                             description: Package name in `ros2 run <package> <executable>`.
@@ -666,16 +660,15 @@ spec:
                           selector:
                             additionalProperties:
                               type: string
-                            description: Cluster selector. If empty, run pod will
-                              be created. If `robolaunch.io/cloud-instance` is specified
+                            description: Cluster selector. If empty, run pod will be
+                              created. If `robolaunch.io/cloud-instance` is specified
                               only, run process will be running on the cloud instance.
                               If `robolaunch.io/physical-instance` is specified only,
                               run process will be running on the physical instance.
                             type: object
                           workspace:
-                            description: Name of the workspace. Should be selected
-                              among the existing workspaces in WorkspaceManager's
-                              manifests.
+                            description: Name of the workspace. Should be selected among
+                              the existing workspaces in WorkspaceManager's manifests.
                             type: string
                         required:
                         - executable
@@ -698,17 +691,17 @@ spec:
                 description: Robot development suite template
                 properties:
                   ideEnabled:
-                    description: If `true`, a Cloud IDE will be provisioned inside
-                      development suite.
+                    description: If `true`, a Cloud IDE will be provisioned inside development
+                      suite.
                     type: boolean
                   robotIDETemplate:
                     description: Configurational parameters of RobotIDE. Applied if
                       `.spec.ideEnabled` is set to `true`.
                     properties:
                       display:
-                        description: Cloud IDE connects an X11 socket if it's set
-                          to `true` and a target RobotVDI resource is set in labels
-                          with key `robolaunch.io/target-vdi`. Applications that requires
+                        description: Cloud IDE connects an X11 socket if it's set to
+                          `true` and a target RobotVDI resource is set in labels with
+                          key `robolaunch.io/target-vdi`. Applications that requires
                           GUI can be executed such as rViz.
                         type: boolean
                       ingress:
@@ -718,8 +711,8 @@ spec:
                       privileged:
                         description: If `true`, containers of RobotIDE will be privileged
                           containers. It can be used in physical instances where it's
-                          necessary to access I/O devices on the host machine. Not
-                          recommended to activate this field on cloud instances.
+                          necessary to access I/O devices on the host machine. Not recommended
+                          to activate this field on cloud instances.
                         type: boolean
                       resources:
                         description: Resource limitations of Cloud IDE.
@@ -759,8 +752,8 @@ spec:
                       privileged:
                         description: If `true`, containers of RobotIDE will be privileged
                           containers. It can be used in physical instances where it's
-                          necessary to access I/O devices on the host machine. Not
-                          recommended to activate this field on cloud instances.
+                          necessary to access I/O devices on the host machine. Not recommended
+                          to activate this field on cloud instances.
                         type: boolean
                       resolution:
                         default: 2048x1152
@@ -799,8 +792,8 @@ spec:
                         type: string
                     type: object
                   vdiEnabled:
-                    description: If `true`, a Cloud VDI will be provisioned inside
-                      development suite.
+                    description: If `true`, a Cloud VDI will be provisioned inside development
+                      suite.
                     type: boolean
                 type: object
               rootDNSConfig:
@@ -857,8 +850,7 @@ spec:
                   amount:
                     default: 10000
                     description: Specifies how much storage will be allocated in total.
-                      Use MB as a unit of measurement. (eg. `10240` is equal to 10
-                      GB)
+                      Use MB as a unit of measurement. (eg. `10240` is equal to 10 GB)
                     type: integer
                   storageClassConfig:
                     description: Storage class selection for robot's volumes.
@@ -891,8 +883,8 @@ spec:
                   updateNeeded:
                     description: WorkspaceManager is triggered if this field is set
                       to `true`. Then the workspaces are being configured again while
-                      backing up the old configurations. This field is often used
-                      by operator.
+                      backing up the old configurations. This field is often used by
+                      operator.
                     type: boolean
                   workspaces:
                     description: Workspace definitions of robot. Multiple ROS 2 workspaces
@@ -911,8 +903,8 @@ spec:
                           - humble
                           type: string
                         name:
-                          description: Name of workspace. If a workspace's name is
-                            `my_ws`, it's absolute path is `/home/workspaces/my_ws`.
+                          description: Name of workspace. If a workspace's name is `my_ws`,
+                            it's absolute path is `/home/workspaces/my_ws`.
                           type: string
                         repositories:
                           additionalProperties:
@@ -925,8 +917,8 @@ spec:
                                 description: '[*Autofilled*] Hash of last commit'
                                 type: string
                               owner:
-                                description: '[*Autofilled*] User or organization,
-                                  maintainer of repository'
+                                description: '[*Autofilled*] User or organization, maintainer
+                                  of repository'
                                 type: string
                               path:
                                 description: '[*Autofilled*] Absolute path of repository'
@@ -965,3 +957,9 @@ spec:
     storage: true
     subresources:
       status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

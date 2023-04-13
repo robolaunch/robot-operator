@@ -1,12 +1,24 @@
----
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  annotations:
-    controller-gen.kubebuilder.io/version: v0.9.2
-  creationTimestamp: null
   name: launchmanagers.robot.roboscale.io
+  annotations:
+    cert-manager.io/inject-ca-from: '{{ .Release.Namespace }}/{{ include "robot-operator.fullname"
+      . }}-serving-cert'
+    controller-gen.kubebuilder.io/version: v0.9.2
+  labels:
+  {{- include "robot-operator.labels" . | nindent 4 }}
 spec:
+  conversion:
+    strategy: Webhook
+    webhook:
+      clientConfig:
+        service:
+          name: '{{ include "robot-operator.fullname" . }}-webhook-service'
+          namespace: '{{ .Release.Namespace }}'
+          path: /convert
+      conversionReviewVersions:
+      - v1
   group: robot.roboscale.io
   names:
     kind: LaunchManager
@@ -37,9 +49,8 @@ spec:
             properties:
               display:
                 description: Launch processes connects an X11 socket if it's set to
-                  `true` and a target RobotVDI resource is set in labels with key
-                  `robolaunch.io/target-vdi`. Applications that requires GUI can be
-                  executed such as rViz.
+                  `true` and a target RobotVDI resource is set in labels with key `robolaunch.io/target-vdi`.
+                  Applications that requires GUI can be executed such as rViz.
                 type: boolean
               launch:
                 additionalProperties:
@@ -53,20 +64,19 @@ spec:
                           in a Container.
                         properties:
                           name:
-                            description: Name of the environment variable. Must be
-                              a C_IDENTIFIER.
+                            description: Name of the environment variable. Must be a
+                              C_IDENTIFIER.
                             type: string
                           value:
                             description: 'Variable references $(VAR_NAME) are expanded
                               using the previously defined environment variables in
-                              the container and any service environment variables.
-                              If a variable cannot be resolved, the reference in the
-                              input string will be unchanged. Double $$ are reduced
-                              to a single $, which allows for escaping the $(VAR_NAME)
-                              syntax: i.e. "$$(VAR_NAME)" will produce the string
-                              literal "$(VAR_NAME)". Escaped references will never
-                              be expanded, regardless of whether the variable exists
-                              or not. Defaults to "".'
+                              the container and any service environment variables. If
+                              a variable cannot be resolved, the reference in the input
+                              string will be unchanged. Double $$ are reduced to a single
+                              $, which allows for escaping the $(VAR_NAME) syntax: i.e.
+                              "$$(VAR_NAME)" will produce the string literal "$(VAR_NAME)".
+                              Escaped references will never be expanded, regardless
+                              of whether the variable exists or not. Defaults to "".'
                             type: string
                           valueFrom:
                             description: Source for the environment variable's value.
@@ -79,22 +89,21 @@ spec:
                                     description: The key to select.
                                     type: string
                                   name:
-                                    description: 'Name of the referent. More info:
-                                      https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                                       TODO: Add other useful fields. apiVersion, kind,
                                       uid?'
                                     type: string
                                   optional:
-                                    description: Specify whether the ConfigMap or
-                                      its key must be defined
+                                    description: Specify whether the ConfigMap or its
+                                      key must be defined
                                     type: boolean
                                 required:
                                 - key
                                 type: object
                                 x-kubernetes-map-type: atomic
                               fieldRef:
-                                description: 'Selects a field of the pod: supports
-                                  metadata.name, metadata.namespace, `metadata.labels[''<KEY>'']`,
+                                description: 'Selects a field of the pod: supports metadata.name,
+                                  metadata.namespace, `metadata.labels[''<KEY>'']`,
                                   `metadata.annotations[''<KEY>'']`, spec.nodeName,
                                   spec.serviceAccountName, status.hostIP, status.podIP,
                                   status.podIPs.'
@@ -112,11 +121,10 @@ spec:
                                 type: object
                                 x-kubernetes-map-type: atomic
                               resourceFieldRef:
-                                description: 'Selects a resource of the container:
-                                  only resources limits and requests (limits.cpu,
-                                  limits.memory, limits.ephemeral-storage, requests.cpu,
-                                  requests.memory and requests.ephemeral-storage)
-                                  are currently supported.'
+                                description: 'Selects a resource of the container: only
+                                  resources limits and requests (limits.cpu, limits.memory,
+                                  limits.ephemeral-storage, requests.cpu, requests.memory
+                                  and requests.ephemeral-storage) are currently supported.'
                                 properties:
                                   containerName:
                                     description: 'Container name: required for volumes,
@@ -146,14 +154,13 @@ spec:
                                       be a valid secret key.
                                     type: string
                                   name:
-                                    description: 'Name of the referent. More info:
-                                      https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                                       TODO: Add other useful fields. apiVersion, kind,
                                       uid?'
                                     type: string
                                   optional:
-                                    description: Specify whether the Secret or its
-                                      key must be defined
+                                    description: Specify whether the Secret or its key
+                                      must be defined
                                     type: boolean
                                 required:
                                 - key
@@ -168,10 +175,9 @@ spec:
                       description: Path to launchfile in repository. (eg. `linorobot/linorobot_gazebo/launch.py`)
                       type: string
                     namespacing:
-                      description: ROS 2 namespacing. May not be suitable for all
-                        launchfiles. If used, all the node names and topic names should
-                        be defined relative, not absolute. (eg. `cmd_vel` instead
-                        of /cmd_vel``)
+                      description: ROS 2 namespacing. May not be suitable for all launchfiles.
+                        If used, all the node names and topic names should be defined
+                        relative, not absolute. (eg. `cmd_vel` instead of /cmd_vel``)
                       type: boolean
                     parameters:
                       additionalProperties:
@@ -211,15 +217,14 @@ spec:
                     selector:
                       additionalProperties:
                         type: string
-                      description: Cluster selector. If empty, launch pod will be
-                        created. If `robolaunch.io/cloud-instance` is specified only,
-                        launch will be running on the cloud instance. If `robolaunch.io/physical-instance`
-                        is specified only, launch will be running on the physical
-                        instance.
+                      description: Cluster selector. If empty, launch pod will be created.
+                        If `robolaunch.io/cloud-instance` is specified only, launch
+                        will be running on the cloud instance. If `robolaunch.io/physical-instance`
+                        is specified only, launch will be running on the physical instance.
                       type: object
                     workspace:
-                      description: Name of the workspace. Should be selected among
-                        the existing workspaces in WorkspaceManager's manifests.
+                      description: Name of the workspace. Should be selected among the
+                        existing workspaces in WorkspaceManager's manifests.
                       type: string
                   required:
                   - launchFilePath
@@ -241,20 +246,19 @@ spec:
                           in a Container.
                         properties:
                           name:
-                            description: Name of the environment variable. Must be
-                              a C_IDENTIFIER.
+                            description: Name of the environment variable. Must be a
+                              C_IDENTIFIER.
                             type: string
                           value:
                             description: 'Variable references $(VAR_NAME) are expanded
                               using the previously defined environment variables in
-                              the container and any service environment variables.
-                              If a variable cannot be resolved, the reference in the
-                              input string will be unchanged. Double $$ are reduced
-                              to a single $, which allows for escaping the $(VAR_NAME)
-                              syntax: i.e. "$$(VAR_NAME)" will produce the string
-                              literal "$(VAR_NAME)". Escaped references will never
-                              be expanded, regardless of whether the variable exists
-                              or not. Defaults to "".'
+                              the container and any service environment variables. If
+                              a variable cannot be resolved, the reference in the input
+                              string will be unchanged. Double $$ are reduced to a single
+                              $, which allows for escaping the $(VAR_NAME) syntax: i.e.
+                              "$$(VAR_NAME)" will produce the string literal "$(VAR_NAME)".
+                              Escaped references will never be expanded, regardless
+                              of whether the variable exists or not. Defaults to "".'
                             type: string
                           valueFrom:
                             description: Source for the environment variable's value.
@@ -267,22 +271,21 @@ spec:
                                     description: The key to select.
                                     type: string
                                   name:
-                                    description: 'Name of the referent. More info:
-                                      https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                                       TODO: Add other useful fields. apiVersion, kind,
                                       uid?'
                                     type: string
                                   optional:
-                                    description: Specify whether the ConfigMap or
-                                      its key must be defined
+                                    description: Specify whether the ConfigMap or its
+                                      key must be defined
                                     type: boolean
                                 required:
                                 - key
                                 type: object
                                 x-kubernetes-map-type: atomic
                               fieldRef:
-                                description: 'Selects a field of the pod: supports
-                                  metadata.name, metadata.namespace, `metadata.labels[''<KEY>'']`,
+                                description: 'Selects a field of the pod: supports metadata.name,
+                                  metadata.namespace, `metadata.labels[''<KEY>'']`,
                                   `metadata.annotations[''<KEY>'']`, spec.nodeName,
                                   spec.serviceAccountName, status.hostIP, status.podIP,
                                   status.podIPs.'
@@ -300,11 +303,10 @@ spec:
                                 type: object
                                 x-kubernetes-map-type: atomic
                               resourceFieldRef:
-                                description: 'Selects a resource of the container:
-                                  only resources limits and requests (limits.cpu,
-                                  limits.memory, limits.ephemeral-storage, requests.cpu,
-                                  requests.memory and requests.ephemeral-storage)
-                                  are currently supported.'
+                                description: 'Selects a resource of the container: only
+                                  resources limits and requests (limits.cpu, limits.memory,
+                                  limits.ephemeral-storage, requests.cpu, requests.memory
+                                  and requests.ephemeral-storage) are currently supported.'
                                 properties:
                                   containerName:
                                     description: 'Container name: required for volumes,
@@ -334,14 +336,13 @@ spec:
                                       be a valid secret key.
                                     type: string
                                   name:
-                                    description: 'Name of the referent. More info:
-                                      https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                                       TODO: Add other useful fields. apiVersion, kind,
                                       uid?'
                                     type: string
                                   optional:
-                                    description: Specify whether the Secret or its
-                                      key must be defined
+                                    description: Specify whether the Secret or its key
+                                      must be defined
                                     type: boolean
                                 required:
                                 - key
@@ -356,10 +357,9 @@ spec:
                       description: Executable name in `ros2 run <package> <executable>`.
                       type: string
                     namespacing:
-                      description: ROS 2 namespacing. May not be suitable for all
-                        executables. If used, all the node names and topic names should
-                        be defined relative, not absolute. (eg. `cmd_vel` instead
-                        of /cmd_vel``)
+                      description: ROS 2 namespacing. May not be suitable for all executables.
+                        If used, all the node names and topic names should be defined
+                        relative, not absolute. (eg. `cmd_vel` instead of /cmd_vel``)
                       type: boolean
                     package:
                       description: Package name in `ros2 run <package> <executable>`.
@@ -406,8 +406,8 @@ spec:
                         instance.
                       type: object
                     workspace:
-                      description: Name of the workspace. Should be selected among
-                        the existing workspaces in WorkspaceManager's manifests.
+                      description: Name of the workspace. Should be selected among the
+                        existing workspaces in WorkspaceManager's manifests.
                       type: string
                   required:
                   - executable
@@ -422,8 +422,8 @@ spec:
             description: Most recently observed status of the LaunchManager.
             properties:
               active:
-                description: Indicates if the LaunchManager is attached to a Robot
-                  and actively running.
+                description: Indicates if the LaunchManager is attached to a Robot and
+                  actively running.
                 type: boolean
               launchPodStatus:
                 description: Collective statuses of launch pod and launch objects.
@@ -437,8 +437,7 @@ spec:
                             selectors.
                           type: boolean
                         containerStatus:
-                          description: Statuses of the containers of pods owned by
-                            LaunchManager.
+                          description: Statuses of the containers of pods owned by LaunchManager.
                           properties:
                             containerID:
                               description: Container's ID in the format '<type>://<container_id>'.
@@ -458,8 +457,8 @@ spec:
                                   description: Details about a running container
                                   properties:
                                     startedAt:
-                                      description: Time at which the container was
-                                        last (re-)started
+                                      description: Time at which the container was last
+                                        (re-)started
                                       format: date-time
                                       type: string
                                   type: object
@@ -508,8 +507,8 @@ spec:
                                         is not yet running.
                                       type: string
                                     reason:
-                                      description: (brief) reason the container is
-                                        not yet running.
+                                      description: (brief) reason the container is not
+                                        yet running.
                                       type: string
                                   type: object
                               type: object
@@ -541,8 +540,8 @@ spec:
                                   description: Details about a running container
                                   properties:
                                     startedAt:
-                                      description: Time at which the container was
-                                        last (re-)started
+                                      description: Time at which the container was last
+                                        (re-)started
                                       format: date-time
                                       type: string
                                   type: object
@@ -591,8 +590,8 @@ spec:
                                         is not yet running.
                                       type: string
                                     reason:
-                                      description: (brief) reason the container is
-                                        not yet running.
+                                      description: (brief) reason the container is not
+                                        yet running.
                                       type: string
                                   type: object
                               type: object
@@ -605,8 +604,7 @@ spec:
                           type: object
                       type: object
                     description: Status of launch objects. Every launch object generates
-                      a `ros2 launch` command that will run as an entrypoint in a
-                      container.
+                      a `ros2 launch` command that will run as an entrypoint in a container.
                     type: object
                   status:
                     description: Launch pod status. Every LaunchManager creates one
@@ -631,19 +629,18 @@ spec:
                                 description: API version of the referent.
                                 type: string
                               fieldPath:
-                                description: 'If referring to a piece of an object
-                                  instead of an entire object, this string should
-                                  contain a valid JSON/Go field access statement,
-                                  such as desiredState.manifest.containers[2]. For
-                                  example, if the object reference is to a container
+                                description: 'If referring to a piece of an object instead
+                                  of an entire object, this string should contain a
+                                  valid JSON/Go field access statement, such as desiredState.manifest.containers[2].
+                                  For example, if the object reference is to a container
                                   within a pod, this would take on a value like: "spec.containers{name}"
                                   (where "name" refers to the name of the container
                                   that triggered the event) or if no container name
                                   is specified "spec.containers[2]" (container with
-                                  index 2 in this pod). This syntax is chosen only
-                                  to have some well-defined way of referencing a part
-                                  of an object. TODO: this design is not final and
-                                  this field is subject to change in the future.'
+                                  index 2 in this pod). This syntax is chosen only to
+                                  have some well-defined way of referencing a part of
+                                  an object. TODO: this design is not final and this
+                                  field is subject to change in the future.'
                                 type: string
                               kind:
                                 description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
@@ -678,3 +675,9 @@ spec:
     storage: true
     subresources:
       status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
