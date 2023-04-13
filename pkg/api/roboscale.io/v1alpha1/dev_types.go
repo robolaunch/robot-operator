@@ -144,9 +144,12 @@ type RobotIDEStatus struct {
 
 // VDI resource limits.
 type Resources struct {
+	// GPU core number that will be allocated.
 	GPUCore int `json:"gpuCore,omitempty"`
+	// CPU resource limit.
 	// +kubebuilder:validation:Pattern=`^([0-9])+(m)$`
 	CPU string `json:"cpu,omitempty"`
+	// Memory resource limit.
 	// +kubebuilder:validation:Pattern=`^([0-9])+(Mi|Gi)$`
 	Memory string `json:"memory,omitempty"`
 }
