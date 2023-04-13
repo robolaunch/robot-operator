@@ -42,12 +42,15 @@ type RobotList struct {
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 
-// DiscoveryServer is the Schema for the discoveryservers API
+// DiscoveryServer is a custom resource that connects Robots and Fleets
+// both locally and geoghraphically in DDS (UDP multicast) level.
 type DiscoveryServer struct {
-	metav1.TypeMeta   `json:",inline"`
+	metav1.TypeMeta `json:",inline"`
+	// Standard object's metadata.
 	metav1.ObjectMeta `json:"metadata,omitempty"`
-
-	Spec   DiscoveryServerSpec   `json:"spec,omitempty"`
+	// Specification of the desired behavior of the DiscoveryServer.
+	Spec DiscoveryServerSpec `json:"spec,omitempty"`
+	// Most recently observed status of the DiscoveryServer.
 	Status DiscoveryServerStatus `json:"status,omitempty"`
 }
 
@@ -64,12 +67,16 @@ type DiscoveryServerList struct {
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 
-// ROSBridge is the Schema for the rosbridges API
+// ROSBridge is a custom resource that provisions ROS/2 bridge resources and workloads.
+// It could also convert ROS 2 topics to ROS topics using ROS 1 to 2 bridge.
+// (see https://github.com/ros2/ros1_bridge)
 type ROSBridge struct {
-	metav1.TypeMeta   `json:",inline"`
+	metav1.TypeMeta `json:",inline"`
+	// Standard object's metadata.
 	metav1.ObjectMeta `json:"metadata,omitempty"`
-
-	Spec   ROSBridgeSpec   `json:"spec,omitempty"`
+	// Specification of the desired behavior of the ROSBridge.
+	Spec ROSBridgeSpec `json:"spec,omitempty"`
+	// Most recently observed status of the ROSBridge.
 	Status ROSBridgeStatus `json:"status,omitempty"`
 }
 
@@ -85,11 +92,12 @@ type ROSBridgeList struct {
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 
-// RobotArtifact is the Schema for the robotartifacts API
+// RobotArtifact is a non-functional resource that holds Robot's specifications.
+// It is used to define Robot templates.
 type RobotArtifact struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
-
+	// Holds Robot's `.spec`.
 	Template RobotSpec `json:"template,omitempty"`
 }
 
@@ -106,8 +114,8 @@ type RobotArtifactList struct {
 // Robot types
 // ********************************
 
-// ROS distro selection. Allowed distros are Foxy and Galactic. It is aimed to support Humble, Melodic and Noetic in further versions.
-// +kubebuilder:validation:Enum=foxy;galactic;noetic;melodic;humble
+// ROS 2 distribution selection. Currently supported distributions are Humble, Foxy, Galactic.
+// +kubebuilder:validation:Enum=foxy;galactic;humble
 type ROSDistro string
 
 const (
@@ -123,13 +131,14 @@ const (
 	ROSDistroHumble ROSDistro = "humble"
 )
 
+// RMW implementation chooses DDS vendor for ROS 2. Currently, only eProsima's FastDDS is supported.
 // +kubebuilder:validation:Enum=rmw_fastrtps_cpp
 type RMWImplementation string
 
 const (
 	// Cyclone DDS
 	RMWImplementationCycloneDDS RMWImplementation = "rmw_cyclonedds_cpp"
-	// FastRTPS
+	// FastDDS
 	RMWImplementationFastRTPS RMWImplementation = "rmw_fastrtps_cpp"
 	// Connext
 	RMWImplementationConnext RMWImplementation = "rmw_connext_cpp"
@@ -139,15 +148,15 @@ const (
 
 // Storage class configuration for a volume type.
 type StorageClassConfig struct {
-	// Storage class name
+	// Storage class name.
 	Name string `json:"name,omitempty"`
-	// PVC access mode
+	// PVC access modes. Currently, only `ReadWriteOnce` is supported.
 	AccessMode corev1.PersistentVolumeAccessMode `json:"accessMode,omitempty"`
 }
 
 // Robot's resource limitations.
 type Storage struct {
-	// Specifies how much storage will be allocated in total.
+	// Specifies how much storage will be allocated in total. Use MB as a unit of measurement. (eg. `10240` is equal to 10 GB)
 	// +kubebuilder:default=10000
 	Amount int `json:"amount,omitempty"`
 	// Storage class selection for robot's volumes.
@@ -155,16 +164,16 @@ type Storage struct {
 }
 
 type TLSSecretReference struct {
-	// TLS secret object name.
+	// [*alpha*] TLS secret object name.
 	// +kubebuilder:validation:Required
 	Name string `json:"name"`
-	// TLS secret object namespace.
+	// [*alpha*] TLS secret object namespace.
 	// +kubebuilder:validation:Required
 	Namespace string `json:"namespace"`
 }
 
 type RootDNSConfig struct {
-	// DNS host.
+	// [*alpha*] Root DNS name..
 	// +kubebuilder:validation:Required
 	Host string `json:"host"`
 }
@@ -205,10 +214,15 @@ type RobotSpec struct {
 }
 
 type VolumeStatuses struct {
-	Var       OwnedResourceStatus `json:"varDir,omitempty"`
-	Etc       OwnedResourceStatus `json:"etcDir,omitempty"`
-	Usr       OwnedResourceStatus `json:"usrDir,omitempty"`
-	Opt       OwnedResourceStatus `json:"optDir,omitempty"`
+	// Holds PVC status of the `/var` directory of underlying OS.
+	Var OwnedResourceStatus `json:"varDir,omitempty"`
+	// Holds PVC status of the `/etc` directory of underlying OS.
+	Etc OwnedResourceStatus `json:"etcDir,omitempty"`
+	// Holds PVC status of the `/usr` directory of underlying OS.
+	Usr OwnedResourceStatus `json:"usrDir,omitempty"`
+	// Holds PVC status of the `/opt` directory of underlying OS.
+	Opt OwnedResourceStatus `json:"optDir,omitempty"`
+	// Holds PVC status of the workspaces directory of underlying OS.
 	Workspace OwnedResourceStatus `json:"workspaceDir,omitempty"`
 }
 
@@ -221,18 +235,24 @@ const (
 )
 
 type AttachedBuildObject struct {
+	// Reference to the BuildManager instance.
 	Reference corev1.ObjectReference `json:"reference,omitempty"`
-	Status    BuildManagerStatus     `json:"status,omitempty"`
+	// Status of attached BuildManager.
+	Status BuildManagerStatus `json:"status,omitempty"`
 }
 
 type AttachedLaunchObject struct {
+	// Reference to the LaunchManager instance.
 	Reference corev1.ObjectReference `json:"reference,omitempty"`
-	Status    LaunchManagerStatus    `json:"status,omitempty"`
+	// Status of attached LaunchManager.
+	Status LaunchManagerStatus `json:"status,omitempty"`
 }
 
 type AttachedDevObject struct {
+	// Reference to the RobotDevSuite instance.
 	Reference corev1.ObjectReference `json:"reference,omitempty"`
-	Status    RobotDevSuiteStatus    `json:"status,omitempty"`
+	// Status of attached RobotDevSuite.
+	Status RobotDevSuiteStatus `json:"status,omitempty"`
 }
 
 // RobotStatus defines the observed state of Robot.
@@ -278,6 +298,7 @@ type RobotStatus struct {
 // DiscoveryServer types
 // ********************************
 
+// Instance type can be either `Server` or `Client`.
 type DiscoveryServerInstanceType string
 
 const (
@@ -285,30 +306,55 @@ const (
 	DiscoveryServerInstanceTypeClient DiscoveryServerInstanceType = "Client"
 )
 
-// DiscoveryServerSpec defines the desired state of DiscoveryServer
+// DiscoveryServerSpec defines the desired state of DiscoveryServer.
 type DiscoveryServerSpec struct {
-	Type      DiscoveryServerInstanceType `json:"type,omitempty"`
-	Reference corev1.ObjectReference      `json:"reference,omitempty"`
-	Cluster   string                      `json:"cluster,omitempty"`
-	Hostname  string                      `json:"hostname,omitempty"`
-	Subdomain string                      `json:"subdomain,omitempty"`
-	Image     string                      `json:"image,omitempty"`
-	Args      []string                    `json:"args,omitempty"`
+	// Instance type can be either `Server` or `Client`.
+	// If `Server`, instance creates discovery server resources and workloads.
+	// Other `Client` instances can connect to the `Server` instance.
+	// If `Client`, instance tries to connect a `Server` instance and hold `Server` configuration in a ConfigMap.
+	Type DiscoveryServerInstanceType `json:"type,omitempty"`
+	// Reference to the `Server` instance.
+	// It is used if `.spec.type` is `Client`.
+	// Referenced object can be provisioned in another cluster.
+	Reference corev1.ObjectReference `json:"reference,omitempty"`
+	// Cloud instance name that holds DiscoveryServer instance with `Server` type.
+	Cluster string `json:"cluster,omitempty"`
+	// If instance type is `Server`, it can be an arbitrary value.
+	// If instance type is `Client`, it should be the same with Server's hostname.
+	// Used for getting Server's IP over DNS.
+	Hostname string `json:"hostname,omitempty"`
+	// If instance type is `Server`, it can be an arbitrary value.
+	// If instance type is `Client`, it should be the same with Server's subdomain.
+	// Used for getting Server's IP over DNS.
+	Subdomain string `json:"subdomain,omitempty"`
+	// Image for discovery server. Recommended to use images which has configured ROS 2.
+	Image string `json:"image,omitempty"`
+	// Entrypoint of the DiscoveryServer. Applied if the instance type is `Server`.
+	Args []string `json:"args,omitempty"`
 }
 
 type ConnectionInfo struct {
-	IP            string `json:"ip,omitempty"`
+	// IP of the discovery server.
+	// IP is being obtained from the DNS name, which is being built according to the discovery server configuration.
+	IP string `json:"ip,omitempty"`
+	// Name of the config map that holds discovery server configuration.
 	ConfigMapName string `json:"configMapName,omitempty"`
 }
 
 // DiscoveryServerStatus defines the observed state of DiscoveryServer
 type DiscoveryServerStatus struct {
-	Phase               DiscoveryServerPhase `json:"phase,omitempty"`
-	ServiceStatus       OwnedResourceStatus  `json:"serviceStatus,omitempty"`
-	ServiceExportStatus OwnedResourceStatus  `json:"serviceExportStatus,omitempty"`
-	PodStatus           OwnedPodStatus       `json:"podStatus,omitempty"`
-	ConfigMapStatus     OwnedResourceStatus  `json:"configMapStatus,omitempty"`
-	ConnectionInfo      ConnectionInfo       `json:"connectionInfo,omitempty"`
+	// Phase of the DiscoveryServer.
+	Phase DiscoveryServerPhase `json:"phase,omitempty"`
+	// Status of the DiscoveryServer service.
+	ServiceStatus OwnedResourceStatus `json:"serviceStatus,omitempty"`
+	// Status of the DiscoveryServer ServiceExport.
+	ServiceExportStatus OwnedResourceStatus `json:"serviceExportStatus,omitempty"`
+	// Status of the DiscoveryServer pod.
+	PodStatus OwnedPodStatus `json:"podStatus,omitempty"`
+	// Status of the DiscoveryServer config map.
+	ConfigMapStatus OwnedResourceStatus `json:"configMapStatus,omitempty"`
+	// Connection information.
+	ConnectionInfo ConnectionInfo `json:"connectionInfo,omitempty"`
 }
 
 // ********************************
@@ -316,21 +362,29 @@ type DiscoveryServerStatus struct {
 // ********************************
 
 type BridgeDistro struct {
-	Enabled bool      `json:"enabled,omitempty"`
-	Distro  ROSDistro `json:"distro,omitempty"`
+	// If `true`, resources and workloads are created by ROSBridge.
+	Enabled bool `json:"enabled,omitempty"`
+	// ROS distribution for bridge.
+	Distro ROSDistro `json:"distro,omitempty"`
 }
 
 // ROSBridgeSpec defines the desired state of ROSBridge
 type ROSBridgeSpec struct {
-	ROS   BridgeDistro `json:"ros,omitempty"`
-	ROS2  BridgeDistro `json:"ros2,omitempty"`
-	Image string       `json:"image,omitempty"`
+	// Configurational parameters for ROS bridge.
+	ROS BridgeDistro `json:"ros,omitempty"`
+	// Configurational parameters for ROS 2 bridge.
+	ROS2 BridgeDistro `json:"ros2,omitempty"`
+	// Image contains ROS/2 bridge packages.
+	Image string `json:"image,omitempty"`
 }
 
 // ROSBridgeStatus defines the observed state of ROSBridge
 type ROSBridgeStatus struct {
-	Phase         BridgePhase         `json:"phase,omitempty"`
-	PodStatus     OwnedResourceStatus `json:"podStatus,omitempty"`
+	// Phase of ROSBridge.
+	Phase BridgePhase `json:"phase,omitempty"`
+	// Status of ROSBridge pod.
+	PodStatus OwnedResourceStatus `json:"podStatus,omitempty"`
+	// Status of ROSBridge service.
 	ServiceStatus OwnedResourceStatus `json:"serviceStatus,omitempty"`
 }
 
