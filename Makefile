@@ -9,8 +9,6 @@ MANIFEST_LOCATION = hack/deploy/manifests
 LOCAL_MANIFEST_LOCATION = hack/deploy.local/manifests
 # Release version
 RELEASE ?= v0.1.0
-# Chart version
-CHART_VERSION ?= v0.1.0
 
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
 ifeq (,$(shell go env GOBIN))
@@ -206,9 +204,9 @@ $(HELMIFY): $(LOCALBIN)
 helm: manifests kustomize helmify
 	$(KUSTOMIZE) build config/default | $(HELMIFY) hack/deploy.local/chart/robot-operator
 	yq e -i '.appVersion = "${RELEASE}"' hack/deploy.local/chart/robot-operator/Chart.yaml
-	yq e -i '.version = "${RELEASE}-chart-${CHART_VERSION}"' hack/deploy.local/chart/robot-operator/Chart.yaml
+	yq e -i '.version = "${RELEASE}"' hack/deploy.local/chart/robot-operator/Chart.yaml
   
 gh-helm: manifests kustomize helmify
 	$(KUSTOMIZE) build config/default | $(HELMIFY) hack/deploy/chart/robot-operator
 	yq e -i '.appVersion = "${RELEASE}"' hack/deploy/chart/robot-operator/Chart.yaml
-	yq e -i '.version = "${RELEASE}-chart-${CHART_VERSION}"' hack/deploy/chart/robot-operator/Chart.yaml
+	yq e -i '.version = "${RELEASE}"' hack/deploy/chart/robot-operator/Chart.yaml
