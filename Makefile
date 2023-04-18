@@ -202,11 +202,13 @@ $(HELMIFY): $(LOCALBIN)
 	test -s $(LOCALBIN)/helmify || GOBIN=$(LOCALBIN) go install github.com/arttor/helmify/cmd/helmify@latest
 
 helm: manifests kustomize helmify
+	rm -rf hack/deploy.local/chart/robot-operator
 	$(KUSTOMIZE) build config/default | $(HELMIFY) hack/deploy.local/chart/robot-operator
 	yq e -i '.appVersion = "${RELEASE}"' hack/deploy.local/chart/robot-operator/Chart.yaml
 	yq e -i '.version = "${RELEASE}"' hack/deploy.local/chart/robot-operator/Chart.yaml
   
 gh-helm: manifests kustomize helmify
+	rm -rf hack/deploy/chart/robot-operator
 	$(KUSTOMIZE) build config/default | $(HELMIFY) hack/deploy/chart/robot-operator
 	yq e -i '.appVersion = "${RELEASE}"' hack/deploy/chart/robot-operator/Chart.yaml
 	yq e -i '.version = "${RELEASE}"' hack/deploy/chart/robot-operator/Chart.yaml
