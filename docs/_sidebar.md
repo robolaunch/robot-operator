@@ -1,4 +1,4 @@
 - [Overview](./README.md)
-- [Installation](./installation/installation.md)
+- [Installation](./installation/README.md)
 - [Concepts](./concepts/README.md)
-- [API Reference](./reference/reference.md)
+- [API Reference](./reference/README.md)
