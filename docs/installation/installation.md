@@ -1,7 +1,8 @@
 # Installation
+
 ## Prerequisites
 
-For Robot Operator v0.1.1, these prerequisites should be satisfied:
+For Robot Operator, these prerequisites should be satisfied:
 
 |     Tool     |       Version      |
 |:------------:|:------------------:|
@@ -23,14 +24,54 @@ kubectl label <NODE> robolaunch.io/cloud-instance-alias=cluster-alias
 
 ## Installing Robot Operator
 
+### via Helm
+
+Add robolaunch Helm repository and update:
+
+```bash
+helm repo add robolaunch https://robolaunch.github.io/charts/
+helm repo update
+```
+
+Install latest version of robot-operator (remove `--devel` for getting latest stable version):
+
+```bash
+helm upgrade -i robot-operator robolaunch/robot-operator  \
+--namespace robot-system \
+--create-namespace \
+--devel
+```
+
+Or you can specify a version (remove the `v` letter at the beginning of the release or tag name):
+
+```bash
+VERSION="0.2.5-alpha.6"
+helm upgrade -i robot-operator robolaunch/robot-operator  \
+--namespace robot-system \
+--create-namespace \
+--version $VERSION
+```
+
+To uninstall robot operator installed with Helm, run the following commands:
+
+```bash
+helm delete robot-operator -n robot-system
+kubectl delete ns robot-system
+```
+
 ### via Manifest
 
 Deploy robot operator one-file YAML using the command below:
 
 ```bash
-kubectl apply -f https://github.com/robolaunch/robot-operator/releases/download/v0.1.1/robot_operator.yaml
+# select a tag
+TAG="v0.2.5-alpha.6"
+kubectl apply -f https://raw.githubusercontent.com/robolaunch/robot-operator/$TAG/hack/deploy/manifests/robot_operator.yaml
 ```
 
-### via Helm
-
-Will be added.
+To uninstall robot operator installed with one-file YAML, run the following commands:
+```bash
+# find the tag you installed
+TAG="v0.2.5-alpha.6"
+kubectl delete -f https://raw.githubusercontent.com/robolaunch/robot-operator/$TAG/hack/deploy/manifests/robot_operator.yaml
+```
