@@ -315,9 +315,12 @@ type DiscoveryServerSpec struct {
 	Type DiscoveryServerInstanceType `json:"type,omitempty"`
 	// Reference to the `Server` instance.
 	// It is used if `.spec.type` is `Client`.
-	// Referenced object can be provisioned in another cluster.
+	// Referenced object can be previously provisioned in another cluster.
+	// In that case, cluster's name can be specified in `.spec.cluster` field.
 	Reference corev1.ObjectReference `json:"reference,omitempty"`
 	// Cloud instance name that holds DiscoveryServer instance with `Server` type.
+	// Should be empty if the type is `Server` since it takes cloud instance's name automatically.
+	// Should be set if the type is `Client`.
 	Cluster string `json:"cluster,omitempty"`
 	// If instance type is `Server`, it can be an arbitrary value.
 	// If instance type is `Client`, it should be the same with Server's hostname.

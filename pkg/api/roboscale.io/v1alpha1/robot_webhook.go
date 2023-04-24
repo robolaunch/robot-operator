@@ -264,6 +264,10 @@ func (r *DiscoveryServer) checkContainerInfo() error {
 		if !reflect.DeepEqual(r.Spec.Reference, corev1.ObjectReference{}) {
 			return errors.New("reference should be nil if the type is server")
 		}
+
+		if !reflect.DeepEqual(r.Spec.Cluster, "") {
+			return errors.New("cluster should be nil if the type is server")
+		}
 	}
 
 	return nil
