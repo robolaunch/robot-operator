@@ -52,9 +52,6 @@ func (r *ROSBridgeReconciler) reconcileCheckPod(ctx context.Context, instance *r
 			if container.Name == resources.ROS2_BRIDGE_PORT_NAME {
 				ros2BridgeFound = true
 			}
-			if instance.Spec.Image != container.Image {
-				rightImage = false
-			}
 		}
 
 		if (instance.Spec.ROS.Enabled && !rosBridgeFound) ||
