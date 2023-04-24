@@ -333,6 +333,9 @@ type DiscoveryServerSpec struct {
 }
 
 type ConnectionInfo struct {
+	// URI of the discovery server.
+	// Discovery server instance tries to ping this address to see if it's reachable.
+	URI string `json:"uri,omitempty"`
 	// IP of the discovery server.
 	// IP is being obtained from the DNS name, which is being built according to the discovery server configuration.
 	IP string `json:"ip,omitempty"`
