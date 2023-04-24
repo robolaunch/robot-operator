@@ -376,8 +376,6 @@ type ROSBridgeSpec struct {
 	ROS BridgeDistro `json:"ros,omitempty"`
 	// Configurational parameters for ROS 2 bridge.
 	ROS2 BridgeDistro `json:"ros2,omitempty"`
-	// Image contains ROS/2 bridge packages.
-	Image string `json:"image,omitempty"`
 }
 
 // ROSBridgeStatus defines the observed state of ROSBridge.
