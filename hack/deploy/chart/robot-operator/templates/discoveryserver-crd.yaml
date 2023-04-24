@@ -36,28 +36,22 @@ spec:
           spec:
             description: Specification of the desired behavior of the DiscoveryServer.
             properties:
-              args:
-                description: Entrypoint of the DiscoveryServer. Applied if the instance
-                  type is `Server`.
-                items:
-                  type: string
-                type: array
               cluster:
                 description: Cloud instance name that holds DiscoveryServer instance
-                  with `Server` type.
+                  with `Server` type. Should be empty if the type is `Server` since
+                  it takes cloud instance's name automatically. Should be set if the
+                  type is `Client`.
                 type: string
               hostname:
                 description: If instance type is `Server`, it can be an arbitrary value.
                   If instance type is `Client`, it should be the same with Server's
                   hostname. Used for getting Server's IP over DNS.
                 type: string
-              image:
-                description: Image for discovery server. Recommended to use images which
-                  has configured ROS 2.
-                type: string
               reference:
                 description: Reference to the `Server` instance. It is used if `.spec.type`
-                  is `Client`. Referenced object can be provisioned in another cluster.
+                  is `Client`. Referenced object can be previously provisioned in another
+                  cluster. In that case, cluster's name can be specified in `.spec.cluster`
+                  field.
                 properties:
                   apiVersion:
                     description: API version of the referent.
@@ -169,6 +163,10 @@ spec:
                     description: IP of the discovery server. IP is being obtained from
                       the DNS name, which is being built according to the discovery
                       server configuration.
+                    type: string
+                  uri:
+                    description: URI of the discovery server. Discovery server instance
+                      tries to ping this address to see if it's reachable.
                     type: string
                 type: object
               phase:

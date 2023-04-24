@@ -37,9 +37,6 @@ spec:
           spec:
             description: Specification of the desired behavior of the ROSBridge.
             properties:
-              image:
-                description: Image contains ROS/2 bridge packages.
-                type: string
               ros:
                 description: Configurational parameters for ROS bridge.
                 properties:
