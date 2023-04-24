@@ -125,17 +125,19 @@ func GetDiscoveryServerDNS(discoveryServer robotv1alpha1.DiscoveryServer) string
 	cluster := label.GetClusterName(&discoveryServer)
 
 	var serviceDNSBuilder strings.Builder
-	if dsConfig.Cluster == cluster {
-		if dsConfig.Type == robotv1alpha1.DiscoveryServerInstanceTypeServer {
-			// server
-			serviceDNSBuilder.WriteString(dsConfig.Hostname + "." + discoveryServer.GetDiscoveryServerServiceMetadata().Name + "." + discoveryServer.Namespace + ".svc." + cluster + ".local")
-		} else {
+
+	switch dsConfig.Type {
+	case robotv1alpha1.DiscoveryServerInstanceTypeServer:
+		// server
+		serviceDNSBuilder.WriteString(dsConfig.Hostname + "." + discoveryServer.GetDiscoveryServerServiceMetadata().Name + "." + discoveryServer.Namespace + ".svc." + cluster + ".local")
+	case robotv1alpha1.DiscoveryServerInstanceTypeClient:
+		if dsConfig.Cluster == cluster {
 			// client, server is in the same cluster
 			serviceDNSBuilder.WriteString(dsConfig.Hostname + "." + dsConfig.Reference.Name + "-" + dsConfig.Subdomain + "." + dsConfig.Reference.Namespace + ".svc." + cluster + ".local")
+		} else {
+			// client, server is in another cluster
+			serviceDNSBuilder.WriteString(dsConfig.Hostname + "." + dsConfig.Cluster + "." + dsConfig.Reference.Name + "-" + dsConfig.Subdomain + "." + dsConfig.Reference.Namespace + ".svc.clusterset.local")
 		}
-	} else {
-		// client, server is in another cluster
-		serviceDNSBuilder.WriteString(dsConfig.Hostname + "." + dsConfig.Cluster + "." + dsConfig.Reference.Name + "-" + dsConfig.Subdomain + "." + dsConfig.Reference.Namespace + ".svc.clusterset.local")
 	}
 
 	return serviceDNSBuilder.String()
