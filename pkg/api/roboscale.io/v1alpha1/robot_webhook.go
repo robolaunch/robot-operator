@@ -261,14 +261,6 @@ func (r *DiscoveryServer) ValidateDelete() error {
 func (r *DiscoveryServer) checkContainerInfo() error {
 
 	if r.Spec.Type == DiscoveryServerInstanceTypeServer {
-		if r.Spec.Image == "" {
-			return errors.New("image name should be set if the type is server")
-		}
-
-		if len(r.Spec.Args) == 0 {
-			return errors.New("discovery server entrypoint should be set if the type is server")
-		}
-
 		if !reflect.DeepEqual(r.Spec.Reference, corev1.ObjectReference{}) {
 			return errors.New("reference should be nil if the type is server")
 		}

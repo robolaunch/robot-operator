@@ -327,10 +327,6 @@ type DiscoveryServerSpec struct {
 	// If instance type is `Client`, it should be the same with Server's subdomain.
 	// Used for getting Server's IP over DNS.
 	Subdomain string `json:"subdomain,omitempty"`
-	// Image for discovery server. Recommended to use images which has configured ROS 2.
-	Image string `json:"image,omitempty"`
-	// Entrypoint of the DiscoveryServer. Applied if the instance type is `Server`.
-	Args []string `json:"args,omitempty"`
 }
 
 type ConnectionInfo struct {
