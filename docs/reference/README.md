@@ -545,7 +545,6 @@ _Appears in:_
 | --- | --- |
 | `ros` _[BridgeDistro](#bridgedistro)_ | Configurational parameters for ROS bridge. |
 | `ros2` _[BridgeDistro](#bridgedistro)_ | Configurational parameters for ROS 2 bridge. |
-| `image` _string_ | Image contains ROS/2 bridge packages. |
 
 
 #### ROSBridgeStatus
