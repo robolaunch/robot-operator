@@ -111,7 +111,7 @@ WorkspaceManager configures the ROS 2 workspaces and repositories by executing K
 
 
 
-WorkspaceManagerSpec defines the desired state of WorkspaceManager
+WorkspaceManagerSpec defines the desired state of WorkspaceManager.
 
 _Appears in:_
 - [RobotSpec](#robotspec)
@@ -282,7 +282,7 @@ _Appears in:_
 
 
 
-RobotDevSuiteStatus defines the observed state of RobotDevSuite
+RobotDevSuiteStatus defines the observed state of RobotDevSuite.
 
 _Appears in:_
 - [AttachedDevObject](#attacheddevobject)
@@ -369,7 +369,7 @@ RobotVDI creates and manages Cloud VDI resources and workloads.
 
 
 
-RobotVDISpec defines the desired state of RobotVDI
+RobotVDISpec defines the desired state of RobotVDI.
 
 _Appears in:_
 - [RobotDevSuiteSpec](#robotdevsuitespec)
@@ -390,7 +390,7 @@ _Appears in:_
 
 
 
-RobotVDIStatus defines the observed state of RobotVDI
+RobotVDIStatus defines the observed state of RobotVDI.
 
 _Appears in:_
 - [RobotVDI](#robotvdi)
@@ -426,7 +426,7 @@ RobotIDE creates and manages Cloud IDE resources and workloads.
 
 
 
-RobotIDESpec defines the desired state of RobotIDE
+RobotIDESpec defines the desired state of RobotIDE.
 
 _Appears in:_
 - [RobotDevSuiteSpec](#robotdevsuitespec)
@@ -488,19 +488,17 @@ _Appears in:_
 | Field | Description |
 | --- | --- |
 | `type` _[DiscoveryServerInstanceType](#discoveryserverinstancetype)_ | Instance type can be either `Server` or `Client`. If `Server`, instance creates discovery server resources and workloads. Other `Client` instances can connect to the `Server` instance. If `Client`, instance tries to connect a `Server` instance and hold `Server` configuration in a ConfigMap. |
-| `reference` _[ObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#objectreference-v1-core)_ | Reference to the `Server` instance. It is used if `.spec.type` is `Client`. Referenced object can be provisioned in another cluster. |
-| `cluster` _string_ | Cloud instance name that holds DiscoveryServer instance with `Server` type. |
+| `reference` _[ObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#objectreference-v1-core)_ | Reference to the `Server` instance. It is used if `.spec.type` is `Client`. Referenced object can be previously provisioned in another cluster. In that case, cluster's name can be specified in `.spec.cluster` field. |
+| `cluster` _string_ | Cloud instance name that holds DiscoveryServer instance with `Server` type. Should be empty if the type is `Server` since it takes cloud instance's name automatically. Should be set if the type is `Client`. |
 | `hostname` _string_ | If instance type is `Server`, it can be an arbitrary value. If instance type is `Client`, it should be the same with Server's hostname. Used for getting Server's IP over DNS. |
 | `subdomain` _string_ | If instance type is `Server`, it can be an arbitrary value. If instance type is `Client`, it should be the same with Server's subdomain. Used for getting Server's IP over DNS. |
-| `image` _string_ | Image for discovery server. Recommended to use images which has configured ROS 2. |
-| `args` _string array_ | Entrypoint of the DiscoveryServer. Applied if the instance type is `Server`. |
 
 
 #### DiscoveryServerStatus
 
 
 
-DiscoveryServerStatus defines the observed state of DiscoveryServer
+DiscoveryServerStatus defines the observed state of DiscoveryServer.
 
 _Appears in:_
 - [DiscoveryServer](#discoveryserver)
@@ -537,7 +535,7 @@ ROSBridge is a custom resource that provisions ROS/2 bridge resources and worklo
 
 
 
-ROSBridgeSpec defines the desired state of ROSBridge
+ROSBridgeSpec defines the desired state of ROSBridge.
 
 _Appears in:_
 - [ROSBridge](#rosbridge)
@@ -547,14 +545,13 @@ _Appears in:_
 | --- | --- |
 | `ros` _[BridgeDistro](#bridgedistro)_ | Configurational parameters for ROS bridge. |
 | `ros2` _[BridgeDistro](#bridgedistro)_ | Configurational parameters for ROS 2 bridge. |
-| `image` _string_ | Image contains ROS/2 bridge packages. |
 
 
 #### ROSBridgeStatus
 
 
 
-ROSBridgeStatus defines the observed state of ROSBridge
+ROSBridgeStatus defines the observed state of ROSBridge.
 
 _Appears in:_
 - [ROSBridge](#rosbridge)
@@ -665,6 +662,7 @@ _Appears in:_
 
 | Field | Description |
 | --- | --- |
+| `uri` _string_ | URI of the discovery server. Discovery server instance tries to ping this address to see if it's reachable. |
 | `ip` _string_ | IP of the discovery server. IP is being obtained from the DNS name, which is being built according to the discovery server configuration. |
 | `configMapName` _string_ | Name of the config map that holds discovery server configuration. |
 

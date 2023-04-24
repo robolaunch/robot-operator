@@ -315,9 +315,12 @@ type DiscoveryServerSpec struct {
 	Type DiscoveryServerInstanceType `json:"type,omitempty"`
 	// Reference to the `Server` instance.
 	// It is used if `.spec.type` is `Client`.
-	// Referenced object can be provisioned in another cluster.
+	// Referenced object can be previously provisioned in another cluster.
+	// In that case, cluster's name can be specified in `.spec.cluster` field.
 	Reference corev1.ObjectReference `json:"reference,omitempty"`
 	// Cloud instance name that holds DiscoveryServer instance with `Server` type.
+	// Should be empty if the type is `Server` since it takes cloud instance's name automatically.
+	// Should be set if the type is `Client`.
 	Cluster string `json:"cluster,omitempty"`
 	// If instance type is `Server`, it can be an arbitrary value.
 	// If instance type is `Client`, it should be the same with Server's hostname.
@@ -327,13 +330,12 @@ type DiscoveryServerSpec struct {
 	// If instance type is `Client`, it should be the same with Server's subdomain.
 	// Used for getting Server's IP over DNS.
 	Subdomain string `json:"subdomain,omitempty"`
-	// Image for discovery server. Recommended to use images which has configured ROS 2.
-	Image string `json:"image,omitempty"`
-	// Entrypoint of the DiscoveryServer. Applied if the instance type is `Server`.
-	Args []string `json:"args,omitempty"`
 }
 
 type ConnectionInfo struct {
+	// URI of the discovery server.
+	// Discovery server instance tries to ping this address to see if it's reachable.
+	URI string `json:"uri,omitempty"`
 	// IP of the discovery server.
 	// IP is being obtained from the DNS name, which is being built according to the discovery server configuration.
 	IP string `json:"ip,omitempty"`
@@ -374,8 +376,6 @@ type ROSBridgeSpec struct {
 	ROS BridgeDistro `json:"ros,omitempty"`
 	// Configurational parameters for ROS 2 bridge.
 	ROS2 BridgeDistro `json:"ros2,omitempty"`
-	// Image contains ROS/2 bridge packages.
-	Image string `json:"image,omitempty"`
 }
 
 // ROSBridgeStatus defines the observed state of ROSBridge.

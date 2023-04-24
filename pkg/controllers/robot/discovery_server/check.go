@@ -145,6 +145,8 @@ func (r *DiscoveryServerReconciler) reconcileCleanupOwnedServices(ctx context.Co
 
 func (r *DiscoveryServerReconciler) reconcileCheckConfigMap(ctx context.Context, instance *robotv1alpha1.DiscoveryServer) error {
 
+	instance.Status.ConnectionInfo.URI = resources.GetDiscoveryServerDNS(*instance)
+
 	discoveryServerConfigMapQuery := &corev1.ConfigMap{}
 	err := r.Get(ctx, *instance.GetDiscoveryServerConfigMapMetadata(), discoveryServerConfigMapQuery)
 	if err != nil && errors.IsNotFound(err) {
