@@ -216,6 +216,14 @@ type Prelaunch struct {
 	// Script  string `json:"script,omitempty"`
 }
 
+type LaunchType string
+
+const (
+	LaunchTypeLaunch LaunchType = "Launch"
+	LaunchTypeRun    LaunchType = "Run"
+	LaunchTypeCustom LaunchType = "Custom"
+)
+
 // Launch description of a repository.
 type Launch struct {
 	// Cluster selector. If empty, launch pod will be created.
@@ -231,6 +239,9 @@ type Launch struct {
 	// (eg. `cmd_vel` instead of /cmd_vel``)
 	// +kubebuilder:validation:Required
 	Namespacing bool `json:"namespacing,omitempty"`
+	// Launching type. Can be `Launch`, `Run` or `Custom`.
+	// +kubebuilder:validation:Enum=Launch;Run;Custom
+	Type LaunchType `json:"type,omitempty"`
 	// Package name. (eg. `robolaunch_cloudy_navigation`)
 	// +kubebuilder:validation:Required
 	Package string `json:"package"`
