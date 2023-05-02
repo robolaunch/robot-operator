@@ -17,36 +17,17 @@ import (
 func GetLaunchPod(launchManager *robotv1alpha1.LaunchManager, podNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot, buildManager robotv1alpha1.BuildManager, robotVDI robotv1alpha1.RobotVDI, node corev1.Node) *corev1.Pod {
 
 	containers := []corev1.Container{}
+	clusterName := label.GetClusterName(&robot)
 	for k, l := range launchManager.Spec.Launch {
-		if physicalInstance, ok := l.Selector[internal.PHYSICAL_INSTANCE_LABEL_KEY]; ok {
-			if physicalInstance == label.GetClusterName(&robot) {
-				cont := getLaunchContainer(l, k, robot, buildManager)
-				containers = append(containers, cont)
-			}
-		} else if cloudInstance, ok := l.Selector[internal.CLOUD_INSTANCE_LABEL_KEY]; ok {
-			if cloudInstance == label.GetClusterName(&robot) {
-				cont := getLaunchContainer(l, k, robot, buildManager)
-				containers = append(containers, cont)
-			}
-		} else {
-			cont := getLaunchContainer(l, k, robot, buildManager)
-			containers = append(containers, cont)
-		}
-	}
+		if ContainsInstance(l.Instances, clusterName) {
+			cont := corev1.Container{}
+			switch l.Type {
+			case robotv1alpha1.LaunchTypeLaunch:
+				cont = getLaunchContainer(l, k, robot, buildManager)
+			case robotv1alpha1.LaunchTypeRun:
+				cont = getRunContainer(l, k, robot, buildManager)
 
-	for k, r := range launchManager.Spec.Run {
-		if physicalInstance, ok := r.Selector[internal.PHYSICAL_INSTANCE_LABEL_KEY]; ok {
-			if physicalInstance == label.GetClusterName(&robot) {
-				cont := getRunContainer(r, k, robot, buildManager)
-				containers = append(containers, cont)
 			}
-		} else if cloudInstance, ok := r.Selector[internal.CLOUD_INSTANCE_LABEL_KEY]; ok {
-			if cloudInstance == label.GetClusterName(&robot) {
-				cont := getRunContainer(r, k, robot, buildManager)
-				containers = append(containers, cont)
-			}
-		} else {
-			cont := getRunContainer(r, k, robot, buildManager)
 			containers = append(containers, cont)
 		}
 	}
@@ -131,18 +112,18 @@ func getLaunchContainer(launch robotv1alpha1.Launch, launchName string, robot ro
 	return container
 }
 
-func getRunContainer(run robotv1alpha1.Run, launchName string, robot robotv1alpha1.Robot, buildManager robotv1alpha1.BuildManager) corev1.Container {
+func getRunContainer(launch robotv1alpha1.Launch, launchName string, robot robotv1alpha1.Robot, buildManager robotv1alpha1.BuildManager) corev1.Container {
 
 	sleepTimeInt := 3
 	sleepTime := strconv.Itoa(sleepTimeInt)
 
-	workspace, _ := robot.GetWorkspaceByName(run.Workspace)
+	workspace, _ := robot.GetWorkspaceByName(launch.Workspace)
 
 	var cmdBuilder strings.Builder
 	cmdBuilder.WriteString("echo \"Starting node in " + sleepTime + " seconds...\" && ")
 	cmdBuilder.WriteString("sleep " + sleepTime + " && ")
 	cmdBuilder.WriteString("source " + filepath.Join("/opt", "ros", string(workspace.Distro), "setup.bash") + " && ")
-	cmdBuilder.WriteString("source " + filepath.Join("$WORKSPACES_PATH", run.Workspace, getWsSubDir(workspace.Distro), "setup.bash") + " && ")
+	cmdBuilder.WriteString("source " + filepath.Join("$WORKSPACES_PATH", launch.Workspace, getWsSubDir(workspace.Distro), "setup.bash") + " && ")
 	cmdBuilder.WriteString("$PRELAUNCH; ")
 	cmdBuilder.WriteString("$COMMAND")
 
@@ -161,16 +142,16 @@ func getRunContainer(run robotv1alpha1.Run, launchName string, robot robotv1alph
 			configure.GetVolumeMount(internal.CUSTOM_SCRIPTS_PATH, configure.GetVolumeConfigMaps(&buildManager)),
 		},
 		Resources: corev1.ResourceRequirements{
-			Limits: getResourceLimits(run.Resources),
+			Limits: getResourceLimits(launch.Resources),
 		},
 		Env: []corev1.EnvVar{
-			GeneratePrelaunchCommandAsEnv(run.Prelaunch, robot),
-			GenerateRunCommandAsEnv(run, robot),
+			GeneratePrelaunchCommandAsEnv(launch.Prelaunch, robot),
+			GenerateRunCommandAsEnv(launch, robot),
 		},
 		ImagePullPolicy:          corev1.PullAlways,
 		TerminationMessagePolicy: corev1.TerminationMessageReadFile,
 		SecurityContext: &corev1.SecurityContext{
-			Privileged: &run.Privileged,
+			Privileged: &launch.Privileged,
 		},
 	}
 
@@ -179,17 +160,20 @@ func getRunContainer(run robotv1alpha1.Run, launchName string, robot robotv1alph
 
 func HasLaunchInThisInstance(launchManager robotv1alpha1.LaunchManager, robot robotv1alpha1.Robot) bool {
 
-	for _, l := range launchManager.Spec.Launch {
-		if physicalInstance, ok := l.Selector[internal.PHYSICAL_INSTANCE_LABEL_KEY]; ok {
-			if physicalInstance == label.GetClusterName(&robot) {
-				return true
-			}
-		} else if cloudInstance, ok := l.Selector[internal.CLOUD_INSTANCE_LABEL_KEY]; ok {
-			if cloudInstance == label.GetClusterName(&robot) {
-				return true
+	clusterName := label.GetClusterName(&robot)
 
-			}
-		} else {
+	for _, l := range launchManager.Spec.Launch {
+		if ContainsInstance(l.Instances, clusterName) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func ContainsInstance(instances []string, instance string) bool {
+	for _, v := range instances {
+		if v == instance {
 			return true
 		}
 	}
@@ -229,28 +213,28 @@ func GenerateLaunchCommandAsEnv(launch robotv1alpha1.Launch, robot robotv1alpha1
 	return internal.Env(commandKey, cmdBuilder.String())
 }
 
-func GenerateRunCommandAsEnv(run robotv1alpha1.Run, robot robotv1alpha1.Robot) corev1.EnvVar {
+func GenerateRunCommandAsEnv(launch robotv1alpha1.Launch, robot robotv1alpha1.Robot) corev1.EnvVar {
 
 	robotName := robot.Name
 
 	commandKey := "COMMAND"
 
 	var parameterBuilder strings.Builder
-	if run.Namespacing {
+	if launch.Namespacing {
 		rosNs := strings.ReplaceAll(robotName, "-", "_")
-		run.Parameters["__ns"] = rosNs
+		launch.Parameters["__ns"] = rosNs
 	}
-	if len(run.Parameters) > 0 {
+	if len(launch.Parameters) > 0 {
 		parameterBuilder.WriteString("--ros-args ")
 	}
-	for key, val := range run.Parameters {
+	for key, val := range launch.Parameters {
 		parameterBuilder.WriteString("-r " + key + ":=" + val + " ")
 	}
 
 	var cmdBuilder strings.Builder
 
 	cmdBuilder.WriteString("ros2 run ")
-	cmdBuilder.WriteString(run.Package + " " + run.Executable + " ")
+	cmdBuilder.WriteString(launch.Package + " " + launch.Executable + " ")
 	cmdBuilder.WriteString(parameterBuilder.String())
 
 	return internal.Env(commandKey, cmdBuilder.String())
