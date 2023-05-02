@@ -39,6 +39,7 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/robolaunch/robot-operator/internal"
 	robotErr "github.com/robolaunch/robot-operator/internal/error"
+	"github.com/robolaunch/robot-operator/internal/hybrid"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 )
 
@@ -133,54 +134,66 @@ func (r *BuildManagerReconciler) reconcileCheckStatus(ctx context.Context, insta
 	switch instance.Status.Active {
 	case true:
 
+		robot, err := r.reconcileGetTargetRobot(ctx, instance)
+		if err != nil {
+			return err
+		}
+
 		switch instance.Status.ScriptConfigMapStatus.Created {
 		case true:
 
-			instance.Status.Phase = robotv1alpha1.BuildManagerBuildingRobot
+			switch hybrid.HasStepInThisInstance(*instance, *robot) {
+			case true:
 
-			for k := range instance.Status.Steps {
-				if instance.Status.Steps[k].Resource.Created {
+				instance.Status.Phase = robotv1alpha1.BuildManagerBuildingRobot
 
-					if instance.Status.Steps[k].Resource.Phase == string(robotv1alpha1.JobSucceeded) {
-						continue
-					} else if instance.Status.Steps[k].Resource.Phase == string(robotv1alpha1.JobActive) {
-						Requeue(&defaultReturnResult)
-						break
-					} else if instance.Status.Steps[k].Resource.Phase == string(robotv1alpha1.JobFailed) {
-						Requeue(&defaultReturnResult)
-						break
+				for k := range instance.Status.Steps {
+					if instance.Status.Steps[k].Resource.Created {
+
+						if instance.Status.Steps[k].Resource.Phase == string(robotv1alpha1.JobSucceeded) {
+							continue
+						} else if instance.Status.Steps[k].Resource.Phase == string(robotv1alpha1.JobActive) {
+							Requeue(&defaultReturnResult)
+							break
+						} else if instance.Status.Steps[k].Resource.Phase == string(robotv1alpha1.JobFailed) {
+							Requeue(&defaultReturnResult)
+							break
+						} else {
+							Requeue(&defaultReturnResult)
+							break
+						}
+
 					} else {
-						Requeue(&defaultReturnResult)
+
+						err := r.createBuilderJob(ctx, instance, k)
+						if err != nil {
+							return err
+						}
+
+						stepStatus := instance.Status.Steps[k]
+						stepStatus.Resource.Created = true
+						instance.Status.Steps[k] = stepStatus
+
 						break
 					}
+				}
 
-				} else {
+				areJobsSucceeded := false
 
-					err := r.createBuilderJob(ctx, instance, k)
-					if err != nil {
-						return err
+				for key := range instance.Status.Steps {
+					if instance.Status.Steps[key].Resource.Phase == string(robotv1alpha1.JobSucceeded) {
+						areJobsSucceeded = true
+					} else {
+						areJobsSucceeded = false
+						break
 					}
-
-					stepStatus := instance.Status.Steps[k]
-					stepStatus.Resource.Created = true
-					instance.Status.Steps[k] = stepStatus
-
-					break
 				}
-			}
 
-			areJobsSucceeded := false
-
-			for key := range instance.Status.Steps {
-				if instance.Status.Steps[key].Resource.Phase == string(robotv1alpha1.JobSucceeded) {
-					areJobsSucceeded = true
-				} else {
-					areJobsSucceeded = false
-					break
+				if areJobsSucceeded {
+					instance.Status.Phase = robotv1alpha1.BuildManagerReady
 				}
-			}
 
-			if areJobsSucceeded {
+			case false:
 				instance.Status.Phase = robotv1alpha1.BuildManagerReady
 			}
 

@@ -166,10 +166,9 @@ type WorkspaceManagerStatus struct {
 // Step is a command or script to execute when building a robot. Either `command` or `script` should be specified
 // for each step.
 type Step struct {
-	// Cluster selector. If empty, step will be executed.
-	// If `robolaunch.io/cloud-instance` is specified only, step will be running on the cloud instance.
-	// If `robolaunch.io/physical-instance` is specified only, step will be running on the physical instance.
-	Selector map[string]string `json:"selector,omitempty"`
+	// Cluster selector.
+	// If the current instance name is on the list, BuildManager creates building jobs.
+	Instances []string `json:"instances,omitempty"`
 	// Name of the step.
 	Name string `json:"name"`
 	// Name of the workspace.
@@ -216,69 +215,66 @@ type Prelaunch struct {
 	// Script  string `json:"script,omitempty"`
 }
 
-// Launch description of a repository.
-type Launch struct {
-	// Cluster selector. If empty, launch pod will be created.
-	// If `robolaunch.io/cloud-instance` is specified only, launch will be running on the cloud instance.
-	// If `robolaunch.io/physical-instance` is specified only, launch will be running on the physical instance.
-	Selector map[string]string `json:"selector,omitempty"`
-	// Name of the workspace.
-	// Should be selected among the existing workspaces in WorkspaceManager's manifests.
+type LaunchEntrypointConfig struct {
+	// Launching type. Can be `Launch`, `Run` or `Custom`.
+	// +kubebuilder:validation:Enum=Launch;Run;Custom
+	Type LaunchType `json:"type,omitempty"`
+	// Package name. (eg. `robolaunch_cloudy_navigation`)
 	// +kubebuilder:validation:Required
-	Workspace string `json:"workspace"`
-	// Name of the repository which includes the launchfile.
-	// +kubebuilder:validation:Required
-	Repository string `json:"repository"`
-	// ROS 2 namespacing. May not be suitable for all launchfiles.
-	// If used, all the node names and topic names should be defined relative, not absolute.
-	// (eg. `cmd_vel` instead of /cmd_vel``)
-	// +kubebuilder:validation:Required
-	Namespacing bool `json:"namespacing,omitempty"`
-	// Additional environment variables to set when launching ROS nodes.
-	Env []corev1.EnvVar `json:"env,omitempty"`
-	// Path to launchfile in repository. (eg. `linorobot/linorobot_gazebo/launch.py`)
-	// +kubebuilder:validation:Required
-	LaunchFilePath string `json:"launchFilePath"`
+	Package string `json:"package"`
+	// Launchfile. (eg. `nav_launch.py`)
+	// Required and used if the launch type is `Launch`.
+	Launchfile string `json:"launchfile"`
+	// Executable file name. (eg. `webcam_pub.py`)
+	// Required and used if the launch type is `Run`.
+	Executable string `json:"executable"`
+	// If `true`, workspaces are not sourced by default.
+	// Used if the launch type is `Custom`.
+	DisableSourcingWorkspace bool `json:"disableSourcingWs"`
+	// Custom command to launch packages or start nodes.
+	// Required if the launch type is `Custom`.
+	Command string `json:"cmd"`
 	// Launch parameters.
 	Parameters map[string]string `json:"parameters,omitempty"`
 	// Command or script to run just before node's execution.
 	Prelaunch Prelaunch `json:"prelaunch,omitempty"`
+}
+
+type LaunchContainerConfig struct {
+	// Additional environment variables to set when launching ROS nodes.
+	Env []corev1.EnvVar `json:"env,omitempty"`
 	// Launch container privilege.
 	Privileged bool `json:"privileged,omitempty"`
 	// Launch container resource limits.
 	Resources Resources `json:"resources,omitempty"`
 }
 
-// Run description.
-type Run struct {
-	// Cluster selector. If empty, run pod will be created.
-	// If `robolaunch.io/cloud-instance` is specified only, run process will be running on the cloud instance.
-	// If `robolaunch.io/physical-instance` is specified only, run process will be running on the physical instance.
-	Selector map[string]string `json:"selector,omitempty"`
+type LaunchType string
+
+const (
+	LaunchTypeLaunch LaunchType = "Launch"
+	LaunchTypeRun    LaunchType = "Run"
+	LaunchTypeCustom LaunchType = "Custom"
+)
+
+// Launch description of a repository.
+type Launch struct {
+	// Cluster selector.
+	// If the current instance name is on the list, LaunchManager creates launch pods.
+	Instances []string `json:"instances,omitempty"`
 	// Name of the workspace.
 	// Should be selected among the existing workspaces in WorkspaceManager's manifests.
 	// +kubebuilder:validation:Required
 	Workspace string `json:"workspace"`
-	// ROS 2 namespacing. May not be suitable for all executables.
+	// ROS 2 namespacing. May not be suitable for all launchfiles.
 	// If used, all the node names and topic names should be defined relative, not absolute.
 	// (eg. `cmd_vel` instead of /cmd_vel``)
 	// +kubebuilder:validation:Required
 	Namespacing bool `json:"namespacing,omitempty"`
-	// Additional environment variables to set when launching ROS nodes.
-	Env []corev1.EnvVar `json:"env,omitempty"`
-	// Package name in `ros2 run <package> <executable>`.
-	// +kubebuilder:validation:Required
-	Package string `json:"package"`
-	// Executable name in `ros2 run <package> <executable>`.
-	Executable string `json:"executable"`
-	// Run parameters.
-	Parameters map[string]string `json:"parameters,omitempty"`
-	// Command or script to run just before node's execution.
-	Prelaunch Prelaunch `json:"prelaunch,omitempty"`
-	// Launch container privilege.
-	Privileged bool `json:"privileged,omitempty"`
-	// Launch container resource limits.
-	Resources Resources `json:"resources,omitempty"`
+	// Entrypoint configuration of launch.
+	Entrypoint LaunchEntrypointConfig `json:"entrypoint,omitempty"`
+	// General container configuration parameters.
+	Container LaunchContainerConfig `json:"container,omitempty"`
 }
 
 // LaunchManagerSpec defines the desired state of LaunchManager.
@@ -287,10 +283,8 @@ type LaunchManagerSpec struct {
 	// Applications that requires GUI can be executed such as rViz.
 	Display bool `json:"display,omitempty"`
 	// Launch descriptions.
-	// Every object defined here generates a `ros2 launch` command in the specified workspace.
+	// Every object defined here generates a launching command in the specified workspace.
 	Launch map[string]Launch `json:"launch,omitempty"`
-	// Every object defined here generates a `ros2 run` command in the specified workspace.
-	Run map[string]Run `json:"run,omitempty"`
 }
 
 type LaunchStatus struct {

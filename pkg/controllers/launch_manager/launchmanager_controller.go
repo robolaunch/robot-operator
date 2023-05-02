@@ -35,7 +35,7 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/robolaunch/robot-operator/internal"
-	"github.com/robolaunch/robot-operator/internal/resources"
+	"github.com/robolaunch/robot-operator/internal/hybrid"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 )
 
@@ -107,7 +107,7 @@ func (r *LaunchManagerReconciler) reconcileCheckStatus(ctx context.Context, inst
 			return err
 		}
 
-		switch resources.HasLaunchInThisInstance(*instance, *robot) {
+		switch hybrid.HasLaunchInThisInstance(*instance, *robot) {
 		case true:
 
 			switch instance.Status.LaunchPodStatus.Status.Resource.Created {

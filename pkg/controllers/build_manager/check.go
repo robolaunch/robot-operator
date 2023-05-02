@@ -3,7 +3,7 @@ package build_manager
 import (
 	"context"
 
-	"github.com/robolaunch/robot-operator/internal"
+	"github.com/robolaunch/robot-operator/internal/hybrid"
 	"github.com/robolaunch/robot-operator/internal/label"
 	"github.com/robolaunch/robot-operator/internal/reference"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
@@ -42,20 +42,9 @@ func (r *BuildManagerReconciler) reconcileCheckBuilderJobs(ctx context.Context, 
 
 	for _, step := range instance.Spec.Steps {
 
-		runOnCluster := false
-		if physicalInstance, ok := step.Selector[internal.PHYSICAL_INSTANCE_LABEL_KEY]; ok {
-			if physicalInstance == label.GetClusterName(robot) {
-				runOnCluster = true
-			}
-		} else if cloudInstance, ok := step.Selector[internal.CLOUD_INSTANCE_LABEL_KEY]; ok {
-			if cloudInstance == label.GetClusterName(robot) {
-				runOnCluster = true
-			}
-		} else {
-			runOnCluster = true
-		}
+		clusterName := label.GetClusterName(robot)
 
-		if runOnCluster {
+		if hybrid.ContainsInstance(step.Instances, clusterName) {
 			jobMetadata := types.NamespacedName{
 				Namespace: instance.Namespace,
 				Name:      instance.Name + "-" + step.Name,

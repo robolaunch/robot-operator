@@ -7,6 +7,7 @@ import (
 
 	"github.com/robolaunch/robot-operator/internal"
 	"github.com/robolaunch/robot-operator/internal/configure"
+	"github.com/robolaunch/robot-operator/internal/hybrid"
 	"github.com/robolaunch/robot-operator/internal/label"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
@@ -17,37 +18,10 @@ import (
 func GetLaunchPod(launchManager *robotv1alpha1.LaunchManager, podNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot, buildManager robotv1alpha1.BuildManager, robotVDI robotv1alpha1.RobotVDI, node corev1.Node) *corev1.Pod {
 
 	containers := []corev1.Container{}
+	clusterName := label.GetClusterName(&robot)
 	for k, l := range launchManager.Spec.Launch {
-		if physicalInstance, ok := l.Selector[internal.PHYSICAL_INSTANCE_LABEL_KEY]; ok {
-			if physicalInstance == label.GetClusterName(&robot) {
-				cont := getLaunchContainer(l, k, robot, buildManager)
-				containers = append(containers, cont)
-			}
-		} else if cloudInstance, ok := l.Selector[internal.CLOUD_INSTANCE_LABEL_KEY]; ok {
-			if cloudInstance == label.GetClusterName(&robot) {
-				cont := getLaunchContainer(l, k, robot, buildManager)
-				containers = append(containers, cont)
-			}
-		} else {
-			cont := getLaunchContainer(l, k, robot, buildManager)
-			containers = append(containers, cont)
-		}
-	}
-
-	for k, r := range launchManager.Spec.Run {
-		if physicalInstance, ok := r.Selector[internal.PHYSICAL_INSTANCE_LABEL_KEY]; ok {
-			if physicalInstance == label.GetClusterName(&robot) {
-				cont := getRunContainer(r, k, robot, buildManager)
-				containers = append(containers, cont)
-			}
-		} else if cloudInstance, ok := r.Selector[internal.CLOUD_INSTANCE_LABEL_KEY]; ok {
-			if cloudInstance == label.GetClusterName(&robot) {
-				cont := getRunContainer(r, k, robot, buildManager)
-				containers = append(containers, cont)
-			}
-		} else {
-			cont := getRunContainer(r, k, robot, buildManager)
-			containers = append(containers, cont)
+		if hybrid.ContainsInstance(l.Instances, clusterName) {
+			containers = append(containers, getContainer(l, k, robot, buildManager))
 		}
 	}
 
@@ -85,7 +59,50 @@ func GetLaunchPod(launchManager *robotv1alpha1.LaunchManager, podNamespacedName 
 	return &launchPod
 }
 
-func getLaunchContainer(launch robotv1alpha1.Launch, launchName string, robot robotv1alpha1.Robot, buildManager robotv1alpha1.BuildManager) corev1.Container {
+func getContainer(launch robotv1alpha1.Launch, launchName string, robot robotv1alpha1.Robot, buildManager robotv1alpha1.BuildManager) corev1.Container {
+
+	cmdEnv := corev1.EnvVar{}
+	switch launch.Entrypoint.Type {
+	case robotv1alpha1.LaunchTypeLaunch:
+		cmdEnv = generateLaunchCommandAsEnv(launch, robot)
+	case robotv1alpha1.LaunchTypeRun:
+		cmdEnv = generateRunCommandAsEnv(launch, robot)
+	case robotv1alpha1.LaunchTypeCustom:
+		cmdEnv = generateCustomCommandAsEnv(launch, robot)
+	}
+
+	container := corev1.Container{
+		Name:    launchName,
+		Image:   robot.Status.Image,
+		Command: buildContainerEntrypoint(launch, robot, launch.Entrypoint.DisableSourcingWorkspace),
+		Stdin:   true,
+		TTY:     true,
+		VolumeMounts: []corev1.VolumeMount{
+			configure.GetVolumeMount("", configure.GetVolumeVar(&robot)),
+			configure.GetVolumeMount("", configure.GetVolumeUsr(&robot)),
+			configure.GetVolumeMount("", configure.GetVolumeOpt(&robot)),
+			configure.GetVolumeMount("", configure.GetVolumeEtc(&robot)),
+			configure.GetVolumeMount(robot.Spec.WorkspaceManagerTemplate.WorkspacesPath, configure.GetVolumeWorkspace(&robot)),
+			configure.GetVolumeMount(internal.CUSTOM_SCRIPTS_PATH, configure.GetVolumeConfigMaps(&buildManager)),
+		},
+		Resources: corev1.ResourceRequirements{
+			Limits: getResourceLimits(launch.Container.Resources),
+		},
+		Env: []corev1.EnvVar{
+			generatePrelaunchCommandAsEnv(launch.Entrypoint.Prelaunch, robot),
+			cmdEnv,
+		},
+		ImagePullPolicy:          corev1.PullAlways,
+		TerminationMessagePolicy: corev1.TerminationMessageReadFile,
+		SecurityContext: &corev1.SecurityContext{
+			Privileged: &launch.Container.Privileged,
+		},
+	}
+
+	return container
+}
+
+func buildContainerEntrypoint(launch robotv1alpha1.Launch, robot robotv1alpha1.Robot, disableSourcingWs bool) []string {
 
 	sleepTimeInt := 3
 	sleepTime := strconv.Itoa(sleepTimeInt)
@@ -95,133 +112,30 @@ func getLaunchContainer(launch robotv1alpha1.Launch, launchName string, robot ro
 	var cmdBuilder strings.Builder
 	cmdBuilder.WriteString("echo \"Starting node in " + sleepTime + " seconds...\" && ")
 	cmdBuilder.WriteString("sleep " + sleepTime + " && ")
-	cmdBuilder.WriteString("source " + filepath.Join("/opt", "ros", string(workspace.Distro), "setup.bash") + " && ")
-	cmdBuilder.WriteString("source " + filepath.Join("$WORKSPACES_PATH", launch.Workspace, getWsSubDir(workspace.Distro), "setup.bash") + " && ")
+	if !disableSourcingWs {
+		cmdBuilder.WriteString("source " + filepath.Join("/opt", "ros", string(workspace.Distro), "setup.bash") + " && ")
+		cmdBuilder.WriteString("source " + filepath.Join("$WORKSPACES_PATH", launch.Workspace, getWsSubDir(workspace.Distro), "setup.bash") + " && ")
+	}
 	cmdBuilder.WriteString("$PRELAUNCH; ")
 	cmdBuilder.WriteString("$COMMAND")
 
-	container := corev1.Container{
-		Name:    launchName,
-		Image:   robot.Status.Image,
-		Command: internal.Bash(cmdBuilder.String()),
-		Stdin:   true,
-		TTY:     true,
-		VolumeMounts: []corev1.VolumeMount{
-			configure.GetVolumeMount("", configure.GetVolumeVar(&robot)),
-			configure.GetVolumeMount("", configure.GetVolumeUsr(&robot)),
-			configure.GetVolumeMount("", configure.GetVolumeOpt(&robot)),
-			configure.GetVolumeMount("", configure.GetVolumeEtc(&robot)),
-			configure.GetVolumeMount(robot.Spec.WorkspaceManagerTemplate.WorkspacesPath, configure.GetVolumeWorkspace(&robot)),
-			configure.GetVolumeMount(internal.CUSTOM_SCRIPTS_PATH, configure.GetVolumeConfigMaps(&buildManager)),
-		},
-		Resources: corev1.ResourceRequirements{
-			Limits: getResourceLimits(launch.Resources),
-		},
-		Env: []corev1.EnvVar{
-			GeneratePrelaunchCommandAsEnv(launch.Prelaunch, robot),
-			GenerateLaunchCommandAsEnv(launch, robot),
-		},
-		ImagePullPolicy:          corev1.PullAlways,
-		TerminationMessagePolicy: corev1.TerminationMessageReadFile,
-		SecurityContext: &corev1.SecurityContext{
-			Privileged: &launch.Privileged,
-		},
-	}
-
-	return container
+	return internal.Bash(cmdBuilder.String())
 }
 
-func getRunContainer(run robotv1alpha1.Run, launchName string, robot robotv1alpha1.Robot, buildManager robotv1alpha1.BuildManager) corev1.Container {
-
-	sleepTimeInt := 3
-	sleepTime := strconv.Itoa(sleepTimeInt)
-
-	workspace, _ := robot.GetWorkspaceByName(run.Workspace)
-
-	var cmdBuilder strings.Builder
-	cmdBuilder.WriteString("echo \"Starting node in " + sleepTime + " seconds...\" && ")
-	cmdBuilder.WriteString("sleep " + sleepTime + " && ")
-	cmdBuilder.WriteString("source " + filepath.Join("/opt", "ros", string(workspace.Distro), "setup.bash") + " && ")
-	cmdBuilder.WriteString("source " + filepath.Join("$WORKSPACES_PATH", run.Workspace, getWsSubDir(workspace.Distro), "setup.bash") + " && ")
-	cmdBuilder.WriteString("$PRELAUNCH; ")
-	cmdBuilder.WriteString("$COMMAND")
-
-	container := corev1.Container{
-		Name:    launchName,
-		Image:   robot.Status.Image,
-		Command: internal.Bash(cmdBuilder.String()),
-		Stdin:   true,
-		TTY:     true,
-		VolumeMounts: []corev1.VolumeMount{
-			configure.GetVolumeMount("", configure.GetVolumeVar(&robot)),
-			configure.GetVolumeMount("", configure.GetVolumeUsr(&robot)),
-			configure.GetVolumeMount("", configure.GetVolumeOpt(&robot)),
-			configure.GetVolumeMount("", configure.GetVolumeEtc(&robot)),
-			configure.GetVolumeMount(robot.Spec.WorkspaceManagerTemplate.WorkspacesPath, configure.GetVolumeWorkspace(&robot)),
-			configure.GetVolumeMount(internal.CUSTOM_SCRIPTS_PATH, configure.GetVolumeConfigMaps(&buildManager)),
-		},
-		Resources: corev1.ResourceRequirements{
-			Limits: getResourceLimits(run.Resources),
-		},
-		Env: []corev1.EnvVar{
-			GeneratePrelaunchCommandAsEnv(run.Prelaunch, robot),
-			GenerateRunCommandAsEnv(run, robot),
-		},
-		ImagePullPolicy:          corev1.PullAlways,
-		TerminationMessagePolicy: corev1.TerminationMessageReadFile,
-		SecurityContext: &corev1.SecurityContext{
-			Privileged: &run.Privileged,
-		},
-	}
-
-	return container
-}
-
-func HasLaunchInThisInstance(launchManager robotv1alpha1.LaunchManager, robot robotv1alpha1.Robot) bool {
-
-	for _, l := range launchManager.Spec.Launch {
-		if physicalInstance, ok := l.Selector[internal.PHYSICAL_INSTANCE_LABEL_KEY]; ok {
-			if physicalInstance == label.GetClusterName(&robot) {
-				return true
-			}
-		} else if cloudInstance, ok := l.Selector[internal.CLOUD_INSTANCE_LABEL_KEY]; ok {
-			if cloudInstance == label.GetClusterName(&robot) {
-				return true
-
-			}
-		} else {
-			return true
-		}
-	}
-
-	return false
-}
-
-func GetWorkspaceSourceFilePath(workspacesPath string, wsName string, distro robotv1alpha1.ROSDistro) string {
-	return filepath.Join(workspacesPath, wsName, getWsSubDir(distro), "setup.bash")
-}
-
-func GetLaunchfilePathAbsolute(workspacesPath string, wsName string, repoName string, lfRelativePath string) string {
-	return filepath.Join(workspacesPath, wsName, "src", repoName, lfRelativePath)
-}
-
-func GenerateLaunchCommandAsEnv(launch robotv1alpha1.Launch, robot robotv1alpha1.Robot) corev1.EnvVar {
+func generateLaunchCommandAsEnv(launch robotv1alpha1.Launch, robot robotv1alpha1.Robot) corev1.EnvVar {
 
 	robotName := robot.Name
-	robotSpec := robot.Spec
-
 	commandKey := "COMMAND"
-	launchPath := GetLaunchfilePathAbsolute(robotSpec.WorkspaceManagerTemplate.WorkspacesPath, launch.Workspace, launch.Repository, launch.LaunchFilePath)
 
 	var parameterBuilder strings.Builder
-	for key, val := range launch.Parameters {
+	for key, val := range launch.Entrypoint.Parameters {
 		parameterBuilder.WriteString(key + ":=" + val + " ")
 	}
 
 	var cmdBuilder strings.Builder
 
 	cmdBuilder.WriteString("ros2 launch ")
-	cmdBuilder.WriteString(launchPath + " ")
+	cmdBuilder.WriteString(launch.Entrypoint.Package + " " + launch.Entrypoint.Launchfile + " ")
 	cmdBuilder.WriteString(parameterBuilder.String())
 
 	if launch.Namespacing {
@@ -232,34 +146,44 @@ func GenerateLaunchCommandAsEnv(launch robotv1alpha1.Launch, robot robotv1alpha1
 	return internal.Env(commandKey, cmdBuilder.String())
 }
 
-func GenerateRunCommandAsEnv(run robotv1alpha1.Run, robot robotv1alpha1.Robot) corev1.EnvVar {
+func generateRunCommandAsEnv(launch robotv1alpha1.Launch, robot robotv1alpha1.Robot) corev1.EnvVar {
 
 	robotName := robot.Name
 
 	commandKey := "COMMAND"
 
 	var parameterBuilder strings.Builder
-	if run.Namespacing {
+	if launch.Namespacing {
 		rosNs := strings.ReplaceAll(robotName, "-", "_")
-		run.Parameters["__ns"] = rosNs
+		launch.Entrypoint.Parameters["__ns"] = rosNs
 	}
-	if len(run.Parameters) > 0 {
+	if len(launch.Entrypoint.Parameters) > 0 {
 		parameterBuilder.WriteString("--ros-args ")
 	}
-	for key, val := range run.Parameters {
+	for key, val := range launch.Entrypoint.Parameters {
 		parameterBuilder.WriteString("-r " + key + ":=" + val + " ")
 	}
 
 	var cmdBuilder strings.Builder
 
 	cmdBuilder.WriteString("ros2 run ")
-	cmdBuilder.WriteString(run.Package + " " + run.Executable + " ")
+	cmdBuilder.WriteString(launch.Entrypoint.Package + " " + launch.Entrypoint.Executable + " ")
 	cmdBuilder.WriteString(parameterBuilder.String())
 
 	return internal.Env(commandKey, cmdBuilder.String())
 }
 
-func GeneratePrelaunchCommandAsEnv(prelaunch robotv1alpha1.Prelaunch, robot robotv1alpha1.Robot) corev1.EnvVar {
+func generateCustomCommandAsEnv(launch robotv1alpha1.Launch, robot robotv1alpha1.Robot) corev1.EnvVar {
+
+	commandKey := "COMMAND"
+
+	var cmdBuilder strings.Builder
+	cmdBuilder.WriteString(launch.Entrypoint.Command)
+
+	return internal.Env(commandKey, cmdBuilder.String())
+}
+
+func generatePrelaunchCommandAsEnv(prelaunch robotv1alpha1.Prelaunch, robot robotv1alpha1.Robot) corev1.EnvVar {
 
 	commandKey := "PRELAUNCH"
 	command := prelaunch.Command
@@ -280,4 +204,12 @@ func getWsSubDir(distro robotv1alpha1.ROSDistro) string {
 		return "install"
 	}
 	return "install"
+}
+
+func getWorkspaceSourceFilePath(workspacesPath string, wsName string, distro robotv1alpha1.ROSDistro) string {
+	return filepath.Join(workspacesPath, wsName, getWsSubDir(distro), "setup.bash")
+}
+
+func getLaunchfilePathAbsolute(workspacesPath string, wsName string, repoName string, lfRelativePath string) string {
+	return filepath.Join(workspacesPath, wsName, "src", repoName, lfRelativePath)
 }

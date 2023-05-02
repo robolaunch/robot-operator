@@ -222,8 +222,7 @@ _Appears in:_
 | Field | Description |
 | --- | --- |
 | `display` _boolean_ | Launch processes connects an X11 socket if it's set to `true` and a target RobotVDI resource is set in labels with key `robolaunch.io/target-vdi`. Applications that requires GUI can be executed such as rViz. |
-| `launch` _object (keys:string, values:[Launch](#launch))_ | Launch descriptions. Every object defined here generates a `ros2 launch` command in the specified workspace. |
-| `run` _object (keys:string, values:[Run](#run))_ | Every object defined here generates a `ros2 run` command in the specified workspace. |
+| `launch` _object (keys:string, values:[Launch](#launch))_ | Launch descriptions. Every object defined here generates a launching command in the specified workspace. |
 
 
 #### LaunchManagerStatus
@@ -734,16 +733,48 @@ _Appears in:_
 
 | Field | Description |
 | --- | --- |
-| `selector` _object (keys:string, values:string)_ | Cluster selector. If empty, launch pod will be created. If `robolaunch.io/cloud-instance` is specified only, launch will be running on the cloud instance. If `robolaunch.io/physical-instance` is specified only, launch will be running on the physical instance. |
+| `instances` _string array_ | Cluster selector. If the current instance name is on the list, LaunchManager creates launch pods. |
 | `workspace` _string_ | Name of the workspace. Should be selected among the existing workspaces in WorkspaceManager's manifests. |
-| `repository` _string_ | Name of the repository which includes the launchfile. |
 | `namespacing` _boolean_ | ROS 2 namespacing. May not be suitable for all launchfiles. If used, all the node names and topic names should be defined relative, not absolute. (eg. `cmd_vel` instead of /cmd_vel``) |
+| `entrypoint` _[LaunchEntrypointConfig](#launchentrypointconfig)_ | Entrypoint configuration of launch. |
+| `container` _[LaunchContainerConfig](#launchcontainerconfig)_ | General container configuration parameters. |
+
+
+#### LaunchContainerConfig
+
+
+
+
+
+_Appears in:_
+- [Launch](#launch)
+
+| Field | Description |
+| --- | --- |
 | `env` _[EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#envvar-v1-core) array_ | Additional environment variables to set when launching ROS nodes. |
-| `launchFilePath` _string_ | Path to launchfile in repository. (eg. `linorobot/linorobot_gazebo/launch.py`) |
-| `parameters` _object (keys:string, values:string)_ | Launch parameters. |
-| `prelaunch` _[Prelaunch](#prelaunch)_ | Command or script to run just before node's execution. |
 | `privileged` _boolean_ | Launch container privilege. |
 | `resources` _[Resources](#resources)_ | Launch container resource limits. |
+
+
+#### LaunchEntrypointConfig
+
+
+
+
+
+_Appears in:_
+- [Launch](#launch)
+
+| Field | Description |
+| --- | --- |
+| `type` _[LaunchType](#launchtype)_ | Launching type. Can be `Launch`, `Run` or `Custom`. |
+| `package` _string_ | Package name. (eg. `robolaunch_cloudy_navigation`) |
+| `launchfile` _string_ | Launchfile. (eg. `nav_launch.py`) Required and used if the launch type is `Launch`. |
+| `executable` _string_ | Executable file name. (eg. `webcam_pub.py`) Required and used if the launch type is `Run`. |
+| `disableSourcingWs` _boolean_ | If `true`, workspaces are not sourced by default. Used if the launch type is `Custom`. |
+| `cmd` _string_ | Custom command to launch packages or start nodes. Required if the launch type is `Custom`. |
+| `parameters` _object (keys:string, values:string)_ | Launch parameters. |
+| `prelaunch` _[Prelaunch](#prelaunch)_ | Command or script to run just before node's execution. |
 
 
 #### LaunchManagerPhase
@@ -785,6 +816,17 @@ _Appears in:_
 | --- | --- |
 | `active` _boolean_ | Inditaces if the launch process are actively running on cluster. It may not be selected by launch cluster selectors. |
 | `containerStatus` _[ContainerStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#containerstatus-v1-core)_ | Statuses of the containers of pods owned by LaunchManager. |
+
+
+#### LaunchType
+
+_Underlying type:_ `string`
+
+
+
+_Appears in:_
+- [LaunchEntrypointConfig](#launchentrypointconfig)
+
 
 
 #### MetricsExporterPhase
@@ -900,8 +942,7 @@ _Appears in:_
 Prelaunch command or script is applied just before the node is started.
 
 _Appears in:_
-- [Launch](#launch)
-- [Run](#run)
+- [LaunchEntrypointConfig](#launchentrypointconfig)
 
 | Field | Description |
 | --- | --- |
@@ -973,10 +1014,9 @@ _Appears in:_
 VDI resource limits.
 
 _Appears in:_
-- [Launch](#launch)
+- [LaunchContainerConfig](#launchcontainerconfig)
 - [RobotIDESpec](#robotidespec)
 - [RobotVDISpec](#robotvdispec)
-- [Run](#run)
 
 | Field | Description |
 | --- | --- |
@@ -1047,29 +1087,6 @@ _Appears in:_
 | `host` _string_ | [*alpha*] Root DNS name.. |
 
 
-#### Run
-
-
-
-Run description.
-
-_Appears in:_
-- [LaunchManagerSpec](#launchmanagerspec)
-
-| Field | Description |
-| --- | --- |
-| `selector` _object (keys:string, values:string)_ | Cluster selector. If empty, run pod will be created. If `robolaunch.io/cloud-instance` is specified only, run process will be running on the cloud instance. If `robolaunch.io/physical-instance` is specified only, run process will be running on the physical instance. |
-| `workspace` _string_ | Name of the workspace. Should be selected among the existing workspaces in WorkspaceManager's manifests. |
-| `namespacing` _boolean_ | ROS 2 namespacing. May not be suitable for all executables. If used, all the node names and topic names should be defined relative, not absolute. (eg. `cmd_vel` instead of /cmd_vel``) |
-| `env` _[EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#envvar-v1-core) array_ | Additional environment variables to set when launching ROS nodes. |
-| `package` _string_ | Package name in `ros2 run <package> <executable>`. |
-| `executable` _string_ | Executable name in `ros2 run <package> <executable>`. |
-| `parameters` _object (keys:string, values:string)_ | Run parameters. |
-| `prelaunch` _[Prelaunch](#prelaunch)_ | Command or script to run just before node's execution. |
-| `privileged` _boolean_ | Launch container privilege. |
-| `resources` _[Resources](#resources)_ | Launch container resource limits. |
-
-
 #### Step
 
 
@@ -1082,7 +1099,7 @@ _Appears in:_
 
 | Field | Description |
 | --- | --- |
-| `selector` _object (keys:string, values:string)_ | Cluster selector. If empty, step will be executed. If `robolaunch.io/cloud-instance` is specified only, step will be running on the cloud instance. If `robolaunch.io/physical-instance` is specified only, step will be running on the physical instance. |
+| `instances` _string array_ | Cluster selector. If the current instance name is on the list, BuildManager creates building jobs. |
 | `name` _string_ | Name of the step. |
 | `workspace` _string_ | Name of the workspace. Should be selected among the existing workspaces in WorkspaceManager's manifests. |
 | `command` _string_ | Bash command to run. Assume that your command will be `/bin/bash -c <COMMAND>`. Use logical operators (eg. `&&`) and pipes if the multiple dependent commands will be executed. |
