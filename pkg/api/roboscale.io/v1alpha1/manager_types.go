@@ -166,10 +166,9 @@ type WorkspaceManagerStatus struct {
 // Step is a command or script to execute when building a robot. Either `command` or `script` should be specified
 // for each step.
 type Step struct {
-	// Cluster selector. If empty, step will be executed.
-	// If `robolaunch.io/cloud-instance` is specified only, step will be running on the cloud instance.
-	// If `robolaunch.io/physical-instance` is specified only, step will be running on the physical instance.
-	Selector map[string]string `json:"selector,omitempty"`
+	// Cluster selector.
+	// If the current instance name is on the list, BuildManager creates building jobs.
+	Instances []string `json:"instances,omitempty"`
 	// Name of the step.
 	Name string `json:"name"`
 	// Name of the workspace.
