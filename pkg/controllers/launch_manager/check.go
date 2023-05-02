@@ -3,10 +3,10 @@ package launch_manager
 import (
 	"context"
 
-	"github.com/robolaunch/robot-operator/internal"
 	"github.com/robolaunch/robot-operator/internal/handle"
 	"github.com/robolaunch/robot-operator/internal/label"
 	"github.com/robolaunch/robot-operator/internal/reference"
+	"github.com/robolaunch/robot-operator/internal/resources"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -44,30 +44,21 @@ func (r *LaunchManagerReconciler) reconcileCheckLaunchPod(ctx context.Context, i
 
 		// create map, select active ones
 		for k, v := range instance.Spec.Launch {
-			if v.Selector == nil {
+			if len(v.Instances) == 0 {
 				launchStatus[k] = robotv1alpha1.LaunchStatus{
 					Active: true,
 				}
 			} else {
-				if physicalInstance, ok := v.Selector[internal.PHYSICAL_INSTANCE_LABEL_KEY]; ok {
-					if physicalInstance == label.GetClusterName(robot) {
-						launchStatus[k] = robotv1alpha1.LaunchStatus{
-							Active: true,
-						}
-					} else {
-						launchStatus[k] = robotv1alpha1.LaunchStatus{
-							Active: false,
-						}
+
+				clusterName := label.GetClusterName(robot)
+
+				if resources.ContainsInstance(v.Instances, clusterName) {
+					launchStatus[k] = robotv1alpha1.LaunchStatus{
+						Active: true,
 					}
-				} else if cloudInstance, ok := v.Selector[internal.CLOUD_INSTANCE_LABEL_KEY]; ok {
-					if cloudInstance == label.GetClusterName(robot) {
-						launchStatus[k] = robotv1alpha1.LaunchStatus{
-							Active: true,
-						}
-					} else {
-						launchStatus[k] = robotv1alpha1.LaunchStatus{
-							Active: false,
-						}
+				} else {
+					launchStatus[k] = robotv1alpha1.LaunchStatus{
+						Active: false,
 					}
 				}
 			}
