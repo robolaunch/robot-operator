@@ -246,8 +246,11 @@ type Launch struct {
 	// +kubebuilder:validation:Required
 	Package string `json:"package"`
 	// Launchfile. (eg. `nav_launch.py`)
-	// +kubebuilder:validation:Required
+	// Required and used if the launch type is `Launch`.
 	Launchfile string `json:"launchfile"`
+	// Executable file name. (eg. `webcam_pub.py`)
+	// Required if the launch type is `Run`.
+	Executable string `json:"executable"`
 	// Additional environment variables to set when launching ROS nodes.
 	Env []corev1.EnvVar `json:"env,omitempty"`
 	// Launch parameters.
