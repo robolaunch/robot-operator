@@ -376,6 +376,10 @@ func (lec *LaunchEntrypointConfig) checkLaunchEntrypointConfig() error {
 			return errors.New(".spec.launch[].entrypoint.launchfile should be empty if the launch type is `Custom`")
 		}
 
+		if !reflect.DeepEqual(lec.Parameters, nil) {
+			return errors.New(".spec.launch[].entrypoint.parameters should be nil if the launch type is `Custom`")
+		}
+
 	}
 	return nil
 }
