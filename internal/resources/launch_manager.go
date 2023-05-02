@@ -7,6 +7,7 @@ import (
 
 	"github.com/robolaunch/robot-operator/internal"
 	"github.com/robolaunch/robot-operator/internal/configure"
+	"github.com/robolaunch/robot-operator/internal/hybrid"
 	"github.com/robolaunch/robot-operator/internal/label"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
@@ -19,7 +20,7 @@ func GetLaunchPod(launchManager *robotv1alpha1.LaunchManager, podNamespacedName 
 	containers := []corev1.Container{}
 	clusterName := label.GetClusterName(&robot)
 	for k, l := range launchManager.Spec.Launch {
-		if ContainsInstance(l.Instances, clusterName) {
+		if hybrid.ContainsInstance(l.Instances, clusterName) {
 			cont := corev1.Container{}
 			switch l.Type {
 			case robotv1alpha1.LaunchTypeLaunch:
@@ -156,29 +157,6 @@ func getRunContainer(launch robotv1alpha1.Launch, launchName string, robot robot
 	}
 
 	return container
-}
-
-func HasLaunchInThisInstance(launchManager robotv1alpha1.LaunchManager, robot robotv1alpha1.Robot) bool {
-
-	clusterName := label.GetClusterName(&robot)
-
-	for _, l := range launchManager.Spec.Launch {
-		if ContainsInstance(l.Instances, clusterName) {
-			return true
-		}
-	}
-
-	return false
-}
-
-func ContainsInstance(instances []string, instance string) bool {
-	for _, v := range instances {
-		if v == instance {
-			return true
-		}
-	}
-
-	return false
 }
 
 func GetWorkspaceSourceFilePath(workspacesPath string, wsName string, distro robotv1alpha1.ROSDistro) string {
