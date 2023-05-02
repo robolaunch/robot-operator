@@ -62,7 +62,7 @@ func GetLaunchPod(launchManager *robotv1alpha1.LaunchManager, podNamespacedName 
 func getContainer(launch robotv1alpha1.Launch, launchName string, robot robotv1alpha1.Robot, buildManager robotv1alpha1.BuildManager) corev1.Container {
 
 	cmdEnv := corev1.EnvVar{}
-	switch launch.Type {
+	switch launch.Entrypoint.Type {
 	case robotv1alpha1.LaunchTypeLaunch:
 		cmdEnv = generateLaunchCommandAsEnv(launch, robot)
 	case robotv1alpha1.LaunchTypeRun:
@@ -74,7 +74,7 @@ func getContainer(launch robotv1alpha1.Launch, launchName string, robot robotv1a
 	container := corev1.Container{
 		Name:    launchName,
 		Image:   robot.Status.Image,
-		Command: buildContainerEntrypoint(launch, robot, launch.DisableSourcingWorkspace),
+		Command: buildContainerEntrypoint(launch, robot, launch.Entrypoint.DisableSourcingWorkspace),
 		Stdin:   true,
 		TTY:     true,
 		VolumeMounts: []corev1.VolumeMount{
@@ -86,16 +86,16 @@ func getContainer(launch robotv1alpha1.Launch, launchName string, robot robotv1a
 			configure.GetVolumeMount(internal.CUSTOM_SCRIPTS_PATH, configure.GetVolumeConfigMaps(&buildManager)),
 		},
 		Resources: corev1.ResourceRequirements{
-			Limits: getResourceLimits(launch.Resources),
+			Limits: getResourceLimits(launch.Container.Resources),
 		},
 		Env: []corev1.EnvVar{
-			generatePrelaunchCommandAsEnv(launch.Prelaunch, robot),
+			generatePrelaunchCommandAsEnv(launch.Entrypoint.Prelaunch, robot),
 			cmdEnv,
 		},
 		ImagePullPolicy:          corev1.PullAlways,
 		TerminationMessagePolicy: corev1.TerminationMessageReadFile,
 		SecurityContext: &corev1.SecurityContext{
-			Privileged: &launch.Privileged,
+			Privileged: &launch.Container.Privileged,
 		},
 	}
 
@@ -128,14 +128,14 @@ func generateLaunchCommandAsEnv(launch robotv1alpha1.Launch, robot robotv1alpha1
 	commandKey := "COMMAND"
 
 	var parameterBuilder strings.Builder
-	for key, val := range launch.Parameters {
+	for key, val := range launch.Entrypoint.Parameters {
 		parameterBuilder.WriteString(key + ":=" + val + " ")
 	}
 
 	var cmdBuilder strings.Builder
 
 	cmdBuilder.WriteString("ros2 launch ")
-	cmdBuilder.WriteString(launch.Package + " " + launch.Launchfile + " ")
+	cmdBuilder.WriteString(launch.Entrypoint.Package + " " + launch.Entrypoint.Launchfile + " ")
 	cmdBuilder.WriteString(parameterBuilder.String())
 
 	if launch.Namespacing {
@@ -155,19 +155,19 @@ func generateRunCommandAsEnv(launch robotv1alpha1.Launch, robot robotv1alpha1.Ro
 	var parameterBuilder strings.Builder
 	if launch.Namespacing {
 		rosNs := strings.ReplaceAll(robotName, "-", "_")
-		launch.Parameters["__ns"] = rosNs
+		launch.Entrypoint.Parameters["__ns"] = rosNs
 	}
-	if len(launch.Parameters) > 0 {
+	if len(launch.Entrypoint.Parameters) > 0 {
 		parameterBuilder.WriteString("--ros-args ")
 	}
-	for key, val := range launch.Parameters {
+	for key, val := range launch.Entrypoint.Parameters {
 		parameterBuilder.WriteString("-r " + key + ":=" + val + " ")
 	}
 
 	var cmdBuilder strings.Builder
 
 	cmdBuilder.WriteString("ros2 run ")
-	cmdBuilder.WriteString(launch.Package + " " + launch.Executable + " ")
+	cmdBuilder.WriteString(launch.Entrypoint.Package + " " + launch.Entrypoint.Executable + " ")
 	cmdBuilder.WriteString(parameterBuilder.String())
 
 	return internal.Env(commandKey, cmdBuilder.String())
@@ -178,7 +178,7 @@ func generateCustomCommandAsEnv(launch robotv1alpha1.Launch, robot robotv1alpha1
 	commandKey := "COMMAND"
 
 	var cmdBuilder strings.Builder
-	cmdBuilder.WriteString(launch.Command)
+	cmdBuilder.WriteString(launch.Entrypoint.Command)
 
 	return internal.Env(commandKey, cmdBuilder.String())
 }
