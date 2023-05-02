@@ -18,6 +18,19 @@ func HasLaunchInThisInstance(launchManager robotv1alpha1.LaunchManager, robot ro
 	return false
 }
 
+func HasStepInThisInstance(buildManager robotv1alpha1.BuildManager, robot robotv1alpha1.Robot) bool {
+
+	clusterName := label.GetClusterName(&robot)
+
+	for _, s := range buildManager.Spec.Steps {
+		if ContainsInstance(s.Instances, clusterName) {
+			return true
+		}
+	}
+
+	return false
+}
+
 func ContainsInstance(instances []string, instance string) bool {
 
 	if len(instances) == 0 {
