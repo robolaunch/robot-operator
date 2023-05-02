@@ -179,6 +179,16 @@ func GenerateRunCommandAsEnv(launch robotv1alpha1.Launch, robot robotv1alpha1.Ro
 	return internal.Env(commandKey, cmdBuilder.String())
 }
 
+func GenerateCustomCommandAsEnv(launch robotv1alpha1.Launch, robot robotv1alpha1.Robot) corev1.EnvVar {
+
+	commandKey := "COMMAND"
+
+	var cmdBuilder strings.Builder
+	cmdBuilder.WriteString(launch.Command)
+
+	return internal.Env(commandKey, cmdBuilder.String())
+}
+
 func GeneratePrelaunchCommandAsEnv(prelaunch robotv1alpha1.Prelaunch, robot robotv1alpha1.Robot) corev1.EnvVar {
 
 	commandKey := "PRELAUNCH"
