@@ -21,15 +21,7 @@ func GetLaunchPod(launchManager *robotv1alpha1.LaunchManager, podNamespacedName 
 	clusterName := label.GetClusterName(&robot)
 	for k, l := range launchManager.Spec.Launch {
 		if hybrid.ContainsInstance(l.Instances, clusterName) {
-			cont := corev1.Container{}
-			switch l.Type {
-			case robotv1alpha1.LaunchTypeLaunch:
-				cont = getLaunchContainer(l, k, robot, buildManager)
-			case robotv1alpha1.LaunchTypeRun:
-				cont = getRunContainer(l, k, robot, buildManager)
-
-			}
-			containers = append(containers, cont)
+			containers = append(containers, getContainer(l, k, robot, buildManager))
 		}
 	}
 
@@ -67,7 +59,7 @@ func GetLaunchPod(launchManager *robotv1alpha1.LaunchManager, podNamespacedName 
 	return &launchPod
 }
 
-func getLaunchContainer(launch robotv1alpha1.Launch, launchName string, robot robotv1alpha1.Robot, buildManager robotv1alpha1.BuildManager) corev1.Container {
+func getContainer(launch robotv1alpha1.Launch, launchName string, robot robotv1alpha1.Robot, buildManager robotv1alpha1.BuildManager) corev1.Container {
 
 	sleepTimeInt := 3
 	sleepTime := strconv.Itoa(sleepTimeInt)
@@ -82,52 +74,21 @@ func getLaunchContainer(launch robotv1alpha1.Launch, launchName string, robot ro
 	cmdBuilder.WriteString("$PRELAUNCH; ")
 	cmdBuilder.WriteString("$COMMAND")
 
-	container := corev1.Container{
-		Name:    launchName,
-		Image:   robot.Status.Image,
-		Command: internal.Bash(cmdBuilder.String()),
-		Stdin:   true,
-		TTY:     true,
-		VolumeMounts: []corev1.VolumeMount{
-			configure.GetVolumeMount("", configure.GetVolumeVar(&robot)),
-			configure.GetVolumeMount("", configure.GetVolumeUsr(&robot)),
-			configure.GetVolumeMount("", configure.GetVolumeOpt(&robot)),
-			configure.GetVolumeMount("", configure.GetVolumeEtc(&robot)),
-			configure.GetVolumeMount(robot.Spec.WorkspaceManagerTemplate.WorkspacesPath, configure.GetVolumeWorkspace(&robot)),
-			configure.GetVolumeMount(internal.CUSTOM_SCRIPTS_PATH, configure.GetVolumeConfigMaps(&buildManager)),
-		},
-		Resources: corev1.ResourceRequirements{
-			Limits: getResourceLimits(launch.Resources),
-		},
-		Env: []corev1.EnvVar{
-			GeneratePrelaunchCommandAsEnv(launch.Prelaunch, robot),
-			GenerateLaunchCommandAsEnv(launch, robot),
-		},
-		ImagePullPolicy:          corev1.PullAlways,
-		TerminationMessagePolicy: corev1.TerminationMessageReadFile,
-		SecurityContext: &corev1.SecurityContext{
-			Privileged: &launch.Privileged,
-		},
+	cmdEnv := corev1.EnvVar{}
+	switch launch.Type {
+	case robotv1alpha1.LaunchTypeLaunch:
+
+		cmdEnv = GenerateLaunchCommandAsEnv(launch, robot)
+
+	case robotv1alpha1.LaunchTypeRun:
+
+		cmdEnv = GenerateRunCommandAsEnv(launch, robot)
+
+	case robotv1alpha1.LaunchTypeCustom:
+
+		// TODO: allow custom cmds
 	}
 
-	return container
-}
-
-func getRunContainer(launch robotv1alpha1.Launch, launchName string, robot robotv1alpha1.Robot, buildManager robotv1alpha1.BuildManager) corev1.Container {
-
-	sleepTimeInt := 3
-	sleepTime := strconv.Itoa(sleepTimeInt)
-
-	workspace, _ := robot.GetWorkspaceByName(launch.Workspace)
-
-	var cmdBuilder strings.Builder
-	cmdBuilder.WriteString("echo \"Starting node in " + sleepTime + " seconds...\" && ")
-	cmdBuilder.WriteString("sleep " + sleepTime + " && ")
-	cmdBuilder.WriteString("source " + filepath.Join("/opt", "ros", string(workspace.Distro), "setup.bash") + " && ")
-	cmdBuilder.WriteString("source " + filepath.Join("$WORKSPACES_PATH", launch.Workspace, getWsSubDir(workspace.Distro), "setup.bash") + " && ")
-	cmdBuilder.WriteString("$PRELAUNCH; ")
-	cmdBuilder.WriteString("$COMMAND")
-
 	container := corev1.Container{
 		Name:    launchName,
 		Image:   robot.Status.Image,
@@ -147,7 +108,7 @@ func getRunContainer(launch robotv1alpha1.Launch, launchName string, robot robot
 		},
 		Env: []corev1.EnvVar{
 			GeneratePrelaunchCommandAsEnv(launch.Prelaunch, robot),
-			GenerateRunCommandAsEnv(launch, robot),
+			cmdEnv,
 		},
 		ImagePullPolicy:          corev1.PullAlways,
 		TerminationMessagePolicy: corev1.TerminationMessageReadFile,
