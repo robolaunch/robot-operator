@@ -20,6 +20,7 @@ import (
 	"context"
 	"errors"
 	"net/url"
+	"reflect"
 	"strings"
 
 	"github.com/google/go-github/github"
@@ -300,5 +301,85 @@ func (r *LaunchManager) checkTargetRobotVDILabel() error {
 		}
 	}
 
+	return nil
+}
+
+func (r *LaunchManager) checkLaunchEntrypointConfigs() error {
+	for _, l := range r.Spec.Launch {
+		err := l.Entrypoint.checkLaunchEntrypointConfig()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (lec *LaunchEntrypointConfig) checkLaunchEntrypointConfig() error {
+	switch lec.Type {
+	case LaunchTypeLaunch:
+		if reflect.DeepEqual(lec.Package, "") {
+			return errors.New(".spec.launch[].entrypoint.package cannot be empty if the launch type is `Launch`")
+		}
+
+		if reflect.DeepEqual(lec.Launchfile, "") {
+			return errors.New(".spec.launch[].entrypoint.launchfile cannot be empty if the launch type is `Launch`")
+		}
+
+		if !reflect.DeepEqual(lec.Executable, "") {
+			return errors.New(".spec.launch[].entrypoint.executable should be empty if the launch type is `Launch`")
+		}
+
+		if !reflect.DeepEqual(lec.DisableSourcingWorkspace, "") {
+			return errors.New(".spec.launch[].entrypoint.disableSourcingWs cannot be `true` if the launch type is `Launch`")
+		}
+
+		if !reflect.DeepEqual(lec.Command, "") {
+			return errors.New(".spec.launch[].entrypoint.cmd should be empty if the launch type is `Launch`")
+		}
+	case LaunchTypeRun:
+
+		if reflect.DeepEqual(lec.Package, "") {
+			return errors.New(".spec.launch[].entrypoint.package cannot be empty if the launch type is `Run`")
+		}
+
+		if reflect.DeepEqual(lec.Executable, "") {
+			return errors.New(".spec.launch[].entrypoint.executable cannot be empty if the launch type is `Run`")
+		}
+
+		if !reflect.DeepEqual(lec.Launchfile, "") {
+			return errors.New(".spec.launch[].entrypoint.launchfile should be empty if the launch type is `Run`")
+		}
+
+		if !reflect.DeepEqual(lec.DisableSourcingWorkspace, "") {
+			return errors.New(".spec.launch[].entrypoint.disableSourcingWs cannot be `true` if the launch type is `Run`")
+		}
+
+		if !reflect.DeepEqual(lec.Command, "") {
+			return errors.New(".spec.launch[].entrypoint.cmd should be empty if the launch type is `Run`")
+		}
+
+	case LaunchTypeCustom:
+
+		if reflect.DeepEqual(lec.Command, "") {
+			return errors.New(".spec.launch[].entrypoint.cmd cannot be empty if the launch type is `Custom`")
+		}
+
+		if !reflect.DeepEqual(lec.Package, "") {
+			return errors.New(".spec.launch[].entrypoint.package should be empty if the launch type is `Custom`")
+		}
+
+		if !reflect.DeepEqual(lec.Executable, "") {
+			return errors.New(".spec.launch[].entrypoint.executable should be empty if the launch type is `Custom`")
+		}
+
+		if !reflect.DeepEqual(lec.Launchfile, "") {
+			return errors.New(".spec.launch[].entrypoint.launchfile should be empty if the launch type is `Custom`")
+		}
+
+		if !reflect.DeepEqual(lec.Parameters, nil) {
+			return errors.New(".spec.launch[].entrypoint.parameters should be nil if the launch type is `Custom`")
+		}
+
+	}
 	return nil
 }

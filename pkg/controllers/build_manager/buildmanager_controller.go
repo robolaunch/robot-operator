@@ -139,10 +139,10 @@ func (r *BuildManagerReconciler) reconcileCheckStatus(ctx context.Context, insta
 			return err
 		}
 
-		switch hybrid.HasStepInThisInstance(*instance, *robot) {
+		switch instance.Status.ScriptConfigMapStatus.Created {
 		case true:
 
-			switch instance.Status.ScriptConfigMapStatus.Created {
+			switch hybrid.HasStepInThisInstance(*instance, *robot) {
 			case true:
 
 				instance.Status.Phase = robotv1alpha1.BuildManagerBuildingRobot
@@ -194,18 +194,18 @@ func (r *BuildManagerReconciler) reconcileCheckStatus(ctx context.Context, insta
 				}
 
 			case false:
-
-				instance.Status.Phase = robotv1alpha1.BuildManagerCreatingConfigMap
-				err := r.createScriptConfigMap(ctx, instance)
-				if err != nil {
-					return err
-				}
-				instance.Status.ScriptConfigMapStatus.Created = true
-
+				instance.Status.Phase = robotv1alpha1.BuildManagerReady
 			}
 
 		case false:
-			instance.Status.Phase = robotv1alpha1.BuildManagerReady
+
+			instance.Status.Phase = robotv1alpha1.BuildManagerCreatingConfigMap
+			err := r.createScriptConfigMap(ctx, instance)
+			if err != nil {
+				return err
+			}
+			instance.Status.ScriptConfigMapStatus.Created = true
+
 		}
 
 	case false:

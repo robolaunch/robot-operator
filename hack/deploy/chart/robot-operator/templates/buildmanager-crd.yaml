@@ -173,20 +173,18 @@ spec:
                         - name
                         type: object
                       type: array
+                    instances:
+                      description: Cluster selector. If the current instance name is
+                        on the list, BuildManager creates building jobs.
+                      items:
+                        type: string
+                      type: array
                     name:
                       description: Name of the step.
                       type: string
                     script:
                       description: Bash script to run.
                       type: string
-                    selector:
-                      additionalProperties:
-                        type: string
-                      description: Cluster selector. If empty, step will be executed.
-                        If `robolaunch.io/cloud-instance` is specified only, step will
-                        be running on the cloud instance. If `robolaunch.io/physical-instance`
-                        is specified only, step will be running on the physical instance.
-                      type: object
                     workspace:
                       description: Name of the workspace. Should be selected among the
                         existing workspaces in WorkspaceManager's manifests.
@@ -439,21 +437,18 @@ spec:
                             - name
                             type: object
                           type: array
+                        instances:
+                          description: Cluster selector. If the current instance name
+                            is on the list, BuildManager creates building jobs.
+                          items:
+                            type: string
+                          type: array
                         name:
                           description: Name of the step.
                           type: string
                         script:
                           description: Bash script to run.
                           type: string
-                        selector:
-                          additionalProperties:
-                            type: string
-                          description: Cluster selector. If empty, step will be executed.
-                            If `robolaunch.io/cloud-instance` is specified only, step
-                            will be running on the cloud instance. If `robolaunch.io/physical-instance`
-                            is specified only, step will be running on the physical
-                            instance.
-                          type: object
                         workspace:
                           description: Name of the workspace. Should be selected among
                             the existing workspaces in WorkspaceManager's manifests.
