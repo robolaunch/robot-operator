@@ -231,14 +231,14 @@ type Launch struct {
 	// (eg. `cmd_vel` instead of /cmd_vel``)
 	// +kubebuilder:validation:Required
 	Namespacing bool `json:"namespacing,omitempty"`
-	// Additional environment variables to set when launching ROS nodes.
-	Env []corev1.EnvVar `json:"env,omitempty"`
 	// Package name. (eg. `robolaunch_cloudy_navigation`)
 	// +kubebuilder:validation:Required
 	Package string `json:"package"`
 	// Launchfile. (eg. `nav_launch.py`)
 	// +kubebuilder:validation:Required
 	Launchfile string `json:"launchfile"`
+	// Additional environment variables to set when launching ROS nodes.
+	Env []corev1.EnvVar `json:"env,omitempty"`
 	// Launch parameters.
 	Parameters map[string]string `json:"parameters,omitempty"`
 	// Command or script to run just before node's execution.

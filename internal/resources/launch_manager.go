@@ -208,10 +208,7 @@ func GetLaunchfilePathAbsolute(workspacesPath string, wsName string, repoName st
 func GenerateLaunchCommandAsEnv(launch robotv1alpha1.Launch, robot robotv1alpha1.Robot) corev1.EnvVar {
 
 	robotName := robot.Name
-	robotSpec := robot.Spec
-
 	commandKey := "COMMAND"
-	launchPath := GetLaunchfilePathAbsolute(robotSpec.WorkspaceManagerTemplate.WorkspacesPath, launch.Workspace, launch.Repository, launch.LaunchFilePath)
 
 	var parameterBuilder strings.Builder
 	for key, val := range launch.Parameters {
@@ -221,7 +218,7 @@ func GenerateLaunchCommandAsEnv(launch robotv1alpha1.Launch, robot robotv1alpha1
 	var cmdBuilder strings.Builder
 
 	cmdBuilder.WriteString("ros2 launch ")
-	cmdBuilder.WriteString(launchPath + " ")
+	cmdBuilder.WriteString(launch.Package + " " + launch.Launchfile + " ")
 	cmdBuilder.WriteString(parameterBuilder.String())
 
 	if launch.Namespacing {
