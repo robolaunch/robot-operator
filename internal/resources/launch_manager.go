@@ -61,38 +61,20 @@ func GetLaunchPod(launchManager *robotv1alpha1.LaunchManager, podNamespacedName 
 
 func getContainer(launch robotv1alpha1.Launch, launchName string, robot robotv1alpha1.Robot, buildManager robotv1alpha1.BuildManager) corev1.Container {
 
-	sleepTimeInt := 3
-	sleepTime := strconv.Itoa(sleepTimeInt)
-
-	workspace, _ := robot.GetWorkspaceByName(launch.Workspace)
-
-	var cmdBuilder strings.Builder
-	cmdBuilder.WriteString("echo \"Starting node in " + sleepTime + " seconds...\" && ")
-	cmdBuilder.WriteString("sleep " + sleepTime + " && ")
-	cmdBuilder.WriteString("source " + filepath.Join("/opt", "ros", string(workspace.Distro), "setup.bash") + " && ")
-	cmdBuilder.WriteString("source " + filepath.Join("$WORKSPACES_PATH", launch.Workspace, getWsSubDir(workspace.Distro), "setup.bash") + " && ")
-	cmdBuilder.WriteString("$PRELAUNCH; ")
-	cmdBuilder.WriteString("$COMMAND")
-
 	cmdEnv := corev1.EnvVar{}
 	switch launch.Type {
 	case robotv1alpha1.LaunchTypeLaunch:
-
-		cmdEnv = GenerateLaunchCommandAsEnv(launch, robot)
-
+		cmdEnv = generateLaunchCommandAsEnv(launch, robot)
 	case robotv1alpha1.LaunchTypeRun:
-
-		cmdEnv = GenerateRunCommandAsEnv(launch, robot)
-
+		cmdEnv = generateRunCommandAsEnv(launch, robot)
 	case robotv1alpha1.LaunchTypeCustom:
-
-		// TODO: allow custom cmds
+		cmdEnv = generateCustomCommandAsEnv(launch, robot)
 	}
 
 	container := corev1.Container{
 		Name:    launchName,
 		Image:   robot.Status.Image,
-		Command: internal.Bash(cmdBuilder.String()),
+		Command: buildContainerEntrypoint(launch, robot, launch.DisableSourcingWorkspace),
 		Stdin:   true,
 		TTY:     true,
 		VolumeMounts: []corev1.VolumeMount{
@@ -107,7 +89,7 @@ func getContainer(launch robotv1alpha1.Launch, launchName string, robot robotv1a
 			Limits: getResourceLimits(launch.Resources),
 		},
 		Env: []corev1.EnvVar{
-			GeneratePrelaunchCommandAsEnv(launch.Prelaunch, robot),
+			generatePrelaunchCommandAsEnv(launch.Prelaunch, robot),
 			cmdEnv,
 		},
 		ImagePullPolicy:          corev1.PullAlways,
@@ -120,15 +102,27 @@ func getContainer(launch robotv1alpha1.Launch, launchName string, robot robotv1a
 	return container
 }
 
-func GetWorkspaceSourceFilePath(workspacesPath string, wsName string, distro robotv1alpha1.ROSDistro) string {
-	return filepath.Join(workspacesPath, wsName, getWsSubDir(distro), "setup.bash")
+func buildContainerEntrypoint(launch robotv1alpha1.Launch, robot robotv1alpha1.Robot, disableSourcingWs bool) []string {
+
+	sleepTimeInt := 3
+	sleepTime := strconv.Itoa(sleepTimeInt)
+
+	workspace, _ := robot.GetWorkspaceByName(launch.Workspace)
+
+	var cmdBuilder strings.Builder
+	cmdBuilder.WriteString("echo \"Starting node in " + sleepTime + " seconds...\" && ")
+	cmdBuilder.WriteString("sleep " + sleepTime + " && ")
+	if !disableSourcingWs {
+		cmdBuilder.WriteString("source " + filepath.Join("/opt", "ros", string(workspace.Distro), "setup.bash") + " && ")
+		cmdBuilder.WriteString("source " + filepath.Join("$WORKSPACES_PATH", launch.Workspace, getWsSubDir(workspace.Distro), "setup.bash") + " && ")
+	}
+	cmdBuilder.WriteString("$PRELAUNCH; ")
+	cmdBuilder.WriteString("$COMMAND")
+
+	return internal.Bash(cmdBuilder.String())
 }
 
-func GetLaunchfilePathAbsolute(workspacesPath string, wsName string, repoName string, lfRelativePath string) string {
-	return filepath.Join(workspacesPath, wsName, "src", repoName, lfRelativePath)
-}
-
-func GenerateLaunchCommandAsEnv(launch robotv1alpha1.Launch, robot robotv1alpha1.Robot) corev1.EnvVar {
+func generateLaunchCommandAsEnv(launch robotv1alpha1.Launch, robot robotv1alpha1.Robot) corev1.EnvVar {
 
 	robotName := robot.Name
 	commandKey := "COMMAND"
@@ -152,7 +146,7 @@ func GenerateLaunchCommandAsEnv(launch robotv1alpha1.Launch, robot robotv1alpha1
 	return internal.Env(commandKey, cmdBuilder.String())
 }
 
-func GenerateRunCommandAsEnv(launch robotv1alpha1.Launch, robot robotv1alpha1.Robot) corev1.EnvVar {
+func generateRunCommandAsEnv(launch robotv1alpha1.Launch, robot robotv1alpha1.Robot) corev1.EnvVar {
 
 	robotName := robot.Name
 
@@ -179,7 +173,7 @@ func GenerateRunCommandAsEnv(launch robotv1alpha1.Launch, robot robotv1alpha1.Ro
 	return internal.Env(commandKey, cmdBuilder.String())
 }
 
-func GenerateCustomCommandAsEnv(launch robotv1alpha1.Launch, robot robotv1alpha1.Robot) corev1.EnvVar {
+func generateCustomCommandAsEnv(launch robotv1alpha1.Launch, robot robotv1alpha1.Robot) corev1.EnvVar {
 
 	commandKey := "COMMAND"
 
@@ -189,7 +183,7 @@ func GenerateCustomCommandAsEnv(launch robotv1alpha1.Launch, robot robotv1alpha1
 	return internal.Env(commandKey, cmdBuilder.String())
 }
 
-func GeneratePrelaunchCommandAsEnv(prelaunch robotv1alpha1.Prelaunch, robot robotv1alpha1.Robot) corev1.EnvVar {
+func generatePrelaunchCommandAsEnv(prelaunch robotv1alpha1.Prelaunch, robot robotv1alpha1.Robot) corev1.EnvVar {
 
 	commandKey := "PRELAUNCH"
 	command := prelaunch.Command
@@ -210,4 +204,12 @@ func getWsSubDir(distro robotv1alpha1.ROSDistro) string {
 		return "install"
 	}
 	return "install"
+}
+
+func getWorkspaceSourceFilePath(workspacesPath string, wsName string, distro robotv1alpha1.ROSDistro) string {
+	return filepath.Join(workspacesPath, wsName, getWsSubDir(distro), "setup.bash")
+}
+
+func getLaunchfilePathAbsolute(workspacesPath string, wsName string, repoName string, lfRelativePath string) string {
+	return filepath.Join(workspacesPath, wsName, "src", repoName, lfRelativePath)
 }
