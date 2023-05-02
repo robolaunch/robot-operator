@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"github.com/robolaunch/robot-operator/internal/handle"
+	"github.com/robolaunch/robot-operator/internal/hybrid"
 	"github.com/robolaunch/robot-operator/internal/label"
 	"github.com/robolaunch/robot-operator/internal/reference"
-	"github.com/robolaunch/robot-operator/internal/resources"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -52,7 +52,7 @@ func (r *LaunchManagerReconciler) reconcileCheckLaunchPod(ctx context.Context, i
 
 				clusterName := label.GetClusterName(robot)
 
-				if resources.ContainsInstance(v.Instances, clusterName) {
+				if hybrid.ContainsInstance(v.Instances, clusterName) {
 					launchStatus[k] = robotv1alpha1.LaunchStatus{
 						Active: true,
 					}
