@@ -56,366 +56,217 @@ spec:
                 additionalProperties:
                   description: Launch description of a repository.
                   properties:
-                    env:
-                      description: Additional environment variables to set when launching
-                        ROS nodes.
-                      items:
-                        description: EnvVar represents an environment variable present
-                          in a Container.
-                        properties:
-                          name:
-                            description: Name of the environment variable. Must be a
-                              C_IDENTIFIER.
-                            type: string
-                          value:
-                            description: 'Variable references $(VAR_NAME) are expanded
-                              using the previously defined environment variables in
-                              the container and any service environment variables. If
-                              a variable cannot be resolved, the reference in the input
-                              string will be unchanged. Double $$ are reduced to a single
-                              $, which allows for escaping the $(VAR_NAME) syntax: i.e.
-                              "$$(VAR_NAME)" will produce the string literal "$(VAR_NAME)".
-                              Escaped references will never be expanded, regardless
-                              of whether the variable exists or not. Defaults to "".'
-                            type: string
-                          valueFrom:
-                            description: Source for the environment variable's value.
-                              Cannot be used if value is not empty.
+                    container:
+                      description: General container configuration parameters.
+                      properties:
+                        env:
+                          description: Additional environment variables to set when
+                            launching ROS nodes.
+                          items:
+                            description: EnvVar represents an environment variable present
+                              in a Container.
                             properties:
-                              configMapKeyRef:
-                                description: Selects a key of a ConfigMap.
+                              name:
+                                description: Name of the environment variable. Must
+                                  be a C_IDENTIFIER.
+                                type: string
+                              value:
+                                description: 'Variable references $(VAR_NAME) are expanded
+                                  using the previously defined environment variables
+                                  in the container and any service environment variables.
+                                  If a variable cannot be resolved, the reference in
+                                  the input string will be unchanged. Double $$ are
+                                  reduced to a single $, which allows for escaping the
+                                  $(VAR_NAME) syntax: i.e. "$$(VAR_NAME)" will produce
+                                  the string literal "$(VAR_NAME)". Escaped references
+                                  will never be expanded, regardless of whether the
+                                  variable exists or not. Defaults to "".'
+                                type: string
+                              valueFrom:
+                                description: Source for the environment variable's value.
+                                  Cannot be used if value is not empty.
                                 properties:
-                                  key:
-                                    description: The key to select.
-                                    type: string
-                                  name:
-                                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                      TODO: Add other useful fields. apiVersion, kind,
-                                      uid?'
-                                    type: string
-                                  optional:
-                                    description: Specify whether the ConfigMap or its
-                                      key must be defined
-                                    type: boolean
-                                required:
-                                - key
+                                  configMapKeyRef:
+                                    description: Selects a key of a ConfigMap.
+                                    properties:
+                                      key:
+                                        description: The key to select.
+                                        type: string
+                                      name:
+                                        description: 'Name of the referent. More info:
+                                          https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                          TODO: Add other useful fields. apiVersion,
+                                          kind, uid?'
+                                        type: string
+                                      optional:
+                                        description: Specify whether the ConfigMap or
+                                          its key must be defined
+                                        type: boolean
+                                    required:
+                                    - key
+                                    type: object
+                                    x-kubernetes-map-type: atomic
+                                  fieldRef:
+                                    description: 'Selects a field of the pod: supports
+                                      metadata.name, metadata.namespace, `metadata.labels[''<KEY>'']`,
+                                      `metadata.annotations[''<KEY>'']`, spec.nodeName,
+                                      spec.serviceAccountName, status.hostIP, status.podIP,
+                                      status.podIPs.'
+                                    properties:
+                                      apiVersion:
+                                        description: Version of the schema the FieldPath
+                                          is written in terms of, defaults to "v1".
+                                        type: string
+                                      fieldPath:
+                                        description: Path of the field to select in
+                                          the specified API version.
+                                        type: string
+                                    required:
+                                    - fieldPath
+                                    type: object
+                                    x-kubernetes-map-type: atomic
+                                  resourceFieldRef:
+                                    description: 'Selects a resource of the container:
+                                      only resources limits and requests (limits.cpu,
+                                      limits.memory, limits.ephemeral-storage, requests.cpu,
+                                      requests.memory and requests.ephemeral-storage)
+                                      are currently supported.'
+                                    properties:
+                                      containerName:
+                                        description: 'Container name: required for volumes,
+                                          optional for env vars'
+                                        type: string
+                                      divisor:
+                                        anyOf:
+                                        - type: integer
+                                        - type: string
+                                        description: Specifies the output format of
+                                          the exposed resources, defaults to "1"
+                                        pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                        x-kubernetes-int-or-string: true
+                                      resource:
+                                        description: 'Required: resource to select'
+                                        type: string
+                                    required:
+                                    - resource
+                                    type: object
+                                    x-kubernetes-map-type: atomic
+                                  secretKeyRef:
+                                    description: Selects a key of a secret in the pod's
+                                      namespace
+                                    properties:
+                                      key:
+                                        description: The key of the secret to select
+                                          from.  Must be a valid secret key.
+                                        type: string
+                                      name:
+                                        description: 'Name of the referent. More info:
+                                          https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                          TODO: Add other useful fields. apiVersion,
+                                          kind, uid?'
+                                        type: string
+                                      optional:
+                                        description: Specify whether the Secret or its
+                                          key must be defined
+                                        type: boolean
+                                    required:
+                                    - key
+                                    type: object
+                                    x-kubernetes-map-type: atomic
                                 type: object
-                                x-kubernetes-map-type: atomic
-                              fieldRef:
-                                description: 'Selects a field of the pod: supports metadata.name,
-                                  metadata.namespace, `metadata.labels[''<KEY>'']`,
-                                  `metadata.annotations[''<KEY>'']`, spec.nodeName,
-                                  spec.serviceAccountName, status.hostIP, status.podIP,
-                                  status.podIPs.'
-                                properties:
-                                  apiVersion:
-                                    description: Version of the schema the FieldPath
-                                      is written in terms of, defaults to "v1".
-                                    type: string
-                                  fieldPath:
-                                    description: Path of the field to select in the
-                                      specified API version.
-                                    type: string
-                                required:
-                                - fieldPath
-                                type: object
-                                x-kubernetes-map-type: atomic
-                              resourceFieldRef:
-                                description: 'Selects a resource of the container: only
-                                  resources limits and requests (limits.cpu, limits.memory,
-                                  limits.ephemeral-storage, requests.cpu, requests.memory
-                                  and requests.ephemeral-storage) are currently supported.'
-                                properties:
-                                  containerName:
-                                    description: 'Container name: required for volumes,
-                                      optional for env vars'
-                                    type: string
-                                  divisor:
-                                    anyOf:
-                                    - type: integer
-                                    - type: string
-                                    description: Specifies the output format of the
-                                      exposed resources, defaults to "1"
-                                    pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
-                                    x-kubernetes-int-or-string: true
-                                  resource:
-                                    description: 'Required: resource to select'
-                                    type: string
-                                required:
-                                - resource
-                                type: object
-                                x-kubernetes-map-type: atomic
-                              secretKeyRef:
-                                description: Selects a key of a secret in the pod's
-                                  namespace
-                                properties:
-                                  key:
-                                    description: The key of the secret to select from.  Must
-                                      be a valid secret key.
-                                    type: string
-                                  name:
-                                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                      TODO: Add other useful fields. apiVersion, kind,
-                                      uid?'
-                                    type: string
-                                  optional:
-                                    description: Specify whether the Secret or its key
-                                      must be defined
-                                    type: boolean
-                                required:
-                                - key
-                                type: object
-                                x-kubernetes-map-type: atomic
+                            required:
+                            - name
                             type: object
-                        required:
-                        - name
-                        type: object
+                          type: array
+                        privileged:
+                          description: Launch container privilege.
+                          type: boolean
+                        resources:
+                          description: Launch container resource limits.
+                          properties:
+                            cpu:
+                              description: CPU resource limit.
+                              pattern: ^([0-9])+(m)$
+                              type: string
+                            gpuCore:
+                              description: GPU core number that will be allocated.
+                              type: integer
+                            memory:
+                              description: Memory resource limit.
+                              pattern: ^([0-9])+(Mi|Gi)$
+                              type: string
+                          type: object
+                      type: object
+                    entrypoint:
+                      description: Entrypoint configuration of launch.
+                      properties:
+                        cmd:
+                          description: Custom command to launch packages or start nodes.
+                            Required if the launch type is `Custom`.
+                          type: string
+                        disableSourcingWs:
+                          description: If `true`, workspaces are not sourced by default.
+                            Used if the launch type is `Custom`.
+                          type: boolean
+                        executable:
+                          description: Executable file name. (eg. `webcam_pub.py`) Required
+                            and used if the launch type is `Run`.
+                          type: string
+                        launchfile:
+                          description: Launchfile. (eg. `nav_launch.py`) Required and
+                            used if the launch type is `Launch`.
+                          type: string
+                        package:
+                          description: Package name. (eg. `robolaunch_cloudy_navigation`)
+                          type: string
+                        parameters:
+                          additionalProperties:
+                            type: string
+                          description: Launch parameters.
+                          type: object
+                        prelaunch:
+                          description: Command or script to run just before node's execution.
+                          properties:
+                            command:
+                              description: Bash command to run before ROS node execution.
+                              type: string
+                          required:
+                          - command
+                          type: object
+                        type:
+                          description: Launching type. Can be `Launch`, `Run` or `Custom`.
+                          enum:
+                          - Launch
+                          - Run
+                          - Custom
+                          type: string
+                      required:
+                      - cmd
+                      - disableSourcingWs
+                      - executable
+                      - launchfile
+                      - package
+                      type: object
+                    instances:
+                      description: Cluster selector. If the current instance name is
+                        on the list, LaunchManager creates launch pods.
+                      items:
+                        type: string
                       type: array
-                    launchFilePath:
-                      description: Path to launchfile in repository. (eg. `linorobot/linorobot_gazebo/launch.py`)
-                      type: string
                     namespacing:
                       description: ROS 2 namespacing. May not be suitable for all launchfiles.
                         If used, all the node names and topic names should be defined
                         relative, not absolute. (eg. `cmd_vel` instead of /cmd_vel``)
                       type: boolean
-                    parameters:
-                      additionalProperties:
-                        type: string
-                      description: Launch parameters.
-                      type: object
-                    prelaunch:
-                      description: Command or script to run just before node's execution.
-                      properties:
-                        command:
-                          description: Bash command to run before ROS node execution.
-                          type: string
-                      required:
-                      - command
-                      type: object
-                    privileged:
-                      description: Launch container privilege.
-                      type: boolean
-                    repository:
-                      description: Name of the repository which includes the launchfile.
-                      type: string
-                    resources:
-                      description: Launch container resource limits.
-                      properties:
-                        cpu:
-                          description: CPU resource limit.
-                          pattern: ^([0-9])+(m)$
-                          type: string
-                        gpuCore:
-                          description: GPU core number that will be allocated.
-                          type: integer
-                        memory:
-                          description: Memory resource limit.
-                          pattern: ^([0-9])+(Mi|Gi)$
-                          type: string
-                      type: object
-                    selector:
-                      additionalProperties:
-                        type: string
-                      description: Cluster selector. If empty, launch pod will be created.
-                        If `robolaunch.io/cloud-instance` is specified only, launch
-                        will be running on the cloud instance. If `robolaunch.io/physical-instance`
-                        is specified only, launch will be running on the physical instance.
-                      type: object
                     workspace:
                       description: Name of the workspace. Should be selected among the
                         existing workspaces in WorkspaceManager's manifests.
                       type: string
                   required:
-                  - launchFilePath
-                  - repository
                   - workspace
                   type: object
                 description: Launch descriptions. Every object defined here generates
-                  a `ros2 launch` command in the specified workspace.
-                type: object
-              run:
-                additionalProperties:
-                  description: Run description.
-                  properties:
-                    env:
-                      description: Additional environment variables to set when launching
-                        ROS nodes.
-                      items:
-                        description: EnvVar represents an environment variable present
-                          in a Container.
-                        properties:
-                          name:
-                            description: Name of the environment variable. Must be a
-                              C_IDENTIFIER.
-                            type: string
-                          value:
-                            description: 'Variable references $(VAR_NAME) are expanded
-                              using the previously defined environment variables in
-                              the container and any service environment variables. If
-                              a variable cannot be resolved, the reference in the input
-                              string will be unchanged. Double $$ are reduced to a single
-                              $, which allows for escaping the $(VAR_NAME) syntax: i.e.
-                              "$$(VAR_NAME)" will produce the string literal "$(VAR_NAME)".
-                              Escaped references will never be expanded, regardless
-                              of whether the variable exists or not. Defaults to "".'
-                            type: string
-                          valueFrom:
-                            description: Source for the environment variable's value.
-                              Cannot be used if value is not empty.
-                            properties:
-                              configMapKeyRef:
-                                description: Selects a key of a ConfigMap.
-                                properties:
-                                  key:
-                                    description: The key to select.
-                                    type: string
-                                  name:
-                                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                      TODO: Add other useful fields. apiVersion, kind,
-                                      uid?'
-                                    type: string
-                                  optional:
-                                    description: Specify whether the ConfigMap or its
-                                      key must be defined
-                                    type: boolean
-                                required:
-                                - key
-                                type: object
-                                x-kubernetes-map-type: atomic
-                              fieldRef:
-                                description: 'Selects a field of the pod: supports metadata.name,
-                                  metadata.namespace, `metadata.labels[''<KEY>'']`,
-                                  `metadata.annotations[''<KEY>'']`, spec.nodeName,
-                                  spec.serviceAccountName, status.hostIP, status.podIP,
-                                  status.podIPs.'
-                                properties:
-                                  apiVersion:
-                                    description: Version of the schema the FieldPath
-                                      is written in terms of, defaults to "v1".
-                                    type: string
-                                  fieldPath:
-                                    description: Path of the field to select in the
-                                      specified API version.
-                                    type: string
-                                required:
-                                - fieldPath
-                                type: object
-                                x-kubernetes-map-type: atomic
-                              resourceFieldRef:
-                                description: 'Selects a resource of the container: only
-                                  resources limits and requests (limits.cpu, limits.memory,
-                                  limits.ephemeral-storage, requests.cpu, requests.memory
-                                  and requests.ephemeral-storage) are currently supported.'
-                                properties:
-                                  containerName:
-                                    description: 'Container name: required for volumes,
-                                      optional for env vars'
-                                    type: string
-                                  divisor:
-                                    anyOf:
-                                    - type: integer
-                                    - type: string
-                                    description: Specifies the output format of the
-                                      exposed resources, defaults to "1"
-                                    pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
-                                    x-kubernetes-int-or-string: true
-                                  resource:
-                                    description: 'Required: resource to select'
-                                    type: string
-                                required:
-                                - resource
-                                type: object
-                                x-kubernetes-map-type: atomic
-                              secretKeyRef:
-                                description: Selects a key of a secret in the pod's
-                                  namespace
-                                properties:
-                                  key:
-                                    description: The key of the secret to select from.  Must
-                                      be a valid secret key.
-                                    type: string
-                                  name:
-                                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                      TODO: Add other useful fields. apiVersion, kind,
-                                      uid?'
-                                    type: string
-                                  optional:
-                                    description: Specify whether the Secret or its key
-                                      must be defined
-                                    type: boolean
-                                required:
-                                - key
-                                type: object
-                                x-kubernetes-map-type: atomic
-                            type: object
-                        required:
-                        - name
-                        type: object
-                      type: array
-                    executable:
-                      description: Executable name in `ros2 run <package> <executable>`.
-                      type: string
-                    namespacing:
-                      description: ROS 2 namespacing. May not be suitable for all executables.
-                        If used, all the node names and topic names should be defined
-                        relative, not absolute. (eg. `cmd_vel` instead of /cmd_vel``)
-                      type: boolean
-                    package:
-                      description: Package name in `ros2 run <package> <executable>`.
-                      type: string
-                    parameters:
-                      additionalProperties:
-                        type: string
-                      description: Run parameters.
-                      type: object
-                    prelaunch:
-                      description: Command or script to run just before node's execution.
-                      properties:
-                        command:
-                          description: Bash command to run before ROS node execution.
-                          type: string
-                      required:
-                      - command
-                      type: object
-                    privileged:
-                      description: Launch container privilege.
-                      type: boolean
-                    resources:
-                      description: Launch container resource limits.
-                      properties:
-                        cpu:
-                          description: CPU resource limit.
-                          pattern: ^([0-9])+(m)$
-                          type: string
-                        gpuCore:
-                          description: GPU core number that will be allocated.
-                          type: integer
-                        memory:
-                          description: Memory resource limit.
-                          pattern: ^([0-9])+(Mi|Gi)$
-                          type: string
-                      type: object
-                    selector:
-                      additionalProperties:
-                        type: string
-                      description: Cluster selector. If empty, run pod will be created.
-                        If `robolaunch.io/cloud-instance` is specified only, run process
-                        will be running on the cloud instance. If `robolaunch.io/physical-instance`
-                        is specified only, run process will be running on the physical
-                        instance.
-                      type: object
-                    workspace:
-                      description: Name of the workspace. Should be selected among the
-                        existing workspaces in WorkspaceManager's manifests.
-                      type: string
-                  required:
-                  - executable
-                  - package
-                  - workspace
-                  type: object
-                description: Every object defined here generates a `ros2 run` command
-                  in the specified workspace.
+                  a launching command in the specified workspace.
                 type: object
             type: object
           status:
