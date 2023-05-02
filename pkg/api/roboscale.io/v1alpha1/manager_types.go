@@ -262,48 +262,14 @@ type Launch struct {
 	Resources Resources `json:"resources,omitempty"`
 }
 
-// Run description.
-type Run struct {
-	// Cluster selector. If empty, run pod will be created.
-	// If `robolaunch.io/cloud-instance` is specified only, run process will be running on the cloud instance.
-	// If `robolaunch.io/physical-instance` is specified only, run process will be running on the physical instance.
-	Selector map[string]string `json:"selector,omitempty"`
-	// Name of the workspace.
-	// Should be selected among the existing workspaces in WorkspaceManager's manifests.
-	// +kubebuilder:validation:Required
-	Workspace string `json:"workspace"`
-	// ROS 2 namespacing. May not be suitable for all executables.
-	// If used, all the node names and topic names should be defined relative, not absolute.
-	// (eg. `cmd_vel` instead of /cmd_vel``)
-	// +kubebuilder:validation:Required
-	Namespacing bool `json:"namespacing,omitempty"`
-	// Additional environment variables to set when launching ROS nodes.
-	Env []corev1.EnvVar `json:"env,omitempty"`
-	// Package name in `ros2 run <package> <executable>`.
-	// +kubebuilder:validation:Required
-	Package string `json:"package"`
-	// Executable name in `ros2 run <package> <executable>`.
-	Executable string `json:"executable"`
-	// Run parameters.
-	Parameters map[string]string `json:"parameters,omitempty"`
-	// Command or script to run just before node's execution.
-	Prelaunch Prelaunch `json:"prelaunch,omitempty"`
-	// Launch container privilege.
-	Privileged bool `json:"privileged,omitempty"`
-	// Launch container resource limits.
-	Resources Resources `json:"resources,omitempty"`
-}
-
 // LaunchManagerSpec defines the desired state of LaunchManager.
 type LaunchManagerSpec struct {
 	// Launch processes connects an X11 socket if it's set to `true` and a target RobotVDI resource is set in labels with key `robolaunch.io/target-vdi`.
 	// Applications that requires GUI can be executed such as rViz.
 	Display bool `json:"display,omitempty"`
 	// Launch descriptions.
-	// Every object defined here generates a `ros2 launch` command in the specified workspace.
+	// Every object defined here generates a launching command in the specified workspace.
 	Launch map[string]Launch `json:"launch,omitempty"`
-	// Every object defined here generates a `ros2 run` command in the specified workspace.
-	Run map[string]Run `json:"run,omitempty"`
 }
 
 type LaunchStatus struct {
