@@ -226,9 +226,6 @@ type Launch struct {
 	// Should be selected among the existing workspaces in WorkspaceManager's manifests.
 	// +kubebuilder:validation:Required
 	Workspace string `json:"workspace"`
-	// Name of the repository which includes the launchfile.
-	// +kubebuilder:validation:Required
-	Repository string `json:"repository"`
 	// ROS 2 namespacing. May not be suitable for all launchfiles.
 	// If used, all the node names and topic names should be defined relative, not absolute.
 	// (eg. `cmd_vel` instead of /cmd_vel``)
@@ -236,9 +233,12 @@ type Launch struct {
 	Namespacing bool `json:"namespacing,omitempty"`
 	// Additional environment variables to set when launching ROS nodes.
 	Env []corev1.EnvVar `json:"env,omitempty"`
-	// Path to launchfile in repository. (eg. `linorobot/linorobot_gazebo/launch.py`)
+	// Package name. (eg. `robolaunch_cloudy_navigation`)
 	// +kubebuilder:validation:Required
-	LaunchFilePath string `json:"launchFilePath"`
+	Package string `json:"package"`
+	// Launchfile. (eg. `nav_launch.py`)
+	// +kubebuilder:validation:Required
+	Launchfile string `json:"launchfile"`
 	// Launch parameters.
 	Parameters map[string]string `json:"parameters,omitempty"`
 	// Command or script to run just before node's execution.
