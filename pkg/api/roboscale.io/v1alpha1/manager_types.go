@@ -226,10 +226,9 @@ const (
 
 // Launch description of a repository.
 type Launch struct {
-	// Cluster selector. If empty, launch pod will be created.
-	// If `robolaunch.io/cloud-instance` is specified only, launch will be running on the cloud instance.
-	// If `robolaunch.io/physical-instance` is specified only, launch will be running on the physical instance.
-	Selector map[string]string `json:"selector,omitempty"`
+	// Cluster selector.
+	// If the current instance name is on the list, LaunchManager creates launch pods.
+	Instances []string `json:"instances,omitempty"`
 	// Name of the workspace.
 	// Should be selected among the existing workspaces in WorkspaceManager's manifests.
 	// +kubebuilder:validation:Required
