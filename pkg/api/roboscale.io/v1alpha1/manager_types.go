@@ -215,6 +215,40 @@ type Prelaunch struct {
 	// Script  string `json:"script,omitempty"`
 }
 
+type LaunchEntrypointConfig struct {
+	// Launching type. Can be `Launch`, `Run` or `Custom`.
+	// +kubebuilder:validation:Enum=Launch;Run;Custom
+	Type LaunchType `json:"type,omitempty"`
+	// Package name. (eg. `robolaunch_cloudy_navigation`)
+	// +kubebuilder:validation:Required
+	Package string `json:"package"`
+	// Launchfile. (eg. `nav_launch.py`)
+	// Required and used if the launch type is `Launch`.
+	Launchfile string `json:"launchfile"`
+	// Executable file name. (eg. `webcam_pub.py`)
+	// Required and used if the launch type is `Run`.
+	Executable string `json:"executable"`
+	// If `true`, workspaces are not sourced by default.
+	// Used if the launch type is `Custom`.
+	DisableSourcingWorkspace bool `json:"disableSourcingWs"`
+	// Custom command to launch packages or start nodes.
+	// Required if the launch type is `Custom`.
+	Command string `json:"cmd"`
+	// Launch parameters.
+	Parameters map[string]string `json:"parameters,omitempty"`
+	// Command or script to run just before node's execution.
+	Prelaunch Prelaunch `json:"prelaunch,omitempty"`
+}
+
+type LaunchContainerConfig struct {
+	// Additional environment variables to set when launching ROS nodes.
+	Env []corev1.EnvVar `json:"env,omitempty"`
+	// Launch container privilege.
+	Privileged bool `json:"privileged,omitempty"`
+	// Launch container resource limits.
+	Resources Resources `json:"resources,omitempty"`
+}
+
 type LaunchType string
 
 const (
@@ -237,34 +271,10 @@ type Launch struct {
 	// (eg. `cmd_vel` instead of /cmd_vel``)
 	// +kubebuilder:validation:Required
 	Namespacing bool `json:"namespacing,omitempty"`
-	// Launching type. Can be `Launch`, `Run` or `Custom`.
-	// +kubebuilder:validation:Enum=Launch;Run;Custom
-	Type LaunchType `json:"type,omitempty"`
-	// Package name. (eg. `robolaunch_cloudy_navigation`)
-	// +kubebuilder:validation:Required
-	Package string `json:"package"`
-	// Launchfile. (eg. `nav_launch.py`)
-	// Required and used if the launch type is `Launch`.
-	Launchfile string `json:"launchfile"`
-	// Executable file name. (eg. `webcam_pub.py`)
-	// Required and used if the launch type is `Run`.
-	Executable string `json:"executable"`
-	// If `true`, workspaces are not sourced by default.
-	// Used if the launch type is `Custom`.
-	DisableSourcingWorkspace bool `json:"disableSourcingWs"`
-	// Custom command to launch packages or start nodes.
-	// Required if the launch type is `Custom`.
-	Command string `json:"cmd"`
-	// Additional environment variables to set when launching ROS nodes.
-	Env []corev1.EnvVar `json:"env,omitempty"`
-	// Launch parameters.
-	Parameters map[string]string `json:"parameters,omitempty"`
-	// Command or script to run just before node's execution.
-	Prelaunch Prelaunch `json:"prelaunch,omitempty"`
-	// Launch container privilege.
-	Privileged bool `json:"privileged,omitempty"`
-	// Launch container resource limits.
-	Resources Resources `json:"resources,omitempty"`
+	// Entrypoint configuration of launch.
+	Entrypoint LaunchEntrypointConfig `json:"entrypoint,omitempty"`
+	// General container configuration parameters.
+	Container LaunchContainerConfig `json:"container,omitempty"`
 }
 
 // LaunchManagerSpec defines the desired state of LaunchManager.
