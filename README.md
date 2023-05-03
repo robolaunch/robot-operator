@@ -84,17 +84,30 @@ Refer [robolaunch.io](robolaunch.io) and [project wiki](https://github.com/robol
 
 ### Installation
 
-Installation steps will be instructed here.
-
-<!-- Make sure your Kubernetes cluster meets [prerequisites here](./docs/installation/installation.md#prerequisites).
-
-Label one of your Kubernetes nodes.
+Label a node in your cluster:
 
 ```bash
-kubectl label node <NODE> robolaunch.io/platform=true
+kubectl label <NODE> robolaunch.io/organization=robolaunch
+kubectl label <NODE> robolaunch.io/team=robotics
+kubectl label <NODE> robolaunch.io/region=europe-east
+kubectl label <NODE> robolaunch.io/cloud-instance=cluster
+kubectl label <NODE> robolaunch.io/cloud-instance-alias=cluster-alias
 ```
 
-Apply release YAML. -->
+Install Robot Operator with Helm:
+
+```bash
+# add robolaunch Helm repository and update
+helm repo add robolaunch https://robolaunch.github.io/charts/
+helm repo update
+# install chart
+helm upgrade -i robot-operator robolaunch/robot-operator  \
+--namespace robot-system \
+--create-namespace \
+--devel
+```
+
+See [installation guide for more](./docs/installation/README.md).
 
 ### Deploy Your First Robot
 
