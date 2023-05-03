@@ -97,7 +97,11 @@ const (
 		"<dds>" +
 		"<profiles xmlns='http://www.eprosima.com/XMLSchemas/fastRTPS_Profiles'>" +
 		"<participant profile_name='super_client_profile' is_default_profile='true'>" +
-		"<rtps>" +
+		"	<rtps>" +
+		"		<userTransports>" +
+		"			<transport_id>udp_transport</transport_id>" +
+		"		<userTransports>" +
+		"		<useBuiltinTransports>false</useBuiltinTransports>" +
 		"		<builtin>" +
 		"			<discovery_config>" +
 		"				<discoveryProtocol>SUPER_CLIENT</discoveryProtocol>" +
