@@ -33,10 +33,6 @@ func HasStepInThisInstance(buildManager robotv1alpha1.BuildManager, robot robotv
 
 func ContainsInstance(instances []string, instance string) bool {
 
-	if len(instances) == 0 {
-		return true
-	}
-
 	for _, v := range instances {
 		if v == instance {
 			return true
