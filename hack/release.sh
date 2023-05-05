@@ -14,3 +14,4 @@ make gh-select-node LABEL_KEY="robolaunch.io/region" LABEL_VAL="europe-east"
 make gh-select-node LABEL_KEY="robolaunch.io/cloud-instance" LABEL_VAL="cluster"
 make gh-select-node LABEL_KEY="robolaunch.io/cloud-instance-alias" LABEL_VAL="cluster-alias"
 make gh-helm RELEASE=$1
+make changelog

@@ -5,12 +5,11 @@ info:
   repository_url: https://github.com/robolaunch/robot-operator
 options:
   commits:
-    # filters:
-    #   Type:
-    #     - feat
-    #     - fix
-    #     - perf
-    #     - refactor
+    filters:
+      Type:
+        - feat
+        - fix
+        - perf
   commit_groups:
     # title_maps:
     #   feat: Features
