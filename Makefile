@@ -9,6 +9,8 @@ MANIFEST_LOCATION = hack/deploy/manifests
 LOCAL_MANIFEST_LOCATION = hack/deploy.local/manifests
 # Release version
 RELEASE ?= v0.1.0
+# git-chglog config path
+GIT_CHGLOG_CONFIG_PATH ?= docs/.chglog/config.yml
 
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
 ifeq (,$(shell go env GOBIN))
@@ -175,6 +177,7 @@ KUSTOMIZE ?= $(LOCALBIN)/kustomize
 CONTROLLER_GEN ?= $(LOCALBIN)/controller-gen
 ENVTEST ?= $(LOCALBIN)/setup-envtest
 HELMIFY ?= $(LOCALBIN)/helmify
+GIT_CHGLOG ?= $(LOCALBIN)/git-chglog
 
 ## Tool Versions
 KUSTOMIZE_VERSION ?= v3.8.7
@@ -201,6 +204,11 @@ helmify: $(HELMIFY) ## Download helmify locally if necessary.
 $(HELMIFY): $(LOCALBIN)
 	test -s $(LOCALBIN)/helmify || GOBIN=$(LOCALBIN) go install github.com/arttor/helmify/cmd/helmify@latest
 
+.PHONY: git-chglog
+git-chglog: $(GIT_CHGLOG) ## Download helmify locally if necessary.
+$(GIT_CHGLOG): $(LOCALBIN)
+	test -s $(LOCALBIN)/git-chglog || GOBIN=$(LOCALBIN) go install github.com/git-chglog/git-chglog/cmd/git-chglog@latest
+
 helm: manifests kustomize helmify
 	rm -rf hack/deploy.local/chart/robot-operator
 	$(KUSTOMIZE) build config/default | $(HELMIFY) hack/deploy.local/chart/robot-operator
@@ -212,3 +220,6 @@ gh-helm: manifests kustomize helmify
 	$(KUSTOMIZE) build config/default | $(HELMIFY) hack/deploy/chart/robot-operator
 	yq e -i '.appVersion = "v${RELEASE}"' hack/deploy/chart/robot-operator/Chart.yaml
 	yq e -i '.version = "${RELEASE}"' hack/deploy/chart/robot-operator/Chart.yaml
+
+changelog: git-chglog
+	$(GIT_CHGLOG) --config ${GIT_CHGLOG_CONFIG_PATH} -o CHANGELOG.md
