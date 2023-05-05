@@ -40,9 +40,9 @@ func (r *BuildManagerReconciler) reconcileCheckBuilderJobs(ctx context.Context, 
 		return err
 	}
 
-	for _, step := range instance.Spec.Steps {
+	clusterName := label.GetClusterName(robot)
 
-		clusterName := label.GetClusterName(robot)
+	for _, step := range instance.Spec.Steps {
 
 		if hybrid.ContainsInstance(step.Instances, clusterName) {
 			jobMetadata := types.NamespacedName{
