@@ -9,7 +9,7 @@ func HasLaunchInThisInstance(launchManager robotv1alpha1.LaunchManager, robot ro
 
 	clusterName := label.GetClusterName(&robot)
 
-	for _, l := range launchManager.Spec.Launch {
+	for _, l := range launchManager.Spec.Launches {
 		if ContainsInstance(l.Instances, clusterName) {
 			return true
 		}
