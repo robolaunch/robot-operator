@@ -43,7 +43,7 @@ func (r *LaunchManagerReconciler) reconcileCheckLaunchPod(ctx context.Context, i
 		instance.Status.LaunchPodStatus.LaunchStatus = launchStatus
 
 		// create map, select active ones
-		for k, v := range instance.Spec.Launch {
+		for k, v := range instance.Spec.Launches {
 			if len(v.Instances) == 0 {
 				launchStatus[k] = robotv1alpha1.LaunchStatus{
 					Active: true,

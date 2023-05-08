@@ -18,7 +18,7 @@ func (r *LaunchManagerReconciler) createLaunchPod(ctx context.Context, instance 
 	}
 
 	robotVDI := &robotv1alpha1.RobotVDI{}
-	if label.GetTargetRobotVDI(instance) != "" {
+	if resources.InstanceNeedDisplay(*instance, *robot) && label.GetTargetRobotVDI(instance) != "" {
 		robotVDI, err = r.reconcileGetTargetRobotVDI(ctx, instance)
 		if err != nil {
 			return err
