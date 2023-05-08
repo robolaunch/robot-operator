@@ -221,8 +221,7 @@ _Appears in:_
 
 | Field | Description |
 | --- | --- |
-| `display` _boolean_ | Launch processes connects an X11 socket if it's set to `true` and a target RobotVDI resource is set in labels with key `robolaunch.io/target-vdi`. Applications that requires GUI can be executed such as rViz. |
-| `launch` _object (keys:string, values:[Launch](#launch))_ | Launch descriptions. Every object defined here generates a launching command in the specified workspace. |
+| `launches` _object (keys:string, values:[Launch](#launch))_ | Launch descriptions. Every object defined here generates a launching command in the specified workspace. |
 
 
 #### LaunchManagerStatus
@@ -754,6 +753,7 @@ _Appears in:_
 | `env` _[EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#envvar-v1-core) array_ | Additional environment variables to set when launching ROS nodes. |
 | `privileged` _boolean_ | Launch container privilege. |
 | `resources` _[Resources](#resources)_ | Launch container resource limits. |
+| `display` _boolean_ | Launch processes connects an X11 socket if it's set to `true` and a target RobotVDI resource is set in labels with key `robolaunch.io/target-vdi`. Applications that requires GUI can be executed such as rViz. |
 
 
 #### LaunchEntrypointConfig

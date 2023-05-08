@@ -18,9 +18,6 @@
 - **import:** fix broken imports
 
 
-<a name="v0.2.5-alpha.7"></a>
-## [v0.2.5-alpha.7] - 2023-04-24
-
 <a name="v0.2.5-alpha.6"></a>
 ## [v0.2.5-alpha.6] - 2023-04-18
 
@@ -90,8 +87,7 @@
 
 
 [Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.8...HEAD
-[v0.2.5-alpha.8]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.7...v0.2.5-alpha.8
-[v0.2.5-alpha.7]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.6...v0.2.5-alpha.7
+[v0.2.5-alpha.8]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.6...v0.2.5-alpha.8
 [v0.2.5-alpha.6]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.5...v0.2.5-alpha.6
 [v0.2.5-alpha.5]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.4...v0.2.5-alpha.5
 [v0.2.5-alpha.4]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.3...v0.2.5-alpha.4

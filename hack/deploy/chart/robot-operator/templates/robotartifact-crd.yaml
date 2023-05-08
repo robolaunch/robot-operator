@@ -283,19 +283,20 @@ spec:
                 items:
                   description: LaunchManagerSpec defines the desired state of LaunchManager.
                   properties:
-                    display:
-                      description: Launch processes connects an X11 socket if it's set
-                        to `true` and a target RobotVDI resource is set in labels with
-                        key `robolaunch.io/target-vdi`. Applications that requires GUI
-                        can be executed such as rViz.
-                      type: boolean
-                    launch:
+                    launches:
                       additionalProperties:
                         description: Launch description of a repository.
                         properties:
                           container:
                             description: General container configuration parameters.
                             properties:
+                              display:
+                                description: Launch processes connects an X11 socket
+                                  if it's set to `true` and a target RobotVDI resource
+                                  is set in labels with key `robolaunch.io/target-vdi`.
+                                  Applications that requires GUI can be executed such
+                                  as rViz.
+                                type: boolean
                               env:
                                 description: Additional environment variables to set
                                   when launching ROS nodes.
