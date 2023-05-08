@@ -19,7 +19,7 @@ func GetLaunchPod(launchManager *robotv1alpha1.LaunchManager, podNamespacedName 
 
 	containers := []corev1.Container{}
 	clusterName := label.GetClusterName(&robot)
-	for k, l := range launchManager.Spec.Launch {
+	for k, l := range launchManager.Spec.Launches {
 		if hybrid.ContainsInstance(l.Instances, clusterName) {
 			containers = append(containers, getContainer(l, k, robot, buildManager))
 		}
@@ -51,12 +51,22 @@ func GetLaunchPod(launchManager *robotv1alpha1.LaunchManager, podNamespacedName 
 	configure.InjectRMWImplementationConfiguration(&launchPod, robot)                                                  // RMW implementation configuration
 	configure.InjectPodDiscoveryServerConnection(&launchPod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo) // Discovery server configuration
 	configure.InjectRuntimeClass(&launchPod, robot, node)
-	if launchManager.Spec.Display && label.GetTargetRobotVDI(launchManager) != "" {
+
+	if InstanceNeedDisplay(*launchManager, robot) && label.GetTargetRobotVDI(launchManager) != "" {
 		// TODO: Add control for validating robot VDI
-		configure.InjectPodDisplayConfiguration(&launchPod, robotVDI) // Display configuration
+		configure.InjectLaunchPodDisplayConfiguration(&launchPod, *launchManager, robotVDI) // Display configuration
 	}
 
 	return &launchPod
+}
+
+func InstanceNeedDisplay(launchManager robotv1alpha1.LaunchManager, robot robotv1alpha1.Robot) bool {
+	for _, l := range launchManager.Spec.Launches {
+		if l.Container.Display && hybrid.ContainsInstance(l.Instances, label.GetClusterName(&robot)) {
+			return true
+		}
+	}
+	return false
 }
 
 func getContainer(launch robotv1alpha1.Launch, launchName string, robot robotv1alpha1.Robot, buildManager robotv1alpha1.BuildManager) corev1.Container {
