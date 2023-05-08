@@ -256,6 +256,11 @@ func (r *LaunchManager) ValidateCreate() error {
 		return err
 	}
 
+	err = r.checkLaunchEntrypointConfigs()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -269,6 +274,11 @@ func (r *LaunchManager) ValidateUpdate(old runtime.Object) error {
 	}
 
 	err = r.checkTargetRobotVDILabel()
+	if err != nil {
+		return err
+	}
+
+	err = r.checkLaunchEntrypointConfigs()
 	if err != nil {
 		return err
 	}
@@ -295,17 +305,15 @@ func (r *LaunchManager) checkTargetRobotLabel() error {
 func (r *LaunchManager) checkTargetRobotVDILabel() error {
 	labels := r.GetLabels()
 
-	if r.Spec.Display {
-		if _, ok := labels[internal.TARGET_VDI_LABEL_KEY]; !ok {
-			return errors.New("target robot vdi label should be added with key " + internal.TARGET_VDI_LABEL_KEY)
-		}
+	if _, ok := labels[internal.TARGET_VDI_LABEL_KEY]; !ok {
+		return errors.New("target robot vdi label should be added with key " + internal.TARGET_VDI_LABEL_KEY)
 	}
 
 	return nil
 }
 
 func (r *LaunchManager) checkLaunchEntrypointConfigs() error {
-	for _, l := range r.Spec.Launch {
+	for _, l := range r.Spec.Launches {
 		err := l.Entrypoint.checkLaunchEntrypointConfig()
 		if err != nil {
 			return err
@@ -376,7 +384,7 @@ func (lec *LaunchEntrypointConfig) checkLaunchEntrypointConfig() error {
 			return errors.New(".spec.launch[].entrypoint.launchfile should be empty if the launch type is `Custom`")
 		}
 
-		if !reflect.DeepEqual(lec.Parameters, nil) {
+		if !reflect.DeepEqual(len(lec.Parameters), 0) {
 			return errors.New(".spec.launch[].entrypoint.parameters should be nil if the launch type is `Custom`")
 		}
 
