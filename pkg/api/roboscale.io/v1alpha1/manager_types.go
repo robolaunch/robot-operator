@@ -247,6 +247,9 @@ type LaunchContainerConfig struct {
 	Privileged bool `json:"privileged,omitempty"`
 	// Launch container resource limits.
 	Resources Resources `json:"resources,omitempty"`
+	// Launch processes connects an X11 socket if it's set to `true` and a target RobotVDI resource is set in labels with key `robolaunch.io/target-vdi`.
+	// Applications that requires GUI can be executed such as rViz.
+	Display bool `json:"display,omitempty"`
 }
 
 type LaunchType string
@@ -279,12 +282,9 @@ type Launch struct {
 
 // LaunchManagerSpec defines the desired state of LaunchManager.
 type LaunchManagerSpec struct {
-	// Launch processes connects an X11 socket if it's set to `true` and a target RobotVDI resource is set in labels with key `robolaunch.io/target-vdi`.
-	// Applications that requires GUI can be executed such as rViz.
-	Display bool `json:"display,omitempty"`
 	// Launch descriptions.
 	// Every object defined here generates a launching command in the specified workspace.
-	Launch map[string]Launch `json:"launch,omitempty"`
+	Launches map[string]Launch `json:"launches,omitempty"`
 }
 
 type LaunchStatus struct {
