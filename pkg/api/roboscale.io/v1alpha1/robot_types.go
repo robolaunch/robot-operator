@@ -392,6 +392,8 @@ type ROSBridgeStatus struct {
 	PodStatus OwnedResourceStatus `json:"podStatus,omitempty"`
 	// Status of ROSBridge service.
 	ServiceStatus OwnedServiceStatus `json:"serviceStatus,omitempty"`
+	// Status of ROSBridge Ingress.
+	IngressStatus OwnedResourceStatus `json:"ingressStatus,omitempty"`
 }
 
 // ********************************
