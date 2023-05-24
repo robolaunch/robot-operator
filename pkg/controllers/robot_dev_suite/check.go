@@ -34,6 +34,7 @@ func (r *RobotDevSuiteReconciler) reconcileCheckRobotVDI(ctx context.Context, in
 			instance.Status.RobotVDIStatus.Resource.Created = true
 			reference.SetReference(&instance.Status.RobotVDIStatus.Resource.Reference, robotVDIQuery.TypeMeta, robotVDIQuery.ObjectMeta)
 			instance.Status.RobotVDIStatus.Resource.Phase = string(robotVDIQuery.Status.Phase)
+			instance.Status.RobotVDIStatus.Connection = robotVDIQuery.Status.ServiceTCPStatus.URL
 
 		} else {
 
@@ -74,6 +75,7 @@ func (r *RobotDevSuiteReconciler) reconcileCheckRobotIDE(ctx context.Context, in
 			instance.Status.RobotIDEStatus.Resource.Created = true
 			reference.SetReference(&instance.Status.RobotIDEStatus.Resource.Reference, robotIDEQuery.TypeMeta, robotIDEQuery.ObjectMeta)
 			instance.Status.RobotIDEStatus.Resource.Phase = string(robotIDEQuery.Status.Phase)
+			instance.Status.RobotIDEStatus.Connection = robotIDEQuery.Status.ServiceStatus.URL
 
 		} else {
 
