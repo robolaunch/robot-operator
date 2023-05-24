@@ -35,13 +35,24 @@ func (r *RobotVDIReconciler) reconcileCheckServices(ctx context.Context, instanc
 	err := r.Get(ctx, *instance.GetRobotVDIServiceTCPMetadata(), serviceTCPQuery)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			instance.Status.ServiceTCPStatus = robotv1alpha1.OwnedResourceStatus{}
+			instance.Status.ServiceTCPStatus = robotv1alpha1.OwnedServiceStatus{}
 		} else {
 			return err
 		}
 	} else {
-		instance.Status.ServiceTCPStatus.Created = true
-		reference.SetReference(&instance.Status.ServiceTCPStatus.Reference, serviceTCPQuery.TypeMeta, serviceTCPQuery.ObjectMeta)
+		robot, err := r.reconcileGetTargetRobot(ctx, instance)
+		if err != nil {
+			return err
+		}
+
+		instance.Status.ServiceTCPStatus.Resource.Created = true
+		reference.SetReference(&instance.Status.ServiceTCPStatus.Resource.Reference, serviceTCPQuery.TypeMeta, serviceTCPQuery.ObjectMeta)
+		if instance.Spec.Ingress {
+			instance.Status.ServiceTCPStatus.URL = robotv1alpha1.GetRobotServiceDNS(*robot, "https://", "")
+		} else if instance.Spec.ServiceType == corev1.ServiceTypeNodePort {
+			// TODO: Address with Node IP and port will be generated.
+			instance.Status.ServiceTCPStatus.URL = "http://<NODE-IP>:<PORT>"
+		}
 	}
 
 	serviceUDPQuery := &corev1.Service{}
