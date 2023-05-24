@@ -75,15 +75,22 @@ type StepStatus struct {
 
 func GetRobotServiceDNS(robot Robot, prefix, postfix string) string {
 	tenancy := label.GetTenancy(&robot)
-	connectionStr := tenancy.Organization + "." + robot.Spec.RootDNSConfig.Host +
-		"/" + tenancy.Team +
+	connectionStr := tenancy.Organization + "." + robot.Spec.RootDNSConfig.Host + GetRobotServicePath(robot, postfix)
+
+	if prefix != "" {
+		connectionStr = prefix + connectionStr
+	}
+
+	return connectionStr
+}
+
+func GetRobotServicePath(robot Robot, postfix string) string {
+	tenancy := label.GetTenancy(&robot)
+	connectionStr := "/" + tenancy.Team +
 		"/" + tenancy.Region +
 		"/" + tenancy.CloudInstance +
 		"/" + robot.Namespace +
 		"/" + robot.Name
-	if prefix != "" {
-		connectionStr = prefix + connectionStr
-	}
 
 	if postfix != "" {
 		connectionStr = connectionStr + postfix
