@@ -2,6 +2,14 @@
 ## [Unreleased]
 
 ### Fix
+- **ide:** update ide host and path values in ingress
+- **oauth2:** fix oauth2 url
+- **vdi:** update vdi host and path values in ingress
+
+
+<a name="v0.2.5-alpha.9"></a>
+## [v0.2.5-alpha.9] - 2023-05-08
+### Fix
 - **scheduling:** stop assigning status to all steps in deletion attempts
 - **steps:** fix instance scheduling of buildmanager steps
 
@@ -86,7 +94,8 @@
 - Merge pull request [#24](https://github.com/robolaunch/robot-operator/issues/24) from robolaunch/23-allow-multiple-launches
 
 
-[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.8...HEAD
+[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.9...HEAD
+[v0.2.5-alpha.9]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.8...v0.2.5-alpha.9
 [v0.2.5-alpha.8]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.6...v0.2.5-alpha.8
 [v0.2.5-alpha.6]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.5...v0.2.5-alpha.6
 [v0.2.5-alpha.5]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.4...v0.2.5-alpha.5
