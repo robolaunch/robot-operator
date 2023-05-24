@@ -8,6 +8,7 @@ import (
 	"github.com/robolaunch/robot-operator/internal/resources"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
+	networkingv1 "k8s.io/api/networking/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 )
 
@@ -80,6 +81,26 @@ func (r *ROSBridgeReconciler) reconcileCheckPod(ctx context.Context, instance *r
 		instance.Status.PodStatus.Created = true
 		reference.SetReference(&instance.Status.PodStatus.Reference, bridgePodQuery.TypeMeta, bridgePodQuery.ObjectMeta)
 		instance.Status.PodStatus.Phase = string(bridgePodQuery.Status.Phase)
+	}
+
+	return nil
+}
+
+func (r *ROSBridgeReconciler) reconcileCheckIngress(ctx context.Context, instance *robotv1alpha1.ROSBridge) error {
+
+	if instance.Spec.Ingress {
+		ingressQuery := &networkingv1.Ingress{}
+		err := r.Get(ctx, *instance.GetBridgeIngressMetadata(), ingressQuery)
+		if err != nil {
+			if errors.IsNotFound(err) {
+				instance.Status.IngressStatus = robotv1alpha1.OwnedResourceStatus{}
+			} else {
+				return err
+			}
+		} else {
+			instance.Status.IngressStatus.Created = true
+			reference.SetReference(&instance.Status.IngressStatus.Reference, ingressQuery.TypeMeta, ingressQuery.ObjectMeta)
+		}
 	}
 
 	return nil

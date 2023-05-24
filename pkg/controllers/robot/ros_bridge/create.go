@@ -54,3 +54,28 @@ func (r *ROSBridgeReconciler) createPod(ctx context.Context, instance *robotv1al
 	logger.Info("STATUS: Pod " + pod.Name + " is created.")
 	return nil
 }
+
+func (r *ROSBridgeReconciler) createIngress(ctx context.Context, instance *robotv1alpha1.ROSBridge, ingressNamespacedName *types.NamespacedName) error {
+
+	robot, err := r.reconcileGetOwner(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	ingress := resources.GetBridgeIngress(instance, instance.GetBridgeIngressMetadata(), *robot)
+
+	err = ctrl.SetControllerReference(instance, ingress, r.Scheme)
+	if err != nil {
+		return err
+	}
+
+	err = r.Create(ctx, ingress)
+	if err != nil && errors.IsAlreadyExists(err) {
+		return nil
+	} else if err != nil {
+		return err
+	}
+
+	logger.Info("STATUS: ıNGRESS " + ingress.Name + " is created.")
+	return nil
+}

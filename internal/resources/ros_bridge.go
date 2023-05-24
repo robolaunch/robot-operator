@@ -93,7 +93,7 @@ func GetBridgeService(rosbridge *robotv1alpha1.ROSBridge, svcNamespacedName *typ
 	return &bridgeSvc
 }
 
-func GetROSBridgeIngress(rosBridge *robotv1alpha1.ROSBridge, ingressNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot) *networkingv1.Ingress {
+func GetBridgeIngress(rosBridge *robotv1alpha1.ROSBridge, ingressNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot) *networkingv1.Ingress {
 
 	tenancy := label.GetTenancy(&robot)
 
