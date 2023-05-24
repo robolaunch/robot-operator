@@ -1,11 +1,14 @@
 package resources
 
 import (
+	"fmt"
+
 	"github.com/robolaunch/robot-operator/internal"
 	"github.com/robolaunch/robot-operator/internal/configure"
 	"github.com/robolaunch/robot-operator/internal/label"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
+	networkingv1 "k8s.io/api/networking/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -88,6 +91,73 @@ func GetBridgeService(rosbridge *robotv1alpha1.ROSBridge, svcNamespacedName *typ
 	}
 
 	return &bridgeSvc
+}
+
+func GetROSBridgeIngress(rosBridge *robotv1alpha1.ROSBridge, ingressNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot) *networkingv1.Ingress {
+
+	tenancy := label.GetTenancy(&robot)
+
+	rootDNSConfig := robot.Spec.RootDNSConfig
+	secretName := robot.Spec.TLSSecretReference.Name
+
+	annotations := map[string]string{
+		internal.INGRESS_AUTH_URL_KEY:                fmt.Sprintf(internal.INGRESS_AUTH_URL_VAL, tenancy.Organization, rootDNSConfig.Host),
+		internal.INGRESS_AUTH_SIGNIN_KEY:             fmt.Sprintf(internal.INGRESS_AUTH_SIGNIN_VAL, tenancy.Organization, rootDNSConfig.Host),
+		internal.INGRESS_AUTH_RESPONSE_HEADERS_KEY:   internal.INGRESS_AUTH_RESPONSE_HEADERS_VAL,
+		internal.INGRESS_CONFIGURATION_SNIPPET_KEY:   internal.INGRESS_IDE_CONFIGURATION_SNIPPET_VAL,
+		internal.INGRESS_CERT_MANAGER_KEY:            internal.INGRESS_CERT_MANAGER_VAL,
+		internal.INGRESS_NGINX_PROXY_BUFFER_SIZE_KEY: internal.INGRESS_NGINX_PROXY_BUFFER_SIZE_VAL,
+		internal.INGRESS_NGINX_REWRITE_TARGET_KEY:    internal.INGRESS_NGINX_REWRITE_TARGET_VAL,
+	}
+
+	pathTypePrefix := networkingv1.PathTypePrefix
+	ingressClassNameNginx := "nginx"
+
+	ingressSpec := networkingv1.IngressSpec{
+		TLS: []networkingv1.IngressTLS{
+			{
+				Hosts: []string{
+					tenancy.Organization + "." + rootDNSConfig.Host,
+				},
+				SecretName: secretName,
+			},
+		},
+		Rules: []networkingv1.IngressRule{
+			{
+				Host: tenancy.Organization + "." + rootDNSConfig.Host,
+				IngressRuleValue: networkingv1.IngressRuleValue{
+					HTTP: &networkingv1.HTTPIngressRuleValue{
+						Paths: []networkingv1.HTTPIngressPath{
+							{
+								Path:     robotv1alpha1.GetRobotServicePath(robot, "/bridge") + "(/|$)(.*)",
+								PathType: &pathTypePrefix,
+								Backend: networkingv1.IngressBackend{
+									Service: &networkingv1.IngressServiceBackend{
+										Name: rosBridge.GetBridgeServiceMetadata().Name,
+										Port: networkingv1.ServiceBackendPort{
+											Number: 9000,
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		IngressClassName: &ingressClassNameNginx,
+	}
+
+	ingress := &networkingv1.Ingress{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:        ingressNamespacedName.Name,
+			Namespace:   ingressNamespacedName.Namespace,
+			Annotations: annotations,
+		},
+		Spec: ingressSpec,
+	}
+
+	return ingress
 }
 
 func getRoscoreContainer(rosbridge *robotv1alpha1.ROSBridge) corev1.Container {
