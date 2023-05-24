@@ -159,7 +159,7 @@ type RobotIDEStatus struct {
 	// Status of Cloud IDE pod.
 	PodStatus OwnedPodStatus `json:"podStatus,omitempty"`
 	// Status of Cloud IDE service.
-	ServiceStatus OwnedResourceStatus `json:"serviceStatus,omitempty"`
+	ServiceStatus OwnedServiceStatus `json:"serviceStatus,omitempty"`
 	// Status of Cloud IDE Ingress.
 	IngressStatus OwnedResourceStatus `json:"ingressStatus,omitempty"`
 }
@@ -214,7 +214,7 @@ type RobotVDIStatus struct {
 	// Status of Cloud VDI pod.
 	PodStatus OwnedPodStatus `json:"podStatus,omitempty"`
 	// Status of Cloud VDI TCP service.
-	ServiceTCPStatus OwnedResourceStatus `json:"serviceTCPStatus,omitempty"`
+	ServiceTCPStatus OwnedServiceStatus `json:"serviceTCPStatus,omitempty"`
 	// Status of Cloud VDI UDP service.
 	ServiceUDPStatus OwnedResourceStatus `json:"serviceUDPStatus,omitempty"`
 	// Status of Cloud VDI Ingress.
