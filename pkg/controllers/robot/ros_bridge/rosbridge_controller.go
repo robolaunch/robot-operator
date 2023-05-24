@@ -92,7 +92,7 @@ func (r *ROSBridgeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 
 func (r *ROSBridgeReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.ROSBridge) error {
 
-	switch instance.Status.ServiceStatus.Created {
+	switch instance.Status.ServiceStatus.Resource.Created {
 	case true:
 
 		switch instance.Status.PodStatus.Created {
@@ -125,7 +125,7 @@ func (r *ROSBridgeReconciler) reconcileCheckStatus(ctx context.Context, instance
 		if err != nil {
 			return err
 		}
-		instance.Status.ServiceStatus.Created = true
+		instance.Status.ServiceStatus.Resource.Created = true
 
 	}
 

@@ -16,12 +16,23 @@ func (r *ROSBridgeReconciler) reconcileCheckService(ctx context.Context, instanc
 	bridgeServiceQuery := &corev1.Service{}
 	err := r.Get(ctx, *instance.GetBridgeServiceMetadata(), bridgeServiceQuery)
 	if err != nil && errors.IsNotFound(err) {
-		instance.Status.ServiceStatus = robotv1alpha1.OwnedResourceStatus{}
+		instance.Status.ServiceStatus = robotv1alpha1.OwnedServiceStatus{}
 	} else if err != nil {
 		return err
 	} else {
-		instance.Status.ServiceStatus.Created = true
-		reference.SetReference(&instance.Status.ServiceStatus.Reference, bridgeServiceQuery.TypeMeta, bridgeServiceQuery.ObjectMeta)
+		robot, err := r.reconcileGetOwner(ctx, instance)
+		if err != nil {
+			return err
+		}
+
+		instance.Status.ServiceStatus.Resource.Created = true
+		reference.SetReference(&instance.Status.ServiceStatus.Resource.Reference, bridgeServiceQuery.TypeMeta, bridgeServiceQuery.ObjectMeta)
+		if instance.Spec.Ingress {
+			instance.Status.ServiceStatus.URL = robotv1alpha1.GetRobotServiceDNS(*robot, "wss://", "/bridge")
+		} else if instance.Spec.ServiceType == corev1.ServiceTypeNodePort {
+			// TODO: Address with Node IP and port will be generated.
+			instance.Status.ServiceStatus.URL = "ws://<NODE-IP>:<PORT>"
+		}
 	}
 
 	return nil
