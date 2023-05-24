@@ -48,6 +48,8 @@ type ROSBridgeInstanceStatus struct {
 	Resource OwnedResourceStatus `json:"resource,omitempty"`
 	// Status of the ROSBridge instance.
 	Status ROSBridgeStatus `json:"status,omitempty"`
+	// Address of the robot service that can be reached from outside.
+	Connection string `json:"connection,omitempty"`
 }
 
 type RobotDevSuiteInstanceStatus struct {
