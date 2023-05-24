@@ -89,7 +89,7 @@ func (r *RobotIDEReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 
 func (r *RobotIDEReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.RobotIDE) error {
 
-	switch instance.Status.ServiceStatus.Created {
+	switch instance.Status.ServiceStatus.Resource.Created {
 	case true:
 
 		switch instance.Status.PodStatus.Resource.Created {
@@ -133,7 +133,7 @@ func (r *RobotIDEReconciler) reconcileCheckStatus(ctx context.Context, instance 
 		if err != nil {
 			return err
 		}
-		instance.Status.ServiceStatus.Created = true
+		instance.Status.ServiceStatus.Resource.Created = true
 
 	}
 
