@@ -119,19 +119,19 @@ func (r *RobotDevSuiteReconciler) reconcileCheckStatus(ctx context.Context, inst
 		switch instance.Spec.VDIEnabled {
 		case true:
 
-			switch instance.Status.RobotVDIStatus.Created {
+			switch instance.Status.RobotVDIStatus.Resource.Created {
 			case true:
 
-				switch instance.Status.RobotVDIStatus.Phase {
+				switch instance.Status.RobotVDIStatus.Resource.Phase {
 				case string(robotv1alpha1.RobotVDIPhaseRunning):
 
 					switch instance.Spec.IDEEnabled {
 					case true:
 
-						switch instance.Status.RobotIDEStatus.Created {
+						switch instance.Status.RobotIDEStatus.Resource.Created {
 						case true:
 
-							switch instance.Status.RobotIDEStatus.Phase {
+							switch instance.Status.RobotIDEStatus.Resource.Phase {
 							case string(robotv1alpha1.RobotIDEPhaseRunning):
 
 								instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseRunning
@@ -145,7 +145,7 @@ func (r *RobotDevSuiteReconciler) reconcileCheckStatus(ctx context.Context, inst
 							if err != nil {
 								return err
 							}
-							instance.Status.RobotIDEStatus.Created = true
+							instance.Status.RobotIDEStatus.Resource.Created = true
 
 						}
 
@@ -164,7 +164,7 @@ func (r *RobotDevSuiteReconciler) reconcileCheckStatus(ctx context.Context, inst
 				if err != nil {
 					return err
 				}
-				instance.Status.RobotVDIStatus.Created = true
+				instance.Status.RobotVDIStatus.Resource.Created = true
 
 			}
 
@@ -173,10 +173,10 @@ func (r *RobotDevSuiteReconciler) reconcileCheckStatus(ctx context.Context, inst
 			switch instance.Spec.IDEEnabled {
 			case true:
 
-				switch instance.Status.RobotIDEStatus.Created {
+				switch instance.Status.RobotIDEStatus.Resource.Created {
 				case true:
 
-					switch instance.Status.RobotIDEStatus.Phase {
+					switch instance.Status.RobotIDEStatus.Resource.Phase {
 					case string(robotv1alpha1.RobotIDEPhaseRunning):
 
 						instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseRunning
@@ -190,7 +190,7 @@ func (r *RobotDevSuiteReconciler) reconcileCheckStatus(ctx context.Context, inst
 					if err != nil {
 						return err
 					}
-					instance.Status.RobotIDEStatus.Created = true
+					instance.Status.RobotIDEStatus.Resource.Created = true
 
 				}
 

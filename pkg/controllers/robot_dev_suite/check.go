@@ -15,7 +15,7 @@ func (r *RobotDevSuiteReconciler) reconcileCheckRobotVDI(ctx context.Context, in
 	err := r.Get(ctx, *instance.GetRobotVDIMetadata(), robotVDIQuery)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			instance.Status.RobotVDIStatus = robotv1alpha1.OwnedResourceStatus{}
+			instance.Status.RobotVDIStatus = robotv1alpha1.OwnedRobotServiceStatus{}
 		} else {
 			return err
 		}
@@ -31,9 +31,9 @@ func (r *RobotDevSuiteReconciler) reconcileCheckRobotVDI(ctx context.Context, in
 				}
 			}
 
-			instance.Status.RobotVDIStatus.Created = true
-			reference.SetReference(&instance.Status.RobotVDIStatus.Reference, robotVDIQuery.TypeMeta, robotVDIQuery.ObjectMeta)
-			instance.Status.RobotVDIStatus.Phase = string(robotVDIQuery.Status.Phase)
+			instance.Status.RobotVDIStatus.Resource.Created = true
+			reference.SetReference(&instance.Status.RobotVDIStatus.Resource.Reference, robotVDIQuery.TypeMeta, robotVDIQuery.ObjectMeta)
+			instance.Status.RobotVDIStatus.Resource.Phase = string(robotVDIQuery.Status.Phase)
 
 		} else {
 
@@ -55,7 +55,7 @@ func (r *RobotDevSuiteReconciler) reconcileCheckRobotIDE(ctx context.Context, in
 	err := r.Get(ctx, *instance.GetRobotIDEMetadata(), robotIDEQuery)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			instance.Status.RobotIDEStatus = robotv1alpha1.OwnedResourceStatus{}
+			instance.Status.RobotIDEStatus = robotv1alpha1.OwnedRobotServiceStatus{}
 		} else {
 			return err
 		}
@@ -71,9 +71,9 @@ func (r *RobotDevSuiteReconciler) reconcileCheckRobotIDE(ctx context.Context, in
 				}
 			}
 
-			instance.Status.RobotIDEStatus.Created = true
-			reference.SetReference(&instance.Status.RobotIDEStatus.Reference, robotIDEQuery.TypeMeta, robotIDEQuery.ObjectMeta)
-			instance.Status.RobotIDEStatus.Phase = string(robotIDEQuery.Status.Phase)
+			instance.Status.RobotIDEStatus.Resource.Created = true
+			reference.SetReference(&instance.Status.RobotIDEStatus.Resource.Reference, robotIDEQuery.TypeMeta, robotIDEQuery.ObjectMeta)
+			instance.Status.RobotIDEStatus.Resource.Phase = string(robotIDEQuery.Status.Phase)
 
 		} else {
 
