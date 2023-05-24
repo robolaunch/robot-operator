@@ -12,6 +12,13 @@ type OwnedResourceStatus struct {
 	Phase string `json:"phase,omitempty"`
 }
 
+type OwnedRobotServiceStatus struct {
+	// Generic status for any owned resource.
+	Resource OwnedResourceStatus `json:"resource,omitempty"`
+	// URL of the robot service.
+	URL string `json:"url,omitempty"`
+}
+
 type OwnedPodStatus struct {
 	// Generic status for any owned resource.
 	Resource OwnedResourceStatus `json:"resource,omitempty"`

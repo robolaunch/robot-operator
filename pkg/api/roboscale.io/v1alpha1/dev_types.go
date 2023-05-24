@@ -121,9 +121,9 @@ type RobotDevSuiteStatus struct {
 	// Phase of RobotDevSuite.
 	Phase RobotDevSuitePhase `json:"phase,omitempty"`
 	// Status of RobotVDI.
-	RobotVDIStatus OwnedResourceStatus `json:"robotVDIStatus,omitempty"`
+	RobotVDIStatus OwnedRobotServiceStatus `json:"robotVDIStatus,omitempty"`
 	// Status of RobotIDE.
-	RobotIDEStatus OwnedResourceStatus `json:"robotIDEStatus,omitempty"`
+	RobotIDEStatus OwnedRobotServiceStatus `json:"robotIDEStatus,omitempty"`
 	// [*alpha*] Indicates if RobotDevSuite is attached to a Robot and actively provisioned it's resources.
 	Active bool `json:"active,omitempty"`
 }
