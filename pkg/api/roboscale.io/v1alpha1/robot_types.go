@@ -380,7 +380,7 @@ type ROSBridgeSpec struct {
 	// +kubebuilder:validation:Enum=ClusterIP;NodePort
 	// +kubebuilder:default="NodePort"
 	ServiceType corev1.ServiceType `json:"serviceType,omitempty"`
-	// [*alpha*] RobotIDE will create an Ingress resource if `true`.
+	// [*alpha*] ROSBridge will create an Ingress resource if `true`.
 	Ingress bool `json:"ingress,omitempty"`
 }
 
