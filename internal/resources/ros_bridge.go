@@ -85,7 +85,7 @@ func GetBridgeService(rosbridge *robotv1alpha1.ROSBridge, svcNamespacedName *typ
 					},
 				},
 			},
-			Type:     corev1.ServiceTypeNodePort,
+			Type:     rosbridge.Spec.ServiceType,
 			Selector: getROSBridgeSelector(*rosbridge),
 		},
 	}
