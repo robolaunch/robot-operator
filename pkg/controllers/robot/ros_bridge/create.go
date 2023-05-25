@@ -76,6 +76,6 @@ func (r *ROSBridgeReconciler) createIngress(ctx context.Context, instance *robot
 		return err
 	}
 
-	logger.Info("STATUS: ıNGRESS " + ingress.Name + " is created.")
+	logger.Info("STATUS: Ingress " + ingress.Name + " is created.")
 	return nil
 }
