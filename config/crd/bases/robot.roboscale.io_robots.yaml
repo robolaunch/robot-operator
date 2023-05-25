@@ -658,7 +658,7 @@ spec:
                 description: ROS bridge configurational parameters.
                 properties:
                   ingress:
-                    description: '[*alpha*] RobotIDE will create an Ingress resource
+                    description: '[*alpha*] ROSBridge will create an Ingress resource
                       if `true`.'
                     type: boolean
                   ros:

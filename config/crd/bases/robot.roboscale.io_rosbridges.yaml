@@ -38,8 +38,8 @@ spec:
             description: Specification of the desired behavior of the ROSBridge.
             properties:
               ingress:
-                description: '[*alpha*] RobotIDE will create an Ingress resource if
-                  `true`.'
+                description: '[*alpha*] ROSBridge will create an Ingress resource
+                  if `true`.'
                 type: boolean
               ros:
                 description: Configurational parameters for ROS bridge.
