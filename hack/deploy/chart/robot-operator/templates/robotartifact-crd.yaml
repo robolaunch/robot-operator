@@ -644,6 +644,10 @@ spec:
               rosBridgeTemplate:
                 description: ROS bridge configurational parameters.
                 properties:
+                  ingress:
+                    description: '[*alpha*] RobotIDE will create an Ingress resource
+                      if `true`.'
+                    type: boolean
                   ros:
                     description: Configurational parameters for ROS bridge.
                     properties:
@@ -674,6 +678,14 @@ spec:
                           by ROSBridge.
                         type: boolean
                     type: object
+                  serviceType:
+                    default: NodePort
+                    description: Service type of ROSBridge. `ClusterIP` and `NodePort`
+                      is supported.
+                    enum:
+                    - ClusterIP
+                    - NodePort
+                    type: string
                 type: object
               storage:
                 description: Total storage amount to persist via Robot. Unit of measurement
