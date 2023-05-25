@@ -145,6 +145,7 @@ func (r *RobotReconciler) reconcileCheckROSBridge(ctx context.Context, instance 
 			instance.Status.ROSBridgeStatus.Resource.Created = true
 			reference.SetReference(&instance.Status.ROSBridgeStatus.Resource.Reference, rosBridgeQuery.TypeMeta, rosBridgeQuery.ObjectMeta)
 			instance.Status.ROSBridgeStatus.Status = rosBridgeQuery.Status
+			instance.Status.ROSBridgeStatus.Connection = rosBridgeQuery.Status.ServiceStatus.URL
 		}
 	}
 

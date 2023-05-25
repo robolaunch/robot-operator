@@ -376,6 +376,12 @@ type ROSBridgeSpec struct {
 	ROS BridgeDistro `json:"ros,omitempty"`
 	// Configurational parameters for ROS 2 bridge.
 	ROS2 BridgeDistro `json:"ros2,omitempty"`
+	// Service type of ROSBridge. `ClusterIP` and `NodePort` is supported.
+	// +kubebuilder:validation:Enum=ClusterIP;NodePort
+	// +kubebuilder:default="NodePort"
+	ServiceType corev1.ServiceType `json:"serviceType,omitempty"`
+	// [*alpha*] RobotIDE will create an Ingress resource if `true`.
+	Ingress bool `json:"ingress,omitempty"`
 }
 
 // ROSBridgeStatus defines the observed state of ROSBridge.
@@ -385,7 +391,9 @@ type ROSBridgeStatus struct {
 	// Status of ROSBridge pod.
 	PodStatus OwnedResourceStatus `json:"podStatus,omitempty"`
 	// Status of ROSBridge service.
-	ServiceStatus OwnedResourceStatus `json:"serviceStatus,omitempty"`
+	ServiceStatus OwnedServiceStatus `json:"serviceStatus,omitempty"`
+	// Status of ROSBridge Ingress.
+	IngressStatus OwnedResourceStatus `json:"ingressStatus,omitempty"`
 }
 
 // ********************************

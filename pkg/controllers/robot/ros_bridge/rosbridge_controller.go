@@ -20,6 +20,7 @@ import (
 	"context"
 
 	corev1 "k8s.io/api/core/v1"
+	networkingv1 "k8s.io/api/networking/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/dynamic"
@@ -92,7 +93,7 @@ func (r *ROSBridgeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 
 func (r *ROSBridgeReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.ROSBridge) error {
 
-	switch instance.Status.ServiceStatus.Created {
+	switch instance.Status.ServiceStatus.Resource.Created {
 	case true:
 
 		switch instance.Status.PodStatus.Created {
@@ -103,7 +104,30 @@ func (r *ROSBridgeReconciler) reconcileCheckStatus(ctx context.Context, instance
 
 				// TODO: handle other pod phases
 
-				instance.Status.Phase = robotv1alpha1.BridgePhaseReady
+				switch instance.Spec.Ingress {
+				case true:
+
+					switch instance.Status.IngressStatus.Created {
+					case true:
+
+						instance.Status.Phase = robotv1alpha1.BridgePhaseReady
+
+					case false:
+
+						instance.Status.Phase = robotv1alpha1.BridgePhaseCreatingIngress
+						err := r.createIngress(ctx, instance, instance.GetBridgeIngressMetadata())
+						if err != nil {
+							return err
+						}
+						instance.Status.IngressStatus.Created = true
+
+					}
+
+				case false:
+
+					instance.Status.Phase = robotv1alpha1.BridgePhaseReady
+
+				}
 
 			}
 
@@ -125,7 +149,7 @@ func (r *ROSBridgeReconciler) reconcileCheckStatus(ctx context.Context, instance
 		if err != nil {
 			return err
 		}
-		instance.Status.ServiceStatus.Created = true
+		instance.Status.ServiceStatus.Resource.Created = true
 
 	}
 
@@ -144,6 +168,11 @@ func (r *ROSBridgeReconciler) reconcileCheckResources(ctx context.Context, insta
 		return err
 	}
 
+	err = r.reconcileCheckIngress(ctx, instance)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -153,5 +182,6 @@ func (r *ROSBridgeReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		For(&robotv1alpha1.ROSBridge{}).
 		Owns(&corev1.Pod{}).
 		Owns(&corev1.Service{}).
+		Owns(&networkingv1.Ingress{}).
 		Complete(r)
 }

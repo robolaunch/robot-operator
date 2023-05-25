@@ -40,6 +40,7 @@ type BridgePhase string
 const (
 	BridgePhaseCreatingService BridgePhase = "CreatingService"
 	BridgePhaseCreatingPod     BridgePhase = "CreatingPod"
+	BridgePhaseCreatingIngress BridgePhase = "CreatingIngress"
 	BridgePhaseReady           BridgePhase = "Ready"
 	BridgePhaseDeletingPod     BridgePhase = "DeletingPod"
 	BridgePhaseDeletingService BridgePhase = "DeletingService"

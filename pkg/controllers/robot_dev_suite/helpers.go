@@ -99,7 +99,7 @@ func (r *RobotDevSuiteReconciler) reconcileCheckOtherAttachedResources(ctx conte
 
 		for _, lm := range launchManagerList.Items {
 
-			if lm.Status.Active == true {
+			if lm.Status.Active {
 				return &robotErr.RobotResourcesHasNotBeenReleasedError{
 					ResourceKind:      instance.Kind,
 					ResourceName:      instance.Name,
@@ -128,7 +128,7 @@ func (r *RobotDevSuiteReconciler) reconcileCheckOtherAttachedResources(ctx conte
 				continue
 			}
 
-			if bm.Status.Active == true {
+			if bm.Status.Active {
 				return &robotErr.RobotResourcesHasNotBeenReleasedError{
 					ResourceKind:      instance.Kind,
 					ResourceName:      instance.Name,

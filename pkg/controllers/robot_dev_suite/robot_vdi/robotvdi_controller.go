@@ -93,7 +93,7 @@ func (r *RobotVDIReconciler) reconcileCheckStatus(ctx context.Context, instance 
 	switch instance.Status.PVCStatus.Created {
 	case true:
 
-		switch instance.Status.ServiceTCPStatus.Created {
+		switch instance.Status.ServiceTCPStatus.Resource.Created {
 		case true:
 
 			switch instance.Status.ServiceUDPStatus.Created {
@@ -161,7 +161,7 @@ func (r *RobotVDIReconciler) reconcileCheckStatus(ctx context.Context, instance 
 			if err != nil {
 				return err
 			}
-			instance.Status.ServiceTCPStatus.Created = true
+			instance.Status.ServiceTCPStatus.Resource.Created = true
 
 		}
 

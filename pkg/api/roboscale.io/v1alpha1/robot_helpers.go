@@ -135,6 +135,13 @@ func (rosbridge *ROSBridge) GetBridgeServiceMetadata() *types.NamespacedName {
 	}
 }
 
+func (rosbridge *ROSBridge) GetBridgeIngressMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Name:      rosbridge.Name,
+		Namespace: rosbridge.Namespace,
+	}
+}
+
 func (rosbridge *ROSBridge) GetOwnerMetadata() *types.NamespacedName {
 	return &types.NamespacedName{
 		Name:      rosbridge.OwnerReferences[0].Name,
