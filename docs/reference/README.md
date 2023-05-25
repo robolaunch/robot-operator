@@ -290,8 +290,8 @@ _Appears in:_
 | Field | Description |
 | --- | --- |
 | `phase` _[RobotDevSuitePhase](#robotdevsuitephase)_ | Phase of RobotDevSuite. |
-| `robotVDIStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ | Status of RobotVDI. |
-| `robotIDEStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ | Status of RobotIDE. |
+| `robotVDIStatus` _[OwnedRobotServiceStatus](#ownedrobotservicestatus)_ | Status of RobotVDI. |
+| `robotIDEStatus` _[OwnedRobotServiceStatus](#ownedrobotservicestatus)_ | Status of RobotIDE. |
 | `active` _boolean_ | [*alpha*] Indicates if RobotDevSuite is attached to a Robot and actively provisioned it's resources. |
 
 
@@ -397,7 +397,7 @@ _Appears in:_
 | --- | --- |
 | `phase` _[RobotVDIPhase](#robotvdiphase)_ | Phase of RobotVDI. |
 | `podStatus` _[OwnedPodStatus](#ownedpodstatus)_ | Status of Cloud VDI pod. |
-| `serviceTCPStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ | Status of Cloud VDI TCP service. |
+| `serviceTCPStatus` _[OwnedServiceStatus](#ownedservicestatus)_ | Status of Cloud VDI TCP service. |
 | `serviceUDPStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ | Status of Cloud VDI UDP service. |
 | `ingressStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ | Status of Cloud VDI Ingress. |
 | `pvcStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ | Status of Cloud VDI persistent volume claim. This PVC dynamically provisions a volume that is a shared between RobotVDI workloads and other workloads that requests display. |
@@ -452,7 +452,7 @@ _Appears in:_
 | --- | --- |
 | `phase` _[RobotIDEPhase](#robotidephase)_ | Phase of RobotIDE. |
 | `podStatus` _[OwnedPodStatus](#ownedpodstatus)_ | Status of Cloud IDE pod. |
-| `serviceStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ | Status of Cloud IDE service. |
+| `serviceStatus` _[OwnedServiceStatus](#ownedservicestatus)_ | Status of Cloud IDE service. |
 | `ingressStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ | Status of Cloud IDE Ingress. |
 
 
@@ -543,6 +543,8 @@ _Appears in:_
 | --- | --- |
 | `ros` _[BridgeDistro](#bridgedistro)_ | Configurational parameters for ROS bridge. |
 | `ros2` _[BridgeDistro](#bridgedistro)_ | Configurational parameters for ROS 2 bridge. |
+| `serviceType` _[ServiceType](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#servicetype-v1-core)_ | Service type of ROSBridge. `ClusterIP` and `NodePort` is supported. |
+| `ingress` _boolean_ | [*alpha*] ROSBridge will create an Ingress resource if `true`. |
 
 
 #### ROSBridgeStatus
@@ -559,7 +561,8 @@ _Appears in:_
 | --- | --- |
 | `phase` _BridgePhase_ | Phase of ROSBridge. |
 | `podStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ | Status of ROSBridge pod. |
-| `serviceStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ | Status of ROSBridge service. |
+| `serviceStatus` _[OwnedServiceStatus](#ownedservicestatus)_ | Status of ROSBridge service. |
+| `ingressStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ | Status of ROSBridge Ingress. |
 
 
 #### RobotArtifact
@@ -916,10 +919,11 @@ _Appears in:_
 - [DiscoveryServerStatus](#discoveryserverstatus)
 - [MetricsExporterStatus](#metricsexporterstatus)
 - [OwnedPodStatus](#ownedpodstatus)
+- [OwnedRobotServiceStatus](#ownedrobotservicestatus)
+- [OwnedServiceStatus](#ownedservicestatus)
 - [ROSBridgeInstanceStatus](#rosbridgeinstancestatus)
 - [ROSBridgeStatus](#rosbridgestatus)
 - [RobotDevSuiteInstanceStatus](#robotdevsuiteinstancestatus)
-- [RobotDevSuiteStatus](#robotdevsuitestatus)
 - [RobotIDEStatus](#robotidestatus)
 - [RobotStatus](#robotstatus)
 - [RobotVDIStatus](#robotvdistatus)
@@ -933,6 +937,38 @@ _Appears in:_
 | `created` _boolean_ | Shows if the owned resource is created. |
 | `reference` _[ObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#objectreference-v1-core)_ | Reference to the owned resource. |
 | `phase` _string_ | Phase of the owned resource. |
+
+
+#### OwnedRobotServiceStatus
+
+
+
+
+
+_Appears in:_
+- [RobotDevSuiteStatus](#robotdevsuitestatus)
+
+| Field | Description |
+| --- | --- |
+| `resource` _[OwnedResourceStatus](#ownedresourcestatus)_ | Generic status for any owned resource. |
+| `connection` _string_ | Address of the robot service that can be reached from outside. |
+
+
+#### OwnedServiceStatus
+
+
+
+
+
+_Appears in:_
+- [ROSBridgeStatus](#rosbridgestatus)
+- [RobotIDEStatus](#robotidestatus)
+- [RobotVDIStatus](#robotvdistatus)
+
+| Field | Description |
+| --- | --- |
+| `resource` _[OwnedResourceStatus](#ownedresourcestatus)_ | Generic status for any owned resource. |
+| `url` _string_ | Connection URL. |
 
 
 #### Prelaunch
@@ -973,6 +1009,7 @@ _Appears in:_
 | --- | --- |
 | `resource` _[OwnedResourceStatus](#ownedresourcestatus)_ | Generic status for any owned resource. |
 | `status` _[ROSBridgeStatus](#rosbridgestatus)_ | Status of the ROSBridge instance. |
+| `connection` _string_ | Address of the robot service that can be reached from outside. |
 
 
 #### ROSDistro
