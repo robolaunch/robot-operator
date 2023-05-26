@@ -30,7 +30,7 @@ func (r *RobotIDEReconciler) reconcileCheckService(ctx context.Context, instance
 		instance.Status.ServiceStatus.Resource.Created = true
 		reference.SetReference(&instance.Status.ServiceStatus.Resource.Reference, serviceQuery.TypeMeta, serviceQuery.ObjectMeta)
 		if instance.Spec.Ingress {
-			instance.Status.ServiceStatus.URL = robotv1alpha1.GetRobotServiceDNS(*robot, "https://", "/ide")
+			instance.Status.ServiceStatus.URL = robotv1alpha1.GetRobotServiceDNS(*robot, "https://", "/ide/")
 		} else if instance.Spec.ServiceType == corev1.ServiceTypeNodePort {
 			// TODO: Address with Node IP and port will be generated.
 			instance.Status.ServiceStatus.URL = "http://<NODE-IP>:<PORT>"
