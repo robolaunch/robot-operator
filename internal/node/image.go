@@ -69,7 +69,7 @@ func GetReadyRobotProperties(robot robotv1alpha1.Robot) ReadyRobotProperties {
 	}
 }
 
-func GetImage(node corev1.Node, robot robotv1alpha1.Robot) string {
+func GetImage(node corev1.Node, robot robotv1alpha1.Robot) (string, error) {
 
 	var imageBuilder strings.Builder
 	var tagBuilder strings.Builder
@@ -86,7 +86,7 @@ func GetImage(node corev1.Node, robot robotv1alpha1.Robot) string {
 		platformVersion := GetPlatformVersion(node)
 		imageProps, err := getImageProps(platformVersion)
 		if err != nil {
-			panic(err)
+			return "", err
 		}
 
 		organization := imageProps.Organization
@@ -111,7 +111,7 @@ func GetImage(node corev1.Node, robot robotv1alpha1.Robot) string {
 
 	}
 
-	return imageBuilder.String()
+	return imageBuilder.String(), nil
 
 }
 

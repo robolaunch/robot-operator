@@ -92,7 +92,10 @@ func (r *RobotReconciler) reconcileCheckImage(ctx context.Context, instance *rob
 	}
 
 	if instance.Status.Image == "" {
-		instance.Status.Image = nodePkg.GetImage(*node, *instance)
+		instance.Status.Image, err = nodePkg.GetImage(*node, *instance)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
