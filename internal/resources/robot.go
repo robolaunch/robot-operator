@@ -184,6 +184,9 @@ func GetLoaderJob(robot *robotv1alpha1.Robot, jobNamespacedName *types.Namespace
 			Image:           robot.Status.Image,
 			Command:         internal.Bash(driverInstallerCmdBuilder.String()),
 			ImagePullPolicy: corev1.PullAlways,
+			Env: []corev1.EnvVar{
+				internal.Env("NVIDIA_DRIVER_VERSION", "agnostic"),
+			},
 			VolumeMounts: []corev1.VolumeMount{
 				configure.GetVolumeMount("", configure.GetVolumeVar(robot)),
 				configure.GetVolumeMount("", configure.GetVolumeUsr(robot)),
