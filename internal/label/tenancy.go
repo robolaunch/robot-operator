@@ -128,13 +128,3 @@ func GetClusterName(obj metav1.Object) string {
 	}
 	return tenancy.PhysicalInstance
 }
-
-func GetPlatformVersion(obj metav1.Object) string {
-	labels := obj.GetLabels()
-
-	if platformVersion, ok := labels[internal.PLATFORM_VERSION_LABEL_KEY]; ok {
-		return platformVersion
-	}
-
-	return ""
-}
