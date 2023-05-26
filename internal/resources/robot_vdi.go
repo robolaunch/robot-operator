@@ -263,7 +263,7 @@ func GetRobotVDIIngress(robotVDI *robotv1alpha1.RobotVDI, ingressNamespacedName 
 					HTTP: &networkingv1.HTTPIngressRuleValue{
 						Paths: []networkingv1.HTTPIngressPath{
 							{
-								Path:     robotv1alpha1.GetRobotServicePath(robot, "") + "(/|$)(.*)",
+								Path:     robotv1alpha1.GetRobotServicePath(robot, "/vdi") + "(/|$)(.*)",
 								PathType: &pathTypePrefix,
 								Backend: networkingv1.IngressBackend{
 									Service: &networkingv1.IngressServiceBackend{
