@@ -2,6 +2,11 @@ package internal
 
 import corev1 "k8s.io/api/core/v1"
 
+// Platform related labels
+const (
+	PLATFORM_VERSION_LABEL_KEY = "robolaunch.io/platform"
+)
+
 // Tenancy labels
 const (
 	ORGANIZATION_LABEL_KEY         = "robolaunch.io/organization"
