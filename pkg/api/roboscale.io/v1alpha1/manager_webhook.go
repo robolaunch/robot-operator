@@ -337,7 +337,7 @@ func (lec *LaunchEntrypointConfig) checkLaunchEntrypointConfig() error {
 			return errors.New(".spec.launch[].entrypoint.executable should be empty if the launch type is `Launch`")
 		}
 
-		if !reflect.DeepEqual(lec.DisableSourcingWorkspace, "") {
+		if reflect.DeepEqual(lec.DisableSourcingWorkspace, true) {
 			return errors.New(".spec.launch[].entrypoint.disableSourcingWs cannot be `true` if the launch type is `Launch`")
 		}
 
@@ -358,7 +358,7 @@ func (lec *LaunchEntrypointConfig) checkLaunchEntrypointConfig() error {
 			return errors.New(".spec.launch[].entrypoint.launchfile should be empty if the launch type is `Run`")
 		}
 
-		if !reflect.DeepEqual(lec.DisableSourcingWorkspace, "") {
+		if reflect.DeepEqual(lec.DisableSourcingWorkspace, true) {
 			return errors.New(".spec.launch[].entrypoint.disableSourcingWs cannot be `true` if the launch type is `Run`")
 		}
 
