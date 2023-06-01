@@ -1,6 +1,9 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+
+<a name="v0.2.5-alpha.13"></a>
+## [v0.2.5-alpha.13] - 2023-05-29
 ### Feat
 - **image:** :rocket: select robot image by querying versioning map
 
@@ -114,7 +117,8 @@
 - Merge pull request [#24](https://github.com/robolaunch/robot-operator/issues/24) from robolaunch/23-allow-multiple-launches
 
 
-[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.12...HEAD
+[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.13...HEAD
+[v0.2.5-alpha.13]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.12...v0.2.5-alpha.13
 [v0.2.5-alpha.12]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.11...v0.2.5-alpha.12
 [v0.2.5-alpha.11]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.10...v0.2.5-alpha.11
 [v0.2.5-alpha.10]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.9...v0.2.5-alpha.10

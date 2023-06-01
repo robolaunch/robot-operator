@@ -148,14 +148,14 @@ func GetRobotIDEIngress(robotIDE *robotv1alpha1.RobotIDE, ingressNamespacedName 
 		TLS: []networkingv1.IngressTLS{
 			{
 				Hosts: []string{
-					tenancy.Organization + "." + rootDNSConfig.Host,
+					tenancy.CloudInstanceAlias + "." + rootDNSConfig.Host,
 				},
 				SecretName: secretName,
 			},
 		},
 		Rules: []networkingv1.IngressRule{
 			{
-				Host: tenancy.Organization + "." + rootDNSConfig.Host,
+				Host: tenancy.CloudInstanceAlias + "." + rootDNSConfig.Host,
 				IngressRuleValue: networkingv1.IngressRuleValue{
 					HTTP: &networkingv1.HTTPIngressRuleValue{
 						Paths: []networkingv1.HTTPIngressPath{
