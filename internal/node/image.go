@@ -69,6 +69,7 @@ func GetReadyRobotProperties(robot robotv1alpha1.Robot) ReadyRobotProperties {
 	}
 }
 
+// TODO: Fetch all properties from platform versioning map
 func GetImage(node corev1.Node, robot robotv1alpha1.Robot) (string, error) {
 
 	var imageBuilder strings.Builder
@@ -92,15 +93,16 @@ func GetImage(node corev1.Node, robot robotv1alpha1.Robot) (string, error) {
 		organization := imageProps.Organization
 		repository := imageProps.Repository
 
+		tagBuilder.WriteString("ros2-")
 		tagBuilder.WriteString(getDistroStr(distributions))
 
 		hasGPU := HasGPU(node)
 
 		if hasGPU {
-			tagBuilder.WriteString("-xfce") // TODO: make desktop selectable
+			tagBuilder.WriteString("-focal-xfce") // TODO: make desktop selectable
 
 		} else {
-			tagBuilder.WriteString("-xfce") // TODO: make desktop selectable
+			tagBuilder.WriteString("-focal-xfce") // TODO: make desktop selectable
 		}
 
 		// get latest tag
