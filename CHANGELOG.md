@@ -1,6 +1,9 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+### Fix
+- **ingress:** :bug: fix ingress annotations
+
 
 <a name="v0.2.5-alpha.13"></a>
 ## [v0.2.5-alpha.13] - 2023-05-29
