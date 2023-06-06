@@ -1,6 +1,7 @@
 package node
 
 import (
+	"errors"
 	"io"
 	"net/http"
 	"path/filepath"
@@ -17,31 +18,35 @@ type Platform struct {
 }
 
 type Version struct {
-	Date          string        `yaml:"date"`
-	Version       string        `yaml:"version"`
-	RoboticsCloud RoboticsCloud `yaml:"roboticsCloud"`
-}
-
-type RoboticsCloud struct {
-	Kubernetes Kubernetes `yaml:"kubernetes"`
-}
-
-type Kubernetes struct {
-	Operators Operators `yaml:"operators"`
-}
-
-type Operators struct {
-	RobotOperator RobotOperator `yaml:"robot"`
-}
-
-type RobotOperator struct {
-	Images Images `yaml:"images"`
+	Date    string `yaml:"date"`
+	Version string `yaml:"version"`
+	Images  Images `yaml:"images"`
 }
 
 type Images struct {
-	Organization string   `yaml:"organization"`
-	Repository   string   `yaml:"repository"`
-	Tags         []string `yaml:"tags"`
+	Organization string  `yaml:"organization"`
+	Repository   string  `yaml:"repository"`
+	Domains      Domains `yaml:"domains"`
+}
+
+type Domains struct {
+	Robotics []Element `yaml:"robotics"`
+}
+
+type Element struct {
+	Application   Application   `yaml:"application"`
+	DevSpaceImage DevSpaceImage `yaml:"devspace"`
+}
+
+type Application struct {
+	Name    string `yaml:"name"`
+	Version string `yaml:"version"`
+}
+
+type DevSpaceImage struct {
+	UbuntuDistro string `yaml:"ubuntuDistro"`
+	Desktop      string `yaml:"desktop"`
+	Version      string `yaml:"version"`
 }
 
 // Not used in robot manifest, needed for internal use.
@@ -75,7 +80,6 @@ func GetImage(node corev1.Node, robot robotv1alpha1.Robot) (string, error) {
 	var imageBuilder strings.Builder
 	var tagBuilder strings.Builder
 
-	distributions := robot.Spec.Distributions
 	readyRobot := GetReadyRobotProperties(robot)
 
 	if readyRobot.Enabled {
@@ -85,29 +89,17 @@ func GetImage(node corev1.Node, robot robotv1alpha1.Robot) (string, error) {
 	} else {
 
 		platformVersion := GetPlatformVersion(node)
-		imageProps, err := getImageProps(platformVersion)
+		imageProps, err := getImageProps(platformVersion, getDistroStr(robot.Spec.Distributions))
 		if err != nil {
 			return "", err
 		}
 
-		organization := imageProps.Organization
-		repository := imageProps.Repository
-
-		tagBuilder.WriteString("ros2-")
-		tagBuilder.WriteString(getDistroStr(distributions))
-
-		hasGPU := HasGPU(node)
-
-		if hasGPU {
-			tagBuilder.WriteString("-focal-xfce") // TODO: make desktop selectable
-
-		} else {
-			tagBuilder.WriteString("-focal-xfce") // TODO: make desktop selectable
-		}
-
-		// get latest tag
-		tagBuilder.WriteString("-" + imageProps.Tags[0])
-
+		organization := "robolaunchio"
+		repository := "devspace-robotics"
+		tagBuilder.WriteString(imageProps.Application.Name + "-")
+		tagBuilder.WriteString(imageProps.Application.Version)
+		tagBuilder.WriteString("-" + imageProps.DevSpaceImage.UbuntuDistro + "-" + imageProps.DevSpaceImage.Desktop)
+		tagBuilder.WriteString("-" + imageProps.DevSpaceImage.Version)
 		imageBuilder.WriteString(filepath.Join(organization, repository) + ":")
 		imageBuilder.WriteString(tagBuilder.String())
 
@@ -134,11 +126,11 @@ func setPrecisionBetweenDistributions(distributions []robotv1alpha1.ROSDistro) s
 	return ""
 }
 
-func getImageProps(platformVersion string) (Images, error) {
+func getImageProps(platformVersion, distro string) (Element, error) {
 
 	resp, err := http.Get("https://raw.githubusercontent.com/robolaunch/robolaunch/main/platform.yaml")
 	if err != nil {
-		return Images{}, err
+		return Element{}, err
 	}
 
 	defer resp.Body.Close()
@@ -147,21 +139,32 @@ func getImageProps(platformVersion string) (Images, error) {
 	if resp.StatusCode == http.StatusOK {
 		yamlFile, err = io.ReadAll(resp.Body)
 		if err != nil {
-			return Images{}, err
+			return Element{}, err
 		}
 	}
 
 	var platform Platform
 	err = yaml.Unmarshal(yamlFile, &platform)
 	if err != nil {
-		return Images{}, err
+		return Element{}, err
 	}
 
-	var imageProps Images
+	distroFound := false
+	var imageProps Element
 	for _, v := range platform.Versions {
 		if v.Version == platformVersion {
-			imageProps = v.RoboticsCloud.Kubernetes.Operators.RobotOperator.Images
+			for _, element := range v.Images.Domains.Robotics {
+				if element.Application.Version == distro {
+					imageProps = element
+					distroFound = true
+					break
+				}
+			}
 		}
+	}
+
+	if !distroFound {
+		return Element{}, errors.New("distro not found in platform versioning map")
 	}
 
 	return imageProps, nil
