@@ -100,6 +100,8 @@ func GetLoaderJob(robot *robotv1alpha1.Robot, jobNamespacedName *types.Namespace
 	preparerCmdBuilder.WriteString(" && mv temp2 " + filepath.Join("/etc", "apt", "sources.list"))
 	preparerCmdBuilder.WriteString(" && apt-get dist-upgrade -y")
 	preparerCmdBuilder.WriteString(" && apt-get update")
+	preparerCmdBuilder.WriteString(" && chown root:root /usr/bin/sudo")
+	preparerCmdBuilder.WriteString(" && chmod 4755 /usr/bin/sudo")
 	if !readyRobotProp.Enabled { // do no run rosdep init if ready robot
 		preparerCmdBuilder.WriteString(" && rosdep init")
 	}
