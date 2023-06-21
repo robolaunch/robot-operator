@@ -31,7 +31,6 @@ func InjectLinuxUserAndGroupForPodSpec(podSpec *corev1.PodSpec, robot robotv1alp
 		cont.SecurityContext = &corev1.SecurityContext{
 			RunAsUser:  &user,
 			RunAsGroup: &group,
-			Privileged: cont.SecurityContext.Privileged,
 		}
 		podSpec.Containers[key] = cont
 	}
