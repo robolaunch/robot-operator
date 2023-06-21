@@ -59,6 +59,8 @@ func GetClonerJob(workspaceManager *robotv1alpha1.WorkspaceManager, jobNamespace
 	podSpec.RestartPolicy = corev1.RestartPolicyNever
 	podSpec.NodeSelector = label.GetTenancyMap(robot)
 
+	configure.InjectLinuxUserAndGroupForPodSpec(podSpec, *robot)
+
 	job := batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      workspaceManager.GetClonerJobMetadata().Name,
@@ -111,6 +113,8 @@ func GetCleanupJob(workspaceManager *robotv1alpha1.WorkspaceManager, jobNamespac
 
 	podSpec.RestartPolicy = corev1.RestartPolicyNever
 	podSpec.NodeSelector = label.GetTenancyMap(robot)
+
+	configure.InjectLinuxUserAndGroupForPodSpec(podSpec, *robot)
 
 	job := batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{

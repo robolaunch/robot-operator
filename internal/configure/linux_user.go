@@ -18,3 +18,17 @@ func InjectLinuxUserAndGroup(pod *corev1.Pod, robot robotv1alpha1.Robot) *corev1
 
 	return pod
 }
+
+func InjectLinuxUserAndGroupForPodSpec(podSpec *corev1.PodSpec, robot robotv1alpha1.Robot) *corev1.PodSpec {
+
+	var user int64 = 1000
+	var group int64 = 3000
+
+	for key, cont := range podSpec.Containers {
+		cont.SecurityContext.RunAsUser = &user
+		cont.SecurityContext.RunAsGroup = &group
+		podSpec.Containers[key] = cont
+	}
+
+	return podSpec
+}
