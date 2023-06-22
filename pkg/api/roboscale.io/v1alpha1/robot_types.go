@@ -10,6 +10,7 @@ func init() {
 	SchemeBuilder.Register(&ROSBridge{}, &ROSBridgeList{})
 	SchemeBuilder.Register(&DiscoveryServer{}, &DiscoveryServerList{})
 	SchemeBuilder.Register(&RobotArtifact{}, &RobotArtifactList{})
+	SchemeBuilder.Register(&RelayServer{}, &RelayServerList{})
 }
 
 //+genclient
@@ -108,6 +109,28 @@ type RobotArtifactList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []RobotArtifact `json:"items"`
+}
+
+//+genclient
+//+kubebuilder:object:root=true
+//+kubebuilder:subresource:status
+
+// RelayServer is the Schema for the relayservers API
+type RelayServer struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   RelayServerSpec   `json:"spec,omitempty"`
+	Status RelayServerStatus `json:"status,omitempty"`
+}
+
+//+kubebuilder:object:root=true
+
+// RelayServerList contains a list of RelayServer
+type RelayServerList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []RelayServer `json:"items"`
 }
 
 // ********************************
@@ -399,3 +422,15 @@ type ROSBridgeStatus struct {
 // ********************************
 // RobotArtifact types
 // ********************************
+
+// ********************************
+// RelayServer types
+// ********************************
+
+// RelayServerSpec defines the desired state of RelayServer
+type RelayServerSpec struct {
+}
+
+// RelayServerStatus defines the observed state of RelayServer
+type RelayServerStatus struct {
+}
