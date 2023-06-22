@@ -36,7 +36,6 @@ func (robotide *RobotIDE) GetRobotIDEPodMetadata() *types.NamespacedName {
 }
 
 func (robotide *RobotIDE) GetRobotIDEServiceMetadata() *types.NamespacedName {
-
 	instanceType := label.GetInstanceType(robotide)
 	if instanceType == label.InstanceTypeCloudInstance {
 		return &types.NamespacedName{
@@ -51,6 +50,13 @@ func (robotide *RobotIDE) GetRobotIDEServiceMetadata() *types.NamespacedName {
 			Namespace: robotide.Namespace,
 			Name:      robotide.Name + internal.SVC_IDE_POSTFIX + "-" + tenancy.PhysicalInstance,
 		}
+	}
+}
+
+func (robotide *RobotIDE) GetRobotIDEServiceExportMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Namespace: robotide.Namespace,
+		Name:      robotide.GetRobotIDEServiceMetadata().Name,
 	}
 
 }
