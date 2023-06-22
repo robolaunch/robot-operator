@@ -162,6 +162,8 @@ type RobotIDEStatus struct {
 	ServiceStatus OwnedServiceStatus `json:"serviceStatus,omitempty"`
 	// Status of Cloud IDE Ingress.
 	IngressStatus OwnedResourceStatus `json:"ingressStatus,omitempty"`
+	// Status of Cloud IDE ServiceExport. Created only if the instance type is Physical Instance.
+	ServiceExportStatus OwnedResourceStatus `json:"serviceExportStatus,omitempty"`
 }
 
 // ********************************
