@@ -46,6 +46,17 @@ const (
 	BridgePhaseDeletingService BridgePhase = "DeletingService"
 )
 
+type RelayServerPhase string
+
+const (
+	RelayServerPhaseCreatingService RelayServerPhase = "CreatingService"
+	RelayServerPhaseCreatingPod     RelayServerPhase = "CreatingPod"
+	RelayServerPhaseCreatingIngress RelayServerPhase = "CreatingIngress"
+	RelayServerPhaseReady           RelayServerPhase = "Ready"
+	RelayServerPhaseDeletingPod     RelayServerPhase = "DeletingPod"
+	RelayServerPhaseDeletingService RelayServerPhase = "DeletingService"
+)
+
 type WorkspaceManagerPhase string
 
 const (
