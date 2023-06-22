@@ -435,6 +435,10 @@ type RelayServerSpec struct {
 	Subdomain string `json:"subdomain,omitempty"`
 	// Remote instance name.
 	InstanceName string `json:"name,omitempty"`
+	// Remote namespace.
+	RemoteNamespace string `json:"remoteNamespace,omitempty"`
+	// Remote port.
+	RemotePort int `json:"remotePort,omitempty"`
 	// [*alpha*] Root DNS configuration.
 	RootDNSConfig RootDNSConfig `json:"rootDNSConfig,omitempty"`
 	// [*alpha*] TLS secret reference.

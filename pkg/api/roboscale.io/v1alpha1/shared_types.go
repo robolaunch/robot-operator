@@ -98,3 +98,18 @@ func GetRobotServicePath(robot Robot, postfix string) string {
 
 	return connectionStr
 }
+
+func GetRelayServerServicePath(rs RelayServer, postfix string) string {
+	tenancy := label.GetTenancy(&rs)
+	connectionStr := "/" + tenancy.Team +
+		"/" + tenancy.Region +
+		"/" + tenancy.CloudInstance +
+		"/" + rs.Namespace +
+		"/" + rs.Name
+
+	if postfix != "" {
+		connectionStr = connectionStr + postfix
+	}
+
+	return connectionStr
+}
