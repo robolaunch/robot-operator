@@ -94,6 +94,11 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 		configure.InjectPodDisplayConfiguration(&pod, robotVDI)
 	}
 
+	if label.GetInstanceType(&robot) == label.InstanceTypePhysicalInstance {
+		// apply ONLY if the resource is on physical instance
+		configure.InjectRemoteConfigurationsForPod(&pod, *robotIDE)
+	}
+
 	return &pod
 }
 
@@ -109,7 +114,7 @@ func GetRobotIDEService(robotIDE *robotv1alpha1.RobotIDE, svcNamespacedName *typ
 					IntVal: 9000,
 				},
 				Protocol: corev1.ProtocolTCP,
-				Name:     "cloud-ide",
+				Name:     "code-server",
 			},
 		},
 	}
@@ -120,6 +125,11 @@ func GetRobotIDEService(robotIDE *robotv1alpha1.RobotIDE, svcNamespacedName *typ
 			Namespace: robotIDE.GetRobotIDEServiceMetadata().Namespace,
 		},
 		Spec: serviceSpec,
+	}
+
+	if label.GetInstanceType(robotIDE) == label.InstanceTypePhysicalInstance {
+		// apply ONLY if the resource is on physical instance
+		configure.InjectRemoteConfigurationsForService(&service)
 	}
 
 	return &service
