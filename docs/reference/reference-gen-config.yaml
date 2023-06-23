@@ -12,6 +12,7 @@ processor:
     - "RobotIDE"
     - "DiscoveryServer"
     - "ROSBridge"
+    - "RelayServer"
     - "RobotArtifact"
   ignoreFields:
     - "TypeMeta$"

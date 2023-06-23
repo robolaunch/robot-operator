@@ -16,6 +16,7 @@ Package v1alpha1 contains API Schema definitions for the robot v1alpha1 API grou
 - [RobotIDE](#robotide)
 - [DiscoveryServer](#discoveryserver)
 - [ROSBridge](#rosbridge)
+- [RelayServer](#relayserver)
 - [RobotArtifact](#robotartifact)
 
 
@@ -274,6 +275,8 @@ _Appears in:_
 | `robotVDITemplate` _[RobotVDISpec](#robotvdispec)_ | Configurational parameters of RobotVDI. Applied if `.spec.vdiEnabled` is set to `true`. |
 | `ideEnabled` _boolean_ | If `true`, a Cloud IDE will be provisioned inside development suite. |
 | `robotIDETemplate` _[RobotIDESpec](#robotidespec)_ | Configurational parameters of RobotIDE. Applied if `.spec.ideEnabled` is set to `true`. |
+| `remoteIDEEnabled` _boolean_ | If `true`, a relay server for remote Cloud IDE will be provisioned inside development suite. |
+| `remoteIDERelayServerTemplate` _[RelayServerSpec](#relayserverspec)_ | Configurational parameters of remote IDE. Applied if `.spec.remoteIDEEnabled` is set to `true`. |
 
 
 #### RobotDevSuiteStatus
@@ -292,6 +295,7 @@ _Appears in:_
 | `phase` _[RobotDevSuitePhase](#robotdevsuitephase)_ | Phase of RobotDevSuite. |
 | `robotVDIStatus` _[OwnedRobotServiceStatus](#ownedrobotservicestatus)_ | Status of RobotVDI. |
 | `robotIDEStatus` _[OwnedRobotServiceStatus](#ownedrobotservicestatus)_ | Status of RobotIDE. |
+| `remoteIDERelayServerStatus` _[OwnedRobotServiceStatus](#ownedrobotservicestatus)_ | Status of remote Cloud IDE RelayServer. Created only if the instance type is Physical Instance. |
 | `active` _boolean_ | [*alpha*] Indicates if RobotDevSuite is attached to a Robot and actively provisioned it's resources. |
 
 
@@ -454,6 +458,7 @@ _Appears in:_
 | `podStatus` _[OwnedPodStatus](#ownedpodstatus)_ | Status of Cloud IDE pod. |
 | `serviceStatus` _[OwnedServiceStatus](#ownedservicestatus)_ | Status of Cloud IDE service. |
 | `ingressStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ | Status of Cloud IDE Ingress. |
+| `serviceExportStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ | Status of Cloud IDE ServiceExport. Created only if the instance type is Physical Instance. |
 
 
 #### DiscoveryServer
@@ -563,6 +568,61 @@ _Appears in:_
 | `podStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ | Status of ROSBridge pod. |
 | `serviceStatus` _[OwnedServiceStatus](#ownedservicestatus)_ | Status of ROSBridge service. |
 | `ingressStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ | Status of ROSBridge Ingress. |
+
+
+#### RelayServer
+
+
+
+RelayServer is the Schema for the relayservers API
+
+
+
+| Field | Description |
+| --- | --- |
+| `apiVersion` _string_ | `robot.roboscale.io/v1alpha1`
+| `kind` _string_ | `RelayServer`
+| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |
+| `spec` _[RelayServerSpec](#relayserverspec)_ |  |
+| `status` _[RelayServerStatus](#relayserverstatus)_ |  |
+
+
+#### RelayServerSpec
+
+
+
+RelayServerSpec defines the desired state of RelayServer.
+
+_Appears in:_
+- [RelayServer](#relayserver)
+- [RobotDevSuiteSpec](#robotdevsuitespec)
+
+| Field | Description |
+| --- | --- |
+| `hostname` _string_ | Hostname of the remote pod. |
+| `subdomain` _string_ | Subdomain of the remote pod. It's also same with remote service's name. |
+| `instanceName` _string_ | Remote instance name. |
+| `remoteNamespace` _string_ | Remote namespace. |
+| `remotePort` _integer_ | Remote port. |
+| `rootDNSConfig` _[RootDNSConfig](#rootdnsconfig)_ | [*alpha*] Root DNS configuration. |
+| `tlsSecretRef` _[TLSSecretReference](#tlssecretreference)_ | [*alpha*] TLS secret reference. |
+
+
+#### RelayServerStatus
+
+
+
+RelayServerStatus defines the observed state of RelayServer.
+
+_Appears in:_
+- [RelayServer](#relayserver)
+
+| Field | Description |
+| --- | --- |
+| `phase` _RelayServerPhase_ | Phase of RelayServer. |
+| `podStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ | Status of RelayServer pod. |
+| `serviceStatus` _[OwnedServiceStatus](#ownedservicestatus)_ | Status of RelayServer service. |
+| `ingressStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ | Status of RelayServer Ingress. |
 
 
 #### RobotArtifact
@@ -923,6 +983,7 @@ _Appears in:_
 - [OwnedServiceStatus](#ownedservicestatus)
 - [ROSBridgeInstanceStatus](#rosbridgeinstancestatus)
 - [ROSBridgeStatus](#rosbridgestatus)
+- [RelayServerStatus](#relayserverstatus)
 - [RobotDevSuiteInstanceStatus](#robotdevsuiteinstancestatus)
 - [RobotIDEStatus](#robotidestatus)
 - [RobotStatus](#robotstatus)
@@ -962,6 +1023,7 @@ _Appears in:_
 
 _Appears in:_
 - [ROSBridgeStatus](#rosbridgestatus)
+- [RelayServerStatus](#relayserverstatus)
 - [RobotIDEStatus](#robotidestatus)
 - [RobotVDIStatus](#robotvdistatus)
 
@@ -1117,6 +1179,7 @@ _Appears in:_
 
 
 _Appears in:_
+- [RelayServerSpec](#relayserverspec)
 - [RobotSpec](#robotspec)
 
 | Field | Description |
@@ -1196,6 +1259,7 @@ _Appears in:_
 
 
 _Appears in:_
+- [RelayServerSpec](#relayserverspec)
 - [RobotSpec](#robotspec)
 
 | Field | Description |
