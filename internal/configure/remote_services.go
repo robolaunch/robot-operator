@@ -1,7 +1,6 @@
 package configure
 
 import (
-	"github.com/robolaunch/robot-operator/internal/label"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 )
@@ -9,10 +8,8 @@ import (
 // It should be applied ONLY in physical instances.
 func InjectRemoteConfigurationsForPod(pod *corev1.Pod, robotIDE robotv1alpha1.RobotIDE) *corev1.Pod {
 
-	tenancy := label.GetTenancy(&robotIDE)
-
 	pod.Spec.Hostname = robotIDE.Name
-	pod.Spec.Subdomain = robotIDE.GetRobotIDEServiceMetadata().Name + "-" + tenancy.PhysicalInstance
+	pod.Spec.Subdomain = robotIDE.GetRobotIDEServiceMetadata().Name
 
 	return pod
 }

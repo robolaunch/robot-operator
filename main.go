@@ -40,6 +40,7 @@ import (
 	metrics "github.com/robolaunch/robot-operator/pkg/controllers/metrics"
 	robot "github.com/robolaunch/robot-operator/pkg/controllers/robot"
 	discoveryServer "github.com/robolaunch/robot-operator/pkg/controllers/robot/discovery_server"
+	relayServer "github.com/robolaunch/robot-operator/pkg/controllers/robot/relay_server"
 	rosBridge "github.com/robolaunch/robot-operator/pkg/controllers/robot/ros_bridge"
 	robotDevSuite "github.com/robolaunch/robot-operator/pkg/controllers/robot_dev_suite"
 	robotIDE "github.com/robolaunch/robot-operator/pkg/controllers/robot_dev_suite/robot_ide"
@@ -223,6 +224,13 @@ func main() {
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "MetricsExporter")
+		os.Exit(1)
+	}
+	if err = (&relayServer.RelayServerReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "RelayServer")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder

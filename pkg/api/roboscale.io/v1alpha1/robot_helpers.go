@@ -148,3 +148,28 @@ func (rosbridge *ROSBridge) GetOwnerMetadata() *types.NamespacedName {
 		Namespace: rosbridge.Namespace,
 	}
 }
+
+// ********************************
+// RelayServer helpers
+// *******************************
+
+func (relayserver *RelayServer) GetRelayServerPodMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Name:      relayserver.Name,
+		Namespace: relayserver.Namespace,
+	}
+}
+
+func (relayserver *RelayServer) GetRelayServerServiceMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Name:      relayserver.Name,
+		Namespace: relayserver.Namespace,
+	}
+}
+
+func (relayserver *RelayServer) GetRelayServerIngressMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Name:      relayserver.Name,
+		Namespace: relayserver.Namespace,
+	}
+}
