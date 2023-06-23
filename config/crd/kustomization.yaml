@@ -27,7 +27,7 @@ patchesStrategicMerge:
 #- patches/webhook_in_rosbridges.yaml
 - patches/webhook_in_buildmanagers.yaml
 - patches/webhook_in_launchmanagers.yaml
-#- patches/webhook_in_robotdevsuites.yaml
+- patches/webhook_in_robotdevsuites.yaml
 - patches/webhook_in_robotvdis.yaml
 #- patches/webhook_in_robotides.yaml
 #- patches/webhook_in_robotartifacts.yaml
@@ -44,14 +44,14 @@ patchesStrategicMerge:
 #- patches/cainjection_in_rosbridges.yaml
 - patches/cainjection_in_buildmanagers.yaml
 - patches/cainjection_in_launchmanagers.yaml
-#- patches/cainjection_in_robotdevsuites.yaml
+- patches/cainjection_in_robotdevsuites.yaml
 - patches/cainjection_in_robotvdis.yaml
 #- patches/cainjection_in_robotides.yaml
 #- patches/cainjection_in_robotartifacts.yaml
 - patches/cainjection_in_metricscollectors.yaml
 - patches/cainjection_in_workspacemanagers.yaml
 #- patches/cainjection_in_metricsexporters.yaml
-- patches/cainjection_in_relayservers.yaml
+# - patches/cainjection_in_relayservers.yaml
 #+kubebuilder:scaffold:crdkustomizecainjectionpatch
 
 # the following config is for teaching kustomize how to do kustomization for CRDs.
