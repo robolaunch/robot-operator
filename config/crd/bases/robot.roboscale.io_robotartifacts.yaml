@@ -534,6 +534,10 @@ spec:
                     description: If `true`, a Cloud IDE will be provisioned inside
                       development suite.
                     type: boolean
+                  remoteIdeEnabled:
+                    description: If `true`, a relay server for remote Cloud IDE will
+                      be provisioned inside development suite.
+                    type: boolean
                   robotIDETemplate:
                     description: Configurational parameters of RobotIDE. Applied if
                       `.spec.ideEnabled` is set to `true`.

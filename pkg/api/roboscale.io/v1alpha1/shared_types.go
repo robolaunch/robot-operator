@@ -84,6 +84,17 @@ func GetRobotServiceDNS(robot Robot, prefix, postfix string) string {
 	return connectionStr
 }
 
+func GetRelayServerServiceDNS(rs RelayServer, prefix, postfix string) string {
+	tenancy := label.GetTenancy(&rs)
+	connectionStr := tenancy.CloudInstanceAlias + "." + rs.Spec.RootDNSConfig.Host + GetRelayServerServicePath(rs, postfix)
+
+	if prefix != "" {
+		connectionStr = prefix + connectionStr
+	}
+
+	return connectionStr
+}
+
 func GetRobotServicePath(robot Robot, postfix string) string {
 	tenancy := label.GetTenancy(&robot)
 	connectionStr := "/" + tenancy.Team +
