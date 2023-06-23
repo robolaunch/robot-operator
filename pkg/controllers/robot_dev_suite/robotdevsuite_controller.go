@@ -351,6 +351,11 @@ func (r *RobotDevSuiteReconciler) reconcileCheckResources(ctx context.Context, i
 		return err
 	}
 
+	err = r.reconcileCheckRemoteIDERelayServer(ctx, instance)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

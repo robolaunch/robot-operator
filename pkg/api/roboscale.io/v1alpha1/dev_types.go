@@ -129,7 +129,7 @@ type RobotDevSuiteStatus struct {
 	// Status of RobotIDE.
 	RobotIDEStatus OwnedRobotServiceStatus `json:"robotIDEStatus,omitempty"`
 	// Status of remote Cloud IDE RelayServer. Created only if the instance type is Physical Instance.
-	RemoteIDERelayServerStatus RelayServerInstanceStatus `json:"remoteIDERelayServerStatus,omitempty"`
+	RemoteIDERelayServerStatus OwnedRobotServiceStatus `json:"remoteIDERelayServerStatus,omitempty"`
 	// [*alpha*] Indicates if RobotDevSuite is attached to a Robot and actively provisioned it's resources.
 	Active bool `json:"active,omitempty"`
 }
