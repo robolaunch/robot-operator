@@ -116,6 +116,8 @@ type RobotDevSuiteSpec struct {
 	RobotIDETemplate RobotIDESpec `json:"robotIDETemplate,omitempty"`
 	// If `true`, a relay server for remote Cloud IDE will be provisioned inside development suite.
 	RemoteIDEEnabled bool `json:"remoteIDEEnabled,omitempty"`
+	// Configurational parameters of remote IDE. Applied if `.spec.remoteIDEEnabled` is set to `true`.
+	RemoteIDERelayServerTemplate RelayServerSpec `json:"remoteIDERelayServerTemplate,omitempty"`
 }
 
 // RobotDevSuiteStatus defines the observed state of RobotDevSuite.

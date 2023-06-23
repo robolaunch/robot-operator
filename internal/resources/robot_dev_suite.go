@@ -38,3 +38,17 @@ func GetRobotIDE(robotDevSuite *robotv1alpha1.RobotDevSuite, robotIDENamespacedN
 
 	return &robotIDE
 }
+
+func GetRemoteIDERelayServer(robotDevSuite *robotv1alpha1.RobotDevSuite, relayServerNamespacedName *types.NamespacedName) *robotv1alpha1.RelayServer {
+
+	relayServer := robotv1alpha1.RelayServer{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      relayServerNamespacedName.Name,
+			Namespace: relayServerNamespacedName.Namespace,
+			Labels:    robotDevSuite.Labels,
+		},
+		Spec: robotDevSuite.Spec.RemoteIDERelayServerTemplate,
+	}
+
+	return &relayServer
+}
