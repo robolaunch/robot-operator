@@ -36,6 +36,13 @@ type OwnedPodStatus struct {
 	IP string `json:"ip,omitempty"`
 }
 
+type RelayServerInstanceStatus struct {
+	// Generic status for any owned resource.
+	Resource OwnedResourceStatus `json:"resource,omitempty"`
+	// Status of the RelayServer instance.
+	Status RelayServerStatus `json:"status,omitempty"`
+}
+
 type DiscoveryServerInstanceStatus struct {
 	// Generic status for any owned resource.
 	Resource OwnedResourceStatus `json:"resource,omitempty"`
