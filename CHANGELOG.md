@@ -1,6 +1,16 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+### Feat
+- **relayserver:** :tada: use relay server to serve remote services
+- **remote:** :rocket: make remote ide consumable from cloud instance
+
+### Fix
+- **webhooks:** :bug: disable relay server webhooks and enable robotdevsuite webhooks
+
+
+<a name="v0.2.5-alpha.19"></a>
+## [v0.2.5-alpha.19] - 2023-06-21
 ### Fix
 - **security-context:** :bug: remove checking container privilege for ws manager jobs
 
@@ -138,7 +148,8 @@
 - Merge pull request [#24](https://github.com/robolaunch/robot-operator/issues/24) from robolaunch/23-allow-multiple-launches
 
 
-[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.18...HEAD
+[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.19...HEAD
+[v0.2.5-alpha.19]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.18...v0.2.5-alpha.19
 [v0.2.5-alpha.18]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.17...v0.2.5-alpha.18
 [v0.2.5-alpha.17]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.16...v0.2.5-alpha.17
 [v0.2.5-alpha.16]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.15...v0.2.5-alpha.16

@@ -530,6 +530,53 @@ spec:
                     description: If `true`, a Cloud IDE will be provisioned inside development
                       suite.
                     type: boolean
+                  remoteIDEEnabled:
+                    description: If `true`, a relay server for remote Cloud IDE will
+                      be provisioned inside development suite.
+                    type: boolean
+                  remoteIDERelayServerTemplate:
+                    description: Configurational parameters of remote IDE. Applied if
+                      `.spec.remoteIDEEnabled` is set to `true`.
+                    properties:
+                      hostname:
+                        description: Hostname of the remote pod.
+                        type: string
+                      instanceName:
+                        description: Remote instance name.
+                        type: string
+                      remoteNamespace:
+                        description: Remote namespace.
+                        type: string
+                      remotePort:
+                        description: Remote port.
+                        type: integer
+                      rootDNSConfig:
+                        description: '[*alpha*] Root DNS configuration.'
+                        properties:
+                          host:
+                            description: '[*alpha*] Root DNS name..'
+                            type: string
+                        required:
+                        - host
+                        type: object
+                      subdomain:
+                        description: Subdomain of the remote pod. It's also same with
+                          remote service's name.
+                        type: string
+                      tlsSecretRef:
+                        description: '[*alpha*] TLS secret reference.'
+                        properties:
+                          name:
+                            description: '[*alpha*] TLS secret object name.'
+                            type: string
+                          namespace:
+                            description: '[*alpha*] TLS secret object namespace.'
+                            type: string
+                        required:
+                        - name
+                        - namespace
+                        type: object
+                    type: object
                   robotIDETemplate:
                     description: Configurational parameters of RobotIDE. Applied if
                       `.spec.ideEnabled` is set to `true`.
