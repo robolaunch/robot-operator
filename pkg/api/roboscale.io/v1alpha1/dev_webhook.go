@@ -245,7 +245,7 @@ func (r *RobotDevSuite) checkInstanceName() error {
 func (r *RobotDevSuite) checkRemoteIDERelayServerTemplate() error {
 
 	if r.Spec.RemoteIDEEnabled {
-		if reflect.DeepEqual(r.Spec.RemoteIDERelayServerTemplate, RelayServerSpec{}) {
+		if reflect.DeepEqual(r.Spec.RemoteIDERelayServerTemplate, nil) {
 			return errors.New("relay server template cannot be nil if remote ide relay server is enabled")
 		}
 	}
@@ -254,7 +254,7 @@ func (r *RobotDevSuite) checkRemoteIDERelayServerTemplate() error {
 }
 
 func DefaultRemoteIDERelayServerFields(r *RobotDevSuite) {
-	if r.Spec.RemoteIDEEnabled && !reflect.DeepEqual(r.Spec.RemoteIDERelayServerTemplate, RelayServerSpec{}) {
+	if r.Spec.RemoteIDEEnabled {
 		instanceName := r.Spec.RemoteIDERelayServerTemplate.InstanceName
 		rootDNSConfig := r.Spec.RemoteIDERelayServerTemplate.RootDNSConfig
 		tlsSecretRef := r.Spec.RemoteIDERelayServerTemplate.TLSSecretReference

@@ -434,7 +434,7 @@ type RelayServerSpec struct {
 	// Subdomain of the remote pod. It's also same with remote service's name.
 	Subdomain string `json:"subdomain,omitempty"`
 	// Remote instance name.
-	InstanceName string `json:"name,omitempty"`
+	InstanceName string `json:"instanceName,omitempty"`
 	// Remote namespace.
 	RemoteNamespace string `json:"remoteNamespace,omitempty"`
 	// Remote port.

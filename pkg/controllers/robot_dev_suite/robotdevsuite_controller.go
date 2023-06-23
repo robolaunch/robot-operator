@@ -37,6 +37,7 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/robolaunch/robot-operator/internal"
 	robotErr "github.com/robolaunch/robot-operator/internal/error"
+	"github.com/robolaunch/robot-operator/internal/label"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 )
 
@@ -138,7 +139,7 @@ func (r *RobotDevSuiteReconciler) reconcileCheckStatus(ctx context.Context, inst
 							switch instance.Status.RobotIDEStatus.Resource.Phase {
 							case string(robotv1alpha1.RobotIDEPhaseRunning):
 
-								switch instance.Spec.RemoteIDEEnabled {
+								switch instance.Spec.RemoteIDEEnabled && label.GetInstanceType(instance) == label.InstanceTypeCloudInstance {
 								case true:
 
 									switch instance.Status.RemoteIDERelayServerStatus.Resource.Created {
@@ -183,7 +184,7 @@ func (r *RobotDevSuiteReconciler) reconcileCheckStatus(ctx context.Context, inst
 
 					case false:
 
-						switch instance.Spec.RemoteIDEEnabled {
+						switch instance.Spec.RemoteIDEEnabled && label.GetInstanceType(instance) == label.InstanceTypeCloudInstance {
 						case true:
 
 							switch instance.Status.RemoteIDERelayServerStatus.Resource.Created {
@@ -239,7 +240,7 @@ func (r *RobotDevSuiteReconciler) reconcileCheckStatus(ctx context.Context, inst
 					switch instance.Status.RobotIDEStatus.Resource.Phase {
 					case string(robotv1alpha1.RobotIDEPhaseRunning):
 
-						switch instance.Spec.RemoteIDEEnabled {
+						switch instance.Spec.RemoteIDEEnabled && label.GetInstanceType(instance) == label.InstanceTypeCloudInstance {
 						case true:
 
 							switch instance.Status.RemoteIDERelayServerStatus.Resource.Created {
@@ -284,7 +285,7 @@ func (r *RobotDevSuiteReconciler) reconcileCheckStatus(ctx context.Context, inst
 
 			case false:
 
-				switch instance.Spec.RemoteIDEEnabled {
+				switch instance.Spec.RemoteIDEEnabled && label.GetInstanceType(instance) == label.InstanceTypeCloudInstance {
 				case true:
 
 					switch instance.Status.RemoteIDERelayServerStatus.Resource.Created {
@@ -328,6 +329,11 @@ func (r *RobotDevSuiteReconciler) reconcileCheckStatus(ctx context.Context, inst
 		}
 
 		err = r.reconcileDeleteRobotVDI(ctx, instance)
+		if err != nil {
+			return err
+		}
+
+		err = r.reconcileDeleteRemoteIDERelayServer(ctx, instance)
 		if err != nil {
 			return err
 		}

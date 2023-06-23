@@ -38,7 +38,7 @@ spec:
               hostname:
                 description: Hostname of the remote pod.
                 type: string
-              name:
+              instanceName:
                 description: Remote instance name.
                 type: string
               remoteNamespace:
