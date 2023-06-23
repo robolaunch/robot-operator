@@ -2,6 +2,7 @@ package v1alpha1
 
 import (
 	"errors"
+	"reflect"
 
 	"github.com/robolaunch/robot-operator/internal"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -162,4 +163,110 @@ func (r *RobotVDI) checkTargetRobotLabel() error {
 	}
 
 	return nil
+}
+
+// ********************************
+// RobotDevSuite webhooks
+// ********************************
+
+// log is for logging in this package.
+var robotdevsuitelog = logf.Log.WithName("robotdevsuite-resource")
+
+func (r *RobotDevSuite) SetupWebhookWithManager(mgr ctrl.Manager) error {
+	return ctrl.NewWebhookManagedBy(mgr).
+		For(r).
+		Complete()
+}
+
+//+kubebuilder:webhook:path=/mutate-robot-roboscale-io-v1alpha1-robotdevsuite,mutating=true,failurePolicy=fail,sideEffects=None,groups=robot.roboscale.io,resources=robotdevsuites,verbs=create;update,versions=v1alpha1,name=mrobotdevsuite.kb.io,admissionReviewVersions=v1
+
+var _ webhook.Defaulter = &RobotDevSuite{}
+
+// Default implements webhook.Defaulter so a webhook will be registered for the type
+func (r *RobotDevSuite) Default() {
+	robotdevsuitelog.Info("default", "name", r.Name)
+	DefaultRemoteIDERelayServerFields(r)
+}
+
+//+kubebuilder:webhook:path=/validate-robot-roboscale-io-v1alpha1-robotdevsuite,mutating=false,failurePolicy=fail,sideEffects=None,groups=robot.roboscale.io,resources=robotdevsuites,verbs=create;update,versions=v1alpha1,name=vrobotdevsuite.kb.io,admissionReviewVersions=v1
+
+var _ webhook.Validator = &RobotDevSuite{}
+
+// ValidateCreate implements webhook.Validator so a webhook will be registered for the type
+func (r *RobotDevSuite) ValidateCreate() error {
+	robotdevsuitelog.Info("validate create", "name", r.Name)
+
+	err := r.checkInstanceName()
+	if err != nil {
+		return err
+	}
+
+	err = r.checkRemoteIDERelayServerTemplate()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
+func (r *RobotDevSuite) ValidateUpdate(old runtime.Object) error {
+	robotdevsuitelog.Info("validate update", "name", r.Name)
+
+	err := r.checkInstanceName()
+	if err != nil {
+		return err
+	}
+
+	err = r.checkRemoteIDERelayServerTemplate()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// ValidateDelete implements webhook.Validator so a webhook will be registered for the type
+func (r *RobotDevSuite) ValidateDelete() error {
+	robotdevsuitelog.Info("validate delete", "name", r.Name)
+	return nil
+}
+
+func (r *RobotDevSuite) checkInstanceName() error {
+	if r.Spec.RemoteIDEEnabled {
+		if r.Spec.RemoteIDERelayServerTemplate.InstanceName == "" {
+			return errors.New("remote instance name for relay server cannot be empty")
+		}
+	}
+
+	return nil
+}
+
+func (r *RobotDevSuite) checkRemoteIDERelayServerTemplate() error {
+
+	if r.Spec.RemoteIDEEnabled {
+		if reflect.DeepEqual(r.Spec.RemoteIDERelayServerTemplate, RelayServerSpec{}) {
+			return errors.New("relay server template cannot be nil if remote ide relay server is enabled")
+		}
+	}
+
+	return nil
+}
+
+func DefaultRemoteIDERelayServerFields(r *RobotDevSuite) {
+	if r.Spec.RemoteIDEEnabled && !reflect.DeepEqual(r.Spec.RemoteIDERelayServerTemplate, RelayServerSpec{}) {
+		instanceName := r.Spec.RemoteIDERelayServerTemplate.InstanceName
+		rootDNSConfig := r.Spec.RemoteIDERelayServerTemplate.RootDNSConfig
+		tlsSecretRef := r.Spec.RemoteIDERelayServerTemplate.TLSSecretReference
+
+		r.Spec.RemoteIDERelayServerTemplate = RelayServerSpec{
+			Hostname:           r.GetRobotIDEMetadata().Name,
+			Subdomain:          r.GetRobotIDEMetadata().Name + internal.SVC_IDE_POSTFIX + "-" + instanceName,
+			InstanceName:       instanceName,
+			RemoteNamespace:    r.Namespace,
+			RemotePort:         9000,
+			RootDNSConfig:      rootDNSConfig,
+			TLSSecretReference: tlsSecretRef,
+		}
+	}
 }

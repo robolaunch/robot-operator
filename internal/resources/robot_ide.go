@@ -7,6 +7,7 @@ import (
 	"github.com/robolaunch/robot-operator/internal"
 	"github.com/robolaunch/robot-operator/internal/configure"
 	"github.com/robolaunch/robot-operator/internal/label"
+	mcsv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/external/apis/mcsv1alpha1/v1alpha1"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1"
@@ -94,6 +95,11 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 		configure.InjectPodDisplayConfiguration(&pod, robotVDI)
 	}
 
+	if label.GetInstanceType(&robot) == label.InstanceTypePhysicalInstance {
+		// apply ONLY if the resource is on physical instance
+		configure.InjectRemoteConfigurationsForPod(&pod, *robotIDE)
+	}
+
 	return &pod
 }
 
@@ -109,17 +115,22 @@ func GetRobotIDEService(robotIDE *robotv1alpha1.RobotIDE, svcNamespacedName *typ
 					IntVal: 9000,
 				},
 				Protocol: corev1.ProtocolTCP,
-				Name:     "cloud-ide",
+				Name:     "code-server",
 			},
 		},
 	}
 
 	service := corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      robotIDE.GetRobotIDEServiceMetadata().Name,
-			Namespace: robotIDE.GetRobotIDEServiceMetadata().Namespace,
+			Name:      svcNamespacedName.Name,
+			Namespace: svcNamespacedName.Namespace,
 		},
 		Spec: serviceSpec,
+	}
+
+	if label.GetInstanceType(robotIDE) == label.InstanceTypePhysicalInstance {
+		// apply ONLY if the resource is on physical instance
+		configure.InjectRemoteConfigurationsForService(&service)
 	}
 
 	return &service
@@ -190,4 +201,16 @@ func GetRobotIDEIngress(robotIDE *robotv1alpha1.RobotIDE, ingressNamespacedName 
 	}
 
 	return ingress
+}
+
+func GetRobotIDEServiceExport(robotIDE *robotv1alpha1.RobotIDE, svcExportNamespacedName *types.NamespacedName) *mcsv1alpha1.ServiceExport {
+
+	serviceExport := mcsv1alpha1.ServiceExport{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      svcExportNamespacedName.Name,
+			Namespace: svcExportNamespacedName.Namespace,
+		},
+	}
+
+	return &serviceExport
 }

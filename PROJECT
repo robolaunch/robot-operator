@@ -74,6 +74,10 @@ resources:
   kind: RobotDevSuite
   path: github.com/robolaunch/robot-operator/api/v1alpha1
   version: v1alpha1
+  webhooks:
+    defaulting: true
+    validation: true
+    webhookVersion: v1
 - api:
     crdVersion: v1
     namespaced: true
@@ -141,6 +145,15 @@ resources:
   domain: roboscale.io
   group: robot
   kind: MetricsExporter
+  path: github.com/robolaunch/robot-operator/api/v1alpha1
+  version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: roboscale.io
+  group: robot
+  kind: RelayServer
   path: github.com/robolaunch/robot-operator/api/v1alpha1
   version: v1alpha1
 version: "3"

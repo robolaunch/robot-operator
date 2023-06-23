@@ -37,6 +37,7 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/robolaunch/robot-operator/internal"
 	robotErr "github.com/robolaunch/robot-operator/internal/error"
+	"github.com/robolaunch/robot-operator/internal/label"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 )
 
@@ -50,6 +51,10 @@ type RobotDevSuiteReconciler struct {
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=robotdevsuites,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=robotdevsuites/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=robotdevsuites/finalizers,verbs=update
+
+//+kubebuilder:rbac:groups=robot.roboscale.io,resources=robotides,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=robot.roboscale.io,resources=robotvdis,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=robot.roboscale.io,resources=relayservers,verbs=get;list;watch;create;update;patch;delete
 
 var logger logr.Logger
 
@@ -134,7 +139,35 @@ func (r *RobotDevSuiteReconciler) reconcileCheckStatus(ctx context.Context, inst
 							switch instance.Status.RobotIDEStatus.Resource.Phase {
 							case string(robotv1alpha1.RobotIDEPhaseRunning):
 
-								instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseRunning
+								switch instance.Spec.RemoteIDEEnabled && label.GetInstanceType(instance) == label.InstanceTypeCloudInstance {
+								case true:
+
+									switch instance.Status.RemoteIDERelayServerStatus.Resource.Created {
+									case true:
+
+										switch instance.Status.RemoteIDERelayServerStatus.Resource.Phase {
+										case string(robotv1alpha1.RelayServerPhaseReady):
+
+											instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseRunning
+
+										}
+
+									case false:
+
+										instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseCreatingRelayServerForRemoteIDE
+										err := r.reconcileCreateRemoteIDERelayServer(ctx, instance)
+										if err != nil {
+											return err
+										}
+										instance.Status.RemoteIDERelayServerStatus.Resource.Created = true
+
+									}
+
+								case false:
+
+									instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseRunning
+
+								}
 
 							}
 
@@ -151,7 +184,35 @@ func (r *RobotDevSuiteReconciler) reconcileCheckStatus(ctx context.Context, inst
 
 					case false:
 
-						instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseRunning
+						switch instance.Spec.RemoteIDEEnabled && label.GetInstanceType(instance) == label.InstanceTypeCloudInstance {
+						case true:
+
+							switch instance.Status.RemoteIDERelayServerStatus.Resource.Created {
+							case true:
+
+								switch instance.Status.RemoteIDERelayServerStatus.Resource.Phase {
+								case string(robotv1alpha1.RelayServerPhaseReady):
+
+									instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseRunning
+
+								}
+
+							case false:
+
+								instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseCreatingRelayServerForRemoteIDE
+								err := r.reconcileCreateRemoteIDERelayServer(ctx, instance)
+								if err != nil {
+									return err
+								}
+								instance.Status.RemoteIDERelayServerStatus.Resource.Created = true
+
+							}
+
+						case false:
+
+							instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseRunning
+
+						}
 
 					}
 
@@ -179,7 +240,35 @@ func (r *RobotDevSuiteReconciler) reconcileCheckStatus(ctx context.Context, inst
 					switch instance.Status.RobotIDEStatus.Resource.Phase {
 					case string(robotv1alpha1.RobotIDEPhaseRunning):
 
-						instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseRunning
+						switch instance.Spec.RemoteIDEEnabled && label.GetInstanceType(instance) == label.InstanceTypeCloudInstance {
+						case true:
+
+							switch instance.Status.RemoteIDERelayServerStatus.Resource.Created {
+							case true:
+
+								switch instance.Status.RemoteIDERelayServerStatus.Resource.Phase {
+								case string(robotv1alpha1.RelayServerPhaseReady):
+
+									instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseRunning
+
+								}
+
+							case false:
+
+								instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseCreatingRelayServerForRemoteIDE
+								err := r.reconcileCreateRemoteIDERelayServer(ctx, instance)
+								if err != nil {
+									return err
+								}
+								instance.Status.RemoteIDERelayServerStatus.Resource.Created = true
+
+							}
+
+						case false:
+
+							instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseRunning
+
+						}
 
 					}
 
@@ -196,7 +285,35 @@ func (r *RobotDevSuiteReconciler) reconcileCheckStatus(ctx context.Context, inst
 
 			case false:
 
-				instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseRunning
+				switch instance.Spec.RemoteIDEEnabled && label.GetInstanceType(instance) == label.InstanceTypeCloudInstance {
+				case true:
+
+					switch instance.Status.RemoteIDERelayServerStatus.Resource.Created {
+					case true:
+
+						switch instance.Status.RemoteIDERelayServerStatus.Resource.Phase {
+						case string(robotv1alpha1.RelayServerPhaseReady):
+
+							instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseRunning
+
+						}
+
+					case false:
+
+						instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseCreatingRelayServerForRemoteIDE
+						err := r.reconcileCreateRemoteIDERelayServer(ctx, instance)
+						if err != nil {
+							return err
+						}
+						instance.Status.RemoteIDERelayServerStatus.Resource.Created = true
+
+					}
+
+				case false:
+
+					instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseRunning
+
+				}
 
 			}
 
@@ -212,6 +329,11 @@ func (r *RobotDevSuiteReconciler) reconcileCheckStatus(ctx context.Context, inst
 		}
 
 		err = r.reconcileDeleteRobotVDI(ctx, instance)
+		if err != nil {
+			return err
+		}
+
+		err = r.reconcileDeleteRemoteIDERelayServer(ctx, instance)
 		if err != nil {
 			return err
 		}
@@ -235,6 +357,11 @@ func (r *RobotDevSuiteReconciler) reconcileCheckResources(ctx context.Context, i
 		return err
 	}
 
+	err = r.reconcileCheckRemoteIDERelayServer(ctx, instance)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -244,6 +371,7 @@ func (r *RobotDevSuiteReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		For(&robotv1alpha1.RobotDevSuite{}).
 		Owns(&robotv1alpha1.RobotVDI{}).
 		Owns(&robotv1alpha1.RobotIDE{}).
+		Owns(&robotv1alpha1.RelayServer{}).
 		Watches(
 			&source.Kind{Type: &robotv1alpha1.Robot{}},
 			handler.EnqueueRequestsFromMapFunc(r.watchRobots),

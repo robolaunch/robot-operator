@@ -46,6 +46,17 @@ const (
 	BridgePhaseDeletingService BridgePhase = "DeletingService"
 )
 
+type RelayServerPhase string
+
+const (
+	RelayServerPhaseCreatingService RelayServerPhase = "CreatingService"
+	RelayServerPhaseCreatingPod     RelayServerPhase = "CreatingPod"
+	RelayServerPhaseCreatingIngress RelayServerPhase = "CreatingIngress"
+	RelayServerPhaseReady           RelayServerPhase = "Ready"
+	RelayServerPhaseDeletingPod     RelayServerPhase = "DeletingPod"
+	RelayServerPhaseDeletingService RelayServerPhase = "DeletingService"
+)
+
 type WorkspaceManagerPhase string
 
 const (
@@ -81,12 +92,13 @@ const (
 type RobotDevSuitePhase string
 
 const (
-	RobotDevSuitePhaseRobotNotFound    RobotDevSuitePhase = "RobotNotFound"
-	RobotDevSuitePhaseCreatingRobotVDI RobotDevSuitePhase = "CreatingRobotVDI"
-	RobotDevSuitePhaseCreatingRobotIDE RobotDevSuitePhase = "CreatingRobotIDE"
-	RobotDevSuitePhaseRunning          RobotDevSuitePhase = "Running"
-	RobotDevSuitePhaseDeactivating     RobotDevSuitePhase = "Deactivating"
-	RobotDevSuitePhaseInactive         RobotDevSuitePhase = "Inactive"
+	RobotDevSuitePhaseRobotNotFound                   RobotDevSuitePhase = "RobotNotFound"
+	RobotDevSuitePhaseCreatingRobotVDI                RobotDevSuitePhase = "CreatingRobotVDI"
+	RobotDevSuitePhaseCreatingRobotIDE                RobotDevSuitePhase = "CreatingRobotIDE"
+	RobotDevSuitePhaseCreatingRelayServerForRemoteIDE RobotDevSuitePhase = "CreatingRelayServerForRemoteIDE"
+	RobotDevSuitePhaseRunning                         RobotDevSuitePhase = "Running"
+	RobotDevSuitePhaseDeactivating                    RobotDevSuitePhase = "Deactivating"
+	RobotDevSuitePhaseInactive                        RobotDevSuitePhase = "Inactive"
 )
 
 type RobotIDEPhase string

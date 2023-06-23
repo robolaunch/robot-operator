@@ -29,6 +29,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	"github.com/go-logr/logr"
+	"github.com/robolaunch/robot-operator/internal/label"
+	mcsv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/external/apis/mcsv1alpha1/v1alpha1"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 )
 
@@ -46,6 +48,7 @@ type RobotIDEReconciler struct {
 //+kubebuilder:rbac:groups=core,resources=pods,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=core,resources=services,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=networking.k8s.io,resources=ingresses,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=multicluster.x-k8s.io,resources=serviceexports,verbs=get;list;watch;create;update;patch;delete
 
 var logger logr.Logger
 
@@ -137,6 +140,15 @@ func (r *RobotIDEReconciler) reconcileCheckStatus(ctx context.Context, instance 
 
 	}
 
+	switch label.GetInstanceType(instance) == label.InstanceTypePhysicalInstance && !instance.Status.ServiceExportStatus.Created {
+	case true:
+		err := r.reconcileCreateServiceExport(ctx, instance)
+		if err != nil {
+			return err
+		}
+		instance.Status.ServiceExportStatus.Created = true
+	}
+
 	return nil
 }
 
@@ -167,5 +179,6 @@ func (r *RobotIDEReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Owns(&corev1.Pod{}).
 		Owns(&corev1.Service{}).
 		Owns(&networkingv1.Ingress{}).
+		Owns(&mcsv1alpha1.ServiceExport{}).
 		Complete(r)
 }

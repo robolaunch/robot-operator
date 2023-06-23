@@ -2,6 +2,7 @@ package v1alpha1
 
 import (
 	"github.com/robolaunch/robot-operator/internal"
+	"github.com/robolaunch/robot-operator/internal/label"
 	"k8s.io/apimachinery/pkg/types"
 )
 
@@ -23,6 +24,13 @@ func (robotDevSuite *RobotDevSuite) GetRobotIDEMetadata() *types.NamespacedName 
 	}
 }
 
+func (robotDevSuite *RobotDevSuite) GetRemoteIDERelayServerMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Namespace: robotDevSuite.Namespace,
+		Name:      robotDevSuite.Name + "-" + robotDevSuite.Spec.RemoteIDERelayServerTemplate.InstanceName + internal.REMOTE_IDE_RELAY_SERVER_POSTFIX,
+	}
+}
+
 // ********************************
 // RobotIDE helpers
 // ********************************
@@ -35,10 +43,29 @@ func (robotide *RobotIDE) GetRobotIDEPodMetadata() *types.NamespacedName {
 }
 
 func (robotide *RobotIDE) GetRobotIDEServiceMetadata() *types.NamespacedName {
+	instanceType := label.GetInstanceType(robotide)
+	if instanceType == label.InstanceTypeCloudInstance {
+		return &types.NamespacedName{
+			Namespace: robotide.Namespace,
+			Name:      robotide.Name + internal.SVC_IDE_POSTFIX,
+		}
+	} else {
+
+		tenancy := label.GetTenancy(robotide)
+
+		return &types.NamespacedName{
+			Namespace: robotide.Namespace,
+			Name:      robotide.Name + internal.SVC_IDE_POSTFIX + "-" + tenancy.PhysicalInstance,
+		}
+	}
+}
+
+func (robotide *RobotIDE) GetRobotIDEServiceExportMetadata() *types.NamespacedName {
 	return &types.NamespacedName{
 		Namespace: robotide.Namespace,
-		Name:      robotide.Name + internal.SVC_IDE_POSTFIX,
+		Name:      robotide.GetRobotIDEServiceMetadata().Name,
 	}
+
 }
 
 func (robotide *RobotIDE) GetRobotIDEIngressMetadata() *types.NamespacedName {

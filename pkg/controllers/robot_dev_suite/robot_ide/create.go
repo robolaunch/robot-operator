@@ -95,3 +95,24 @@ func (r *RobotIDEReconciler) reconcileCreateIngress(ctx context.Context, instanc
 
 	return nil
 }
+
+func (r *RobotIDEReconciler) reconcileCreateServiceExport(ctx context.Context, instance *robotv1alpha1.RobotIDE) error {
+
+	ideServiceExport := resources.GetRobotIDEServiceExport(instance, instance.GetRobotIDEServiceExportMetadata())
+
+	err := ctrl.SetControllerReference(instance, ideServiceExport, r.Scheme)
+	if err != nil {
+		return err
+	}
+
+	err = r.Create(ctx, ideServiceExport)
+	if err != nil && errors.IsAlreadyExists(err) {
+		return nil
+	} else if err != nil {
+		return err
+	}
+
+	logger.Info("STATUS: IDE service export is created.")
+
+	return nil
+}

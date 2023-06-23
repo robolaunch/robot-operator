@@ -90,3 +90,44 @@ func (r *RobotDevSuiteReconciler) reconcileCheckRobotIDE(ctx context.Context, in
 
 	return nil
 }
+
+func (r *RobotDevSuiteReconciler) reconcileCheckRemoteIDERelayServer(ctx context.Context, instance *robotv1alpha1.RobotDevSuite) error {
+
+	remoteIDERelayServerQuery := &robotv1alpha1.RelayServer{}
+	err := r.Get(ctx, *instance.GetRemoteIDERelayServerMetadata(), remoteIDERelayServerQuery)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			instance.Status.RemoteIDERelayServerStatus = robotv1alpha1.OwnedRobotServiceStatus{}
+		} else {
+			return err
+		}
+	} else {
+
+		if instance.Spec.RemoteIDEEnabled {
+
+			if !reflect.DeepEqual(instance.Spec.RemoteIDERelayServerTemplate, remoteIDERelayServerQuery.Spec) {
+				remoteIDERelayServerQuery.Spec = instance.Spec.RemoteIDERelayServerTemplate
+				err = r.Update(ctx, remoteIDERelayServerQuery)
+				if err != nil {
+					return err
+				}
+			}
+
+			instance.Status.RemoteIDERelayServerStatus.Resource.Created = true
+			reference.SetReference(&instance.Status.RemoteIDERelayServerStatus.Resource.Reference, remoteIDERelayServerQuery.TypeMeta, remoteIDERelayServerQuery.ObjectMeta)
+			instance.Status.RemoteIDERelayServerStatus.Resource.Phase = string(remoteIDERelayServerQuery.Status.Phase)
+			instance.Status.RemoteIDERelayServerStatus.Connection = remoteIDERelayServerQuery.Status.ServiceStatus.URL
+
+		} else {
+
+			err := r.Delete(ctx, remoteIDERelayServerQuery)
+			if err != nil {
+				return err
+			}
+
+		}
+
+	}
+
+	return nil
+}

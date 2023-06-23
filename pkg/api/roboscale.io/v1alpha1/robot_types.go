@@ -10,6 +10,7 @@ func init() {
 	SchemeBuilder.Register(&ROSBridge{}, &ROSBridgeList{})
 	SchemeBuilder.Register(&DiscoveryServer{}, &DiscoveryServerList{})
 	SchemeBuilder.Register(&RobotArtifact{}, &RobotArtifactList{})
+	SchemeBuilder.Register(&RelayServer{}, &RelayServerList{})
 }
 
 //+genclient
@@ -108,6 +109,28 @@ type RobotArtifactList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []RobotArtifact `json:"items"`
+}
+
+//+genclient
+//+kubebuilder:object:root=true
+//+kubebuilder:subresource:status
+
+// RelayServer is the Schema for the relayservers API
+type RelayServer struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   RelayServerSpec   `json:"spec,omitempty"`
+	Status RelayServerStatus `json:"status,omitempty"`
+}
+
+//+kubebuilder:object:root=true
+
+// RelayServerList contains a list of RelayServer
+type RelayServerList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []RelayServer `json:"items"`
 }
 
 // ********************************
@@ -399,3 +422,37 @@ type ROSBridgeStatus struct {
 // ********************************
 // RobotArtifact types
 // ********************************
+
+// ********************************
+// RelayServer types
+// ********************************
+
+// RelayServerSpec defines the desired state of RelayServer.
+type RelayServerSpec struct {
+	// Hostname of the remote pod.
+	Hostname string `json:"hostname,omitempty"`
+	// Subdomain of the remote pod. It's also same with remote service's name.
+	Subdomain string `json:"subdomain,omitempty"`
+	// Remote instance name.
+	InstanceName string `json:"instanceName,omitempty"`
+	// Remote namespace.
+	RemoteNamespace string `json:"remoteNamespace,omitempty"`
+	// Remote port.
+	RemotePort int `json:"remotePort,omitempty"`
+	// [*alpha*] Root DNS configuration.
+	RootDNSConfig RootDNSConfig `json:"rootDNSConfig,omitempty"`
+	// [*alpha*] TLS secret reference.
+	TLSSecretReference TLSSecretReference `json:"tlsSecretRef,omitempty"`
+}
+
+// RelayServerStatus defines the observed state of RelayServer.
+type RelayServerStatus struct {
+	// Phase of RelayServer.
+	Phase RelayServerPhase `json:"phase,omitempty"`
+	// Status of RelayServer pod.
+	PodStatus OwnedResourceStatus `json:"podStatus,omitempty"`
+	// Status of RelayServer service.
+	ServiceStatus OwnedServiceStatus `json:"serviceStatus,omitempty"`
+	// Status of RelayServer Ingress.
+	IngressStatus OwnedResourceStatus `json:"ingressStatus,omitempty"`
+}
