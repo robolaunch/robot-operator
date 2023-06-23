@@ -50,3 +50,24 @@ func (r *RobotDevSuiteReconciler) reconcileCreateRobotIDE(ctx context.Context, i
 
 	return nil
 }
+
+func (r *RobotDevSuiteReconciler) reconcileCreateRemoteIDERelayServer(ctx context.Context, instance *robotv1alpha1.RobotDevSuite) error {
+
+	remoteIDERelayServer := resources.GetRemoteIDERelayServer(instance, instance.GetRemoteIDERelayServerMetadata())
+
+	err := ctrl.SetControllerReference(instance, remoteIDERelayServer, r.Scheme)
+	if err != nil {
+		return err
+	}
+
+	err = r.Create(ctx, remoteIDERelayServer)
+	if err != nil && errors.IsAlreadyExists(err) {
+		return nil
+	} else if err != nil {
+		return err
+	}
+
+	logger.Info("STATUS: Relay server for remote IDE is created.")
+
+	return nil
+}

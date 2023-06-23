@@ -92,12 +92,13 @@ const (
 type RobotDevSuitePhase string
 
 const (
-	RobotDevSuitePhaseRobotNotFound    RobotDevSuitePhase = "RobotNotFound"
-	RobotDevSuitePhaseCreatingRobotVDI RobotDevSuitePhase = "CreatingRobotVDI"
-	RobotDevSuitePhaseCreatingRobotIDE RobotDevSuitePhase = "CreatingRobotIDE"
-	RobotDevSuitePhaseRunning          RobotDevSuitePhase = "Running"
-	RobotDevSuitePhaseDeactivating     RobotDevSuitePhase = "Deactivating"
-	RobotDevSuitePhaseInactive         RobotDevSuitePhase = "Inactive"
+	RobotDevSuitePhaseRobotNotFound                   RobotDevSuitePhase = "RobotNotFound"
+	RobotDevSuitePhaseCreatingRobotVDI                RobotDevSuitePhase = "CreatingRobotVDI"
+	RobotDevSuitePhaseCreatingRobotIDE                RobotDevSuitePhase = "CreatingRobotIDE"
+	RobotDevSuitePhaseCreatingRelayServerForRemoteIDE RobotDevSuitePhase = "CreatingRelayServerForRemoteIDE"
+	RobotDevSuitePhaseRunning                         RobotDevSuitePhase = "Running"
+	RobotDevSuitePhaseDeactivating                    RobotDevSuitePhase = "Deactivating"
+	RobotDevSuitePhaseInactive                        RobotDevSuitePhase = "Inactive"
 )
 
 type RobotIDEPhase string

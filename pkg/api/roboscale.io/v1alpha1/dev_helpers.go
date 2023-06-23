@@ -24,6 +24,13 @@ func (robotDevSuite *RobotDevSuite) GetRobotIDEMetadata() *types.NamespacedName 
 	}
 }
 
+func (robotDevSuite *RobotDevSuite) GetRemoteIDERelayServerMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Namespace: robotDevSuite.Namespace,
+		Name:      robotDevSuite.Name + "-" + robotDevSuite.Spec.RemoteIDERelayServerTemplate.InstanceName + internal.REMOTE_IDE_RELAY_SERVER_POSTFIX,
+	}
+}
+
 // ********************************
 // RobotIDE helpers
 // ********************************

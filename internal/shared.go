@@ -84,8 +84,9 @@ const (
 
 // RobotDevSuite owned resources' postfixes
 const (
-	ROBOT_VDI_POSTFIX = "-vdi"
-	ROBOT_IDE_POSTFIX = "-ide"
+	ROBOT_VDI_POSTFIX               = "-vdi"
+	ROBOT_IDE_POSTFIX               = "-ide"
+	REMOTE_IDE_RELAY_SERVER_POSTFIX = "-relay"
 )
 
 // Paths
