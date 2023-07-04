@@ -126,7 +126,7 @@ func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *ro
 								switch instance.Status.ROSBridgeStatus.Status.Phase {
 								case robotv1alpha1.BridgePhaseReady:
 
-									switch instance.Spec.RobotDevSuiteTemplate.IDEEnabled || instance.Spec.RobotDevSuiteTemplate.VDIEnabled {
+									switch instance.Spec.RobotDevSuiteTemplate.IDEEnabled || instance.Spec.RobotDevSuiteTemplate.VDIEnabled || instance.Spec.RobotDevSuiteTemplate.RemoteIDEEnabled {
 									case true:
 
 										switch instance.Status.RobotDevSuiteStatus.Resource.Created {
@@ -181,7 +181,7 @@ func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *ro
 
 						case false:
 
-							switch instance.Spec.RobotDevSuiteTemplate.IDEEnabled || instance.Spec.RobotDevSuiteTemplate.VDIEnabled {
+							switch instance.Spec.RobotDevSuiteTemplate.IDEEnabled || instance.Spec.RobotDevSuiteTemplate.VDIEnabled || instance.Spec.RobotDevSuiteTemplate.RemoteIDEEnabled {
 							case true:
 
 								switch instance.Status.RobotDevSuiteStatus.Resource.Created {

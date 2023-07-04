@@ -162,7 +162,7 @@ func (r *RobotReconciler) reconcileCheckRobotDevSuite(ctx context.Context, insta
 		return err
 	} else {
 
-		if instance.Spec.RobotDevSuiteTemplate.IDEEnabled || instance.Spec.RobotDevSuiteTemplate.VDIEnabled {
+		if instance.Spec.RobotDevSuiteTemplate.IDEEnabled || instance.Spec.RobotDevSuiteTemplate.VDIEnabled || instance.Spec.RobotDevSuiteTemplate.RemoteIDEEnabled {
 
 			if !reflect.DeepEqual(instance.Spec.RobotDevSuiteTemplate, robotDevSuiteQuery.Spec) {
 				robotDevSuiteQuery.Spec = instance.Spec.RobotDevSuiteTemplate
