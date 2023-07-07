@@ -112,6 +112,13 @@ func (r *DiscoveryServerReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 		return ctrl.Result{}, err
 	}
 
+	if instance.Spec.Type == robotv1alpha1.DiscoveryServerInstanceTypeClient {
+		return ctrl.Result{
+			Requeue:      true,
+			RequeueAfter: 5 * time.Second,
+		}, nil
+	}
+
 	return ctrl.Result{}, nil
 }
 
