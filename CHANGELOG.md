@@ -2,6 +2,12 @@
 ## [Unreleased]
 
 
+<a name="v0.2.5-alpha.21"></a>
+## [v0.2.5-alpha.21] - 2023-07-04
+### Fix
+- **remote-ide:** update rds operational conditions
+
+
 <a name="v0.2.5-alpha.20"></a>
 ## [v0.2.5-alpha.20] - 2023-06-23
 ### Feat
@@ -151,7 +157,8 @@
 - Merge pull request [#24](https://github.com/robolaunch/robot-operator/issues/24) from robolaunch/23-allow-multiple-launches
 
 
-[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.20...HEAD
+[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.21...HEAD
+[v0.2.5-alpha.21]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.20...v0.2.5-alpha.21
 [v0.2.5-alpha.20]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.19...v0.2.5-alpha.20
 [v0.2.5-alpha.19]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.18...v0.2.5-alpha.19
 [v0.2.5-alpha.18]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.17...v0.2.5-alpha.18

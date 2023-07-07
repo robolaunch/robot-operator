@@ -169,6 +169,13 @@ func (r *RobotIDEReconciler) reconcileCheckResources(ctx context.Context, instan
 		return err
 	}
 
+	if label.GetInstanceType(instance) == label.InstanceTypePhysicalInstance {
+		err = r.reconcileCheckServiceExport(ctx, instance)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
