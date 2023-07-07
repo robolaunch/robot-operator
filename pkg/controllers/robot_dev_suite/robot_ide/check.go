@@ -5,6 +5,7 @@ import (
 
 	"github.com/robolaunch/robot-operator/internal/handle"
 	"github.com/robolaunch/robot-operator/internal/reference"
+	mcsv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/external/apis/mcsv1alpha1/v1alpha1"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1"
@@ -81,6 +82,24 @@ func (r *RobotIDEReconciler) reconcileCheckIngress(ctx context.Context, instance
 			instance.Status.IngressStatus.Created = true
 			reference.SetReference(&instance.Status.IngressStatus.Reference, ingressQuery.TypeMeta, ingressQuery.ObjectMeta)
 		}
+	}
+
+	return nil
+}
+
+func (r *RobotIDEReconciler) reconcileCheckServiceExport(ctx context.Context, instance *robotv1alpha1.RobotIDE) error {
+
+	serviceExportQuery := &mcsv1alpha1.ServiceExport{}
+	err := r.Get(ctx, *instance.GetRobotIDEServiceExportMetadata(), serviceExportQuery)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			instance.Status.ServiceExportStatus = robotv1alpha1.OwnedResourceStatus{}
+		} else {
+			return err
+		}
+	} else {
+		instance.Status.ServiceExportStatus.Created = true
+		reference.SetReference(&instance.Status.ServiceExportStatus.Reference, serviceExportQuery.TypeMeta, serviceExportQuery.ObjectMeta)
 	}
 
 	return nil
