@@ -1,6 +1,12 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+### Fix
+- **nodeport:** fix endpoint routes
+
+
+<a name="v0.2.5-alpha.24"></a>
+## [v0.2.5-alpha.24] - 2023-07-11
 
 <a name="v0.2.5-alpha.23"></a>
 ## [v0.2.5-alpha.23] - 2023-07-07
@@ -169,7 +175,8 @@
 - Merge pull request [#24](https://github.com/robolaunch/robot-operator/issues/24) from robolaunch/23-allow-multiple-launches
 
 
-[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.23...HEAD
+[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.24...HEAD
+[v0.2.5-alpha.24]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.23...v0.2.5-alpha.24
 [v0.2.5-alpha.23]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.22...v0.2.5-alpha.23
 [v0.2.5-alpha.22]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.21...v0.2.5-alpha.22
 [v0.2.5-alpha.21]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.20...v0.2.5-alpha.21
