@@ -2,9 +2,11 @@ package robot_ide
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/robolaunch/robot-operator/internal/handle"
 	"github.com/robolaunch/robot-operator/internal/reference"
+	"github.com/robolaunch/robot-operator/internal/resources"
 	mcsv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/external/apis/mcsv1alpha1/v1alpha1"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
@@ -33,8 +35,7 @@ func (r *RobotIDEReconciler) reconcileCheckService(ctx context.Context, instance
 		if instance.Spec.Ingress {
 			instance.Status.ServiceStatus.URL = robotv1alpha1.GetRobotServiceDNS(*robot, "https://", "/ide/")
 		} else if instance.Spec.ServiceType == corev1.ServiceTypeNodePort {
-			// TODO: Address with Node IP and port will be generated.
-			instance.Status.ServiceStatus.URL = "http://<NODE-IP>:<PORT>"
+			instance.Status.ServiceStatus.URL = robotv1alpha1.GetRobotServiceDNS(*robot, "http://", ":"+strconv.Itoa(resources.ROBOT_IDE_PORT))
 		}
 	}
 
