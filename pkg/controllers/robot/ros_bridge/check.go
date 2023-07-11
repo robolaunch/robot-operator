@@ -2,6 +2,7 @@ package ros_bridge
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/robolaunch/robot-operator/internal/handle"
 	"github.com/robolaunch/robot-operator/internal/reference"
@@ -31,8 +32,7 @@ func (r *ROSBridgeReconciler) reconcileCheckService(ctx context.Context, instanc
 		if instance.Spec.Ingress {
 			instance.Status.ServiceStatus.URL = robotv1alpha1.GetRobotServiceDNS(*robot, "wss://", "/bridge")
 		} else if instance.Spec.ServiceType == corev1.ServiceTypeNodePort {
-			// TODO: Address with Node IP and port will be generated.
-			instance.Status.ServiceStatus.URL = "ws://<NODE-IP>:<PORT>"
+			instance.Status.ServiceStatus.URL = robotv1alpha1.GetRobotServiceDNS(*robot, "ws://", ":"+strconv.Itoa(resources.ROS2_BRIDGE_PORT))
 		}
 	}
 

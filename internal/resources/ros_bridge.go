@@ -135,7 +135,7 @@ func GetBridgeIngress(rosBridge *robotv1alpha1.ROSBridge, ingressNamespacedName 
 									Service: &networkingv1.IngressServiceBackend{
 										Name: rosBridge.GetBridgeServiceMetadata().Name,
 										Port: networkingv1.ServiceBackendPort{
-											Number: 9000,
+											Number: ROS2_BRIDGE_PORT,
 										},
 									},
 								},

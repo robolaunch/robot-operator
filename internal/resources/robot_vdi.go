@@ -18,6 +18,11 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
+const (
+	ROBOT_VDI_PORT_NAME = "http"
+	ROBOT_VDI_PORT      = 8055
+)
+
 func getRobotVDISelector(robotVDI robotv1alpha1.RobotVDI) map[string]string {
 	return map[string]string{
 		"robotVDI": robotVDI.Name,
@@ -55,8 +60,8 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 	// add tcp port
 	ports := []corev1.ContainerPort{
 		{
-			Name:          "http",
-			ContainerPort: 8055,
+			Name:          ROBOT_VDI_PORT_NAME,
+			ContainerPort: ROBOT_VDI_PORT,
 			Protocol:      corev1.ProtocolTCP,
 		},
 	}
@@ -159,12 +164,12 @@ func GetRobotVDIServiceTCP(robotVDI *robotv1alpha1.RobotVDI, svcNamespacedName *
 
 	ports := []corev1.ServicePort{
 		{
-			Port: 8055,
+			Port: ROBOT_VDI_PORT,
 			TargetPort: intstr.IntOrString{
-				IntVal: int32(8055),
+				IntVal: int32(ROBOT_VDI_PORT),
 			},
 			Protocol: corev1.ProtocolTCP,
-			Name:     "http",
+			Name:     ROBOT_VDI_PORT_NAME,
 		},
 	}
 
@@ -269,7 +274,7 @@ func GetRobotVDIIngress(robotVDI *robotv1alpha1.RobotVDI, ingressNamespacedName 
 									Service: &networkingv1.IngressServiceBackend{
 										Name: robotVDI.GetRobotVDIServiceTCPMetadata().Name,
 										Port: networkingv1.ServiceBackendPort{
-											Number: int32(8055),
+											Number: int32(ROBOT_VDI_PORT),
 										},
 									},
 								},

@@ -2,6 +2,12 @@
 ## [Unreleased]
 
 
+<a name="v0.2.5-alpha.23"></a>
+## [v0.2.5-alpha.23] - 2023-07-07
+### Fix
+- **discoveryserver:** check discovery server ip frequently from client objects
+
+
 <a name="v0.2.5-alpha.22"></a>
 ## [v0.2.5-alpha.22] - 2023-07-07
 ### Fix
@@ -163,7 +169,8 @@
 - Merge pull request [#24](https://github.com/robolaunch/robot-operator/issues/24) from robolaunch/23-allow-multiple-launches
 
 
-[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.22...HEAD
+[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.23...HEAD
+[v0.2.5-alpha.23]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.22...v0.2.5-alpha.23
 [v0.2.5-alpha.22]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.21...v0.2.5-alpha.22
 [v0.2.5-alpha.21]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.20...v0.2.5-alpha.21
 [v0.2.5-alpha.20]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.19...v0.2.5-alpha.20
