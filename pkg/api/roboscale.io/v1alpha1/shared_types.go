@@ -73,9 +73,14 @@ type StepStatus struct {
 	Step Step `json:"step,omitempty"`
 }
 
-func GetRobotServiceDNSWithNodePort(robot Robot, port string) string {
+func GetRobotServiceDNSWithNodePort(robot Robot, prefix, port string) string {
 	tenancy := label.GetTenancy(&robot)
 	connectionStr := tenancy.CloudInstanceAlias + "." + robot.Spec.RootDNSConfig.Host + ":" + port
+
+	if prefix != "" {
+		connectionStr = prefix + connectionStr
+	}
+
 	return connectionStr
 }
 
