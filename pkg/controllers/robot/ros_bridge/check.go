@@ -32,7 +32,7 @@ func (r *ROSBridgeReconciler) reconcileCheckService(ctx context.Context, instanc
 		if instance.Spec.Ingress {
 			instance.Status.ServiceStatus.URL = robotv1alpha1.GetRobotServiceDNS(*robot, "wss://", "/bridge")
 		} else if instance.Spec.ServiceType == corev1.ServiceTypeNodePort {
-			instance.Status.ServiceStatus.URL = robotv1alpha1.GetRobotServiceDNS(*robot, "ws://", ":"+strconv.Itoa(resources.ROS2_BRIDGE_PORT))
+			instance.Status.ServiceStatus.URL = robotv1alpha1.GetRobotServiceDNSWithNodePort(*robot, strconv.Itoa(resources.ROS2_BRIDGE_PORT))
 		}
 	}
 

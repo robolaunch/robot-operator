@@ -52,7 +52,7 @@ func (r *RobotVDIReconciler) reconcileCheckServices(ctx context.Context, instanc
 		if instance.Spec.Ingress {
 			instance.Status.ServiceTCPStatus.URL = robotv1alpha1.GetRobotServiceDNS(*robot, "https://", "/vdi/")
 		} else if instance.Spec.ServiceType == corev1.ServiceTypeNodePort {
-			instance.Status.ServiceTCPStatus.URL = robotv1alpha1.GetRobotServiceDNS(*robot, "http://", ":"+strconv.Itoa(resources.ROBOT_VDI_PORT))
+			instance.Status.ServiceTCPStatus.URL = robotv1alpha1.GetRobotServiceDNSWithNodePort(*robot, strconv.Itoa(resources.ROBOT_VDI_PORT))
 		}
 	}
 
