@@ -2,6 +2,13 @@
 ## [Unreleased]
 
 ### Fix
+- **nodeport:** replace internal ports connection prefixes w/ node ports
+- **nodeport:** add connection prefixes
+
+
+<a name="v0.2.5-alpha.25"></a>
+## [v0.2.5-alpha.25] - 2023-07-11
+### Fix
 - **nodeport:** fix endpoint routes
 
 
@@ -175,7 +182,8 @@
 - Merge pull request [#24](https://github.com/robolaunch/robot-operator/issues/24) from robolaunch/23-allow-multiple-launches
 
 
-[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.24...HEAD
+[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.25...HEAD
+[v0.2.5-alpha.25]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.24...v0.2.5-alpha.25
 [v0.2.5-alpha.24]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.23...v0.2.5-alpha.24
 [v0.2.5-alpha.23]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.22...v0.2.5-alpha.23
 [v0.2.5-alpha.22]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.21...v0.2.5-alpha.22

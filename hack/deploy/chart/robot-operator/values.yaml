@@ -23,7 +23,7 @@ controllerManager:
         - ALL
     image:
       repository: robolaunchio/robot-controller-manager
-      tag: v0.2.5-alpha.25
+      tag: v0.2.5-alpha.26
     resources:
       limits:
         cpu: 500m
