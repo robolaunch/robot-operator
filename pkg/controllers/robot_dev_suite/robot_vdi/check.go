@@ -6,7 +6,6 @@ import (
 
 	"github.com/robolaunch/robot-operator/internal/handle"
 	"github.com/robolaunch/robot-operator/internal/reference"
-	"github.com/robolaunch/robot-operator/internal/resources"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1"
@@ -52,7 +51,7 @@ func (r *RobotVDIReconciler) reconcileCheckServices(ctx context.Context, instanc
 		if instance.Spec.Ingress {
 			instance.Status.ServiceTCPStatus.URL = robotv1alpha1.GetRobotServiceDNS(*robot, "https://", "/vdi/")
 		} else if instance.Spec.ServiceType == corev1.ServiceTypeNodePort {
-			instance.Status.ServiceTCPStatus.URL = robotv1alpha1.GetRobotServiceDNSWithNodePort(*robot, "http://", strconv.Itoa(resources.ROBOT_VDI_PORT))
+			instance.Status.ServiceTCPStatus.URL = robotv1alpha1.GetRobotServiceDNSWithNodePort(*robot, "http://", strconv.Itoa(int(serviceTCPQuery.Spec.Ports[0].NodePort)))
 		}
 	}
 
