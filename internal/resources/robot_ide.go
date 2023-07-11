@@ -2,6 +2,7 @@ package resources
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/robolaunch/robot-operator/internal"
@@ -14,6 +15,11 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/intstr"
+)
+
+const (
+	ROBOT_IDE_PORT_NAME = "code-server"
+	ROBOT_IDE_PORT      = 9000
 )
 
 func getRobotIDESelector(robotIDE robotv1alpha1.RobotIDE) map[string]string {
@@ -47,7 +53,7 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 					Image:   robot.Status.Image,
 					Command: internal.Bash(cmdBuilder.String()),
 					Env: []corev1.EnvVar{
-						internal.Env("CODE_SERVER_PORT", "9000"),
+						internal.Env("CODE_SERVER_PORT", strconv.Itoa(ROBOT_IDE_PORT)),
 						internal.Env("ROBOT_NAMESPACE", robot.Namespace),
 						internal.Env("ROBOT_NAME", robot.Name),
 						internal.Env("TERM", "xterm-256color"),
@@ -61,8 +67,8 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 					},
 					Ports: []corev1.ContainerPort{
 						{
-							Name:          "code-server",
-							ContainerPort: 9000,
+							Name:          ROBOT_IDE_PORT_NAME,
+							ContainerPort: ROBOT_IDE_PORT,
 						},
 					},
 					Resources: corev1.ResourceRequirements{
@@ -110,12 +116,12 @@ func GetRobotIDEService(robotIDE *robotv1alpha1.RobotIDE, svcNamespacedName *typ
 		Selector: getRobotIDESelector(*robotIDE),
 		Ports: []corev1.ServicePort{
 			{
-				Port: 9000,
+				Port: ROBOT_IDE_PORT,
 				TargetPort: intstr.IntOrString{
-					IntVal: 9000,
+					IntVal: ROBOT_IDE_PORT,
 				},
 				Protocol: corev1.ProtocolTCP,
-				Name:     "code-server",
+				Name:     ROBOT_IDE_PORT_NAME,
 			},
 		},
 	}
@@ -178,7 +184,7 @@ func GetRobotIDEIngress(robotIDE *robotv1alpha1.RobotIDE, ingressNamespacedName 
 									Service: &networkingv1.IngressServiceBackend{
 										Name: robotIDE.GetRobotIDEServiceMetadata().Name,
 										Port: networkingv1.ServiceBackendPort{
-											Number: 9000,
+											Number: ROBOT_IDE_PORT,
 										},
 									},
 								},
