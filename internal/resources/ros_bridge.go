@@ -224,7 +224,7 @@ func getROS2BridgeContainer(rosbridge *robotv1alpha1.ROSBridge) corev1.Container
 	ros2BridgeContainer := corev1.Container{
 		Name:    ROS2_BRIDGE_PORT_NAME,
 		Image:   "robolaunchio/foxy-noetic-bridge:v0.0.3",
-		Command: internal.Bash("source /opt/ros/" + string(ros2distro) + "/setup.bash && ros2 launch rosbridge_server rosbridge_websocket_launch.xml address:=0.0.0.0 port:=9091 use_compression:=true"),
+		Command: internal.Bash("source /opt/ros/" + string(ros2distro) + "/setup.bash && ros2 launch rosbridge_server rosbridge_websocket_launch.xml address:=0.0.0.0 port:=9091 use_compression:=true ssl:=true"),
 		Ports: []corev1.ContainerPort{
 			{
 				ContainerPort: ROS2_BRIDGE_PORT,
