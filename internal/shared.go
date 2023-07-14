@@ -147,6 +147,10 @@ const (
 	INGRESS_AUTH_RESPONSE_HEADERS_KEY     = "nginx.ingress.kubernetes.io/auth-response-headers"
 	INGRESS_AUTH_RESPONSE_HEADERS_VAL     = "x-auth-request-user, x-auth-request-email, x-auth-request-access-token"
 	INGRESS_CONFIGURATION_SNIPPET_KEY     = "nginx.ingress.kubernetes.io/configuration-snippet"
+	INGRESS_PROXY_READ_TIMEOUT_KEY        = "nginx.ingress.kubernetes.io/proxy-read-timeout"
+	INGRESS_PROXY_READ_TIMEOUT_VAL        = "7200"
+	INGRESS_PROXY_SEND_TIMEOUT_KEY        = "nginx.ingress.kubernetes.io/proxy-send-timeout"
+	INGRESS_PROXY_SEND_TIMEOUT_VAL        = "7200"
 	INGRESS_VDI_CONFIGURATION_SNIPPET_VAL = "" +
 		"        #proxy_set_header Host $host;\n" +
 		"		proxy_set_header X-Real-IP $remote_addr;\n" +
