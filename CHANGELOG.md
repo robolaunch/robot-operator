@@ -2,7 +2,14 @@
 ## [Unreleased]
 
 ### Fix
+- **launch:** pass environment variables to launch container
+
+
+<a name="v0.2.5-alpha.28"></a>
+## [v0.2.5-alpha.28] - 2023-07-14
+### Fix
 - **ingress:** define keys and values for annotations
+- **websocket:** avoid websocket connection interrupts in tcp ws services
 
 
 <a name="v0.2.5-alpha.27"></a>
@@ -191,7 +198,8 @@
 - Merge pull request [#24](https://github.com/robolaunch/robot-operator/issues/24) from robolaunch/23-allow-multiple-launches
 
 
-[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.27...HEAD
+[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.28...HEAD
+[v0.2.5-alpha.28]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.27...v0.2.5-alpha.28
 [v0.2.5-alpha.27]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.26...v0.2.5-alpha.27
 [v0.2.5-alpha.26]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.25...v0.2.5-alpha.26
 [v0.2.5-alpha.25]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.24...v0.2.5-alpha.25
