@@ -71,12 +71,6 @@ func InstanceNeedDisplay(launchManager robotv1alpha1.LaunchManager, robot robotv
 
 func getContainer(launch robotv1alpha1.Launch, launchName string, robot robotv1alpha1.Robot, buildManager robotv1alpha1.BuildManager) corev1.Container {
 
-	containerEnv := []corev1.EnvVar{
-		generatePrelaunchCommandAsEnv(launch.Entrypoint.Prelaunch, robot),
-	}
-
-	containerEnv = append(containerEnv, launch.Container.Env...)
-
 	container := corev1.Container{
 		Name:    launchName,
 		Image:   robot.Status.Image,
@@ -94,7 +88,7 @@ func getContainer(launch robotv1alpha1.Launch, launchName string, robot robotv1a
 		Resources: corev1.ResourceRequirements{
 			Limits: getResourceLimits(launch.Container.Resources),
 		},
-		Env:                      containerEnv,
+		Env:                      launch.Container.Env,
 		ImagePullPolicy:          corev1.PullAlways,
 		TerminationMessagePolicy: corev1.TerminationMessageReadFile,
 		SecurityContext: &corev1.SecurityContext{
@@ -188,18 +182,6 @@ func generateCustomCommand(launch robotv1alpha1.Launch, robot robotv1alpha1.Robo
 	cmdBuilder.WriteString(launch.Entrypoint.Command)
 
 	return cmdBuilder.String()
-}
-
-func generatePrelaunchCommandAsEnv(prelaunch robotv1alpha1.Prelaunch, robot robotv1alpha1.Robot) corev1.EnvVar {
-
-	commandKey := "PRELAUNCH"
-	command := prelaunch.Command
-
-	if command == "" {
-		command = "sleep 1"
-	}
-
-	return internal.Env(commandKey, command)
 }
 
 func getWsSubDir(distro robotv1alpha1.ROSDistro) string {
