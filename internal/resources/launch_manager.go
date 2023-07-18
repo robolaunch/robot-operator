@@ -81,6 +81,13 @@ func getContainer(launch robotv1alpha1.Launch, launchName string, robot robotv1a
 		cmdEnv = generateCustomCommandAsEnv(launch, robot)
 	}
 
+	containerEnv := []corev1.EnvVar{
+		generatePrelaunchCommandAsEnv(launch.Entrypoint.Prelaunch, robot),
+		cmdEnv,
+	}
+
+	containerEnv = append(containerEnv, launch.Container.Env...)
+
 	container := corev1.Container{
 		Name:    launchName,
 		Image:   robot.Status.Image,
@@ -98,10 +105,7 @@ func getContainer(launch robotv1alpha1.Launch, launchName string, robot robotv1a
 		Resources: corev1.ResourceRequirements{
 			Limits: getResourceLimits(launch.Container.Resources),
 		},
-		Env: []corev1.EnvVar{
-			generatePrelaunchCommandAsEnv(launch.Entrypoint.Prelaunch, robot),
-			cmdEnv,
-		},
+		Env:                      containerEnv,
 		ImagePullPolicy:          corev1.PullAlways,
 		TerminationMessagePolicy: corev1.TerminationMessageReadFile,
 		SecurityContext: &corev1.SecurityContext{
