@@ -207,14 +207,6 @@ type BuildManagerStatus struct {
 // LaunchManager types
 // ********************************
 
-// Prelaunch command or script is applied just before the node is started.
-type Prelaunch struct {
-	// Bash command to run before ROS node execution.
-	// +kubebuilder:validation:Required
-	Command string `json:"command"`
-	// Script  string `json:"script,omitempty"`
-}
-
 type LaunchEntrypointConfig struct {
 	// Launching type. Can be `Launch`, `Run` or `Custom`.
 	// +kubebuilder:validation:Enum=Launch;Run;Custom
@@ -236,8 +228,6 @@ type LaunchEntrypointConfig struct {
 	Command string `json:"cmd"`
 	// Launch parameters.
 	Parameters map[string]string `json:"parameters,omitempty"`
-	// Command or script to run just before node's execution.
-	Prelaunch Prelaunch `json:"prelaunch,omitempty"`
 }
 
 type LaunchContainerConfig struct {

@@ -805,15 +805,6 @@ spec:
                               type: string
                             description: Launch parameters.
                             type: object
-                          prelaunch:
-                            description: Command or script to run just before node's execution.
-                            properties:
-                              command:
-                                description: Bash command to run before ROS node execution.
-                                type: string
-                            required:
-                              - command
-                            type: object
                           type:
                             description: Launching type. Can be `Launch`, `Run` or `Custom`.
                             enum:
@@ -2067,15 +2058,6 @@ spec:
                                   additionalProperties:
                                     type: string
                                   description: Launch parameters.
-                                  type: object
-                                prelaunch:
-                                  description: Command or script to run just before node's execution.
-                                  properties:
-                                    command:
-                                      description: Bash command to run before ROS node execution.
-                                      type: string
-                                  required:
-                                    - command
                                   type: object
                                 type:
                                   description: Launching type. Can be `Launch`, `Run` or `Custom`.
@@ -3333,15 +3315,6 @@ spec:
                                   additionalProperties:
                                     type: string
                                   description: Launch parameters.
-                                  type: object
-                                prelaunch:
-                                  description: Command or script to run just before node's execution.
-                                  properties:
-                                    command:
-                                      description: Bash command to run before ROS node execution.
-                                      type: string
-                                  required:
-                                    - command
                                   type: object
                                 type:
                                   description: Launching type. Can be `Launch`, `Run` or `Custom`.
@@ -6937,7 +6910,7 @@ spec:
             - --leader-elect
           command:
             - /manager
-          image: robolaunchio/robot-controller-manager:v0.2.5-alpha.28
+          image: robolaunchio/robot-controller-manager:v0.2.5-alpha.29
           livenessProbe:
             httpGet:
               path: /healthz
