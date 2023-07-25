@@ -311,7 +311,7 @@ func GetCloneCommand(workspaces []robotv1alpha1.Workspace, wsKey int) string {
 
 	var cmdBuilder strings.Builder
 	for key, repo := range workspaces[wsKey].Repositories {
-		cmdBuilder.WriteString("git clone " + repo.URL + " -b " + repo.Branch + " " + key + " &&")
+		cmdBuilder.WriteString("git clone --recursive " + repo.URL + " -b " + repo.Branch + " " + key + " &&")
 	}
 	return cmdBuilder.String()
 }
