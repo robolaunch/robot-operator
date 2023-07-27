@@ -31,6 +31,7 @@ func (r *Robot) Default() {
 
 	DefaultRepositoryPaths(r)
 	_ = r.setRepositoryInfo()
+	r.setWorkspacesPath()
 }
 
 func DefaultRepositoryPaths(r *Robot) {
@@ -200,6 +201,18 @@ func (r *Robot) setRepositoryInfo() error {
 
 	return nil
 
+}
+
+func (r *Robot) setWorkspacesPath() {
+	if reflect.DeepEqual(r.Spec.WorkspaceManagerTemplate, WorkspaceManagerSpec{}) {
+		r.Spec.WorkspaceManagerTemplate = WorkspaceManagerSpec{
+			WorkspacesPath: defaultWorkspacePath,
+		}
+	}
+
+	if reflect.DeepEqual(r.Spec.WorkspaceManagerTemplate.WorkspacesPath, "") {
+		r.Spec.WorkspaceManagerTemplate.WorkspacesPath = defaultWorkspacePath
+	}
 }
 
 // ********************************
