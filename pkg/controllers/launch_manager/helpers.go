@@ -54,11 +54,11 @@ func (r *LaunchManagerReconciler) reconcileGetTargetRobot(ctx context.Context, i
 	return robot, nil
 }
 
-func (r *LaunchManagerReconciler) reconcileGetTargetRobotVDI(ctx context.Context, instance *robotv1alpha1.LaunchManager) (*robotv1alpha1.RobotVDI, error) {
+func (r *LaunchManagerReconciler) reconcileGetTargetRobotVDI(ctx context.Context, instance *robotv1alpha1.LaunchManager, robot robotv1alpha1.Robot) (*robotv1alpha1.RobotVDI, error) {
 	robotVDI := &robotv1alpha1.RobotVDI{}
 	err := r.Get(ctx, types.NamespacedName{
 		Namespace: instance.Namespace,
-		Name:      label.GetTargetRobotVDI(instance),
+		Name:      robot.Status.RobotDevSuiteStatus.Status.RobotVDIStatus.Resource.Reference.Name,
 	}, robotVDI)
 	if err != nil {
 		return nil, err
