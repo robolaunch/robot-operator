@@ -32,6 +32,7 @@ func (r *Robot) Default() {
 	DefaultRepositoryPaths(r)
 	_ = r.setRepositoryInfo()
 	r.setWorkspacesPath()
+	r.setDiscoveryServerDomainID()
 }
 
 func DefaultRepositoryPaths(r *Robot) {
