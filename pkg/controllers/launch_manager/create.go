@@ -17,9 +17,13 @@ func (r *LaunchManagerReconciler) createLaunchPod(ctx context.Context, instance 
 		return err
 	}
 
+	// Use RobotVDI display if
+	// - any of the launch objects needs display
+	// - target VDI label is not set empty (TODO: should be deprecated)
+	// - RobotVDI is created
 	robotVDI := &robotv1alpha1.RobotVDI{}
-	if resources.InstanceNeedDisplay(*instance, *robot) && label.GetTargetRobotVDI(instance) != "" {
-		robotVDI, err = r.reconcileGetTargetRobotVDI(ctx, instance)
+	if resources.InstanceNeedDisplay(*instance, *robot) && label.GetTargetRobotVDI(instance) != "" && robot.Status.RobotDevSuiteStatus.Status.RobotVDIStatus.Resource.Created {
+		robotVDI, err = r.reconcileGetTargetRobotVDI(ctx, instance, *robot)
 		if err != nil {
 			return err
 		}
