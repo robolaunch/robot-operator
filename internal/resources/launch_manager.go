@@ -47,8 +47,9 @@ func GetLaunchPod(launchManager *robotv1alpha1.LaunchManager, podNamespacedName 
 	}
 
 	configure.SchedulePod(&launchPod, label.GetTenancyMap(launchManager))
-	configure.InjectGenericEnvironmentVariables(&launchPod, robot)                                                     // Environment variables
-	configure.InjectRMWImplementationConfiguration(&launchPod, robot)                                                  // RMW implementation configuration
+	configure.InjectGenericEnvironmentVariables(&launchPod, robot)    // Environment variables
+	configure.InjectRMWImplementationConfiguration(&launchPod, robot) // RMW implementation configuration
+	configure.InjectROSDomainID(&launchPod, robot.Spec.DomainID)
 	configure.InjectPodDiscoveryServerConnection(&launchPod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo) // Discovery server configuration
 	configure.InjectRuntimeClass(&launchPod, robot, node)
 
