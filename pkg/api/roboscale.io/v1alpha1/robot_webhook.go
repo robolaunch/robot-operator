@@ -215,6 +215,10 @@ func (r *Robot) setWorkspacesPath() {
 	}
 }
 
+func (r *Robot) setDiscoveryServerDomainID() {
+	r.Spec.DiscoveryServerTemplate.DomainID = r.Spec.DomainID
+}
+
 // ********************************
 // DiscoveryServer webhooks
 // ********************************
