@@ -55,6 +55,7 @@ func GetDiscoveryServerPod(discoveryServer *robotv1alpha1.DiscoveryServer, podNa
 	}
 
 	configure.SchedulePod(&discoveryServerPod, label.GetTenancyMap(discoveryServer))
+	configure.InjectROSDomainID(&discoveryServerPod, discoveryServer.Spec.DomainID)
 
 	return &discoveryServerPod
 }
