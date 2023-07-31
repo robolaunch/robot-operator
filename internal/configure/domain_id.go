@@ -6,7 +6,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
-func InjectPodROSDomainID(pod *corev1.Pod, domainID int) *corev1.Pod {
+func InjectROSDomainID(pod *corev1.Pod, domainID int) *corev1.Pod {
 
 	placeROSDomainIDEnvironmentVariables(pod, domainID)
 
