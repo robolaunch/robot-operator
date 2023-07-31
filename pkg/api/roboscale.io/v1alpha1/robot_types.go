@@ -334,6 +334,9 @@ const (
 
 // DiscoveryServerSpec defines the desired state of DiscoveryServer.
 type DiscoveryServerSpec struct {
+	// ROS domain ID for robot. See https://docs.ros.org/en/foxy/Concepts/About-Domain-ID.html.
+	// +kubebuilder:default=0
+	DomainID int `json:"domainID"`
 	// Instance type can be either `Server` or `Client`.
 	// If `Server`, instance creates discovery server resources and workloads.
 	// Other `Client` instances can connect to the `Server` instance.
