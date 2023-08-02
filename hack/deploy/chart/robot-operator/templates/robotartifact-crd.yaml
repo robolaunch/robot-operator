@@ -204,6 +204,12 @@ spec:
                       it takes cloud instance's name automatically. Should be set if
                       the type is `Client`.
                     type: string
+                  domainID:
+                    default: 0
+                    description: ROS domain ID for robot. See https://docs.ros.org/en/foxy/Concepts/About-Domain-ID.html.
+                    maximum: 101
+                    minimum: 0
+                    type: integer
                   hostname:
                     description: If instance type is `Server`, it can be an arbitrary
                       value. If instance type is `Client`, it should be the same with
@@ -261,6 +267,8 @@ spec:
                       If `Client`, instance tries to connect a `Server` instance and
                       hold `Server` configuration in a ConfigMap.
                     type: string
+                required:
+                - domainID
                 type: object
               distributions:
                 description: ROS 2 distributions to be used. You can select multiple
@@ -278,6 +286,12 @@ spec:
                 maxItems: 2
                 minItems: 1
                 type: array
+              domainID:
+                default: 0
+                description: ROS domain ID for robot. See https://docs.ros.org/en/foxy/Concepts/About-Domain-ID.html.
+                maximum: 101
+                minimum: 0
+                type: integer
               launchManagerTemplates:
                 description: '[*alpha*] Launch manager template for initial configuration.'
                 items:
@@ -831,6 +845,7 @@ spec:
                 type: object
             required:
             - distributions
+            - domainID
             - rmwImplementation
             type: object
         type: object

@@ -42,6 +42,12 @@ spec:
                   it takes cloud instance's name automatically. Should be set if the
                   type is `Client`.
                 type: string
+              domainID:
+                default: 0
+                description: ROS domain ID for robot. See https://docs.ros.org/en/foxy/Concepts/About-Domain-ID.html.
+                maximum: 101
+                minimum: 0
+                type: integer
               hostname:
                 description: If instance type is `Server`, it can be an arbitrary value.
                   If instance type is `Client`, it should be the same with Server's
@@ -99,6 +105,8 @@ spec:
                   tries to connect a `Server` instance and hold `Server` configuration
                   in a ConfigMap.
                 type: string
+            required:
+            - domainID
             type: object
           status:
             description: Most recently observed status of the DiscoveryServer.

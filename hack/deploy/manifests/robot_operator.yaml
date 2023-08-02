@@ -406,6 +406,12 @@ spec:
                 cluster:
                   description: Cloud instance name that holds DiscoveryServer instance with `Server` type. Should be empty if the type is `Server` since it takes cloud instance's name automatically. Should be set if the type is `Client`.
                   type: string
+                domainID:
+                  default: 0
+                  description: ROS domain ID for robot. See https://docs.ros.org/en/foxy/Concepts/About-Domain-ID.html.
+                  maximum: 101
+                  minimum: 0
+                  type: integer
                 hostname:
                   description: If instance type is `Server`, it can be an arbitrary value. If instance type is `Client`, it should be the same with Server's hostname. Used for getting Server's IP over DNS.
                   type: string
@@ -441,6 +447,8 @@ spec:
                 type:
                   description: Instance type can be either `Server` or `Client`. If `Server`, instance creates discovery server resources and workloads. Other `Client` instances can connect to the `Server` instance. If `Client`, instance tries to connect a `Server` instance and hold `Server` configuration in a ConfigMap.
                   type: string
+              required:
+                - domainID
               type: object
             status:
               description: Most recently observed status of the DiscoveryServer.
@@ -1870,6 +1878,12 @@ spec:
                     cluster:
                       description: Cloud instance name that holds DiscoveryServer instance with `Server` type. Should be empty if the type is `Server` since it takes cloud instance's name automatically. Should be set if the type is `Client`.
                       type: string
+                    domainID:
+                      default: 0
+                      description: ROS domain ID for robot. See https://docs.ros.org/en/foxy/Concepts/About-Domain-ID.html.
+                      maximum: 101
+                      minimum: 0
+                      type: integer
                     hostname:
                       description: If instance type is `Server`, it can be an arbitrary value. If instance type is `Client`, it should be the same with Server's hostname. Used for getting Server's IP over DNS.
                       type: string
@@ -1905,6 +1919,8 @@ spec:
                     type:
                       description: Instance type can be either `Server` or `Client`. If `Server`, instance creates discovery server resources and workloads. Other `Client` instances can connect to the `Server` instance. If `Client`, instance tries to connect a `Server` instance and hold `Server` configuration in a ConfigMap.
                       type: string
+                  required:
+                    - domainID
                   type: object
                 distributions:
                   description: ROS 2 distributions to be used. You can select multiple distributions if they are supported in the same underlying OS. (eg. `foxy` and `galactic` are supported in Ubuntu Focal, so they can be used together but both cannot be used with `humble`)
@@ -1918,6 +1934,12 @@ spec:
                   maxItems: 2
                   minItems: 1
                   type: array
+                domainID:
+                  default: 0
+                  description: ROS domain ID for robot. See https://docs.ros.org/en/foxy/Concepts/About-Domain-ID.html.
+                  maximum: 101
+                  minimum: 0
+                  type: integer
                 launchManagerTemplates:
                   description: '[*alpha*] Launch manager template for initial configuration.'
                   items:
@@ -2377,6 +2399,7 @@ spec:
                   type: object
               required:
                 - distributions
+                - domainID
                 - rmwImplementation
               type: object
           type: object
@@ -3127,6 +3150,12 @@ spec:
                     cluster:
                       description: Cloud instance name that holds DiscoveryServer instance with `Server` type. Should be empty if the type is `Server` since it takes cloud instance's name automatically. Should be set if the type is `Client`.
                       type: string
+                    domainID:
+                      default: 0
+                      description: ROS domain ID for robot. See https://docs.ros.org/en/foxy/Concepts/About-Domain-ID.html.
+                      maximum: 101
+                      minimum: 0
+                      type: integer
                     hostname:
                       description: If instance type is `Server`, it can be an arbitrary value. If instance type is `Client`, it should be the same with Server's hostname. Used for getting Server's IP over DNS.
                       type: string
@@ -3162,6 +3191,8 @@ spec:
                     type:
                       description: Instance type can be either `Server` or `Client`. If `Server`, instance creates discovery server resources and workloads. Other `Client` instances can connect to the `Server` instance. If `Client`, instance tries to connect a `Server` instance and hold `Server` configuration in a ConfigMap.
                       type: string
+                  required:
+                    - domainID
                   type: object
                 distributions:
                   description: ROS 2 distributions to be used. You can select multiple distributions if they are supported in the same underlying OS. (eg. `foxy` and `galactic` are supported in Ubuntu Focal, so they can be used together but both cannot be used with `humble`)
@@ -3175,6 +3206,12 @@ spec:
                   maxItems: 2
                   minItems: 1
                   type: array
+                domainID:
+                  default: 0
+                  description: ROS domain ID for robot. See https://docs.ros.org/en/foxy/Concepts/About-Domain-ID.html.
+                  maximum: 101
+                  minimum: 0
+                  type: integer
                 launchManagerTemplates:
                   description: '[*alpha*] Launch manager template for initial configuration.'
                   items:
@@ -3634,6 +3671,7 @@ spec:
                   type: object
               required:
                 - distributions
+                - domainID
                 - rmwImplementation
               type: object
             status:
@@ -6910,7 +6948,7 @@ spec:
             - --leader-elect
           command:
             - /manager
-          image: robolaunchio/robot-controller-manager:v0.2.5-alpha.29
+          image: robolaunchio/robot-controller-manager:v0.2.5-alpha.30
           livenessProbe:
             httpGet:
               path: /healthz

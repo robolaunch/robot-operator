@@ -1,8 +1,18 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+### Feat
+- **domain-id:** :rocket: support ros domain id
+
+### Fix
+- **workspaces:** set default workspace path
+
+
+<a name="v0.2.5-alpha.29"></a>
+## [v0.2.5-alpha.29] - 2023-07-20
 ### Fix
 - **launch:** pass environment variables to launch container
+- **launch-manager:** :bug: update launch container
 
 
 <a name="v0.2.5-alpha.28"></a>
@@ -130,6 +140,9 @@
 - **import:** fix broken imports
 
 
+<a name="v0.2.5-alpha.7"></a>
+## [v0.2.5-alpha.7] - 2023-04-24
+
 <a name="v0.2.5-alpha.6"></a>
 ## [v0.2.5-alpha.6] - 2023-04-18
 
@@ -198,7 +211,8 @@
 - Merge pull request [#24](https://github.com/robolaunch/robot-operator/issues/24) from robolaunch/23-allow-multiple-launches
 
 
-[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.28...HEAD
+[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.29...HEAD
+[v0.2.5-alpha.29]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.28...v0.2.5-alpha.29
 [v0.2.5-alpha.28]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.27...v0.2.5-alpha.28
 [v0.2.5-alpha.27]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.26...v0.2.5-alpha.27
 [v0.2.5-alpha.26]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.25...v0.2.5-alpha.26
@@ -218,7 +232,8 @@
 [v0.2.5-alpha.11]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.10...v0.2.5-alpha.11
 [v0.2.5-alpha.10]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.9...v0.2.5-alpha.10
 [v0.2.5-alpha.9]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.8...v0.2.5-alpha.9
-[v0.2.5-alpha.8]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.6...v0.2.5-alpha.8
+[v0.2.5-alpha.8]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.7...v0.2.5-alpha.8
+[v0.2.5-alpha.7]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.6...v0.2.5-alpha.7
 [v0.2.5-alpha.6]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.5...v0.2.5-alpha.6
 [v0.2.5-alpha.5]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.4...v0.2.5-alpha.5
 [v0.2.5-alpha.4]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.3...v0.2.5-alpha.4
