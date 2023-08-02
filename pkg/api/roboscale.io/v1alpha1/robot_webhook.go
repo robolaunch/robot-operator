@@ -32,6 +32,7 @@ func (r *Robot) Default() {
 	DefaultRepositoryPaths(r)
 	_ = r.setRepositoryInfo()
 	r.setWorkspacesPath()
+	r.setDiscoveryServerDomainID()
 }
 
 func DefaultRepositoryPaths(r *Robot) {
@@ -213,6 +214,10 @@ func (r *Robot) setWorkspacesPath() {
 	if reflect.DeepEqual(r.Spec.WorkspaceManagerTemplate.WorkspacesPath, "") {
 		r.Spec.WorkspaceManagerTemplate.WorkspacesPath = defaultWorkspacePath
 	}
+}
+
+func (r *Robot) setDiscoveryServerDomainID() {
+	r.Spec.DiscoveryServerTemplate.DomainID = r.Spec.DomainID
 }
 
 // ********************************

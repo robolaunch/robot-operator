@@ -213,6 +213,11 @@ type RobotSpec struct {
 	// +kubebuilder:validation:Required
 	// +kubebuilder:default=rmw_fastrtps_cpp
 	RMWImplementation RMWImplementation `json:"rmwImplementation"`
+	// ROS domain ID for robot. See https://docs.ros.org/en/foxy/Concepts/About-Domain-ID.html.
+	// +kubebuilder:validation:Minimum=0
+	// +kubebuilder:validation:Maximum=101
+	// +kubebuilder:default=0
+	DomainID int `json:"domainID"`
 	// Total storage amount to persist via Robot. Unit of measurement is MB. (eg. `10240` corresponds 10 GB)
 	// This amount is being shared between different components.
 	Storage Storage `json:"storage,omitempty"`
@@ -331,6 +336,11 @@ const (
 
 // DiscoveryServerSpec defines the desired state of DiscoveryServer.
 type DiscoveryServerSpec struct {
+	// ROS domain ID for robot. See https://docs.ros.org/en/foxy/Concepts/About-Domain-ID.html.
+	// +kubebuilder:validation:Minimum=0
+	// +kubebuilder:validation:Maximum=101
+	// +kubebuilder:default=0
+	DomainID int `json:"domainID"`
 	// Instance type can be either `Server` or `Client`.
 	// If `Server`, instance creates discovery server resources and workloads.
 	// Other `Client` instances can connect to the `Server` instance.

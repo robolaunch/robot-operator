@@ -153,6 +153,7 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 	configure.SchedulePod(vdiPod, label.GetTenancyMap(robotVDI))
 	configure.InjectGenericEnvironmentVariables(vdiPod, robot)
 	configure.InjectRMWImplementationConfiguration(vdiPod, robot)
+	configure.InjectROSDomainID(vdiPod, robot.Spec.DomainID)
 	configure.InjectPodDiscoveryServerConnection(vdiPod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo)
 	configure.InjectPodDisplayConfiguration(vdiPod, *robotVDI)
 	configure.InjectRuntimeClass(vdiPod, robot, node)
