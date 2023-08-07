@@ -89,6 +89,7 @@ func GetBuildJob(buildManager *robotv1alpha1.BuildManager, robot *robotv1alpha1.
 	}
 
 	configure.InjectGenericEnvironmentVariablesForPodSpec(&podSpec, *robot)
+	configure.InjectLinuxUserAndGroupForPodSpec(&podSpec, *robot)
 	configure.InjectRMWImplementationConfigurationForPodSpec(&podSpec, *robot)
 
 	job := batchv1.Job{
