@@ -1,6 +1,9 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+
+<a name="v0.2.5-alpha.30"></a>
+## [v0.2.5-alpha.30] - 2023-08-02
 ### Feat
 - **domain-id:** :rocket: support ros domain id
 
@@ -211,7 +214,8 @@
 - Merge pull request [#24](https://github.com/robolaunch/robot-operator/issues/24) from robolaunch/23-allow-multiple-launches
 
 
-[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.29...HEAD
+[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.30...HEAD
+[v0.2.5-alpha.30]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.29...v0.2.5-alpha.30
 [v0.2.5-alpha.29]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.28...v0.2.5-alpha.29
 [v0.2.5-alpha.28]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.27...v0.2.5-alpha.28
 [v0.2.5-alpha.27]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.26...v0.2.5-alpha.27

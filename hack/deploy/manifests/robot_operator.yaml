@@ -6948,7 +6948,7 @@ spec:
             - --leader-elect
           command:
             - /manager
-          image: robolaunchio/robot-controller-manager:v0.2.5-alpha.30
+          image: robolaunchio/robot-controller-manager:v0.2.5-alpha.31
           livenessProbe:
             httpGet:
               path: /healthz
