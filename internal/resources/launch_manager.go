@@ -98,6 +98,8 @@ func getContainer(launch robotv1alpha1.Launch, launchName string, robot robotv1a
 		},
 	}
 
+	configure.InjectWorkspaceEnvironmentVariableForContainer(&container, robot, launch.Workspace)
+
 	return container
 }
 
