@@ -25,3 +25,23 @@ func InjectGenericEnvironmentVariables(pod *corev1.Pod, robot robotv1alpha1.Robo
 
 	return pod
 }
+
+func InjectWorkspaceEnvironmentVariableForPodSpec(podSpec *corev1.PodSpec, robot robotv1alpha1.Robot, workspace string) *corev1.PodSpec {
+
+	for key, cont := range podSpec.Containers {
+		cont.Env = append(cont.Env, internal.Env("WORKSPACE", robot.Spec.WorkspaceManagerTemplate.WorkspacesPath+"/"+workspace))
+		podSpec.Containers[key] = cont
+	}
+
+	return podSpec
+}
+
+func InjectWorkspaceEnvironmentVariable(pod *corev1.Pod, robot robotv1alpha1.Robot, workspace string) *corev1.Pod {
+
+	for key, cont := range pod.Spec.Containers {
+		cont.Env = append(cont.Env, internal.Env("WORKSPACE", robot.Spec.WorkspaceManagerTemplate.WorkspacesPath+"/"+workspace))
+		pod.Spec.Containers[key] = cont
+	}
+
+	return pod
+}
