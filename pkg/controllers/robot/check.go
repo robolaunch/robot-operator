@@ -125,15 +125,14 @@ func (r *RobotReconciler) reconcileCheckLoaderJob(ctx context.Context, instance 
 
 func (r *RobotReconciler) reconcileCheckROSBridge(ctx context.Context, instance *robotv1alpha1.Robot) error {
 
-	if instance.Spec.ROSBridgeTemplate.ROS.Enabled || instance.Spec.ROSBridgeTemplate.ROS2.Enabled {
-		rosBridgeQuery := &robotv1alpha1.ROSBridge{}
-		err := r.Get(ctx, *instance.GetROSBridgeMetadata(), rosBridgeQuery)
-		if err != nil && errors.IsNotFound(err) {
-			instance.Status.ROSBridgeStatus = robotv1alpha1.ROSBridgeInstanceStatus{}
-		} else if err != nil {
-			return err
-		} else {
-
+	rosBridgeQuery := &robotv1alpha1.ROSBridge{}
+	err := r.Get(ctx, *instance.GetROSBridgeMetadata(), rosBridgeQuery)
+	if err != nil && errors.IsNotFound(err) {
+		instance.Status.ROSBridgeStatus = robotv1alpha1.ROSBridgeInstanceStatus{}
+	} else if err != nil {
+		return err
+	} else {
+		if instance.Spec.ROSBridgeTemplate.ROS2.Enabled {
 			if !reflect.DeepEqual(instance.Spec.ROSBridgeTemplate, rosBridgeQuery.Spec) {
 				rosBridgeQuery.Spec = instance.Spec.ROSBridgeTemplate
 				err = r.Update(ctx, rosBridgeQuery)
@@ -146,6 +145,11 @@ func (r *RobotReconciler) reconcileCheckROSBridge(ctx context.Context, instance 
 			reference.SetReference(&instance.Status.ROSBridgeStatus.Resource.Reference, rosBridgeQuery.TypeMeta, rosBridgeQuery.ObjectMeta)
 			instance.Status.ROSBridgeStatus.Status = rosBridgeQuery.Status
 			instance.Status.ROSBridgeStatus.Connection = rosBridgeQuery.Status.ServiceStatus.URL
+		} else {
+			err := r.Delete(ctx, rosBridgeQuery)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
