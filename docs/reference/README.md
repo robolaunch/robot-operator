@@ -52,6 +52,7 @@ _Appears in:_
 | --- | --- |
 | `distributions` _[ROSDistro](#rosdistro) array_ | ROS 2 distributions to be used. You can select multiple distributions if they are supported in the same underlying OS. (eg. `foxy` and `galactic` are supported in Ubuntu Focal, so they can be used together but both cannot be used with `humble`) |
 | `rmwImplementation` _[RMWImplementation](#rmwimplementation)_ | RMW implementation selection. Robot operator currently supports only FastRTPS. See https://docs.ros.org/en/foxy/How-To-Guides/Working-with-multiple-RMW-implementations.html. |
+| `domainID` _integer_ | ROS domain ID for robot. See https://docs.ros.org/en/foxy/Concepts/About-Domain-ID.html. |
 | `storage` _[Storage](#storage)_ | Total storage amount to persist via Robot. Unit of measurement is MB. (eg. `10240` corresponds 10 GB) This amount is being shared between different components. |
 | `discoveryServerTemplate` _[DiscoveryServerSpec](#discoveryserverspec)_ | Discovery server configurational parameters. |
 | `rosBridgeTemplate` _[ROSBridgeSpec](#rosbridgespec)_ | ROS bridge configurational parameters. |
@@ -490,6 +491,7 @@ _Appears in:_
 
 | Field | Description |
 | --- | --- |
+| `domainID` _integer_ | ROS domain ID for robot. See https://docs.ros.org/en/foxy/Concepts/About-Domain-ID.html. |
 | `type` _[DiscoveryServerInstanceType](#discoveryserverinstancetype)_ | Instance type can be either `Server` or `Client`. If `Server`, instance creates discovery server resources and workloads. Other `Client` instances can connect to the `Server` instance. If `Client`, instance tries to connect a `Server` instance and hold `Server` configuration in a ConfigMap. |
 | `reference` _[ObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#objectreference-v1-core)_ | Reference to the `Server` instance. It is used if `.spec.type` is `Client`. Referenced object can be previously provisioned in another cluster. In that case, cluster's name can be specified in `.spec.cluster` field. |
 | `cluster` _string_ | Cloud instance name that holds DiscoveryServer instance with `Server` type. Should be empty if the type is `Server` since it takes cloud instance's name automatically. Should be set if the type is `Client`. |
@@ -837,7 +839,6 @@ _Appears in:_
 | `disableSourcingWs` _boolean_ | If `true`, workspaces are not sourced by default. Used if the launch type is `Custom`. |
 | `cmd` _string_ | Custom command to launch packages or start nodes. Required if the launch type is `Custom`. |
 | `parameters` _object (keys:string, values:string)_ | Launch parameters. |
-| `prelaunch` _[Prelaunch](#prelaunch)_ | Command or script to run just before node's execution. |
 
 
 #### LaunchManagerPhase
@@ -1031,20 +1032,6 @@ _Appears in:_
 | --- | --- |
 | `resource` _[OwnedResourceStatus](#ownedresourcestatus)_ | Generic status for any owned resource. |
 | `url` _string_ | Connection URL. |
-
-
-#### Prelaunch
-
-
-
-Prelaunch command or script is applied just before the node is started.
-
-_Appears in:_
-- [LaunchEntrypointConfig](#launchentrypointconfig)
-
-| Field | Description |
-| --- | --- |
-| `command` _string_ | Bash command to run before ROS node execution. |
 
 
 #### RMWImplementation
