@@ -10,6 +10,7 @@ func InjectGenericEnvironmentVariablesForPodSpec(podSpec *corev1.PodSpec, robot 
 
 	for key, cont := range podSpec.Containers {
 		cont.Env = append(cont.Env, internal.Env("WORKSPACES_PATH", robot.Spec.WorkspaceManagerTemplate.WorkspacesPath))
+		cont.Env = append(cont.Env, internal.Env("ROS2_SETUP_PATH", "/opt/ros/"+string(robot.Spec.Distributions[0])+"/setup.bash"))
 		podSpec.Containers[key] = cont
 	}
 
@@ -20,6 +21,7 @@ func InjectGenericEnvironmentVariables(pod *corev1.Pod, robot robotv1alpha1.Robo
 
 	for key, cont := range pod.Spec.Containers {
 		cont.Env = append(cont.Env, internal.Env("WORKSPACES_PATH", robot.Spec.WorkspaceManagerTemplate.WorkspacesPath))
+		cont.Env = append(cont.Env, internal.Env("ROS2_SETUP_PATH", "/opt/ros/"+string(robot.Spec.Distributions[0])+"/setup.bash"))
 		pod.Spec.Containers[key] = cont
 	}
 
