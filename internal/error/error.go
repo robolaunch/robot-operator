@@ -60,3 +60,25 @@ type RobotResourcesHasNotBeenReleasedError struct {
 func (r *RobotResourcesHasNotBeenReleasedError) Error() string {
 	return fmt.Sprintf("robot resources has not been released yet for resource %v %v in namespace %v", r.ResourceKind, r.ResourceName, r.ResourceNamespace)
 }
+
+type CreatingResourceError struct {
+	Err               error
+	ResourceKind      string
+	ResourceName      string
+	ResourceNamespace string
+}
+
+func (r *CreatingResourceError) Error() string {
+	return fmt.Sprintf("resource is being created %v %v in namespace %v", r.ResourceKind, r.ResourceName, r.ResourceNamespace)
+}
+
+type WaitingForResourceError struct {
+	Err               error
+	ResourceKind      string
+	ResourceName      string
+	ResourceNamespace string
+}
+
+func (r *WaitingForResourceError) Error() string {
+	return fmt.Sprintf("resource is getting ready %v %v in namespace %v", r.ResourceKind, r.ResourceName, r.ResourceNamespace)
+}
