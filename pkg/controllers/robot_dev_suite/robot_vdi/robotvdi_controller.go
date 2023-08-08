@@ -18,6 +18,8 @@ package robot_vdi
 
 import (
 	"context"
+	goErr "errors"
+	"time"
 
 	corev1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1"
@@ -29,6 +31,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	"github.com/go-logr/logr"
+	robotErr "github.com/robolaunch/robot-operator/internal/error"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 )
 
@@ -53,6 +56,8 @@ var logger logr.Logger
 func (r *RobotVDIReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	logger = log.FromContext(ctx)
 
+	var result ctrl.Result = ctrl.Result{}
+
 	instance, err := r.reconcileGetInstance(ctx, req.NamespacedName)
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -67,7 +72,14 @@ func (r *RobotVDIReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 
 	err = r.reconcileCheckStatus(ctx, instance)
 	if err != nil {
-		return ctrl.Result{}, err
+		var creatingResourceError *robotErr.CreatingResourceError
+		var waitingForResourceError *robotErr.WaitingForResourceError
+		if !(goErr.As(err, &creatingResourceError) || goErr.As(err, &waitingForResourceError)) {
+			return ctrl.Result{}, err
+		} else {
+			result.Requeue = true
+			result.RequeueAfter = 1 * time.Second
+		}
 	}
 
 	err = r.reconcileUpdateInstanceStatus(ctx, instance)
@@ -90,91 +102,32 @@ func (r *RobotVDIReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 
 func (r *RobotVDIReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.RobotVDI) error {
 
-	switch instance.Status.PVCStatus.Created {
-	case true:
-
-		switch instance.Status.ServiceTCPStatus.Resource.Created {
-		case true:
-
-			switch instance.Status.ServiceUDPStatus.Created {
-			case true:
-
-				switch instance.Status.PodStatus.Resource.Created {
-				case true:
-
-					switch instance.Status.PodStatus.Resource.Phase {
-					case string(corev1.PodRunning):
-
-						switch instance.Spec.Ingress {
-						case true:
-
-							switch instance.Status.IngressStatus.Created {
-							case true:
-
-								instance.Status.Phase = robotv1alpha1.RobotVDIPhaseRunning
-
-							case false:
-
-								instance.Status.Phase = robotv1alpha1.RobotVDIPhaseCreatingIngress
-								err := r.reconcileCreateIngress(ctx, instance)
-								if err != nil {
-									return err
-								}
-								instance.Status.IngressStatus.Created = true
-
-							}
-
-						case false:
-
-							instance.Status.Phase = robotv1alpha1.RobotVDIPhaseRunning
-
-						}
-
-					}
-
-				case false:
-
-					instance.Status.Phase = robotv1alpha1.RobotVDIPhaseCreatingPod
-					err := r.reconcileCreatePod(ctx, instance)
-					if err != nil {
-						return err
-					}
-					instance.Status.PodStatus.Resource.Created = true
-
-				}
-
-			case false:
-
-				instance.Status.Phase = robotv1alpha1.RobotVDIPhaseCreatingUDPService
-				err := r.reconcileCreateServiceUDP(ctx, instance)
-				if err != nil {
-					return err
-				}
-				instance.Status.ServiceUDPStatus.Created = true
-
-			}
-
-		case false:
-
-			instance.Status.Phase = robotv1alpha1.RobotVDIPhaseCreatingTCPService
-			err := r.reconcileCreateServiceTCP(ctx, instance)
-			if err != nil {
-				return err
-			}
-			instance.Status.ServiceTCPStatus.Resource.Created = true
-
-		}
-
-	case false:
-
-		instance.Status.Phase = robotv1alpha1.RobotVDIPhaseCreatingPVC
-		err := r.reconcileCreatePVC(ctx, instance)
-		if err != nil {
-			return err
-		}
-		instance.Status.PVCStatus.Created = true
-
+	err := r.reconcileHandlePVC(ctx, instance)
+	if err != nil {
+		return err
 	}
+
+	err = r.reconcileHandleServiceTCP(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	err = r.reconcileHandleServiceUDP(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	err = r.reconcileHandlePod(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	err = r.reconcileHandleIngress(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	instance.Status.Phase = robotv1alpha1.RobotVDIPhaseRunning
 
 	return nil
 }
