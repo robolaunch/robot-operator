@@ -272,41 +272,6 @@ func GetWorkspaceManager(robot *robotv1alpha1.Robot, wsmNamespacedName *types.Na
 
 }
 
-func GetBuildManager(robot *robotv1alpha1.Robot, bmNamespacedName *types.NamespacedName) *robotv1alpha1.BuildManager {
-
-	labels := robot.Labels
-	labels[internal.TARGET_ROBOT_LABEL_KEY] = robot.Name
-
-	buildManager := robotv1alpha1.BuildManager{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      bmNamespacedName.Name,
-			Namespace: bmNamespacedName.Namespace,
-			Labels:    robot.Labels,
-		},
-		Spec: robot.Spec.BuildManagerTemplate,
-	}
-
-	return &buildManager
-}
-
-func GetLaunchManager(robot *robotv1alpha1.Robot, lmNamespacedName *types.NamespacedName, key int) *robotv1alpha1.LaunchManager {
-
-	labels := robot.Labels
-	labels[internal.TARGET_ROBOT_LABEL_KEY] = robot.Name
-	labels[internal.TARGET_VDI_LABEL_KEY] = robot.GetRobotDevSuiteMetadata().Name + internal.ROBOT_VDI_POSTFIX
-
-	launchManager := robotv1alpha1.LaunchManager{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      lmNamespacedName.Name,
-			Namespace: lmNamespacedName.Namespace,
-			Labels:    robot.Labels,
-		},
-		Spec: robot.Spec.LaunchManagerTemplates[key],
-	}
-
-	return &launchManager
-}
-
 func GetCloneCommand(workspaces []robotv1alpha1.Workspace, wsKey int) string {
 
 	var cmdBuilder strings.Builder
