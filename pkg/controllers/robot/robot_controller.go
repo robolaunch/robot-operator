@@ -2,6 +2,8 @@ package robot
 
 import (
 	"context"
+	goErr "errors"
+	"time"
 
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -17,6 +19,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	"github.com/go-logr/logr"
+	robotErr "github.com/robolaunch/robot-operator/internal/error"
 	"github.com/robolaunch/robot-operator/internal/label"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 )
@@ -46,6 +49,8 @@ var logger logr.Logger
 func (r *RobotReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	logger = log.FromContext(ctx)
 
+	var result ctrl.Result = ctrl.Result{}
+
 	instance, err := r.reconcileGetInstance(ctx, req.NamespacedName)
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -59,16 +64,6 @@ func (r *RobotReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 		return ctrl.Result{}, err
 	}
 
-	// err = r.reconcileCheckDeletion(ctx, instance)
-	// if err != nil {
-
-	// 	if errors.IsNotFound(err) {
-	// 		return ctrl.Result{}, nil
-	// 	}
-
-	// 	return ctrl.Result{}, err
-	// }
-
 	err = r.reconcileCheckImage(ctx, instance)
 	if err != nil {
 		return ctrl.Result{}, err
@@ -76,7 +71,14 @@ func (r *RobotReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 
 	err = r.reconcileCheckStatus(ctx, instance)
 	if err != nil {
-		return ctrl.Result{}, err
+		var creatingResourceError *robotErr.CreatingResourceError
+		var waitingForResourceError *robotErr.WaitingForResourceError
+		if !(goErr.As(err, &creatingResourceError) || goErr.As(err, &waitingForResourceError)) {
+			return ctrl.Result{}, err
+		} else {
+			result.Requeue = true
+			result.RequeueAfter = 1 * time.Second
+		}
 	}
 
 	err = r.reconcileUpdateInstanceStatus(ctx, instance)
@@ -94,221 +96,44 @@ func (r *RobotReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 		return ctrl.Result{}, err
 	}
 
-	return ctrl.Result{}, nil
+	return result, nil
 }
 
 func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.Robot) error {
-	switch instance.Status.VolumeStatuses.Var.Created &&
-		instance.Status.VolumeStatuses.Opt.Created &&
-		instance.Status.VolumeStatuses.Etc.Created &&
-		instance.Status.VolumeStatuses.Usr.Created &&
-		instance.Status.VolumeStatuses.Workspace.Created {
-	case true:
 
-		switch instance.Status.DiscoveryServerStatus.Resource.Created {
-		case true:
+	err := r.reconcileHandlePVCs(ctx, instance)
+	if err != nil {
+		return err
+	}
 
-			switch instance.Status.DiscoveryServerStatus.Status.Phase {
-			case robotv1alpha1.DiscoveryServerPhaseReady:
+	err = r.reconcileHandleDiscoveryServer(ctx, instance)
+	if err != nil {
+		return err
+	}
 
-				switch instance.Status.LoaderJobStatus.Created {
-				case true:
+	err = r.reconcileHandleLoaderJob(ctx, instance)
+	if err != nil {
+		return err
+	}
 
-					switch instance.Status.LoaderJobStatus.Phase {
-					case string(robotv1alpha1.JobSucceeded):
+	err = r.reconcileHandleROSBridge(ctx, instance)
+	if err != nil {
+		return err
+	}
 
-						switch instance.Spec.ROSBridgeTemplate.ROS.Enabled || instance.Spec.ROSBridgeTemplate.ROS2.Enabled {
-						case true:
+	err = r.reconcileHandleRobotDevSuite(ctx, instance)
+	if err != nil {
+		return err
+	}
 
-							switch instance.Status.ROSBridgeStatus.Resource.Created {
-							case true:
+	err = r.reconcileHandleWorkspaceManager(ctx, instance)
+	if err != nil {
+		return err
+	}
 
-								switch instance.Status.ROSBridgeStatus.Status.Phase {
-								case robotv1alpha1.BridgePhaseReady:
-
-									switch instance.Spec.RobotDevSuiteTemplate.IDEEnabled || instance.Spec.RobotDevSuiteTemplate.VDIEnabled || instance.Spec.RobotDevSuiteTemplate.RemoteIDEEnabled {
-									case true:
-
-										switch instance.Status.RobotDevSuiteStatus.Resource.Created {
-										case true:
-
-											switch instance.Status.RobotDevSuiteStatus.Status.Phase {
-											case robotv1alpha1.RobotDevSuitePhaseRunning:
-
-												instance.Status.Phase = robotv1alpha1.RobotPhaseEnvironmentReady
-
-												err := r.reconcileHandleAttachments(ctx, instance)
-												if err != nil {
-													return err
-												}
-
-											}
-
-										case false:
-
-											instance.Status.Phase = robotv1alpha1.RobotPhaseCreatingDevelopmentSuite
-											err := r.createRobotDevSuite(ctx, instance, instance.GetRobotDevSuiteMetadata())
-											if err != nil {
-												return err
-											}
-											instance.Status.RobotDevSuiteStatus.Resource.Created = true
-
-										}
-
-									case false:
-
-										instance.Status.Phase = robotv1alpha1.RobotPhaseEnvironmentReady
-
-										err := r.reconcileHandleAttachments(ctx, instance)
-										if err != nil {
-											return err
-										}
-
-									}
-
-								}
-
-							case false:
-
-								instance.Status.Phase = robotv1alpha1.RobotPhaseCreatingBridge
-								err := r.createROSBridge(ctx, instance, instance.GetROSBridgeMetadata())
-								if err != nil {
-									return err
-								}
-								instance.Status.ROSBridgeStatus.Resource.Created = true
-
-							}
-
-						case false:
-
-							switch instance.Spec.RobotDevSuiteTemplate.IDEEnabled || instance.Spec.RobotDevSuiteTemplate.VDIEnabled || instance.Spec.RobotDevSuiteTemplate.RemoteIDEEnabled {
-							case true:
-
-								switch instance.Status.RobotDevSuiteStatus.Resource.Created {
-								case true:
-
-									switch instance.Status.RobotDevSuiteStatus.Status.Phase {
-									case robotv1alpha1.RobotDevSuitePhaseRunning:
-
-										instance.Status.Phase = robotv1alpha1.RobotPhaseEnvironmentReady
-
-										err := r.reconcileHandleAttachments(ctx, instance)
-										if err != nil {
-											return err
-										}
-
-									}
-
-								case false:
-
-									instance.Status.Phase = robotv1alpha1.RobotPhaseCreatingDevelopmentSuite
-									err := r.createRobotDevSuite(ctx, instance, instance.GetRobotDevSuiteMetadata())
-									if err != nil {
-										return err
-									}
-									instance.Status.RobotDevSuiteStatus.Resource.Created = true
-
-								}
-
-							case false:
-
-								instance.Status.Phase = robotv1alpha1.RobotPhaseEnvironmentReady
-
-								err := r.reconcileHandleAttachments(ctx, instance)
-								if err != nil {
-									return err
-								}
-
-							}
-
-						case false:
-
-							instance.Status.Phase = robotv1alpha1.RobotPhaseEnvironmentReady
-
-							err := r.reconcileHandleAttachments(ctx, instance)
-							if err != nil {
-								return err
-							}
-
-						}
-
-					case string(robotv1alpha1.JobActive):
-
-						instance.Status.Phase = robotv1alpha1.RobotPhaseConfiguringEnvironment
-
-					case string(robotv1alpha1.JobFailed):
-
-						// TODO: add reason
-						instance.Status.Phase = robotv1alpha1.RobotPhaseFailed
-
-					}
-
-				case false:
-
-					instance.Status.Phase = robotv1alpha1.RobotPhaseConfiguringEnvironment
-					err := r.createJob(ctx, instance, instance.GetLoaderJobMetadata())
-					if err != nil {
-						return err
-					}
-					instance.Status.LoaderJobStatus.Created = true
-				}
-
-			}
-
-		case false:
-
-			instance.Status.Phase = robotv1alpha1.RobotPhaseCreatingDiscoveryServer
-			err := r.createDiscoveryServer(ctx, instance, instance.GetDiscoveryServerMetadata())
-			if err != nil {
-				return err
-			}
-			instance.Status.DiscoveryServerStatus.Resource.Created = true
-
-		}
-
-	case false:
-
-		instance.Status.Phase = robotv1alpha1.RobotPhaseCreatingEnvironment
-
-		if !instance.Status.VolumeStatuses.Var.Created {
-			err := r.createPVC(ctx, instance, instance.GetPVCVarMetadata())
-			if err != nil {
-				return err
-			}
-			instance.Status.VolumeStatuses.Var.Created = true
-		}
-
-		if !instance.Status.VolumeStatuses.Opt.Created {
-			err := r.createPVC(ctx, instance, instance.GetPVCOptMetadata())
-			if err != nil {
-				return err
-			}
-			instance.Status.VolumeStatuses.Opt.Created = true
-		}
-
-		if !instance.Status.VolumeStatuses.Etc.Created {
-			err := r.createPVC(ctx, instance, instance.GetPVCEtcMetadata())
-			if err != nil {
-				return err
-			}
-			instance.Status.VolumeStatuses.Etc.Created = true
-		}
-
-		if !instance.Status.VolumeStatuses.Usr.Created {
-			err := r.createPVC(ctx, instance, instance.GetPVCUsrMetadata())
-			if err != nil {
-				return err
-			}
-			instance.Status.VolumeStatuses.Usr.Created = true
-		}
-
-		if !instance.Status.VolumeStatuses.Workspace.Created {
-			err := r.createPVC(ctx, instance, instance.GetPVCWorkspaceMetadata())
-			if err != nil {
-				return err
-			}
-			instance.Status.VolumeStatuses.Workspace.Created = true
-		}
+	err = r.reconcileHandleManagers(ctx, instance)
+	if err != nil {
+		return err
 	}
 
 	return nil
