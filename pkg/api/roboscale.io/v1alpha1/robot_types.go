@@ -229,12 +229,6 @@ type RobotSpec struct {
 	RobotDevSuiteTemplate RobotDevSuiteSpec `json:"robotDevSuiteTemplate,omitempty"`
 	// Workspace manager template to configure ROS 2 workspaces.
 	WorkspaceManagerTemplate WorkspaceManagerSpec `json:"workspaceManagerTemplate,omitempty"`
-	// [*alpha*] Build manager template for initial configuration.
-	BuildManagerTemplate BuildManagerSpec `json:"buildManagerTemplate,omitempty"`
-	// [*alpha*] Launch manager template for initial configuration.
-	LaunchManagerTemplates []LaunchManagerSpec `json:"launchManagerTemplates,omitempty"`
-	// [*alpha*] Switch to development mode if `true`.
-	Development bool `json:"development,omitempty"`
 	// [*alpha*] Root DNS configuration.
 	RootDNSConfig RootDNSConfig `json:"rootDNSConfig,omitempty"`
 	// [*alpha*] TLS secret reference.
