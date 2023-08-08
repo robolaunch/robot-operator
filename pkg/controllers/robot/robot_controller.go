@@ -2,8 +2,6 @@ package robot
 
 import (
 	"context"
-	goErr "errors"
-	"time"
 
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -69,16 +67,9 @@ func (r *RobotReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 		return ctrl.Result{}, err
 	}
 
-	err = r.reconcileCheckStatus(ctx, instance)
+	err = r.reconcileCheckStatus(ctx, instance, &result)
 	if err != nil {
-		var creatingResourceError *robotErr.CreatingResourceError
-		var waitingForResourceError *robotErr.WaitingForResourceError
-		if !(goErr.As(err, &creatingResourceError) || goErr.As(err, &waitingForResourceError)) {
-			return ctrl.Result{}, err
-		} else {
-			result.Requeue = true
-			result.RequeueAfter = 1 * time.Second
-		}
+		return result, err
 	}
 
 	err = r.reconcileUpdateInstanceStatus(ctx, instance)
@@ -99,41 +90,41 @@ func (r *RobotReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 	return result, nil
 }
 
-func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.Robot) error {
+func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.Robot, result *ctrl.Result) error {
 
 	err := r.reconcileHandlePVCs(ctx, instance)
 	if err != nil {
-		return err
+		return robotErr.CheckCreatingOrWaitingError(result, err)
 	}
 
 	err = r.reconcileHandleDiscoveryServer(ctx, instance)
 	if err != nil {
-		return err
+		return robotErr.CheckCreatingOrWaitingError(result, err)
 	}
 
 	err = r.reconcileHandleLoaderJob(ctx, instance)
 	if err != nil {
-		return err
+		return robotErr.CheckCreatingOrWaitingError(result, err)
 	}
 
 	err = r.reconcileHandleROSBridge(ctx, instance)
 	if err != nil {
-		return err
+		return robotErr.CheckCreatingOrWaitingError(result, err)
 	}
 
 	err = r.reconcileHandleRobotDevSuite(ctx, instance)
 	if err != nil {
-		return err
+		return robotErr.CheckCreatingOrWaitingError(result, err)
 	}
 
 	err = r.reconcileHandleWorkspaceManager(ctx, instance)
 	if err != nil {
-		return err
+		return robotErr.CheckCreatingOrWaitingError(result, err)
 	}
 
 	err = r.reconcileHandleManagers(ctx, instance)
 	if err != nil {
-		return err
+		return robotErr.CheckCreatingOrWaitingError(result, err)
 	}
 
 	return nil

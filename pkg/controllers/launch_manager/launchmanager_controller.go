@@ -18,8 +18,6 @@ package launch_manager
 
 import (
 	"context"
-	goErr "errors"
-	"time"
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -78,16 +76,9 @@ func (r *LaunchManagerReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 		}
 	}
 
-	err = r.reconcileCheckStatus(ctx, instance)
+	err = r.reconcileCheckStatus(ctx, instance, &result)
 	if err != nil {
-		var creatingResourceError *robotErr.CreatingResourceError
-		var waitingForResourceError *robotErr.WaitingForResourceError
-		if !(goErr.As(err, &creatingResourceError) || goErr.As(err, &waitingForResourceError)) {
-			return ctrl.Result{}, err
-		} else {
-			result.Requeue = true
-			result.RequeueAfter = 1 * time.Second
-		}
+		return result, err
 	}
 
 	err = r.reconcileUpdateInstanceStatus(ctx, instance)
@@ -108,14 +99,14 @@ func (r *LaunchManagerReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 	return ctrl.Result{}, nil
 }
 
-func (r *LaunchManagerReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.LaunchManager) error {
+func (r *LaunchManagerReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.LaunchManager, result *ctrl.Result) error {
 
 	switch instance.Status.Active {
 	case true:
 
 		err := r.reconcileHandlePod(ctx, instance)
 		if err != nil {
-			return err
+			return robotErr.CheckCreatingOrWaitingError(result, err)
 		}
 
 		instance.Status.Phase = robotv1alpha1.LaunchManagerPhaseReady

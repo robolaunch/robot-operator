@@ -78,16 +78,9 @@ func (r *WorkspaceManagerReconciler) Reconcile(ctx context.Context, req ctrl.Req
 		return ctrl.Result{}, nil
 	}
 
-	err = r.reconcileCheckStatus(ctx, instance)
+	err = r.reconcileCheckStatus(ctx, instance, &result)
 	if err != nil {
-		var creatingResourceError *robotErr.CreatingResourceError
-		var waitingForResourceError *robotErr.WaitingForResourceError
-		if !(goErr.As(err, &creatingResourceError) || goErr.As(err, &waitingForResourceError)) {
-			return ctrl.Result{}, err
-		} else {
-			result.Requeue = true
-			result.RequeueAfter = 1 * time.Second
-		}
+		return result, err
 	}
 
 	err = r.reconcileUpdateInstanceStatus(ctx, instance)
@@ -108,11 +101,11 @@ func (r *WorkspaceManagerReconciler) Reconcile(ctx context.Context, req ctrl.Req
 	return ctrl.Result{}, nil
 }
 
-func (r *WorkspaceManagerReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.WorkspaceManager) error {
+func (r *WorkspaceManagerReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.WorkspaceManager, result *ctrl.Result) error {
 
 	err := r.reconcileHandleClonerJob(ctx, instance)
 	if err != nil {
-		return err
+		return robotErr.CheckCreatingOrWaitingError(result, err)
 	}
 
 	instance.Status.Phase = robotv1alpha1.WorkspaceManagerPhaseReady

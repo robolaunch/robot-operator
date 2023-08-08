@@ -94,16 +94,9 @@ func (r *RobotDevSuiteReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 		return ctrl.Result{}, nil
 	}
 
-	err = r.reconcileCheckStatus(ctx, instance)
+	err = r.reconcileCheckStatus(ctx, instance, &result)
 	if err != nil {
-		var creatingResourceError *robotErr.CreatingResourceError
-		var waitingForResourceError *robotErr.WaitingForResourceError
-		if !(goErr.As(err, &creatingResourceError) || goErr.As(err, &waitingForResourceError)) {
-			return ctrl.Result{}, err
-		} else {
-			result.Requeue = true
-			result.RequeueAfter = 1 * time.Second
-		}
+		return result, err
 	}
 
 	err = r.reconcileUpdateInstanceStatus(ctx, instance)
@@ -124,24 +117,24 @@ func (r *RobotDevSuiteReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 	return ctrl.Result{}, nil
 }
 
-func (r *RobotDevSuiteReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.RobotDevSuite) error {
+func (r *RobotDevSuiteReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.RobotDevSuite, result *ctrl.Result) error {
 
 	switch instance.Status.Active {
 	case true:
 
 		err := r.reconcileHandleRobotVDI(ctx, instance)
 		if err != nil {
-			return err
+			return robotErr.CheckCreatingOrWaitingError(result, err)
 		}
 
 		err = r.reconcileHandleRobotIDE(ctx, instance)
 		if err != nil {
-			return err
+			return robotErr.CheckCreatingOrWaitingError(result, err)
 		}
 
 		err = r.reconcileHandleRemoteIDE(ctx, instance)
 		if err != nil {
-			return err
+			return robotErr.CheckCreatingOrWaitingError(result, err)
 		}
 
 		instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseRunning

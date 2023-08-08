@@ -18,8 +18,6 @@ package metrics
 
 import (
 	"context"
-	goErr "errors"
-	"time"
 
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
@@ -68,16 +66,9 @@ func (r *MetricsExporterReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 		return ctrl.Result{}, nil
 	}
 
-	err = r.reconcileCheckStatus(ctx, instance)
+	err = r.reconcileCheckStatus(ctx, instance, &result)
 	if err != nil {
-		var creatingResourceError *robotErr.CreatingResourceError
-		var waitingForResourceError *robotErr.WaitingForResourceError
-		if !(goErr.As(err, &creatingResourceError) || goErr.As(err, &waitingForResourceError)) {
-			return ctrl.Result{}, err
-		} else {
-			result.Requeue = true
-			result.RequeueAfter = 1 * time.Second
-		}
+		return result, err
 	}
 
 	err = r.reconcileUpdateInstanceStatus(ctx, instance)
@@ -98,28 +89,28 @@ func (r *MetricsExporterReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 	return ctrl.Result{}, nil
 }
 
-func (r *MetricsExporterReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.MetricsExporter) error {
+func (r *MetricsExporterReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.MetricsExporter, result *ctrl.Result) error {
 
 	if instance.Spec.GPU.Track || instance.Spec.Network.Track {
 
 		err := r.reconcileHandleRole(ctx, instance)
 		if err != nil {
-			return err
+			return robotErr.CheckCreatingOrWaitingError(result, err)
 		}
 
 		err = r.reconcileHandleServiceAccount(ctx, instance)
 		if err != nil {
-			return err
+			return robotErr.CheckCreatingOrWaitingError(result, err)
 		}
 
 		err = r.reconcileHandleRoleBinding(ctx, instance)
 		if err != nil {
-			return err
+			return robotErr.CheckCreatingOrWaitingError(result, err)
 		}
 
 		err = r.reconcileHandlePod(ctx, instance)
 		if err != nil {
-			return err
+			return robotErr.CheckCreatingOrWaitingError(result, err)
 		}
 
 		instance.Status.Phase = robotv1alpha1.MetricsExporterPhaseReady

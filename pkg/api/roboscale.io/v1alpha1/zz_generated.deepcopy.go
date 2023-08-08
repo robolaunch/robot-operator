@@ -1344,14 +1344,6 @@ func (in *RobotSpec) DeepCopyInto(out *RobotSpec) {
 	out.ROSBridgeTemplate = in.ROSBridgeTemplate
 	out.RobotDevSuiteTemplate = in.RobotDevSuiteTemplate
 	in.WorkspaceManagerTemplate.DeepCopyInto(&out.WorkspaceManagerTemplate)
-	in.BuildManagerTemplate.DeepCopyInto(&out.BuildManagerTemplate)
-	if in.LaunchManagerTemplates != nil {
-		in, out := &in.LaunchManagerTemplates, &out.LaunchManagerTemplates
-		*out = make([]LaunchManagerSpec, len(*in))
-		for i := range *in {
-			(*in)[i].DeepCopyInto(&(*out)[i])
-		}
-	}
 	out.RootDNSConfig = in.RootDNSConfig
 	out.TLSSecretReference = in.TLSSecretReference
 }

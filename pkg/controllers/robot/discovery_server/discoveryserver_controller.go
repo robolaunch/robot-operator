@@ -66,16 +66,9 @@ func (r *DiscoveryServerReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 		return ctrl.Result{}, err
 	}
 
-	err = r.reconcileCheckStatus(ctx, instance)
+	err = r.reconcileCheckStatus(ctx, instance, &result)
 	if err != nil {
-		var creatingResourceError *robotErr.CreatingResourceError
-		var waitingForResourceError *robotErr.WaitingForResourceError
-		if !(goErr.As(err, &creatingResourceError) || goErr.As(err, &waitingForResourceError)) {
-			return ctrl.Result{}, err
-		} else {
-			result.Requeue = true
-			result.RequeueAfter = 1 * time.Second
-		}
+		return result, err
 	}
 
 	err = r.reconcileUpdateInstanceStatus(ctx, instance)
@@ -121,29 +114,29 @@ func (r *DiscoveryServerReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 	return ctrl.Result{}, nil
 }
 
-func (r *DiscoveryServerReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.DiscoveryServer) error {
+func (r *DiscoveryServerReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.DiscoveryServer, result *ctrl.Result) error {
 
 	switch instance.Spec.Type {
 	case robotv1alpha1.DiscoveryServerInstanceTypeServer:
 
 		err := r.reconcileHandleService(ctx, instance)
 		if err != nil {
-			return err
+			return robotErr.CheckCreatingOrWaitingError(result, err)
 		}
 
 		err = r.reconcileHandlePod(ctx, instance)
 		if err != nil {
-			return err
+			return robotErr.CheckCreatingOrWaitingError(result, err)
 		}
 
 		err = r.reconcileHandleServiceExport(ctx, instance)
 		if err != nil {
-			return err
+			return robotErr.CheckCreatingOrWaitingError(result, err)
 		}
 
 		err = r.reconcileHandleConfigMap(ctx, instance)
 		if err != nil {
-			return err
+			return robotErr.CheckCreatingOrWaitingError(result, err)
 		}
 
 		instance.Status.Phase = robotv1alpha1.DiscoveryServerPhaseReady

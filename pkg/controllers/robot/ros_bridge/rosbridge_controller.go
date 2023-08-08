@@ -18,8 +18,6 @@ package ros_bridge
 
 import (
 	"context"
-	goErr "errors"
-	"time"
 
 	corev1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1"
@@ -65,16 +63,9 @@ func (r *ROSBridgeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		return ctrl.Result{}, err
 	}
 
-	err = r.reconcileCheckStatus(ctx, instance)
+	err = r.reconcileCheckStatus(ctx, instance, &result)
 	if err != nil {
-		var creatingResourceError *robotErr.CreatingResourceError
-		var waitingForResourceError *robotErr.WaitingForResourceError
-		if !(goErr.As(err, &creatingResourceError) || goErr.As(err, &waitingForResourceError)) {
-			return ctrl.Result{}, err
-		} else {
-			result.Requeue = true
-			result.RequeueAfter = 1 * time.Second
-		}
+		return result, err
 	}
 
 	err = r.reconcileUpdateInstanceStatus(ctx, instance)
@@ -94,21 +85,21 @@ func (r *ROSBridgeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 	return ctrl.Result{}, nil
 }
 
-func (r *ROSBridgeReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.ROSBridge) error {
+func (r *ROSBridgeReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.ROSBridge, result *ctrl.Result) error {
 
 	err := r.reconcileHandleService(ctx, instance)
 	if err != nil {
-		return err
+		return robotErr.CheckCreatingOrWaitingError(result, err)
 	}
 
 	err = r.reconcileHandlePod(ctx, instance)
 	if err != nil {
-		return err
+		return robotErr.CheckCreatingOrWaitingError(result, err)
 	}
 
 	err = r.reconcileHandleIngress(ctx, instance)
 	if err != nil {
-		return err
+		return robotErr.CheckCreatingOrWaitingError(result, err)
 	}
 
 	instance.Status.Phase = robotv1alpha1.BridgePhaseReady
