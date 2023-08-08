@@ -39,7 +39,6 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/robolaunch/robot-operator/internal"
 	robotErr "github.com/robolaunch/robot-operator/internal/error"
-	"github.com/robolaunch/robot-operator/internal/hybrid"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 )
 
@@ -58,11 +57,11 @@ type BuildManagerReconciler struct {
 //+kubebuilder:rbac:groups=batch,resources=jobs,verbs=get;list;watch;create;update;patch;delete
 
 var logger logr.Logger
-var defaultReturnResult ctrl.Result
 
 func (r *BuildManagerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	logger = log.FromContext(ctx)
-	defaultReturnResult = ctrl.Result{}
+
+	var result ctrl.Result = ctrl.Result{}
 
 	instance, err := r.reconcileGetInstance(ctx, req.NamespacedName)
 	if err != nil {
@@ -71,16 +70,6 @@ func (r *BuildManagerReconciler) Reconcile(ctx context.Context, req ctrl.Request
 		}
 		return ctrl.Result{}, err
 	}
-
-	// err = r.reconcileCheckDeletion(ctx, instance)
-	// if err != nil {
-
-	// 	if errors.IsNotFound(err) {
-	// 		return ctrl.Result{}, nil
-	// 	}
-
-	// 	return ctrl.Result{}, err
-	// }
 
 	// Check target robot's attached object, update activity status
 	err = r.reconcileCheckTargetRobot(ctx, instance)
@@ -108,7 +97,14 @@ func (r *BuildManagerReconciler) Reconcile(ctx context.Context, req ctrl.Request
 
 	err = r.reconcileCheckStatus(ctx, instance)
 	if err != nil {
-		return ctrl.Result{}, err
+		var creatingResourceError *robotErr.CreatingResourceError
+		var waitingForResourceError *robotErr.WaitingForResourceError
+		if !(goErr.As(err, &creatingResourceError) || goErr.As(err, &waitingForResourceError)) {
+			return ctrl.Result{}, err
+		} else {
+			result.Requeue = true
+			result.RequeueAfter = 1 * time.Second
+		}
 	}
 
 	err = r.reconcileUpdateInstanceStatus(ctx, instance)
@@ -134,79 +130,17 @@ func (r *BuildManagerReconciler) reconcileCheckStatus(ctx context.Context, insta
 	switch instance.Status.Active {
 	case true:
 
-		robot, err := r.reconcileGetTargetRobot(ctx, instance)
+		err := r.reconcileHandleConfigMap(ctx, instance)
 		if err != nil {
 			return err
 		}
 
-		switch instance.Status.ScriptConfigMapStatus.Created {
-		case true:
-
-			switch hybrid.HasStepInThisInstance(*instance, *robot) {
-			case true:
-
-				instance.Status.Phase = robotv1alpha1.BuildManagerBuildingRobot
-
-				for k := range instance.Status.Steps {
-					if instance.Status.Steps[k].Resource.Created {
-
-						if instance.Status.Steps[k].Resource.Phase == string(robotv1alpha1.JobSucceeded) {
-							continue
-						} else if instance.Status.Steps[k].Resource.Phase == string(robotv1alpha1.JobActive) {
-							Requeue(&defaultReturnResult)
-							break
-						} else if instance.Status.Steps[k].Resource.Phase == string(robotv1alpha1.JobFailed) {
-							Requeue(&defaultReturnResult)
-							break
-						} else {
-							Requeue(&defaultReturnResult)
-							break
-						}
-
-					} else {
-
-						err := r.createBuilderJob(ctx, instance, k)
-						if err != nil {
-							return err
-						}
-
-						stepStatus := instance.Status.Steps[k]
-						stepStatus.Resource.Created = true
-						instance.Status.Steps[k] = stepStatus
-
-						break
-					}
-				}
-
-				areJobsSucceeded := false
-
-				for key := range instance.Status.Steps {
-					if instance.Status.Steps[key].Resource.Phase == string(robotv1alpha1.JobSucceeded) {
-						areJobsSucceeded = true
-					} else {
-						areJobsSucceeded = false
-						break
-					}
-				}
-
-				if areJobsSucceeded {
-					instance.Status.Phase = robotv1alpha1.BuildManagerReady
-				}
-
-			case false:
-				instance.Status.Phase = robotv1alpha1.BuildManagerReady
-			}
-
-		case false:
-
-			instance.Status.Phase = robotv1alpha1.BuildManagerCreatingConfigMap
-			err := r.createScriptConfigMap(ctx, instance)
-			if err != nil {
-				return err
-			}
-			instance.Status.ScriptConfigMapStatus.Created = true
-
+		err = r.reconcileHandleBuilderJobs(ctx, instance)
+		if err != nil {
+			return err
 		}
+
+		instance.Status.Phase = robotv1alpha1.BuildManagerReady
 
 	case false:
 
