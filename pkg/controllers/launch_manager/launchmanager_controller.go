@@ -18,6 +18,8 @@ package launch_manager
 
 import (
 	"context"
+	goErr "errors"
+	"time"
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -35,7 +37,7 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/robolaunch/robot-operator/internal"
-	"github.com/robolaunch/robot-operator/internal/hybrid"
+	robotErr "github.com/robolaunch/robot-operator/internal/error"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 )
 
@@ -54,6 +56,8 @@ var logger logr.Logger
 
 func (r *LaunchManagerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	logger = log.FromContext(ctx)
+
+	var result ctrl.Result = ctrl.Result{}
 
 	instance, err := r.reconcileGetInstance(ctx, req.NamespacedName)
 	if err != nil {
@@ -76,7 +80,14 @@ func (r *LaunchManagerReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 
 	err = r.reconcileCheckStatus(ctx, instance)
 	if err != nil {
-		return ctrl.Result{}, err
+		var creatingResourceError *robotErr.CreatingResourceError
+		var waitingForResourceError *robotErr.WaitingForResourceError
+		if !(goErr.As(err, &creatingResourceError) || goErr.As(err, &waitingForResourceError)) {
+			return ctrl.Result{}, err
+		} else {
+			result.Requeue = true
+			result.RequeueAfter = 1 * time.Second
+		}
 	}
 
 	err = r.reconcileUpdateInstanceStatus(ctx, instance)
@@ -102,41 +113,12 @@ func (r *LaunchManagerReconciler) reconcileCheckStatus(ctx context.Context, inst
 	switch instance.Status.Active {
 	case true:
 
-		robot, err := r.reconcileGetTargetRobot(ctx, instance)
+		err := r.reconcileHandlePod(ctx, instance)
 		if err != nil {
 			return err
 		}
 
-		switch hybrid.HasLaunchInThisInstance(*instance, *robot) {
-		case true:
-
-			switch instance.Status.LaunchPodStatus.Status.Resource.Created {
-			case true:
-
-				switch instance.Status.LaunchPodStatus.Status.Resource.Phase {
-				case string(corev1.PodRunning):
-
-					instance.Status.Phase = robotv1alpha1.LaunchManagerPhaseReady
-
-				}
-
-			case false:
-
-				instance.Status.Phase = robotv1alpha1.LaunchManagerPhaseCreatingPod
-				err := r.createLaunchPod(ctx, instance)
-				if err != nil {
-					return err
-				}
-				instance.Status.LaunchPodStatus.Status.Resource.Created = true
-				instance.Status.Phase = robotv1alpha1.LaunchManagerPhaseLaunching
-
-			}
-
-		case false:
-
-			instance.Status.Phase = robotv1alpha1.LaunchManagerPhaseReady
-
-		}
+		instance.Status.Phase = robotv1alpha1.LaunchManagerPhaseReady
 
 	case false:
 
