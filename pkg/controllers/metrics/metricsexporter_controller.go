@@ -18,6 +18,8 @@ package metrics
 
 import (
 	"context"
+	goErr "errors"
+	"time"
 
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
@@ -28,6 +30,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	"github.com/go-logr/logr"
+	robotErr "github.com/robolaunch/robot-operator/internal/error"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 )
 
@@ -51,6 +54,8 @@ var logger logr.Logger
 func (r *MetricsExporterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	logger = log.FromContext(ctx)
 
+	var result ctrl.Result = ctrl.Result{}
+
 	instance, err := r.reconcileGetInstance(ctx, req.NamespacedName)
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -65,7 +70,14 @@ func (r *MetricsExporterReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 
 	err = r.reconcileCheckStatus(ctx, instance)
 	if err != nil {
-		return ctrl.Result{}, err
+		var creatingResourceError *robotErr.CreatingResourceError
+		var waitingForResourceError *robotErr.WaitingForResourceError
+		if !(goErr.As(err, &creatingResourceError) || goErr.As(err, &waitingForResourceError)) {
+			return ctrl.Result{}, err
+		} else {
+			result.Requeue = true
+			result.RequeueAfter = 1 * time.Second
+		}
 	}
 
 	err = r.reconcileUpdateInstanceStatus(ctx, instance)
@@ -90,69 +102,27 @@ func (r *MetricsExporterReconciler) reconcileCheckStatus(ctx context.Context, in
 
 	if instance.Spec.GPU.Track || instance.Spec.Network.Track {
 
-		switch instance.Status.RoleStatus.Created {
-		case true:
-
-			switch instance.Status.ServiceAccountStatus.Created {
-			case true:
-
-				switch instance.Status.RoleBindingStatus.Created {
-				case true:
-
-					switch instance.Status.PodStatus.Created {
-					case true:
-
-						switch instance.Status.PodStatus.Phase {
-						case string(corev1.PodRunning):
-
-							instance.Status.Phase = robotv1alpha1.MetricsExporterPhaseReady
-
-						}
-
-					case false:
-
-						instance.Status.Phase = robotv1alpha1.MetricsExporterPhaseCreatingPod
-						err := r.reconcileCreatePod(ctx, instance)
-						if err != nil {
-							return err
-						}
-						instance.Status.PodStatus.Created = true
-
-					}
-
-				case false:
-
-					instance.Status.Phase = robotv1alpha1.MetricsExporterPhaseCreatingRoleBinding
-					err := r.reconcileCreateRoleBinding(ctx, instance)
-					if err != nil {
-						return err
-					}
-					instance.Status.RoleBindingStatus.Created = true
-
-				}
-
-			case false:
-
-				instance.Status.Phase = robotv1alpha1.MetricsExporterPhaseCreatingServiceAccount
-				err := r.reconcileCreateServiceAccount(ctx, instance)
-				if err != nil {
-					return err
-				}
-				instance.Status.ServiceAccountStatus.Created = true
-
-			}
-
-		case false:
-
-			instance.Status.Phase = robotv1alpha1.MetricsExporterPhaseCreatingRole
-			err := r.reconcileCreateRole(ctx, instance)
-			if err != nil {
-				return err
-			}
-			instance.Status.RoleStatus.Created = true
-
+		err := r.reconcileHandleRole(ctx, instance)
+		if err != nil {
+			return err
 		}
 
+		err = r.reconcileHandleServiceAccount(ctx, instance)
+		if err != nil {
+			return err
+		}
+
+		err = r.reconcileHandleRoleBinding(ctx, instance)
+		if err != nil {
+			return err
+		}
+
+		err = r.reconcileHandlePod(ctx, instance)
+		if err != nil {
+			return err
+		}
+
+		instance.Status.Phase = robotv1alpha1.MetricsExporterPhaseReady
 	}
 
 	return nil
