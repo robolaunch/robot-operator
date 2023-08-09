@@ -230,6 +230,39 @@ type RobotConfig struct {
 	ROSBridgeTemplate ROSBridgeSpec `json:"rosBridgeTemplate,omitempty"`
 }
 
+type Application struct {
+	// Application name.
+	// +kubebuilder:validation:Required
+	Name string `json:"name"`
+	// Version of the application.
+	// +kubebuilder:validation:Required
+	Version string `json:"version"`
+}
+
+type DevSpaceImage struct {
+	// Ubuntu distribution of the environment.
+	// +kubebuilder:validation:Required
+	UbuntuDistro string `json:"ubuntuDistro"`
+	// Ubuntu desktop.
+	// +kubebuilder:validation:Required
+	Desktop string `json:"desktop"`
+	// DevSpace image version.
+	// +kubebuilder:validation:Required
+	Version string `json:"version"`
+}
+
+type EnvironmentConfig struct {
+	// Domain of the environment.
+	// +kubebuilder:validation:Required
+	Domain string `json:"domain"`
+	// Application properties.
+	// +kubebuilder:validation:Required
+	Application Application `json:"application"`
+	// DevSpace image properties.
+	// +kubebuilder:validation:Required
+	DevSpaceImage DevSpaceImage `json:"devspace"`
+}
+
 // RobotSpec defines the desired state of Robot.
 type RobotSpec struct {
 	// Determines the object type.
@@ -237,7 +270,11 @@ type RobotSpec struct {
 	// If "Robot", operator will provision an environment specialized for ROS 2 according to the specifications. (`.spec.robot`)
 	Type Type `json:"type,omitempty"`
 	// Holds robot's configuration.
+	// Applied if `.spec.type` is `Robot` and must be `nil` otherwise.
 	RobotConfig RobotConfig `json:"robot,omitempty"`
+	// Holds environment's configuration.
+	// Applied if `.spec.type` is `Environment` and must be `nil` otherwise.
+	EnvironmentConfig EnvironmentConfig `json:"environment,omitempty"`
 	// Total storage amount to persist via Robot. Unit of measurement is MB. (eg. `10240` corresponds 10 GB)
 	// This amount is being shared between different components.
 	Storage Storage `json:"storage,omitempty"`
