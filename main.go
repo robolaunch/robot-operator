@@ -134,6 +134,11 @@ func main() {
 	}
 }
 
+// This function starts Robot CRDs' controllers and webhooks. Here are the CRDs:
+// - Robot (robots.robot.roboscale.io/v1alpha1)
+// - DiscoveryServer (discoveryservers.robot.roboscale.io/v1alpha1)
+// - ROSBridge (rosbridges.robot.roboscale.io/v1alpha1)
+// - RelayServer (relayservers.robot.roboscale.io/v1alpha1)
 func startRobotCRDsAndWebhooks(mgr manager.Manager, dynamicClient dynamic.Interface) {
 
 	// Start Robot controller & webhook
@@ -185,6 +190,10 @@ func startRobotCRDsAndWebhooks(mgr manager.Manager, dynamicClient dynamic.Interf
 
 }
 
+// This function starts Manager CRDs' controllers and webhooks. Here are the CRDs:
+// - WorkspaceManager (workspacemanagers.robot.roboscale.io/v1alpha1)
+// - BuildManager (buildmanagers.robot.roboscale.io/v1alpha1)
+// - LaunchManager (launchmanagers.robot.roboscale.io/v1alpha1)
 func startManagerCRDsAndWebhooks(mgr manager.Manager, dynamicClient dynamic.Interface) {
 
 	// Start WorkspaceManager controller & webhooks
@@ -229,6 +238,10 @@ func startManagerCRDsAndWebhooks(mgr manager.Manager, dynamicClient dynamic.Inte
 	}
 }
 
+// This function starts Dev CRDs' controllers and webhooks. Here are the CRDs:
+// - RobotDevSuite (robotdevsuites.robot.roboscale.io/v1alpha1)
+// - RobotIDE (robotides.robot.roboscale.io/v1alpha1)
+// - RobotVDI (robotvdis.robot.roboscale.io/v1alpha1)
 func startDevCRDsAndWebhooks(mgr manager.Manager, dynamicClient dynamic.Interface) {
 
 	// Start RobotDevSuite controller & webhooks
@@ -270,6 +283,8 @@ func startDevCRDsAndWebhooks(mgr manager.Manager, dynamicClient dynamic.Interfac
 	}
 }
 
+// This function starts Observer CRDs' controllers and webhooks. Here are the CRDs:
+// - MetricsExporter (metricsexporters.robot.roboscale.io/v1alpha1)
 func startObserverCRDsAndWebhooks(mgr manager.Manager, dynamicClient dynamic.Interface) {
 
 	// Start MetricsExporter controller & webhooks
