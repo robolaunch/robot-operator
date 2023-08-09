@@ -1,6 +1,9 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+
+<a name="v0.2.5-alpha.33"></a>
+## [v0.2.5-alpha.33] - 2023-08-09
 ### Fix
 - **bridge:** disable ros bridge on demand
 - **controllers:** handle cyclomatic complexities in controllers
@@ -224,7 +227,8 @@
 - Merge pull request [#24](https://github.com/robolaunch/robot-operator/issues/24) from robolaunch/23-allow-multiple-launches
 
 
-[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.32...HEAD
+[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.33...HEAD
+[v0.2.5-alpha.33]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.32...v0.2.5-alpha.33
 [v0.2.5-alpha.32]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.31...v0.2.5-alpha.32
 [v0.2.5-alpha.31]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.30...v0.2.5-alpha.31
 [v0.2.5-alpha.30]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.29...v0.2.5-alpha.30
