@@ -130,7 +130,7 @@ func (r *RobotReconciler) reconcileHandleLoaderJob(ctx context.Context, instance
 }
 
 func (r *RobotReconciler) reconcileHandleROSBridge(ctx context.Context, instance *robotv1alpha1.Robot) error {
-	if instance.Spec.ROSBridgeTemplate.ROS.Enabled || instance.Spec.ROSBridgeTemplate.ROS2.Enabled {
+	if instance.Spec.RobotConfig.ROSBridgeTemplate.ROS.Enabled || instance.Spec.RobotConfig.ROSBridgeTemplate.ROS2.Enabled {
 		if !instance.Status.ROSBridgeStatus.Resource.Created {
 			instance.Status.Phase = robotv1alpha1.RobotPhaseCreatingBridge
 			err := r.createROSBridge(ctx, instance, instance.GetROSBridgeMetadata())
