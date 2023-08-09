@@ -201,8 +201,7 @@ type RootDNSConfig struct {
 	Host string `json:"host"`
 }
 
-// RobotSpec defines the desired state of Robot.
-type RobotSpec struct {
+type RobotConfig struct {
 	// ROS 2 distributions to be used. You can select multiple distributions if they are supported in the same underlying OS.
 	// (eg. `foxy` and `galactic` are supported in Ubuntu Focal, so they can be used together but both cannot be used with `humble`)
 	// +kubebuilder:validation:Required
@@ -218,13 +217,19 @@ type RobotSpec struct {
 	// +kubebuilder:validation:Maximum=101
 	// +kubebuilder:default=0
 	DomainID int `json:"domainID"`
-	// Total storage amount to persist via Robot. Unit of measurement is MB. (eg. `10240` corresponds 10 GB)
-	// This amount is being shared between different components.
-	Storage Storage `json:"storage,omitempty"`
 	// Discovery server configurational parameters.
 	DiscoveryServerTemplate DiscoveryServerSpec `json:"discoveryServerTemplate,omitempty"`
 	// ROS bridge configurational parameters.
 	ROSBridgeTemplate ROSBridgeSpec `json:"rosBridgeTemplate,omitempty"`
+}
+
+// RobotSpec defines the desired state of Robot.
+type RobotSpec struct {
+	// Holds robot's configuration.
+	RobotConfig RobotConfig `json:"robot,omitempty"`
+	// Total storage amount to persist via Robot. Unit of measurement is MB. (eg. `10240` corresponds 10 GB)
+	// This amount is being shared between different components.
+	Storage Storage `json:"storage,omitempty"`
 	// Robot development suite template
 	RobotDevSuiteTemplate RobotDevSuiteSpec `json:"robotDevSuiteTemplate,omitempty"`
 	// Workspace manager template to configure ROS 2 workspaces.

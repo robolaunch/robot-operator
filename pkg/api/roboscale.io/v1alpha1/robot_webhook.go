@@ -138,7 +138,7 @@ func (r *Robot) checkTenancyLabels() error {
 
 func (r *Robot) checkDistributions() error {
 
-	if len(r.Spec.Distributions) == 2 && (r.Spec.Distributions[0] == ROSDistroHumble || r.Spec.Distributions[1] == ROSDistroHumble) {
+	if len(r.Spec.RobotConfig.Distributions) == 2 && (r.Spec.RobotConfig.Distributions[0] == ROSDistroHumble || r.Spec.RobotConfig.Distributions[1] == ROSDistroHumble) {
 		return errors.New("humble cannot be used in a multidistro environment")
 	}
 
@@ -150,7 +150,7 @@ func (r *Robot) checkWorkspaces() error {
 	for _, ws := range r.Spec.WorkspaceManagerTemplate.Workspaces {
 
 		distroExists := false
-		for _, distro := range r.Spec.Distributions {
+		for _, distro := range r.Spec.RobotConfig.Distributions {
 			if ws.Distro == distro {
 				distroExists = true
 				break
@@ -217,7 +217,7 @@ func (r *Robot) setWorkspacesPath() {
 }
 
 func (r *Robot) setDiscoveryServerDomainID() {
-	r.Spec.DiscoveryServerTemplate.DomainID = r.Spec.DomainID
+	r.Spec.RobotConfig.DiscoveryServerTemplate.DomainID = r.Spec.RobotConfig.DomainID
 }
 
 // ********************************
