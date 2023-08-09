@@ -137,6 +137,13 @@ type RelayServerList struct {
 // Robot types
 // ********************************
 
+type Type string
+
+const (
+	TypeEnvironment Type = "Environment"
+	TypeRobot       Type = "Robot"
+)
+
 // ROS 2 distribution selection. Currently supported distributions are Humble, Foxy, Galactic.
 // +kubebuilder:validation:Enum=foxy;galactic;humble
 type ROSDistro string
@@ -225,6 +232,10 @@ type RobotConfig struct {
 
 // RobotSpec defines the desired state of Robot.
 type RobotSpec struct {
+	// Determines the object type.
+	// If "Environment", operator will provision an environment according to the specifications. (`.spec.environment`)
+	// If "Robot", operator will provision an environment specialized for ROS 2 according to the specifications. (`.spec.robot`)
+	Type Type `json:"type,omitempty"`
 	// Holds robot's configuration.
 	RobotConfig RobotConfig `json:"robot,omitempty"`
 	// Total storage amount to persist via Robot. Unit of measurement is MB. (eg. `10240` corresponds 10 GB)
