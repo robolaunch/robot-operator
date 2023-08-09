@@ -74,7 +74,7 @@ func GetDiscoveryServer(robot *robotv1alpha1.Robot, dsNamespacedName *types.Name
 			Namespace: dsNamespacedName.Namespace,
 			Labels:    robot.Labels,
 		},
-		Spec: robot.Spec.DiscoveryServerTemplate,
+		Spec: robot.Spec.RobotConfig.DiscoveryServerTemplate,
 	}
 
 	return &discoveryServer
@@ -228,7 +228,7 @@ func GetROSBridge(robot *robotv1alpha1.Robot, bridgeNamespacedName *types.Namesp
 			Namespace: bridgeNamespacedName.Namespace,
 			Labels:    robot.Labels,
 		},
-		Spec: robot.Spec.ROSBridgeTemplate,
+		Spec: robot.Spec.RobotConfig.ROSBridgeTemplate,
 	}
 
 	return &rosBridge

@@ -89,7 +89,7 @@ func GetImage(node corev1.Node, robot robotv1alpha1.Robot) (string, error) {
 	} else {
 
 		platformVersion := GetPlatformVersion(node)
-		imageProps, err := getImageProps(platformVersion, getDistroStr(robot.Spec.Distributions))
+		imageProps, err := getImageProps(platformVersion, getDistroStr(robot.Spec.RobotConfig.Distributions))
 		if err != nil {
 			return "", err
 		}

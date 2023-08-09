@@ -94,7 +94,7 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 	configure.InjectGenericEnvironmentVariables(&pod, robot)
 	configure.InjectLinuxUserAndGroup(&pod, robot)
 	configure.InjectRMWImplementationConfiguration(&pod, robot)
-	configure.InjectROSDomainID(&pod, robot.Spec.DomainID)
+	configure.InjectROSDomainID(&pod, robot.Spec.RobotConfig.DomainID)
 	configure.InjectPodDiscoveryServerConnection(&pod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo)
 	configure.InjectRuntimeClass(&pod, robot, node)
 	if robotIDE.Spec.Display && label.GetTargetRobotVDI(robotIDE) != "" {
