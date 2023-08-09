@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/robolaunch/robot-operator/internal"
-	robotErr "github.com/robolaunch/robot-operator/internal/error"
+	"github.com/robolaunch/robot-operator/internal/handle"
 	"github.com/robolaunch/robot-operator/internal/label"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -100,79 +100,19 @@ func (r *WorkspaceManagerReconciler) reconcileCheckOtherAttachedResources(ctx co
 
 	robotSelector := labels.NewSelector().Add(requirements...)
 
-	robotDevSuiteList := robotv1alpha1.RobotDevSuiteList{}
-	err = r.List(ctx, &robotDevSuiteList, &client.ListOptions{Namespace: instance.Namespace, LabelSelector: robotSelector.Add()})
+	err = handle.CheckIfAnyRDSActive(ctx, r.Client, instance, robotSelector)
 	if err != nil {
 		return err
 	}
 
-	for _, rds := range robotDevSuiteList.Items {
-
-		if rds.Status.Active {
-			return &robotErr.RobotResourcesHasNotBeenReleasedError{
-				ResourceKind:      instance.Kind,
-				ResourceName:      instance.Name,
-				ResourceNamespace: instance.Namespace,
-			}
-		}
-
-		if rds.Status.Phase != robotv1alpha1.RobotDevSuitePhaseInactive {
-			return &robotErr.RobotResourcesHasNotBeenReleasedError{
-				ResourceKind:      instance.Kind,
-				ResourceName:      instance.Name,
-				ResourceNamespace: instance.Namespace,
-			}
-		}
-	}
-
-	launchManagerList := robotv1alpha1.LaunchManagerList{}
-	err = r.List(ctx, &launchManagerList, &client.ListOptions{Namespace: instance.Namespace, LabelSelector: robotSelector})
+	err = handle.CheckIfAnyLMActive(ctx, r.Client, instance, robotSelector)
 	if err != nil {
 		return err
 	}
 
-	for _, lm := range launchManagerList.Items {
-
-		if lm.Status.Active {
-			return &robotErr.RobotResourcesHasNotBeenReleasedError{
-				ResourceKind:      instance.Kind,
-				ResourceName:      instance.Name,
-				ResourceNamespace: instance.Namespace,
-			}
-		}
-
-		if lm.Status.Phase != robotv1alpha1.LaunchManagerPhaseInactive {
-			return &robotErr.RobotResourcesHasNotBeenReleasedError{
-				ResourceKind:      instance.Kind,
-				ResourceName:      instance.Name,
-				ResourceNamespace: instance.Namespace,
-			}
-		}
-	}
-
-	buildManagerList := robotv1alpha1.BuildManagerList{}
-	err = r.List(ctx, &buildManagerList, &client.ListOptions{Namespace: instance.Namespace, LabelSelector: robotSelector})
+	err = handle.CheckIfAnyBMActive(ctx, r.Client, instance, robotSelector)
 	if err != nil {
 		return err
-	}
-
-	for _, bm := range buildManagerList.Items {
-
-		if bm.Status.Active {
-			return &robotErr.RobotResourcesHasNotBeenReleasedError{
-				ResourceKind:      instance.Kind,
-				ResourceName:      instance.Name,
-				ResourceNamespace: instance.Namespace,
-			}
-		}
-
-		if bm.Status.Phase != robotv1alpha1.BuildManagerInactive {
-			return &robotErr.RobotResourcesHasNotBeenReleasedError{
-				ResourceKind:      instance.Kind,
-				ResourceName:      instance.Name,
-				ResourceNamespace: instance.Namespace,
-			}
-		}
 	}
 
 	return nil
