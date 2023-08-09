@@ -23,6 +23,10 @@ func (r *Robot) SetupWebhookWithManager(mgr ctrl.Manager) error {
 
 //+kubebuilder:webhook:path=/mutate-robot-roboscale-io-v1alpha1-robot,mutating=true,failurePolicy=fail,sideEffects=None,groups=robot.roboscale.io,resources=robots,verbs=create;update,versions=v1alpha1,name=mrobot.kb.io,admissionReviewVersions=v1
 
+// ********************************
+// Robot webhooks
+// ********************************
+
 var _ webhook.Defaulter = &Robot{}
 
 // Default implements webhook.Defaulter so a webhook will be registered for the type
@@ -60,7 +64,7 @@ func (r *Robot) ValidateCreate() error {
 		return err
 	}
 
-	err = r.checkDistributions()
+	err = r.checkRobotType()
 	if err != nil {
 		return err
 	}
@@ -71,6 +75,11 @@ func (r *Robot) ValidateCreate() error {
 	}
 
 	err = r.checkRobotDevSuite()
+	if err != nil {
+		return err
+	}
+
+	err = r.checkDistributions()
 	if err != nil {
 		return err
 	}
@@ -87,7 +96,7 @@ func (r *Robot) ValidateUpdate(old runtime.Object) error {
 		return err
 	}
 
-	err = r.checkDistributions()
+	err = r.checkRobotType()
 	if err != nil {
 		return err
 	}
@@ -102,6 +111,11 @@ func (r *Robot) ValidateUpdate(old runtime.Object) error {
 		return err
 	}
 
+	err = r.checkDistributions()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -109,6 +123,30 @@ func (r *Robot) ValidateUpdate(old runtime.Object) error {
 func (r *Robot) ValidateDelete() error {
 	robotlog.Info("validate delete", "name", r.Name)
 	return nil
+}
+
+func (r *Robot) checkRobotType() error {
+
+	if reflect.DeepEqual(r.Spec.Type, TypeRobot) {
+		if reflect.DeepEqual(r.Spec.RobotConfig, nil) || reflect.DeepEqual(r.Spec.RobotConfig, RobotConfig{}) {
+			return errors.New("`spec.robot` cannot be empty if the robot type is Robot")
+		}
+		if !(reflect.DeepEqual(r.Spec.EnvironmentConfig, nil) || reflect.DeepEqual(r.Spec.RobotConfig, EnvironmentConfig{})) {
+			return errors.New("`spec.environment` should be empty if the robot type is Robot")
+		}
+	}
+
+	if reflect.DeepEqual(r.Spec.Type, TypeEnvironment) {
+		if reflect.DeepEqual(r.Spec.EnvironmentConfig, nil) || reflect.DeepEqual(r.Spec.EnvironmentConfig, EnvironmentConfig{}) {
+			return errors.New("`spec.environment` cannot be empty if the robot type is Environment")
+		}
+		if !(reflect.DeepEqual(r.Spec.RobotConfig, nil) || reflect.DeepEqual(r.Spec.RobotConfig, RobotConfig{})) {
+			return errors.New("`spec.robot` should be empty if the robot type is Environment")
+		}
+	}
+
+	return nil
+
 }
 
 func (r *Robot) checkTenancyLabels() error {
@@ -137,9 +175,10 @@ func (r *Robot) checkTenancyLabels() error {
 }
 
 func (r *Robot) checkDistributions() error {
-
-	if len(r.Spec.RobotConfig.Distributions) == 2 && (r.Spec.RobotConfig.Distributions[0] == ROSDistroHumble || r.Spec.RobotConfig.Distributions[1] == ROSDistroHumble) {
-		return errors.New("humble cannot be used in a multidistro environment")
+	if reflect.DeepEqual(r.Spec.Type, TypeRobot) {
+		if len(r.Spec.RobotConfig.Distributions) == 2 && (r.Spec.RobotConfig.Distributions[0] == ROSDistroHumble || r.Spec.RobotConfig.Distributions[1] == ROSDistroHumble) {
+			return errors.New("humble cannot be used in a multidistro environment")
+		}
 	}
 
 	return nil
