@@ -408,6 +408,12 @@ spec:
                 - name
                 - namespace
                 type: object
+              type:
+                description: Determines the object type. If "Environment", operator
+                  will provision an environment according to the specifications. (`.spec.environment`)
+                  If "Robot", operator will provision an environment specialized for
+                  ROS 2 according to the specifications. (`.spec.robot`)
+                type: string
               workspaceManagerTemplate:
                 description: Workspace manager template to configure ROS 2 workspaces.
                 properties:
