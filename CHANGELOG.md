@@ -1,6 +1,10 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+### Fix
+- **bridge:** disable ros bridge on demand
+- **controllers:** handle cyclomatic complexities in controllers
+
 
 <a name="v0.2.5-alpha.32"></a>
 ## [v0.2.5-alpha.32] - 2023-08-07
