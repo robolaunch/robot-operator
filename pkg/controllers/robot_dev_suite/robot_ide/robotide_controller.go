@@ -29,6 +29,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	"github.com/go-logr/logr"
+	robotErr "github.com/robolaunch/robot-operator/internal/error"
 	"github.com/robolaunch/robot-operator/internal/label"
 	mcsv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/external/apis/mcsv1alpha1/v1alpha1"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
@@ -55,6 +56,8 @@ var logger logr.Logger
 func (r *RobotIDEReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	logger = log.FromContext(ctx)
 
+	var result ctrl.Result = ctrl.Result{}
+
 	instance, err := r.reconcileGetInstance(ctx, req.NamespacedName)
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -67,9 +70,9 @@ func (r *RobotIDEReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 		return ctrl.Result{}, nil
 	}
 
-	err = r.reconcileCheckStatus(ctx, instance)
+	err = r.reconcileCheckStatus(ctx, instance, &result)
 	if err != nil {
-		return ctrl.Result{}, err
+		return result, err
 	}
 
 	err = r.reconcileUpdateInstanceStatus(ctx, instance)
@@ -90,64 +93,29 @@ func (r *RobotIDEReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	return ctrl.Result{}, nil
 }
 
-func (r *RobotIDEReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.RobotIDE) error {
+func (r *RobotIDEReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.RobotIDE, result *ctrl.Result) error {
 
-	switch instance.Status.ServiceStatus.Resource.Created {
-	case true:
-
-		switch instance.Status.PodStatus.Resource.Created {
-		case true:
-
-			switch instance.Status.IngressStatus.Created || !instance.Spec.Ingress {
-			case true:
-
-				switch instance.Status.PodStatus.Resource.Phase {
-				case string(corev1.PodRunning):
-
-					instance.Status.Phase = robotv1alpha1.RobotIDEPhaseRunning
-
-				}
-
-			case false:
-
-				instance.Status.Phase = robotv1alpha1.RobotIDEPhaseCreatingIngress
-				err := r.reconcileCreateIngress(ctx, instance)
-				if err != nil {
-					return err
-				}
-				instance.Status.IngressStatus.Created = true
-
-			}
-
-		case false:
-
-			instance.Status.Phase = robotv1alpha1.RobotIDEPhaseCreatingPod
-			err := r.reconcileCreatePod(ctx, instance)
-			if err != nil {
-				return err
-			}
-			instance.Status.PodStatus.Resource.Created = true
-		}
-
-	case false:
-
-		instance.Status.Phase = robotv1alpha1.RobotIDEPhaseCreatingService
-		err := r.reconcileCreateService(ctx, instance)
-		if err != nil {
-			return err
-		}
-		instance.Status.ServiceStatus.Resource.Created = true
-
+	err := r.reconcileHandleService(ctx, instance)
+	if err != nil {
+		return robotErr.CheckCreatingOrWaitingError(result, err)
 	}
 
-	switch label.GetInstanceType(instance) == label.InstanceTypePhysicalInstance && !instance.Status.ServiceExportStatus.Created {
-	case true:
-		err := r.reconcileCreateServiceExport(ctx, instance)
-		if err != nil {
-			return err
-		}
-		instance.Status.ServiceExportStatus.Created = true
+	err = r.reconcileHandlePod(ctx, instance)
+	if err != nil {
+		return robotErr.CheckCreatingOrWaitingError(result, err)
 	}
+
+	err = r.reconcileHandleIngress(ctx, instance)
+	if err != nil {
+		return robotErr.CheckCreatingOrWaitingError(result, err)
+	}
+
+	err = r.reconcileHandleServiceExport(ctx, instance)
+	if err != nil {
+		return robotErr.CheckCreatingOrWaitingError(result, err)
+	}
+
+	instance.Status.Phase = robotv1alpha1.RobotIDEPhaseRunning
 
 	return nil
 }

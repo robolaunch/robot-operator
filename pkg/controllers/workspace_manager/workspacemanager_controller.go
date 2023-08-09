@@ -50,6 +50,8 @@ var logger logr.Logger
 func (r *WorkspaceManagerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	logger = log.FromContext(ctx)
 
+	var result ctrl.Result = ctrl.Result{}
+
 	instance, err := r.reconcileGetInstance(ctx, req.NamespacedName)
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -76,9 +78,9 @@ func (r *WorkspaceManagerReconciler) Reconcile(ctx context.Context, req ctrl.Req
 		return ctrl.Result{}, nil
 	}
 
-	err = r.reconcileCheckStatus(ctx, instance)
+	err = r.reconcileCheckStatus(ctx, instance, &result)
 	if err != nil {
-		return ctrl.Result{}, err
+		return result, err
 	}
 
 	err = r.reconcileUpdateInstanceStatus(ctx, instance)
@@ -99,36 +101,14 @@ func (r *WorkspaceManagerReconciler) Reconcile(ctx context.Context, req ctrl.Req
 	return ctrl.Result{}, nil
 }
 
-func (r *WorkspaceManagerReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.WorkspaceManager) error {
+func (r *WorkspaceManagerReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.WorkspaceManager, result *ctrl.Result) error {
 
-	switch instance.Status.ClonerJobStatus.Created {
-	case true:
-
-		switch instance.Status.ClonerJobStatus.Phase {
-		case string(robotv1alpha1.JobSucceeded):
-
-			instance.Status.Phase = robotv1alpha1.WorkspaceManagerPhaseReady
-
-		case string(robotv1alpha1.JobActive):
-
-			instance.Status.Phase = robotv1alpha1.WorkspaceManagerPhaseConfiguringWorkspaces
-
-		case string(robotv1alpha1.JobFailed):
-
-			instance.Status.Phase = robotv1alpha1.WorkspaceManagerPhaseFailed
-
-		}
-
-	case false:
-
-		instance.Status.Phase = robotv1alpha1.WorkspaceManagerPhaseConfiguringWorkspaces
-		err := r.createClonerJob(ctx, instance, instance.GetClonerJobMetadata())
-		if err != nil {
-			return err
-		}
-		instance.Status.ClonerJobStatus.Created = true
-
+	err := r.reconcileHandleClonerJob(ctx, instance)
+	if err != nil {
+		return robotErr.CheckCreatingOrWaitingError(result, err)
 	}
+
+	instance.Status.Phase = robotv1alpha1.WorkspaceManagerPhaseReady
 
 	return nil
 }

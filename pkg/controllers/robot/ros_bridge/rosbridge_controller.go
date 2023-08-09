@@ -29,6 +29,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	"github.com/go-logr/logr"
+	robotErr "github.com/robolaunch/robot-operator/internal/error"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 )
 
@@ -52,6 +53,8 @@ var logger logr.Logger
 func (r *ROSBridgeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	logger = log.FromContext(ctx)
 
+	var result ctrl.Result = ctrl.Result{}
+
 	instance, err := r.reconcileGetInstance(ctx, req.NamespacedName)
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -60,19 +63,9 @@ func (r *ROSBridgeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		return ctrl.Result{}, err
 	}
 
-	// err = r.reconcileCheckDeletion(ctx, instance)
-	// if err != nil {
-
-	// 	if errors.IsNotFound(err) {
-	// 		return ctrl.Result{}, nil
-	// 	}
-
-	// 	return ctrl.Result{}, err
-	// }
-
-	err = r.reconcileCheckStatus(ctx, instance)
+	err = r.reconcileCheckStatus(ctx, instance, &result)
 	if err != nil {
-		return ctrl.Result{}, err
+		return result, err
 	}
 
 	err = r.reconcileUpdateInstanceStatus(ctx, instance)
@@ -92,67 +85,24 @@ func (r *ROSBridgeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 	return ctrl.Result{}, nil
 }
 
-func (r *ROSBridgeReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.ROSBridge) error {
+func (r *ROSBridgeReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.ROSBridge, result *ctrl.Result) error {
 
-	switch instance.Status.ServiceStatus.Resource.Created {
-	case true:
-
-		switch instance.Status.PodStatus.Created {
-		case true:
-
-			switch instance.Status.PodStatus.Phase {
-			case string(corev1.PodRunning):
-
-				// TODO: handle other pod phases
-
-				switch instance.Spec.Ingress {
-				case true:
-
-					switch instance.Status.IngressStatus.Created {
-					case true:
-
-						instance.Status.Phase = robotv1alpha1.BridgePhaseReady
-
-					case false:
-
-						instance.Status.Phase = robotv1alpha1.BridgePhaseCreatingIngress
-						err := r.createIngress(ctx, instance, instance.GetBridgeIngressMetadata())
-						if err != nil {
-							return err
-						}
-						instance.Status.IngressStatus.Created = true
-
-					}
-
-				case false:
-
-					instance.Status.Phase = robotv1alpha1.BridgePhaseReady
-
-				}
-
-			}
-
-		case false:
-
-			instance.Status.Phase = robotv1alpha1.BridgePhaseCreatingPod
-			err := r.createPod(ctx, instance, instance.GetBridgePodMetadata())
-			if err != nil {
-				return err
-			}
-			instance.Status.PodStatus.Created = true
-
-		}
-
-	case false:
-
-		instance.Status.Phase = robotv1alpha1.BridgePhaseCreatingService
-		err := r.createService(ctx, instance, instance.GetBridgeServiceMetadata())
-		if err != nil {
-			return err
-		}
-		instance.Status.ServiceStatus.Resource.Created = true
-
+	err := r.reconcileHandleService(ctx, instance)
+	if err != nil {
+		return robotErr.CheckCreatingOrWaitingError(result, err)
 	}
+
+	err = r.reconcileHandlePod(ctx, instance)
+	if err != nil {
+		return robotErr.CheckCreatingOrWaitingError(result, err)
+	}
+
+	err = r.reconcileHandleIngress(ctx, instance)
+	if err != nil {
+		return robotErr.CheckCreatingOrWaitingError(result, err)
+	}
+
+	instance.Status.Phase = robotv1alpha1.BridgePhaseReady
 
 	return nil
 }

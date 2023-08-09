@@ -56,6 +56,8 @@ var logger logr.Logger
 func (r *DiscoveryServerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	logger = log.FromContext(ctx)
 
+	var result ctrl.Result = ctrl.Result{}
+
 	instance, err := r.reconcileGetInstance(ctx, req.NamespacedName)
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -64,19 +66,9 @@ func (r *DiscoveryServerReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 		return ctrl.Result{}, err
 	}
 
-	// err = r.reconcileCheckDeletion(ctx, instance)
-	// if err != nil {
-
-	// 	if errors.IsNotFound(err) {
-	// 		return ctrl.Result{}, nil
-	// 	}
-
-	// 	return ctrl.Result{}, err
-	// }
-
-	err = r.reconcileCheckStatus(ctx, instance)
+	err = r.reconcileCheckStatus(ctx, instance, &result)
 	if err != nil {
-		return ctrl.Result{}, err
+		return result, err
 	}
 
 	err = r.reconcileUpdateInstanceStatus(ctx, instance)
@@ -122,102 +114,41 @@ func (r *DiscoveryServerReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 	return ctrl.Result{}, nil
 }
 
-func (r *DiscoveryServerReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.DiscoveryServer) error {
+func (r *DiscoveryServerReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.DiscoveryServer, result *ctrl.Result) error {
 
 	switch instance.Spec.Type {
 	case robotv1alpha1.DiscoveryServerInstanceTypeServer:
 
-		switch instance.Status.ServiceStatus.Created {
-		case true:
-
-			switch instance.Status.PodStatus.Resource.Created {
-			case true:
-
-				switch instance.Status.PodStatus.Resource.Phase {
-				case string(corev1.PodRunning):
-
-					// TODO: Cover other pod phases
-
-					switch instance.Status.ServiceExportStatus.Created {
-					case true:
-
-						switch instance.Status.ConfigMapStatus.Created {
-						case true:
-
-							instance.Status.Phase = robotv1alpha1.DiscoveryServerPhaseReady
-
-						case false:
-
-							instance.Status.Phase = robotv1alpha1.DiscoveryServerPhaseCreatingConfigMap
-
-							if instance.Status.ConnectionInfo.IP != "" {
-
-								err := r.createConfigMap(ctx, instance, instance.GetDiscoveryServerConfigMapMetadata())
-								if err != nil {
-									return err
-								}
-								instance.Status.ConfigMapStatus.Created = true
-
-							}
-						}
-
-					case false:
-
-						instance.Status.Phase = robotv1alpha1.DiscoveryServerPhaseCreatingServiceExport
-						err := r.createServiceExport(ctx, instance, instance.GetDiscoveryServerServiceMetadata())
-						if err != nil {
-							return err
-						}
-						instance.Status.ServiceExportStatus.Created = true
-
-					}
-
-				}
-
-			case false:
-
-				instance.Status.Phase = robotv1alpha1.DiscoveryServerPhaseCreatingPod
-				err := r.createPod(ctx, instance, instance.GetDiscoveryServerPodMetadata())
-				if err != nil {
-					return err
-				}
-				instance.Status.PodStatus.Resource.Created = true
-
-			}
-
-		case false:
-
-			instance.Status.Phase = robotv1alpha1.DiscoveryServerPhaseCreatingService
-			err := r.createService(ctx, instance, instance.GetDiscoveryServerPodMetadata())
-			if err != nil {
-				return err
-			}
-			instance.Status.ServiceStatus.Created = true
-
+		err := r.reconcileHandleService(ctx, instance)
+		if err != nil {
+			return robotErr.CheckCreatingOrWaitingError(result, err)
 		}
+
+		err = r.reconcileHandlePod(ctx, instance)
+		if err != nil {
+			return robotErr.CheckCreatingOrWaitingError(result, err)
+		}
+
+		err = r.reconcileHandleServiceExport(ctx, instance)
+		if err != nil {
+			return robotErr.CheckCreatingOrWaitingError(result, err)
+		}
+
+		err = r.reconcileHandleConfigMap(ctx, instance)
+		if err != nil {
+			return robotErr.CheckCreatingOrWaitingError(result, err)
+		}
+
+		instance.Status.Phase = robotv1alpha1.DiscoveryServerPhaseReady
 
 	case robotv1alpha1.DiscoveryServerInstanceTypeClient:
 
-		if instance.Status.ConnectionInfo.IP != "" {
-
-			switch instance.Status.ConfigMapStatus.Created {
-			case true:
-
-				instance.Status.Phase = robotv1alpha1.DiscoveryServerPhaseReady
-
-			case false:
-
-				instance.Status.Phase = robotv1alpha1.DiscoveryServerPhaseCreatingConfigMap
-
-				err := r.createConfigMap(ctx, instance, instance.GetDiscoveryServerConfigMapMetadata())
-				if err != nil {
-					return err
-				}
-				instance.Status.ConfigMapStatus.Created = true
-
-			}
-
+		err := r.reconcileHandleConfigMap(ctx, instance)
+		if err != nil {
+			return err
 		}
+
+		instance.Status.Phase = robotv1alpha1.DiscoveryServerPhaseReady
 
 	}
 

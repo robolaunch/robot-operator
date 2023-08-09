@@ -28,6 +28,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	"github.com/go-logr/logr"
+	robotErr "github.com/robolaunch/robot-operator/internal/error"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 )
 
@@ -50,6 +51,8 @@ var logger logr.Logger
 func (r *RelayServerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	logger = log.FromContext(ctx)
 
+	var result ctrl.Result = ctrl.Result{}
+
 	instance, err := r.reconcileGetInstance(ctx, req.NamespacedName)
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -58,9 +61,9 @@ func (r *RelayServerReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		return ctrl.Result{}, err
 	}
 
-	err = r.reconcileCheckStatus(ctx, instance)
+	err = r.reconcileCheckStatus(ctx, instance, &result)
 	if err != nil {
-		return ctrl.Result{}, err
+		return result, err
 	}
 
 	err = r.reconcileUpdateInstanceStatus(ctx, instance)
@@ -81,56 +84,24 @@ func (r *RelayServerReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	return ctrl.Result{}, nil
 }
 
-func (r *RelayServerReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.RelayServer) error {
+func (r *RelayServerReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.RelayServer, result *ctrl.Result) error {
 
-	switch instance.Status.PodStatus.Created {
-	case true:
-
-		switch instance.Status.PodStatus.Phase {
-		case string(corev1.PodRunning):
-
-			switch instance.Status.ServiceStatus.Resource.Created {
-			case true:
-
-				switch instance.Status.IngressStatus.Created {
-				case true:
-
-					instance.Status.Phase = robotv1alpha1.RelayServerPhaseReady
-
-				case false:
-
-					instance.Status.Phase = robotv1alpha1.RelayServerPhaseCreatingIngress
-					err := r.createIngress(ctx, instance, instance.GetRelayServerIngressMetadata())
-					if err != nil {
-						return err
-					}
-					instance.Status.IngressStatus.Created = true
-
-				}
-
-			case false:
-
-				instance.Status.Phase = robotv1alpha1.RelayServerPhaseCreatingService
-				err := r.createService(ctx, instance, instance.GetRelayServerServiceMetadata())
-				if err != nil {
-					return err
-				}
-				instance.Status.ServiceStatus.Resource.Created = true
-
-			}
-
-		}
-
-	case false:
-
-		instance.Status.Phase = robotv1alpha1.RelayServerPhaseCreatingPod
-		err := r.createPod(ctx, instance, instance.GetRelayServerPodMetadata())
-		if err != nil {
-			return err
-		}
-		instance.Status.PodStatus.Created = true
-
+	err := r.reconcileHandlePod(ctx, instance)
+	if err != nil {
+		return robotErr.CheckCreatingOrWaitingError(result, err)
 	}
+
+	err = r.reconcileHandleService(ctx, instance)
+	if err != nil {
+		return robotErr.CheckCreatingOrWaitingError(result, err)
+	}
+
+	err = r.reconcileHandleIngress(ctx, instance)
+	if err != nil {
+		return robotErr.CheckCreatingOrWaitingError(result, err)
+	}
+
+	instance.Status.Phase = robotv1alpha1.RelayServerPhaseReady
 
 	return nil
 }

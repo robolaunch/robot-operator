@@ -37,7 +37,6 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/robolaunch/robot-operator/internal"
 	robotErr "github.com/robolaunch/robot-operator/internal/error"
-	"github.com/robolaunch/robot-operator/internal/label"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 )
 
@@ -60,6 +59,8 @@ var logger logr.Logger
 
 func (r *RobotDevSuiteReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	logger = log.FromContext(ctx)
+
+	var result ctrl.Result = ctrl.Result{}
 
 	instance, err := r.reconcileGetInstance(ctx, req.NamespacedName)
 	if err != nil {
@@ -93,9 +94,9 @@ func (r *RobotDevSuiteReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 		return ctrl.Result{}, nil
 	}
 
-	err = r.reconcileCheckStatus(ctx, instance)
+	err = r.reconcileCheckStatus(ctx, instance, &result)
 	if err != nil {
-		return ctrl.Result{}, err
+		return result, err
 	}
 
 	err = r.reconcileUpdateInstanceStatus(ctx, instance)
@@ -116,208 +117,27 @@ func (r *RobotDevSuiteReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 	return ctrl.Result{}, nil
 }
 
-func (r *RobotDevSuiteReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.RobotDevSuite) error {
+func (r *RobotDevSuiteReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.RobotDevSuite, result *ctrl.Result) error {
 
 	switch instance.Status.Active {
 	case true:
 
-		switch instance.Spec.VDIEnabled {
-		case true:
-
-			switch instance.Status.RobotVDIStatus.Resource.Created {
-			case true:
-
-				switch instance.Status.RobotVDIStatus.Resource.Phase {
-				case string(robotv1alpha1.RobotVDIPhaseRunning):
-
-					switch instance.Spec.IDEEnabled {
-					case true:
-
-						switch instance.Status.RobotIDEStatus.Resource.Created {
-						case true:
-
-							switch instance.Status.RobotIDEStatus.Resource.Phase {
-							case string(robotv1alpha1.RobotIDEPhaseRunning):
-
-								switch instance.Spec.RemoteIDEEnabled && label.GetInstanceType(instance) == label.InstanceTypeCloudInstance {
-								case true:
-
-									switch instance.Status.RemoteIDERelayServerStatus.Resource.Created {
-									case true:
-
-										switch instance.Status.RemoteIDERelayServerStatus.Resource.Phase {
-										case string(robotv1alpha1.RelayServerPhaseReady):
-
-											instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseRunning
-
-										}
-
-									case false:
-
-										instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseCreatingRelayServerForRemoteIDE
-										err := r.reconcileCreateRemoteIDERelayServer(ctx, instance)
-										if err != nil {
-											return err
-										}
-										instance.Status.RemoteIDERelayServerStatus.Resource.Created = true
-
-									}
-
-								case false:
-
-									instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseRunning
-
-								}
-
-							}
-
-						case false:
-
-							instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseCreatingRobotIDE
-							err := r.reconcileCreateRobotIDE(ctx, instance)
-							if err != nil {
-								return err
-							}
-							instance.Status.RobotIDEStatus.Resource.Created = true
-
-						}
-
-					case false:
-
-						switch instance.Spec.RemoteIDEEnabled && label.GetInstanceType(instance) == label.InstanceTypeCloudInstance {
-						case true:
-
-							switch instance.Status.RemoteIDERelayServerStatus.Resource.Created {
-							case true:
-
-								switch instance.Status.RemoteIDERelayServerStatus.Resource.Phase {
-								case string(robotv1alpha1.RelayServerPhaseReady):
-
-									instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseRunning
-
-								}
-
-							case false:
-
-								instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseCreatingRelayServerForRemoteIDE
-								err := r.reconcileCreateRemoteIDERelayServer(ctx, instance)
-								if err != nil {
-									return err
-								}
-								instance.Status.RemoteIDERelayServerStatus.Resource.Created = true
-
-							}
-
-						case false:
-
-							instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseRunning
-
-						}
-
-					}
-
-				}
-
-			case false:
-
-				instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseCreatingRobotVDI
-				err := r.reconcileCreateRobotVDI(ctx, instance)
-				if err != nil {
-					return err
-				}
-				instance.Status.RobotVDIStatus.Resource.Created = true
-
-			}
-
-		case false:
-
-			switch instance.Spec.IDEEnabled {
-			case true:
-
-				switch instance.Status.RobotIDEStatus.Resource.Created {
-				case true:
-
-					switch instance.Status.RobotIDEStatus.Resource.Phase {
-					case string(robotv1alpha1.RobotIDEPhaseRunning):
-
-						switch instance.Spec.RemoteIDEEnabled && label.GetInstanceType(instance) == label.InstanceTypeCloudInstance {
-						case true:
-
-							switch instance.Status.RemoteIDERelayServerStatus.Resource.Created {
-							case true:
-
-								switch instance.Status.RemoteIDERelayServerStatus.Resource.Phase {
-								case string(robotv1alpha1.RelayServerPhaseReady):
-
-									instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseRunning
-
-								}
-
-							case false:
-
-								instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseCreatingRelayServerForRemoteIDE
-								err := r.reconcileCreateRemoteIDERelayServer(ctx, instance)
-								if err != nil {
-									return err
-								}
-								instance.Status.RemoteIDERelayServerStatus.Resource.Created = true
-
-							}
-
-						case false:
-
-							instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseRunning
-
-						}
-
-					}
-
-				case false:
-
-					instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseCreatingRobotIDE
-					err := r.reconcileCreateRobotIDE(ctx, instance)
-					if err != nil {
-						return err
-					}
-					instance.Status.RobotIDEStatus.Resource.Created = true
-
-				}
-
-			case false:
-
-				switch instance.Spec.RemoteIDEEnabled && label.GetInstanceType(instance) == label.InstanceTypeCloudInstance {
-				case true:
-
-					switch instance.Status.RemoteIDERelayServerStatus.Resource.Created {
-					case true:
-
-						switch instance.Status.RemoteIDERelayServerStatus.Resource.Phase {
-						case string(robotv1alpha1.RelayServerPhaseReady):
-
-							instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseRunning
-
-						}
-
-					case false:
-
-						instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseCreatingRelayServerForRemoteIDE
-						err := r.reconcileCreateRemoteIDERelayServer(ctx, instance)
-						if err != nil {
-							return err
-						}
-						instance.Status.RemoteIDERelayServerStatus.Resource.Created = true
-
-					}
-
-				case false:
-
-					instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseRunning
-
-				}
-
-			}
-
+		err := r.reconcileHandleRobotVDI(ctx, instance)
+		if err != nil {
+			return robotErr.CheckCreatingOrWaitingError(result, err)
 		}
+
+		err = r.reconcileHandleRobotIDE(ctx, instance)
+		if err != nil {
+			return robotErr.CheckCreatingOrWaitingError(result, err)
+		}
+
+		err = r.reconcileHandleRemoteIDE(ctx, instance)
+		if err != nil {
+			return robotErr.CheckCreatingOrWaitingError(result, err)
+		}
+
+		instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseRunning
 
 	case false:
 
