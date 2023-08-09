@@ -45,8 +45,51 @@ spec:
           spec:
             description: Specification of the desired behavior of the Robot.
             properties:
+              environment:
+                description: Holds environment's configuration. Applied if `.spec.type`
+                  is `Environment` and must be `nil` otherwise.
+                properties:
+                  application:
+                    description: Application properties.
+                    properties:
+                      name:
+                        description: Application name.
+                        type: string
+                      version:
+                        description: Version of the application.
+                        type: string
+                    required:
+                    - name
+                    - version
+                    type: object
+                  devspace:
+                    description: DevSpace image properties.
+                    properties:
+                      desktop:
+                        description: Ubuntu desktop.
+                        type: string
+                      ubuntuDistro:
+                        description: Ubuntu distribution of the environment.
+                        type: string
+                      version:
+                        description: DevSpace image version.
+                        type: string
+                    required:
+                    - desktop
+                    - ubuntuDistro
+                    - version
+                    type: object
+                  domain:
+                    description: Domain of the environment.
+                    type: string
+                required:
+                - application
+                - devspace
+                - domain
+                type: object
               robot:
-                description: Holds robot's configuration.
+                description: Holds robot's configuration. Applied if `.spec.type`
+                  is `Robot` and must be `nil` otherwise.
                 properties:
                   discoveryServerTemplate:
                     description: Discovery server configurational parameters.

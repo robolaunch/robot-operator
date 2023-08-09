@@ -271,9 +271,11 @@ type RobotSpec struct {
 	Type Type `json:"type,omitempty"`
 	// Holds robot's configuration.
 	// Applied if `.spec.type` is `Robot` and must be `nil` otherwise.
+	// +kubebuilder:validation:Optional
 	RobotConfig RobotConfig `json:"robot,omitempty"`
 	// Holds environment's configuration.
 	// Applied if `.spec.type` is `Environment` and must be `nil` otherwise.
+	// +kubebuilder:validation:Optional
 	EnvironmentConfig EnvironmentConfig `json:"environment,omitempty"`
 	// Total storage amount to persist via Robot. Unit of measurement is MB. (eg. `10240` corresponds 10 GB)
 	// This amount is being shared between different components.
