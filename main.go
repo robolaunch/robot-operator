@@ -31,13 +31,14 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+	"sigs.k8s.io/controller-runtime/pkg/manager"
 
 	mcsv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/external/apis/mcsv1alpha1/v1alpha1"
 
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	buildManager "github.com/robolaunch/robot-operator/pkg/controllers/build_manager"
 	launchManager "github.com/robolaunch/robot-operator/pkg/controllers/launch_manager"
-	metrics "github.com/robolaunch/robot-operator/pkg/controllers/metrics"
+	"github.com/robolaunch/robot-operator/pkg/controllers/metrics"
 	robot "github.com/robolaunch/robot-operator/pkg/controllers/robot"
 	discoveryServer "github.com/robolaunch/robot-operator/pkg/controllers/robot/discovery_server"
 	relayServer "github.com/robolaunch/robot-operator/pkg/controllers/robot/relay_server"
@@ -109,134 +110,12 @@ func main() {
 		setupLog.Error(err, "unable to create dynamic client")
 	}
 
-	// gvkPod := schema.GroupVersionKind{
-	// 	Group:   "",
-	// 	Version: "v1",
-	// 	Kind:    "Pod",
-	// }
+	// Start controllers and webhooks
+	startRobotCRDsAndWebhooks(mgr, dynamicClient)
+	startManagerCRDsAndWebhooks(mgr, dynamicClient)
+	startDevCRDsAndWebhooks(mgr, dynamicClient)
+	startObserverCRDsAndWebhooks(mgr, dynamicClient)
 
-	// restClient, err := apiutil.RESTClientForGVK(gvkPod, false, mgr.GetConfig(), serializer.NewCodecFactory(mgr.GetScheme()))
-	// if err != nil {
-	// 	setupLog.Error(err, "unable to create REST client")
-	// }
-
-	if err = (&robot.RobotReconciler{
-		Client:        mgr.GetClient(),
-		Scheme:        mgr.GetScheme(),
-		DynamicClient: dynamicClient,
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "Robot")
-		os.Exit(1)
-	}
-	if err = (&robotv1alpha1.Robot{}).SetupWebhookWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create webhook", "webhook", "Robot")
-		os.Exit(1)
-	}
-	if err = (&discoveryServer.DiscoveryServerReconciler{
-		Client:        mgr.GetClient(),
-		Scheme:        mgr.GetScheme(),
-		DynamicClient: dynamicClient,
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "DiscoveryServer")
-		os.Exit(1)
-	}
-	if err = (&rosBridge.ROSBridgeReconciler{
-		Client:        mgr.GetClient(),
-		Scheme:        mgr.GetScheme(),
-		DynamicClient: dynamicClient,
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "ROSBridge")
-		os.Exit(1)
-	}
-	if err = (&buildManager.BuildManagerReconciler{
-		Client:        mgr.GetClient(),
-		Scheme:        mgr.GetScheme(),
-		DynamicClient: dynamicClient,
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "BuildManager")
-		os.Exit(1)
-	}
-	if err = (&robotv1alpha1.BuildManager{}).SetupWebhookWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create webhook", "webhook", "BuildManager")
-		os.Exit(1)
-	}
-	if err = (&launchManager.LaunchManagerReconciler{
-		Client:        mgr.GetClient(),
-		Scheme:        mgr.GetScheme(),
-		DynamicClient: dynamicClient,
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "LaunchManager")
-		os.Exit(1)
-	}
-	if err = (&robotv1alpha1.LaunchManager{}).SetupWebhookWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create webhook", "webhook", "LaunchManager")
-		os.Exit(1)
-	}
-	if err = (&robotDevSuite.RobotDevSuiteReconciler{
-		Client:        mgr.GetClient(),
-		Scheme:        mgr.GetScheme(),
-		DynamicClient: dynamicClient,
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "RobotDevSuite")
-		os.Exit(1)
-	}
-	if err = (&robotVDI.RobotVDIReconciler{
-		Client:        mgr.GetClient(),
-		Scheme:        mgr.GetScheme(),
-		DynamicClient: dynamicClient,
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "RobotVDI")
-		os.Exit(1)
-	}
-	if err = (&robotv1alpha1.RobotVDI{}).SetupWebhookWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create webhook", "webhook", "RobotVDI")
-		os.Exit(1)
-	}
-	if err = (&robotIDE.RobotIDEReconciler{
-		Client:        mgr.GetClient(),
-		Scheme:        mgr.GetScheme(),
-		DynamicClient: dynamicClient,
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "RobotIDE")
-		os.Exit(1)
-	}
-	if err = (&robotv1alpha1.RobotIDE{}).SetupWebhookWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create webhook", "webhook", "RobotIDE")
-		os.Exit(1)
-	}
-	if err = (&workspaceManager.WorkspaceManagerReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "WorkspaceManager")
-		os.Exit(1)
-	}
-	if err = (&robotv1alpha1.WorkspaceManager{}).SetupWebhookWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create webhook", "webhook", "WorkspaceManager")
-		os.Exit(1)
-	}
-	if err = (&robotv1alpha1.DiscoveryServer{}).SetupWebhookWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create webhook", "webhook", "DiscoveryServer")
-		os.Exit(1)
-	}
-	if err = (&metrics.MetricsExporterReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "MetricsExporter")
-		os.Exit(1)
-	}
-	if err = (&relayServer.RelayServerReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "RelayServer")
-		os.Exit(1)
-	}
-	if err = (&robotv1alpha1.RobotDevSuite{}).SetupWebhookWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create webhook", "webhook", "RobotDevSuite")
-		os.Exit(1)
-	}
 	//+kubebuilder:scaffold:builder
 
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
@@ -251,6 +130,158 @@ func main() {
 	setupLog.Info("starting manager")
 	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
 		setupLog.Error(err, "problem running manager")
+		os.Exit(1)
+	}
+}
+
+func startRobotCRDsAndWebhooks(mgr manager.Manager, dynamicClient dynamic.Interface) {
+
+	// Start Robot controller & webhook
+	if err := (&robot.RobotReconciler{
+		Client:        mgr.GetClient(),
+		Scheme:        mgr.GetScheme(),
+		DynamicClient: dynamicClient,
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "Robot")
+		os.Exit(1)
+	}
+	if err := (&robotv1alpha1.Robot{}).SetupWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create webhook", "webhook", "Robot")
+		os.Exit(1)
+	}
+
+	// Start DiscoveryServer controller & webhook
+	if err := (&discoveryServer.DiscoveryServerReconciler{
+		Client:        mgr.GetClient(),
+		Scheme:        mgr.GetScheme(),
+		DynamicClient: dynamicClient,
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "DiscoveryServer")
+		os.Exit(1)
+	}
+	if err := (&robotv1alpha1.DiscoveryServer{}).SetupWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create webhook", "webhook", "DiscoveryServer")
+		os.Exit(1)
+	}
+
+	// Start ROSBridge controller
+	if err := (&rosBridge.ROSBridgeReconciler{
+		Client:        mgr.GetClient(),
+		Scheme:        mgr.GetScheme(),
+		DynamicClient: dynamicClient,
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "ROSBridge")
+		os.Exit(1)
+	}
+
+	// Start RelayServer controller
+	if err := (&relayServer.RelayServerReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "RelayServer")
+		os.Exit(1)
+	}
+
+}
+
+func startManagerCRDsAndWebhooks(mgr manager.Manager, dynamicClient dynamic.Interface) {
+
+	// Start WorkspaceManager controller & webhooks
+	if err := (&workspaceManager.WorkspaceManagerReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "WorkspaceManager")
+		os.Exit(1)
+	}
+	if err := (&robotv1alpha1.WorkspaceManager{}).SetupWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create webhook", "webhook", "WorkspaceManager")
+		os.Exit(1)
+	}
+
+	// Start BuildManager controller & webhooks
+	if err := (&buildManager.BuildManagerReconciler{
+		Client:        mgr.GetClient(),
+		Scheme:        mgr.GetScheme(),
+		DynamicClient: dynamicClient,
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "BuildManager")
+		os.Exit(1)
+	}
+	if err := (&robotv1alpha1.BuildManager{}).SetupWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create webhook", "webhook", "BuildManager")
+		os.Exit(1)
+	}
+
+	// Start LaunchManager controller & webhooks
+	if err := (&launchManager.LaunchManagerReconciler{
+		Client:        mgr.GetClient(),
+		Scheme:        mgr.GetScheme(),
+		DynamicClient: dynamicClient,
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "LaunchManager")
+		os.Exit(1)
+	}
+	if err := (&robotv1alpha1.LaunchManager{}).SetupWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create webhook", "webhook", "LaunchManager")
+		os.Exit(1)
+	}
+}
+
+func startDevCRDsAndWebhooks(mgr manager.Manager, dynamicClient dynamic.Interface) {
+
+	// Start RobotDevSuite controller & webhooks
+	if err := (&robotDevSuite.RobotDevSuiteReconciler{
+		Client:        mgr.GetClient(),
+		Scheme:        mgr.GetScheme(),
+		DynamicClient: dynamicClient,
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "RobotDevSuite")
+		os.Exit(1)
+	}
+
+	// Start RobotVDI controller & webhooks
+	if err := (&robotVDI.RobotVDIReconciler{
+		Client:        mgr.GetClient(),
+		Scheme:        mgr.GetScheme(),
+		DynamicClient: dynamicClient,
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "RobotVDI")
+		os.Exit(1)
+	}
+	if err := (&robotv1alpha1.RobotVDI{}).SetupWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create webhook", "webhook", "RobotVDI")
+		os.Exit(1)
+	}
+
+	// Start RobotIDE controller & webhooks
+	if err := (&robotIDE.RobotIDEReconciler{
+		Client:        mgr.GetClient(),
+		Scheme:        mgr.GetScheme(),
+		DynamicClient: dynamicClient,
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "RobotIDE")
+		os.Exit(1)
+	}
+	if err := (&robotv1alpha1.RobotIDE{}).SetupWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create webhook", "webhook", "RobotIDE")
+		os.Exit(1)
+	}
+}
+
+func startObserverCRDsAndWebhooks(mgr manager.Manager, dynamicClient dynamic.Interface) {
+
+	// Start MetricsExporter controller & webhooks
+	if err := (&metrics.MetricsExporterReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "MetricsExporter")
+		os.Exit(1)
+	}
+	if err := (&robotv1alpha1.RobotDevSuite{}).SetupWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create webhook", "webhook", "RobotDevSuite")
 		os.Exit(1)
 	}
 }
