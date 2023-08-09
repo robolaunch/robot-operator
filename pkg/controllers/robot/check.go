@@ -14,61 +14,45 @@ import (
 
 func (r *RobotReconciler) reconcileCheckPVCs(ctx context.Context, instance *robotv1alpha1.Robot) error {
 
-	pvcVarQuery := &corev1.PersistentVolumeClaim{}
-	err := r.Get(ctx, *instance.GetPVCVarMetadata(), pvcVarQuery)
+	err := r.reconcileCheckPVC(ctx, instance, *instance.GetPVCVarMetadata(), &instance.Status.VolumeStatuses.Var)
+	if err != nil {
+		return err
+	}
+
+	err = r.reconcileCheckPVC(ctx, instance, *instance.GetPVCOptMetadata(), &instance.Status.VolumeStatuses.Opt)
+	if err != nil {
+		return err
+	}
+
+	err = r.reconcileCheckPVC(ctx, instance, *instance.GetPVCEtcMetadata(), &instance.Status.VolumeStatuses.Etc)
+	if err != nil {
+		return err
+	}
+
+	err = r.reconcileCheckPVC(ctx, instance, *instance.GetPVCUsrMetadata(), &instance.Status.VolumeStatuses.Usr)
+	if err != nil {
+		return err
+	}
+
+	err = r.reconcileCheckPVC(ctx, instance, *instance.GetPVCWorkspaceMetadata(), &instance.Status.VolumeStatuses.Workspace)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *RobotReconciler) reconcileCheckPVC(ctx context.Context, instance *robotv1alpha1.Robot, pvcNamespacedName types.NamespacedName, pvcStatus *robotv1alpha1.OwnedResourceStatus) error {
+	pvcQuery := &corev1.PersistentVolumeClaim{}
+	err := r.Get(ctx, pvcNamespacedName, pvcQuery)
 	if err != nil && errors.IsNotFound(err) {
-		instance.Status.VolumeStatuses.Var = robotv1alpha1.OwnedResourceStatus{}
+		pvcStatus = &robotv1alpha1.OwnedResourceStatus{}
 	} else if err != nil {
 		return err
 	} else {
-		instance.Status.VolumeStatuses.Var.Created = true
-		reference.SetReference(&instance.Status.VolumeStatuses.Var.Reference, pvcVarQuery.TypeMeta, pvcVarQuery.ObjectMeta)
+		pvcStatus.Created = true
+		reference.SetReference(&pvcStatus.Reference, pvcQuery.TypeMeta, pvcQuery.ObjectMeta)
 	}
-
-	pvcOptQuery := &corev1.PersistentVolumeClaim{}
-	err = r.Get(ctx, *instance.GetPVCOptMetadata(), pvcOptQuery)
-	if err != nil && errors.IsNotFound(err) {
-		instance.Status.VolumeStatuses.Opt = robotv1alpha1.OwnedResourceStatus{}
-	} else if err != nil {
-		return err
-	} else {
-		instance.Status.VolumeStatuses.Opt.Created = true
-		reference.SetReference(&instance.Status.VolumeStatuses.Opt.Reference, pvcOptQuery.TypeMeta, pvcOptQuery.ObjectMeta)
-	}
-
-	pvcEtcQuery := &corev1.PersistentVolumeClaim{}
-	err = r.Get(ctx, *instance.GetPVCEtcMetadata(), pvcEtcQuery)
-	if err != nil && errors.IsNotFound(err) {
-		instance.Status.VolumeStatuses.Etc = robotv1alpha1.OwnedResourceStatus{}
-	} else if err != nil {
-		return err
-	} else {
-		instance.Status.VolumeStatuses.Etc.Created = true
-		reference.SetReference(&instance.Status.VolumeStatuses.Etc.Reference, pvcEtcQuery.TypeMeta, pvcEtcQuery.ObjectMeta)
-	}
-
-	pvcUsrQuery := &corev1.PersistentVolumeClaim{}
-	err = r.Get(ctx, *instance.GetPVCUsrMetadata(), pvcUsrQuery)
-	if err != nil && errors.IsNotFound(err) {
-		instance.Status.VolumeStatuses.Usr = robotv1alpha1.OwnedResourceStatus{}
-	} else if err != nil {
-		return err
-	} else {
-		instance.Status.VolumeStatuses.Usr.Created = true
-		reference.SetReference(&instance.Status.VolumeStatuses.Usr.Reference, pvcUsrQuery.TypeMeta, pvcUsrQuery.ObjectMeta)
-	}
-
-	pvcWorkspaceQuery := &corev1.PersistentVolumeClaim{}
-	err = r.Get(ctx, *instance.GetPVCWorkspaceMetadata(), pvcWorkspaceQuery)
-	if err != nil && errors.IsNotFound(err) {
-		instance.Status.VolumeStatuses.Workspace = robotv1alpha1.OwnedResourceStatus{}
-	} else if err != nil {
-		return err
-	} else {
-		instance.Status.VolumeStatuses.Workspace.Created = true
-		reference.SetReference(&instance.Status.VolumeStatuses.Workspace.Reference, pvcWorkspaceQuery.TypeMeta, pvcWorkspaceQuery.ObjectMeta)
-	}
-
 	return nil
 }
 

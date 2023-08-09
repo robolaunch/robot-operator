@@ -5,6 +5,7 @@ import (
 
 	robotErr "github.com/robolaunch/robot-operator/internal/error"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
+	"k8s.io/apimachinery/pkg/types"
 )
 
 func (r *RobotReconciler) reconcileHandlePVCs(ctx context.Context, instance *robotv1alpha1.Robot) error {
@@ -16,45 +17,40 @@ func (r *RobotReconciler) reconcileHandlePVCs(ctx context.Context, instance *rob
 		instance.Status.VolumeStatuses.Workspace.Created) {
 		instance.Status.Phase = robotv1alpha1.RobotPhaseCreatingEnvironment
 
-		if !instance.Status.VolumeStatuses.Var.Created {
-			err := r.createPVC(ctx, instance, instance.GetPVCVarMetadata())
-			if err != nil {
-				return err
-			}
-			instance.Status.VolumeStatuses.Var.Created = true
+		err := r.reconcileCreatePVC(ctx, instance, instance.Status.VolumeStatuses.Var, *instance.GetPVCVarMetadata())
+		if err != nil {
+			return err
 		}
 
-		if !instance.Status.VolumeStatuses.Opt.Created {
-			err := r.createPVC(ctx, instance, instance.GetPVCOptMetadata())
-			if err != nil {
-				return err
-			}
-			instance.Status.VolumeStatuses.Opt.Created = true
+		instance.Status.VolumeStatuses.Var.Created = true
+
+		err = r.reconcileCreatePVC(ctx, instance, instance.Status.VolumeStatuses.Opt, *instance.GetPVCOptMetadata())
+		if err != nil {
+			return err
 		}
 
-		if !instance.Status.VolumeStatuses.Etc.Created {
-			err := r.createPVC(ctx, instance, instance.GetPVCEtcMetadata())
-			if err != nil {
-				return err
-			}
-			instance.Status.VolumeStatuses.Etc.Created = true
+		instance.Status.VolumeStatuses.Opt.Created = true
+
+		err = r.reconcileCreatePVC(ctx, instance, instance.Status.VolumeStatuses.Etc, *instance.GetPVCEtcMetadata())
+		if err != nil {
+			return err
 		}
 
-		if !instance.Status.VolumeStatuses.Usr.Created {
-			err := r.createPVC(ctx, instance, instance.GetPVCUsrMetadata())
-			if err != nil {
-				return err
-			}
-			instance.Status.VolumeStatuses.Usr.Created = true
+		instance.Status.VolumeStatuses.Etc.Created = true
+
+		err = r.reconcileCreatePVC(ctx, instance, instance.Status.VolumeStatuses.Usr, *instance.GetPVCUsrMetadata())
+		if err != nil {
+			return err
 		}
 
-		if !instance.Status.VolumeStatuses.Workspace.Created {
-			err := r.createPVC(ctx, instance, instance.GetPVCWorkspaceMetadata())
-			if err != nil {
-				return err
-			}
-			instance.Status.VolumeStatuses.Workspace.Created = true
+		instance.Status.VolumeStatuses.Usr.Created = true
+
+		err = r.reconcileCreatePVC(ctx, instance, instance.Status.VolumeStatuses.Workspace, *instance.GetPVCWorkspaceMetadata())
+		if err != nil {
+			return err
 		}
+
+		instance.Status.VolumeStatuses.Workspace.Created = true
 
 		return &robotErr.CreatingResourceError{
 			ResourceKind:      "PersistentVolumeClaim",
@@ -63,6 +59,16 @@ func (r *RobotReconciler) reconcileHandlePVCs(ctx context.Context, instance *rob
 
 	}
 
+	return nil
+}
+
+func (r *RobotReconciler) reconcileCreatePVC(ctx context.Context, instance *robotv1alpha1.Robot, objStatus robotv1alpha1.OwnedResourceStatus, objNamespacedName types.NamespacedName) error {
+	if !objStatus.Created {
+		err := r.createPVC(ctx, instance, &objNamespacedName)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
