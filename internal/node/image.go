@@ -226,7 +226,7 @@ func setPrecisionBetweenDistributions(distributions []robotv1alpha1.ROSDistro) s
 
 func getImagePropsForRobot(platformVersion, distro string) (Element, error) {
 
-	resp, err := http.Get("https://raw.githubusercontent.com/robolaunch/robolaunch/main/platform.yaml")
+	resp, err := http.Get(internal.IMAGE_MAP_URL)
 	if err != nil {
 		return Element{}, err
 	}
@@ -270,7 +270,7 @@ func getImagePropsForRobot(platformVersion, distro string) (Element, error) {
 
 func getImagePropsForEnvironment(platformVersion string) (Images, error) {
 
-	resp, err := http.Get("https://raw.githubusercontent.com/robolaunch/robolaunch/main/platform.yaml")
+	resp, err := http.Get(internal.IMAGE_MAP_URL)
 	if err != nil {
 		return Images{}, err
 	}
