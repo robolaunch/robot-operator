@@ -131,7 +131,7 @@ func (r *Robot) checkRobotType() error {
 		if reflect.DeepEqual(r.Spec.RobotConfig, nil) || reflect.DeepEqual(r.Spec.RobotConfig, RobotConfig{}) {
 			return errors.New("`spec.robot` cannot be empty if the robot type is Robot")
 		}
-		if !(reflect.DeepEqual(r.Spec.EnvironmentConfig, nil) || reflect.DeepEqual(r.Spec.RobotConfig, EnvironmentConfig{})) {
+		if !(reflect.DeepEqual(r.Spec.EnvironmentConfig, nil) || reflect.DeepEqual(r.Spec.EnvironmentConfig, EnvironmentConfig{})) {
 			return errors.New("`spec.environment` should be empty if the robot type is Robot")
 		}
 	}
