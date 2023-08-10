@@ -1,6 +1,16 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+### Feat
+- **environment:** :rocket: support provisioning environments
+- **environment:** :rocket: implement environment api
+
+### Fix
+- **webhooks:** :bug: update webhook condition
+
+
+<a name="v0.2.5-alpha.34"></a>
+## [v0.2.5-alpha.34] - 2023-08-09
 
 <a name="v0.2.5-alpha.33"></a>
 ## [v0.2.5-alpha.33] - 2023-08-09
@@ -227,7 +237,8 @@
 - Merge pull request [#24](https://github.com/robolaunch/robot-operator/issues/24) from robolaunch/23-allow-multiple-launches
 
 
-[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.33...HEAD
+[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.34...HEAD
+[v0.2.5-alpha.34]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.33...v0.2.5-alpha.34
 [v0.2.5-alpha.33]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.32...v0.2.5-alpha.33
 [v0.2.5-alpha.32]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.31...v0.2.5-alpha.32
 [v0.2.5-alpha.31]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.30...v0.2.5-alpha.31

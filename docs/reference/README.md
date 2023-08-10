@@ -50,17 +50,12 @@ _Appears in:_
 
 | Field | Description |
 | --- | --- |
-| `distributions` _[ROSDistro](#rosdistro) array_ | ROS 2 distributions to be used. You can select multiple distributions if they are supported in the same underlying OS. (eg. `foxy` and `galactic` are supported in Ubuntu Focal, so they can be used together but both cannot be used with `humble`) |
-| `rmwImplementation` _[RMWImplementation](#rmwimplementation)_ | RMW implementation selection. Robot operator currently supports only FastRTPS. See https://docs.ros.org/en/foxy/How-To-Guides/Working-with-multiple-RMW-implementations.html. |
-| `domainID` _integer_ | ROS domain ID for robot. See https://docs.ros.org/en/foxy/Concepts/About-Domain-ID.html. |
+| `type` _[Type](#type)_ | Determines the object type. If "Environment", operator will provision an environment according to the specifications. (`.spec.environment`) If "Robot", operator will provision an environment specialized for ROS 2 according to the specifications. (`.spec.robot`) |
+| `robot` _[RobotConfig](#robotconfig)_ | Holds robot's configuration. Applied if `.spec.type` is `Robot` and must be `nil` otherwise. |
+| `environment` _[EnvironmentConfig](#environmentconfig)_ | Holds environment's configuration. Applied if `.spec.type` is `Environment` and must be `nil` otherwise. |
 | `storage` _[Storage](#storage)_ | Total storage amount to persist via Robot. Unit of measurement is MB. (eg. `10240` corresponds 10 GB) This amount is being shared between different components. |
-| `discoveryServerTemplate` _[DiscoveryServerSpec](#discoveryserverspec)_ | Discovery server configurational parameters. |
-| `rosBridgeTemplate` _[ROSBridgeSpec](#rosbridgespec)_ | ROS bridge configurational parameters. |
 | `robotDevSuiteTemplate` _[RobotDevSuiteSpec](#robotdevsuitespec)_ | Robot development suite template |
 | `workspaceManagerTemplate` _[WorkspaceManagerSpec](#workspacemanagerspec)_ | Workspace manager template to configure ROS 2 workspaces. |
-| `buildManagerTemplate` _[BuildManagerSpec](#buildmanagerspec)_ | [*alpha*] Build manager template for initial configuration. |
-| `launchManagerTemplates` _[LaunchManagerSpec](#launchmanagerspec) array_ | [*alpha*] Launch manager template for initial configuration. |
-| `development` _boolean_ | [*alpha*] Switch to development mode if `true`. |
 | `rootDNSConfig` _[RootDNSConfig](#rootdnsconfig)_ | [*alpha*] Root DNS configuration. |
 | `tlsSecretRef` _[TLSSecretReference](#tlssecretreference)_ | [*alpha*] TLS secret reference. |
 
@@ -169,7 +164,6 @@ BuildManagerSpec defines the desired state of BuildManager.
 
 _Appears in:_
 - [BuildManager](#buildmanager)
-- [RobotSpec](#robotspec)
 
 | Field | Description |
 | --- | --- |
@@ -219,7 +213,6 @@ LaunchManagerSpec defines the desired state of LaunchManager.
 
 _Appears in:_
 - [LaunchManager](#launchmanager)
-- [RobotSpec](#robotspec)
 
 | Field | Description |
 | --- | --- |
@@ -487,7 +480,7 @@ DiscoveryServerSpec defines the desired state of DiscoveryServer.
 
 _Appears in:_
 - [DiscoveryServer](#discoveryserver)
-- [RobotSpec](#robotspec)
+- [RobotConfig](#robotconfig)
 
 | Field | Description |
 | --- | --- |
@@ -544,7 +537,7 @@ ROSBridgeSpec defines the desired state of ROSBridge.
 
 _Appears in:_
 - [ROSBridge](#rosbridge)
-- [RobotSpec](#robotspec)
+- [RobotConfig](#robotconfig)
 
 | Field | Description |
 | --- | --- |
@@ -643,6 +636,21 @@ RobotArtifact is a non-functional resource that holds Robot's specifications. It
 | `template` _[RobotSpec](#robotspec)_ | Holds Robot's `.spec`. |
 
 
+#### Application
+
+
+
+
+
+_Appears in:_
+- [EnvironmentConfig](#environmentconfig)
+
+| Field | Description |
+| --- | --- |
+| `name` _string_ | Application name. |
+| `version` _string_ | Version of the application. |
+
+
 #### AttachedBuildObject
 
 
@@ -730,6 +738,22 @@ _Appears in:_
 | `configMapName` _string_ | Name of the config map that holds discovery server configuration. |
 
 
+#### DevSpaceImage
+
+
+
+
+
+_Appears in:_
+- [EnvironmentConfig](#environmentconfig)
+
+| Field | Description |
+| --- | --- |
+| `ubuntuDistro` _string_ | Ubuntu distribution of the environment. |
+| `desktop` _string_ | Ubuntu desktop. |
+| `version` _string_ | DevSpace image version. |
+
+
 #### DiscoveryServerInstanceStatus
 
 
@@ -754,6 +778,22 @@ Instance type can be either `Server` or `Client`.
 _Appears in:_
 - [DiscoveryServerSpec](#discoveryserverspec)
 
+
+
+#### EnvironmentConfig
+
+
+
+
+
+_Appears in:_
+- [RobotSpec](#robotspec)
+
+| Field | Description |
+| --- | --- |
+| `domain` _string_ | Domain of the environment. |
+| `application` _[Application](#application)_ | Application properties. |
+| `devspace` _[DevSpaceImage](#devspaceimage)_ | DevSpace image properties. |
 
 
 #### GPUMetrics
@@ -1041,7 +1081,7 @@ _Underlying type:_ `string`
 RMW implementation chooses DDS vendor for ROS 2. Currently, only eProsima's FastDDS is supported.
 
 _Appears in:_
-- [RobotSpec](#robotspec)
+- [RobotConfig](#robotconfig)
 
 
 
@@ -1069,7 +1109,7 @@ ROS 2 distribution selection. Currently supported distributions are Humble, Foxy
 
 _Appears in:_
 - [BridgeDistro](#bridgedistro)
-- [RobotSpec](#robotspec)
+- [RobotConfig](#robotconfig)
 - [Workspace](#workspace)
 
 
@@ -1109,6 +1149,24 @@ _Appears in:_
 | `gpuCore` _integer_ | GPU core number that will be allocated. |
 | `cpu` _string_ | CPU resource limit. |
 | `memory` _string_ | Memory resource limit. |
+
+
+#### RobotConfig
+
+
+
+
+
+_Appears in:_
+- [RobotSpec](#robotspec)
+
+| Field | Description |
+| --- | --- |
+| `distributions` _[ROSDistro](#rosdistro) array_ | ROS 2 distributions to be used. You can select multiple distributions if they are supported in the same underlying OS. (eg. `foxy` and `galactic` are supported in Ubuntu Focal, so they can be used together but both cannot be used with `humble`) |
+| `rmwImplementation` _[RMWImplementation](#rmwimplementation)_ | RMW implementation selection. Robot operator currently supports only FastRTPS. See https://docs.ros.org/en/foxy/How-To-Guides/Working-with-multiple-RMW-implementations.html. |
+| `domainID` _integer_ | ROS domain ID for robot. See https://docs.ros.org/en/foxy/Concepts/About-Domain-ID.html. |
+| `discoveryServerTemplate` _[DiscoveryServerSpec](#discoveryserverspec)_ | Discovery server configurational parameters. |
+| `rosBridgeTemplate` _[ROSBridgeSpec](#rosbridgespec)_ | ROS bridge configurational parameters. |
 
 
 #### RobotDevSuiteInstanceStatus
@@ -1253,6 +1311,17 @@ _Appears in:_
 | --- | --- |
 | `name` _string_ | [*alpha*] TLS secret object name. |
 | `namespace` _string_ | [*alpha*] TLS secret object namespace. |
+
+
+#### Type
+
+_Underlying type:_ `string`
+
+
+
+_Appears in:_
+- [RobotSpec](#robotspec)
+
 
 
 #### Usage
