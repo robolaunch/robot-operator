@@ -36,110 +36,204 @@ spec:
           template:
             description: Holds Robot's `.spec`.
             properties:
-              discoveryServerTemplate:
-                description: Discovery server configurational parameters.
+              environment:
+                description: Holds environment's configuration. Applied if `.spec.type`
+                  is `Environment` and must be `nil` otherwise.
                 properties:
-                  cluster:
-                    description: Cloud instance name that holds DiscoveryServer instance
-                      with `Server` type. Should be empty if the type is `Server` since
-                      it takes cloud instance's name automatically. Should be set if
-                      the type is `Client`.
+                  application:
+                    description: Application properties.
+                    properties:
+                      name:
+                        description: Application name.
+                        type: string
+                      version:
+                        description: Version of the application.
+                        type: string
+                    required:
+                    - name
+                    - version
+                    type: object
+                  devspace:
+                    description: DevSpace image properties.
+                    properties:
+                      desktop:
+                        description: Ubuntu desktop.
+                        type: string
+                      ubuntuDistro:
+                        description: Ubuntu distribution of the environment.
+                        type: string
+                      version:
+                        description: DevSpace image version.
+                        type: string
+                    required:
+                    - desktop
+                    - ubuntuDistro
+                    - version
+                    type: object
+                  domain:
+                    description: Domain of the environment.
                     type: string
+                required:
+                - application
+                - devspace
+                - domain
+                type: object
+              robot:
+                description: Holds robot's configuration. Applied if `.spec.type` is
+                  `Robot` and must be `nil` otherwise.
+                properties:
+                  discoveryServerTemplate:
+                    description: Discovery server configurational parameters.
+                    properties:
+                      cluster:
+                        description: Cloud instance name that holds DiscoveryServer
+                          instance with `Server` type. Should be empty if the type is
+                          `Server` since it takes cloud instance's name automatically.
+                          Should be set if the type is `Client`.
+                        type: string
+                      domainID:
+                        description: ROS domain ID for robot. See https://docs.ros.org/en/foxy/Concepts/About-Domain-ID.html.
+                        maximum: 101
+                        minimum: 0
+                        type: integer
+                      hostname:
+                        description: If instance type is `Server`, it can be an arbitrary
+                          value. If instance type is `Client`, it should be the same
+                          with Server's hostname. Used for getting Server's IP over
+                          DNS.
+                        type: string
+                      reference:
+                        description: Reference to the `Server` instance. It is used
+                          if `.spec.type` is `Client`. Referenced object can be previously
+                          provisioned in another cluster. In that case, cluster's name
+                          can be specified in `.spec.cluster` field.
+                        properties:
+                          apiVersion:
+                            description: API version of the referent.
+                            type: string
+                          fieldPath:
+                            description: 'If referring to a piece of an object instead
+                              of an entire object, this string should contain a valid
+                              JSON/Go field access statement, such as desiredState.manifest.containers[2].
+                              For example, if the object reference is to a container
+                              within a pod, this would take on a value like: "spec.containers{name}"
+                              (where "name" refers to the name of the container that
+                              triggered the event) or if no container name is specified
+                              "spec.containers[2]" (container with index 2 in this pod).
+                              This syntax is chosen only to have some well-defined way
+                              of referencing a part of an object. TODO: this design
+                              is not final and this field is subject to change in the
+                              future.'
+                            type: string
+                          kind:
+                            description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                            type: string
+                          name:
+                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                            type: string
+                          namespace:
+                            description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                            type: string
+                          resourceVersion:
+                            description: 'Specific resourceVersion to which this reference
+                              is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                            type: string
+                          uid:
+                            description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                            type: string
+                        type: object
+                        x-kubernetes-map-type: atomic
+                      subdomain:
+                        description: If instance type is `Server`, it can be an arbitrary
+                          value. If instance type is `Client`, it should be the same
+                          with Server's subdomain. Used for getting Server's IP over
+                          DNS.
+                        type: string
+                      type:
+                        description: Instance type can be either `Server` or `Client`.
+                          If `Server`, instance creates discovery server resources and
+                          workloads. Other `Client` instances can connect to the `Server`
+                          instance. If `Client`, instance tries to connect a `Server`
+                          instance and hold `Server` configuration in a ConfigMap.
+                        type: string
+                    required:
+                    - domainID
+                    type: object
+                  distributions:
+                    description: ROS 2 distributions to be used. You can select multiple
+                      distributions if they are supported in the same underlying OS.
+                      (eg. `foxy` and `galactic` are supported in Ubuntu Focal, so they
+                      can be used together but both cannot be used with `humble`)
+                    items:
+                      description: ROS 2 distribution selection. Currently supported
+                        distributions are Humble, Foxy, Galactic.
+                      enum:
+                      - foxy
+                      - galactic
+                      - humble
+                      type: string
+                    maxItems: 2
+                    minItems: 1
+                    type: array
                   domainID:
-                    default: 0
                     description: ROS domain ID for robot. See https://docs.ros.org/en/foxy/Concepts/About-Domain-ID.html.
                     maximum: 101
                     minimum: 0
                     type: integer
-                  hostname:
-                    description: If instance type is `Server`, it can be an arbitrary
-                      value. If instance type is `Client`, it should be the same with
-                      Server's hostname. Used for getting Server's IP over DNS.
+                  rmwImplementation:
+                    description: RMW implementation selection. Robot operator currently
+                      supports only FastRTPS. See https://docs.ros.org/en/foxy/How-To-Guides/Working-with-multiple-RMW-implementations.html.
+                    enum:
+                    - rmw_fastrtps_cpp
                     type: string
-                  reference:
-                    description: Reference to the `Server` instance. It is used if `.spec.type`
-                      is `Client`. Referenced object can be previously provisioned in
-                      another cluster. In that case, cluster's name can be specified
-                      in `.spec.cluster` field.
+                  rosBridgeTemplate:
+                    description: ROS bridge configurational parameters.
                     properties:
-                      apiVersion:
-                        description: API version of the referent.
-                        type: string
-                      fieldPath:
-                        description: 'If referring to a piece of an object instead of
-                          an entire object, this string should contain a valid JSON/Go
-                          field access statement, such as desiredState.manifest.containers[2].
-                          For example, if the object reference is to a container within
-                          a pod, this would take on a value like: "spec.containers{name}"
-                          (where "name" refers to the name of the container that triggered
-                          the event) or if no container name is specified "spec.containers[2]"
-                          (container with index 2 in this pod). This syntax is chosen
-                          only to have some well-defined way of referencing a part of
-                          an object. TODO: this design is not final and this field is
-                          subject to change in the future.'
-                        type: string
-                      kind:
-                        description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
-                        type: string
-                      name:
-                        description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
-                        type: string
-                      namespace:
-                        description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
-                        type: string
-                      resourceVersion:
-                        description: 'Specific resourceVersion to which this reference
-                          is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
-                        type: string
-                      uid:
-                        description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                      ingress:
+                        description: '[*alpha*] ROSBridge will create an Ingress resource
+                          if `true`.'
+                        type: boolean
+                      ros:
+                        description: Configurational parameters for ROS bridge.
+                        properties:
+                          distro:
+                            description: ROS distribution for bridge.
+                            enum:
+                            - foxy
+                            - galactic
+                            - humble
+                            type: string
+                          enabled:
+                            description: If `true`, resources and workloads are created
+                              by ROSBridge.
+                            type: boolean
+                        type: object
+                      ros2:
+                        description: Configurational parameters for ROS 2 bridge.
+                        properties:
+                          distro:
+                            description: ROS distribution for bridge.
+                            enum:
+                            - foxy
+                            - galactic
+                            - humble
+                            type: string
+                          enabled:
+                            description: If `true`, resources and workloads are created
+                              by ROSBridge.
+                            type: boolean
+                        type: object
+                      serviceType:
+                        description: Service type of ROSBridge. `ClusterIP` and `NodePort`
+                          is supported.
+                        enum:
+                        - ClusterIP
+                        - NodePort
                         type: string
                     type: object
-                    x-kubernetes-map-type: atomic
-                  subdomain:
-                    description: If instance type is `Server`, it can be an arbitrary
-                      value. If instance type is `Client`, it should be the same with
-                      Server's subdomain. Used for getting Server's IP over DNS.
-                    type: string
-                  type:
-                    description: Instance type can be either `Server` or `Client`. If
-                      `Server`, instance creates discovery server resources and workloads.
-                      Other `Client` instances can connect to the `Server` instance.
-                      If `Client`, instance tries to connect a `Server` instance and
-                      hold `Server` configuration in a ConfigMap.
-                    type: string
                 required:
                 - domainID
                 type: object
-              distributions:
-                description: ROS 2 distributions to be used. You can select multiple
-                  distributions if they are supported in the same underlying OS. (eg.
-                  `foxy` and `galactic` are supported in Ubuntu Focal, so they can be
-                  used together but both cannot be used with `humble`)
-                items:
-                  description: ROS 2 distribution selection. Currently supported distributions
-                    are Humble, Foxy, Galactic.
-                  enum:
-                  - foxy
-                  - galactic
-                  - humble
-                  type: string
-                maxItems: 2
-                minItems: 1
-                type: array
-              domainID:
-                default: 0
-                description: ROS domain ID for robot. See https://docs.ros.org/en/foxy/Concepts/About-Domain-ID.html.
-                maximum: 101
-                minimum: 0
-                type: integer
-              rmwImplementation:
-                default: rmw_fastrtps_cpp
-                description: RMW implementation selection. Robot operator currently
-                  supports only FastRTPS. See https://docs.ros.org/en/foxy/How-To-Guides/Working-with-multiple-RMW-implementations.html.
-                enum:
-                - rmw_fastrtps_cpp
-                type: string
               robotDevSuiteTemplate:
                 description: Robot development suite template
                 properties:
@@ -305,52 +399,6 @@ spec:
                 required:
                 - host
                 type: object
-              rosBridgeTemplate:
-                description: ROS bridge configurational parameters.
-                properties:
-                  ingress:
-                    description: '[*alpha*] ROSBridge will create an Ingress resource
-                      if `true`.'
-                    type: boolean
-                  ros:
-                    description: Configurational parameters for ROS bridge.
-                    properties:
-                      distro:
-                        description: ROS distribution for bridge.
-                        enum:
-                        - foxy
-                        - galactic
-                        - humble
-                        type: string
-                      enabled:
-                        description: If `true`, resources and workloads are created
-                          by ROSBridge.
-                        type: boolean
-                    type: object
-                  ros2:
-                    description: Configurational parameters for ROS 2 bridge.
-                    properties:
-                      distro:
-                        description: ROS distribution for bridge.
-                        enum:
-                        - foxy
-                        - galactic
-                        - humble
-                        type: string
-                      enabled:
-                        description: If `true`, resources and workloads are created
-                          by ROSBridge.
-                        type: boolean
-                    type: object
-                  serviceType:
-                    default: NodePort
-                    description: Service type of ROSBridge. `ClusterIP` and `NodePort`
-                      is supported.
-                    enum:
-                    - ClusterIP
-                    - NodePort
-                    type: string
-                type: object
               storage:
                 description: Total storage amount to persist via Robot. Unit of measurement
                   is MB. (eg. `10240` corresponds 10 GB) This amount is being shared
@@ -386,6 +434,12 @@ spec:
                 - name
                 - namespace
                 type: object
+              type:
+                description: Determines the object type. If "Environment", operator
+                  will provision an environment according to the specifications. (`.spec.environment`)
+                  If "Robot", operator will provision an environment specialized for
+                  ROS 2 according to the specifications. (`.spec.robot`)
+                type: string
               workspaceManagerTemplate:
                 description: Workspace manager template to configure ROS 2 workspaces.
                 properties:
@@ -457,10 +511,6 @@ spec:
                       path.
                     type: string
                 type: object
-            required:
-            - distributions
-            - domainID
-            - rmwImplementation
             type: object
         type: object
     served: true

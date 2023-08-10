@@ -70,7 +70,6 @@ spec:
                     type: boolean
                 type: object
               serviceType:
-                default: NodePort
                 description: Service type of ROSBridge. `ClusterIP` and `NodePort` is
                   supported.
                 enum:
