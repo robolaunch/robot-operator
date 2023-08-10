@@ -74,7 +74,7 @@ func GetDiscoveryServer(robot *robotv1alpha1.Robot, dsNamespacedName *types.Name
 			Namespace: dsNamespacedName.Namespace,
 			Labels:    robot.Labels,
 		},
-		Spec: robot.Spec.DiscoveryServerTemplate,
+		Spec: robot.Spec.RobotConfig.DiscoveryServerTemplate,
 	}
 
 	return &discoveryServer
@@ -83,6 +83,16 @@ func GetDiscoveryServer(robot *robotv1alpha1.Robot, dsNamespacedName *types.Name
 
 func GetLoaderJob(robot *robotv1alpha1.Robot, jobNamespacedName *types.NamespacedName, hasGPU bool) *batchv1.Job {
 
+	if robot.Spec.Type == robotv1alpha1.TypeRobot {
+		return GetLoaderJobForRobot(robot, jobNamespacedName, hasGPU)
+	} else if robot.Spec.Type == robotv1alpha1.TypeEnvironment {
+		return GetLoaderJobForEnvironment(robot, jobNamespacedName, hasGPU)
+	}
+
+	return nil
+}
+
+func GetLoaderJobForRobot(robot *robotv1alpha1.Robot, jobNamespacedName *types.NamespacedName, hasGPU bool) *batchv1.Job {
 	var copierCmdBuilder strings.Builder
 	copierCmdBuilder.WriteString("yes | cp -rf /var /ros/;")
 	copierCmdBuilder.WriteString(" yes | cp -rf /usr /ros/;")
@@ -105,19 +115,6 @@ func GetLoaderJob(robot *robotv1alpha1.Robot, jobNamespacedName *types.Namespace
 	if !readyRobotProp.Enabled { // do no run rosdep init if ready robot
 		preparerCmdBuilder.WriteString(" && rosdep init")
 	}
-
-	var clonerCmdBuilder strings.Builder
-	for wsKey, ws := range robot.Spec.WorkspaceManagerTemplate.Workspaces {
-
-		var cmdBuilder strings.Builder
-		cmdBuilder.WriteString("mkdir -p " + filepath.Join(robot.Spec.WorkspaceManagerTemplate.WorkspacesPath, ws.Name, "src") + " && ")
-		cmdBuilder.WriteString("cd " + filepath.Join(robot.Spec.WorkspaceManagerTemplate.WorkspacesPath, ws.Name, "src") + " && ")
-		cmdBuilder.WriteString(GetCloneCommand(robot.Spec.WorkspaceManagerTemplate.Workspaces, wsKey))
-		clonerCmdBuilder.WriteString(cmdBuilder.String())
-
-	}
-
-	clonerCmdBuilder.WriteString("echo \"DONE\"")
 
 	copierContainer := corev1.Container{
 		Name:            "copier",
@@ -144,18 +141,111 @@ func GetLoaderJob(robot *robotv1alpha1.Robot, jobNamespacedName *types.Namespace
 		},
 	}
 
-	// clonerContainer := corev1.Container{
-	// 	Name:    "cloner",
-	// 	Image:   "ubuntu:focal",
-	// 	Command: internal.Bash(clonerCmdBuilder.String()),
-	// 	VolumeMounts: []corev1.VolumeMount{
-	// 		configure.GetVolumeMount("", configure.GetVolumeVar(robot)),
-	// 		configure.GetVolumeMount("", configure.GetVolumeUsr(robot)),
-	// 		configure.GetVolumeMount("", configure.GetVolumeOpt(robot)),
-	// 		configure.GetVolumeMount("", configure.GetVolumeEtc(robot)),
-	// 		configure.GetVolumeMount(robot.Spec.WorkspacesPath, configure.GetVolumeWorkspace(robot)),
-	// 	},
-	// }
+	podSpec := &corev1.PodSpec{
+		InitContainers: []corev1.Container{
+			copierContainer,
+		},
+		Containers: []corev1.Container{
+			preparerContainer,
+			// clonerContainer,
+		},
+		Volumes: []corev1.Volume{
+			configure.GetVolumeVar(robot),
+			configure.GetVolumeUsr(robot),
+			configure.GetVolumeOpt(robot),
+			configure.GetVolumeEtc(robot),
+			configure.GetVolumeWorkspace(robot),
+		},
+	}
+
+	if hasGPU {
+
+		var driverInstallerCmdBuilder strings.Builder
+
+		// run /etc/vdi/install-driver.sh
+		driverInstallerCmdBuilder.WriteString(filepath.Join("/etc", "vdi", "install-driver.sh"))
+
+		driverInstaller := corev1.Container{
+			Name:            "driver-installer",
+			Image:           robot.Status.Image,
+			Command:         internal.Bash(driverInstallerCmdBuilder.String()),
+			ImagePullPolicy: corev1.PullAlways,
+			Env: []corev1.EnvVar{
+				internal.Env("NVIDIA_DRIVER_VERSION", "agnostic"),
+				internal.Env("RESOLUTION", robot.Spec.RobotDevSuiteTemplate.RobotVDITemplate.Resolution),
+			},
+			VolumeMounts: []corev1.VolumeMount{
+				configure.GetVolumeMount("", configure.GetVolumeVar(robot)),
+				configure.GetVolumeMount("", configure.GetVolumeUsr(robot)),
+				configure.GetVolumeMount("", configure.GetVolumeOpt(robot)),
+				configure.GetVolumeMount("", configure.GetVolumeEtc(robot)),
+			},
+		}
+
+		podSpec.InitContainers = append(podSpec.InitContainers, driverInstaller)
+
+	}
+
+	podSpec.RestartPolicy = corev1.RestartPolicyNever
+	podSpec.NodeSelector = label.GetTenancyMap(robot)
+
+	job := batchv1.Job{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      robot.GetLoaderJobMetadata().Name,
+			Namespace: robot.GetLoaderJobMetadata().Namespace,
+		},
+		Spec: batchv1.JobSpec{
+			Template: corev1.PodTemplateSpec{
+				Spec: *podSpec,
+			},
+		},
+	}
+
+	return &job
+}
+
+func GetLoaderJobForEnvironment(robot *robotv1alpha1.Robot, jobNamespacedName *types.NamespacedName, hasGPU bool) *batchv1.Job {
+	var copierCmdBuilder strings.Builder
+	copierCmdBuilder.WriteString("yes | cp -rf /var /environment/;")
+	copierCmdBuilder.WriteString(" yes | cp -rf /usr /environment/;")
+	copierCmdBuilder.WriteString(" yes | cp -rf /opt /environment/;")
+	copierCmdBuilder.WriteString(" yes | cp -rf /etc /environment/;")
+	copierCmdBuilder.WriteString(" echo \"DONE\"")
+
+	var preparerCmdBuilder strings.Builder
+	preparerCmdBuilder.WriteString("mv " + filepath.Join("/etc", "apt", "sources.list") + " temp")
+	preparerCmdBuilder.WriteString(" && apt-get update")
+	preparerCmdBuilder.WriteString(" && mv temp " + filepath.Join("/etc", "apt", "sources.list"))
+	preparerCmdBuilder.WriteString(" && apt-get update")
+	preparerCmdBuilder.WriteString(" && apt-get dist-upgrade -y")
+	preparerCmdBuilder.WriteString(" && apt-get update")
+	preparerCmdBuilder.WriteString(" && chown root:root /usr/bin/sudo")
+	preparerCmdBuilder.WriteString(" && chmod 4755 /usr/bin/sudo")
+
+	copierContainer := corev1.Container{
+		Name:            "copier",
+		Image:           robot.Status.Image,
+		Command:         internal.Bash(copierCmdBuilder.String()),
+		ImagePullPolicy: corev1.PullAlways,
+		VolumeMounts: []corev1.VolumeMount{
+			configure.GetVolumeMount("/environment/", configure.GetVolumeVar(robot)),
+			configure.GetVolumeMount("/environment/", configure.GetVolumeUsr(robot)),
+			configure.GetVolumeMount("/environment/", configure.GetVolumeOpt(robot)),
+			configure.GetVolumeMount("/environment/", configure.GetVolumeEtc(robot)),
+		},
+	}
+
+	preparerContainer := corev1.Container{
+		Name:    "preparer",
+		Image:   "ubuntu:focal",
+		Command: internal.Bash(preparerCmdBuilder.String()),
+		VolumeMounts: []corev1.VolumeMount{
+			configure.GetVolumeMount("", configure.GetVolumeVar(robot)),
+			configure.GetVolumeMount("", configure.GetVolumeUsr(robot)),
+			configure.GetVolumeMount("", configure.GetVolumeOpt(robot)),
+			configure.GetVolumeMount("", configure.GetVolumeEtc(robot)),
+		},
+	}
 
 	podSpec := &corev1.PodSpec{
 		InitContainers: []corev1.Container{
@@ -228,7 +318,7 @@ func GetROSBridge(robot *robotv1alpha1.Robot, bridgeNamespacedName *types.Namesp
 			Namespace: bridgeNamespacedName.Namespace,
 			Labels:    robot.Labels,
 		},
-		Spec: robot.Spec.ROSBridgeTemplate,
+		Spec: robot.Spec.RobotConfig.ROSBridgeTemplate,
 	}
 
 	return &rosBridge

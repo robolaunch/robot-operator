@@ -92,6 +92,25 @@ func (r *RobotReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 
 func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.Robot, result *ctrl.Result) error {
 
+	if instance.Spec.Type == robotv1alpha1.TypeRobot {
+
+		err := r.reconcileCheckStatusForRobot(ctx, instance, result)
+		if err != nil {
+			return err
+		}
+
+	} else if instance.Spec.Type == robotv1alpha1.TypeEnvironment {
+		err := r.reconcileCheckStatusForEnvironment(ctx, instance, result)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (r *RobotReconciler) reconcileCheckStatusForRobot(ctx context.Context, instance *robotv1alpha1.Robot, result *ctrl.Result) error {
+
 	err := r.reconcileHandlePVCs(ctx, instance)
 	if err != nil {
 		return robotErr.CheckCreatingOrWaitingError(result, err)
@@ -123,6 +142,31 @@ func (r *RobotReconciler) reconcileCheckStatus(ctx context.Context, instance *ro
 	}
 
 	err = r.reconcileHandleManagers(ctx, instance)
+	if err != nil {
+		return robotErr.CheckCreatingOrWaitingError(result, err)
+	}
+
+	return nil
+}
+
+func (r *RobotReconciler) reconcileCheckStatusForEnvironment(ctx context.Context, instance *robotv1alpha1.Robot, result *ctrl.Result) error {
+
+	err := r.reconcileHandlePVCs(ctx, instance)
+	if err != nil {
+		return robotErr.CheckCreatingOrWaitingError(result, err)
+	}
+
+	err = r.reconcileHandleLoaderJob(ctx, instance)
+	if err != nil {
+		return robotErr.CheckCreatingOrWaitingError(result, err)
+	}
+
+	err = r.reconcileHandleRobotDevSuite(ctx, instance)
+	if err != nil {
+		return robotErr.CheckCreatingOrWaitingError(result, err)
+	}
+
+	err = r.reconcileHandleWorkspaceManager(ctx, instance)
 	if err != nil {
 		return robotErr.CheckCreatingOrWaitingError(result, err)
 	}

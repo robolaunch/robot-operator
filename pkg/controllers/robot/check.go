@@ -66,8 +66,8 @@ func (r *RobotReconciler) reconcileCheckDiscoveryServer(ctx context.Context, ins
 		return err
 	} else {
 
-		if !reflect.DeepEqual(instance.Spec.DiscoveryServerTemplate, discoverServerQuery.Spec) {
-			discoverServerQuery.Spec = instance.Spec.DiscoveryServerTemplate
+		if !reflect.DeepEqual(instance.Spec.RobotConfig.DiscoveryServerTemplate, discoverServerQuery.Spec) {
+			discoverServerQuery.Spec = instance.Spec.RobotConfig.DiscoveryServerTemplate
 			err = r.Update(ctx, discoverServerQuery)
 			if err != nil {
 				return err
@@ -116,9 +116,9 @@ func (r *RobotReconciler) reconcileCheckROSBridge(ctx context.Context, instance 
 	} else if err != nil {
 		return err
 	} else {
-		if instance.Spec.ROSBridgeTemplate.ROS2.Enabled {
-			if !reflect.DeepEqual(instance.Spec.ROSBridgeTemplate, rosBridgeQuery.Spec) {
-				rosBridgeQuery.Spec = instance.Spec.ROSBridgeTemplate
+		if instance.Spec.RobotConfig.ROSBridgeTemplate.ROS2.Enabled {
+			if !reflect.DeepEqual(instance.Spec.RobotConfig.ROSBridgeTemplate, rosBridgeQuery.Spec) {
+				rosBridgeQuery.Spec = instance.Spec.RobotConfig.ROSBridgeTemplate
 				err = r.Update(ctx, rosBridgeQuery)
 				if err != nil {
 					return err

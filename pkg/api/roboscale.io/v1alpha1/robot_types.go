@@ -137,6 +137,13 @@ type RelayServerList struct {
 // Robot types
 // ********************************
 
+type Type string
+
+const (
+	TypeEnvironment Type = "Environment"
+	TypeRobot       Type = "Robot"
+)
+
 // ROS 2 distribution selection. Currently supported distributions are Humble, Foxy, Galactic.
 // +kubebuilder:validation:Enum=foxy;galactic;humble
 type ROSDistro string
@@ -201,30 +208,76 @@ type RootDNSConfig struct {
 	Host string `json:"host"`
 }
 
-// RobotSpec defines the desired state of Robot.
-type RobotSpec struct {
+type RobotConfig struct {
 	// ROS 2 distributions to be used. You can select multiple distributions if they are supported in the same underlying OS.
 	// (eg. `foxy` and `galactic` are supported in Ubuntu Focal, so they can be used together but both cannot be used with `humble`)
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=2
-	Distributions []ROSDistro `json:"distributions"`
+	Distributions []ROSDistro `json:"distributions,omitempty"`
 	// RMW implementation selection. Robot operator currently supports only FastRTPS. See https://docs.ros.org/en/foxy/How-To-Guides/Working-with-multiple-RMW-implementations.html.
 	// +kubebuilder:validation:Required
-	// +kubebuilder:default=rmw_fastrtps_cpp
-	RMWImplementation RMWImplementation `json:"rmwImplementation"`
+	RMWImplementation RMWImplementation `json:"rmwImplementation,omitempty"`
 	// ROS domain ID for robot. See https://docs.ros.org/en/foxy/Concepts/About-Domain-ID.html.
 	// +kubebuilder:validation:Minimum=0
 	// +kubebuilder:validation:Maximum=101
-	// +kubebuilder:default=0
 	DomainID int `json:"domainID"`
-	// Total storage amount to persist via Robot. Unit of measurement is MB. (eg. `10240` corresponds 10 GB)
-	// This amount is being shared between different components.
-	Storage Storage `json:"storage,omitempty"`
 	// Discovery server configurational parameters.
 	DiscoveryServerTemplate DiscoveryServerSpec `json:"discoveryServerTemplate,omitempty"`
 	// ROS bridge configurational parameters.
 	ROSBridgeTemplate ROSBridgeSpec `json:"rosBridgeTemplate,omitempty"`
+}
+
+type Application struct {
+	// Application name.
+	// +kubebuilder:validation:Required
+	Name string `json:"name"`
+	// Version of the application.
+	// +kubebuilder:validation:Required
+	Version string `json:"version"`
+}
+
+type DevSpaceImage struct {
+	// Ubuntu distribution of the environment.
+	// +kubebuilder:validation:Required
+	UbuntuDistro string `json:"ubuntuDistro"`
+	// Ubuntu desktop.
+	// +kubebuilder:validation:Required
+	Desktop string `json:"desktop"`
+	// DevSpace image version.
+	// +kubebuilder:validation:Required
+	Version string `json:"version"`
+}
+
+type EnvironmentConfig struct {
+	// Domain of the environment.
+	// +kubebuilder:validation:Required
+	Domain string `json:"domain"`
+	// Application properties.
+	// +kubebuilder:validation:Required
+	Application Application `json:"application"`
+	// DevSpace image properties.
+	// +kubebuilder:validation:Required
+	DevSpaceImage DevSpaceImage `json:"devspace"`
+}
+
+// RobotSpec defines the desired state of Robot.
+type RobotSpec struct {
+	// Determines the object type.
+	// If "Environment", operator will provision an environment according to the specifications. (`.spec.environment`)
+	// If "Robot", operator will provision an environment specialized for ROS 2 according to the specifications. (`.spec.robot`)
+	Type Type `json:"type,omitempty"`
+	// Holds robot's configuration.
+	// Applied if `.spec.type` is `Robot` and must be `nil` otherwise.
+	// +kubebuilder:validation:Optional
+	RobotConfig RobotConfig `json:"robot,omitempty"`
+	// Holds environment's configuration.
+	// Applied if `.spec.type` is `Environment` and must be `nil` otherwise.
+	// +kubebuilder:validation:Optional
+	EnvironmentConfig EnvironmentConfig `json:"environment,omitempty"`
+	// Total storage amount to persist via Robot. Unit of measurement is MB. (eg. `10240` corresponds 10 GB)
+	// This amount is being shared between different components.
+	Storage Storage `json:"storage,omitempty"`
 	// Robot development suite template
 	RobotDevSuiteTemplate RobotDevSuiteSpec `json:"robotDevSuiteTemplate,omitempty"`
 	// Workspace manager template to configure ROS 2 workspaces.
@@ -333,7 +386,6 @@ type DiscoveryServerSpec struct {
 	// ROS domain ID for robot. See https://docs.ros.org/en/foxy/Concepts/About-Domain-ID.html.
 	// +kubebuilder:validation:Minimum=0
 	// +kubebuilder:validation:Maximum=101
-	// +kubebuilder:default=0
 	DomainID int `json:"domainID"`
 	// Instance type can be either `Server` or `Client`.
 	// If `Server`, instance creates discovery server resources and workloads.
@@ -405,7 +457,6 @@ type ROSBridgeSpec struct {
 	ROS2 BridgeDistro `json:"ros2,omitempty"`
 	// Service type of ROSBridge. `ClusterIP` and `NodePort` is supported.
 	// +kubebuilder:validation:Enum=ClusterIP;NodePort
-	// +kubebuilder:default="NodePort"
 	ServiceType corev1.ServiceType `json:"serviceType,omitempty"`
 	// [*alpha*] ROSBridge will create an Ingress resource if `true`.
 	Ingress bool `json:"ingress,omitempty"`

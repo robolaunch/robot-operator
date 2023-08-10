@@ -176,6 +176,10 @@ const (
 		"}"
 )
 
+const (
+	IMAGE_MAP_URL = "https://raw.githubusercontent.com/robolaunch/robolaunch/main/platform.yaml"
+)
+
 // Commands for collecting metrics
 const (
 	CMD_GET_CPU          = "cat /sys/fs/cgroup/cpu/cpuacct.usage"
