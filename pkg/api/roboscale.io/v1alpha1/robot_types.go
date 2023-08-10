@@ -16,7 +16,11 @@ func init() {
 //+genclient
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
-//+kubebuilder:printcolumn:name="Distributions",type=string,JSONPath=`.spec.distributions`
+//+kubebuilder:printcolumn:name="Distributions",type=string,JSONPath=`.spec.robot.distributions`
+//+kubebuilder:printcolumn:name="Application",type=string,JSONPath=`.spec.environment.application.name`
+//+kubebuilder:printcolumn:name="Version",type=string,JSONPath=`.spec.environment.application.version`
+//+kubebuilder:printcolumn:name="Ubuntu",type=string,JSONPath=`.spec.environment.devspace.ubuntuDistro`
+//+kubebuilder:printcolumn:name="DevSpace",type=string,JSONPath=`.spec.environment.devspace.version`
 //+kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
 
 // Robot is the custom resource that contains ROS 2 components (Workloads, Cloud VDI, Cloud IDE, ROS Bridge, Configurational Resources), robolaunch Robot instances can be decomposed and distributed to both cloud instances and physical instances using federation.
