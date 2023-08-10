@@ -92,7 +92,6 @@ spec:
                           Should be set if the type is `Client`.
                         type: string
                       domainID:
-                        default: 0
                         description: ROS domain ID for robot. See https://docs.ros.org/en/foxy/Concepts/About-Domain-ID.html.
                         maximum: 101
                         minimum: 0
@@ -178,13 +177,11 @@ spec:
                     minItems: 1
                     type: array
                   domainID:
-                    default: 0
                     description: ROS domain ID for robot. See https://docs.ros.org/en/foxy/Concepts/About-Domain-ID.html.
                     maximum: 101
                     minimum: 0
                     type: integer
                   rmwImplementation:
-                    default: rmw_fastrtps_cpp
                     description: RMW implementation selection. Robot operator currently
                       supports only FastRTPS. See https://docs.ros.org/en/foxy/How-To-Guides/Working-with-multiple-RMW-implementations.html.
                     enum:
@@ -228,7 +225,6 @@ spec:
                             type: boolean
                         type: object
                       serviceType:
-                        default: NodePort
                         description: Service type of ROSBridge. `ClusterIP` and `NodePort`
                           is supported.
                         enum:
@@ -237,9 +233,7 @@ spec:
                         type: string
                     type: object
                 required:
-                - distributions
                 - domainID
-                - rmwImplementation
                 type: object
               robotDevSuiteTemplate:
                 description: Robot development suite template
