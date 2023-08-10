@@ -5,8 +5,10 @@ import (
 	"io"
 	"net/http"
 	"path/filepath"
+	"reflect"
 	"strings"
 
+	cosmodrome "github.com/robolaunch/cosmodrome/pkg/api"
 	"github.com/robolaunch/robot-operator/internal"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	"gopkg.in/yaml.v2"
@@ -24,13 +26,9 @@ type Version struct {
 }
 
 type Images struct {
-	Organization string  `yaml:"organization"`
-	Repository   string  `yaml:"repository"`
-	Domains      Domains `yaml:"domains"`
-}
-
-type Domains struct {
-	Robotics []Element `yaml:"robotics"`
+	Organization string               `yaml:"organization"`
+	Repository   string               `yaml:"repository"`
+	Domains      map[string][]Element `yaml:"domains"`
 }
 
 type Element struct {
@@ -74,9 +72,16 @@ func GetReadyRobotProperties(robot robotv1alpha1.Robot) ReadyRobotProperties {
 	}
 }
 
-// TODO: Fetch all properties from platform versioning map
 func GetImage(node corev1.Node, robot robotv1alpha1.Robot) (string, error) {
+	if robot.Spec.Type == robotv1alpha1.TypeRobot {
+		return GetImageForRobot(node, robot)
+	} else if robot.Spec.Type == robotv1alpha1.TypeEnvironment {
+		return GetImageForEnvironment(node, robot)
+	}
+	return "", errors.New("cannot specify the resource type")
+}
 
+func GetImageForRobot(node corev1.Node, robot robotv1alpha1.Robot) (string, error) {
 	var imageBuilder strings.Builder
 	var tagBuilder strings.Builder
 
@@ -89,7 +94,7 @@ func GetImage(node corev1.Node, robot robotv1alpha1.Robot) (string, error) {
 	} else {
 
 		platformVersion := GetPlatformVersion(node)
-		imageProps, err := getImageProps(platformVersion, getDistroStr(robot.Spec.RobotConfig.Distributions))
+		imageProps, err := getImagePropsForRobot(platformVersion, getDistroStr(robot.Spec.RobotConfig.Distributions))
 		if err != nil {
 			return "", err
 		}
@@ -106,7 +111,100 @@ func GetImage(node corev1.Node, robot robotv1alpha1.Robot) (string, error) {
 	}
 
 	return imageBuilder.String(), nil
+}
 
+func GetImageForEnvironment(node corev1.Node, robot robotv1alpha1.Robot) (string, error) {
+	var imageBuilder strings.Builder
+	var tagBuilder strings.Builder
+
+	readyEnvironment := GetReadyRobotProperties(robot)
+
+	if readyEnvironment.Enabled {
+
+		imageBuilder.WriteString(readyEnvironment.Image)
+
+	} else {
+
+		platformVersion := GetPlatformVersion(node)
+		imageProps, err := getImagePropsForEnvironment(platformVersion)
+		if err != nil {
+			return "", err
+		}
+
+		organization := imageProps.Organization
+		repository := imageProps.Repository
+
+		chosenElement := Element{}
+		if robot.Spec.EnvironmentConfig.Domain == "plain" {
+			for _, element := range imageProps.Domains["plain"] {
+				if element.DevSpaceImage.UbuntuDistro != robot.Spec.EnvironmentConfig.DevSpaceImage.UbuntuDistro {
+					continue
+				}
+
+				if element.DevSpaceImage.Desktop != robot.Spec.EnvironmentConfig.DevSpaceImage.Desktop {
+					continue
+				}
+
+				if element.DevSpaceImage.Version != robot.Spec.EnvironmentConfig.DevSpaceImage.Version {
+					continue
+				}
+
+				chosenElement = element
+				break
+			}
+
+			if reflect.DeepEqual(chosenElement, Element{}) {
+				return "", errors.New("environment is not supported")
+			}
+		} else {
+			if domain, ok := imageProps.Domains[robot.Spec.EnvironmentConfig.Domain]; ok {
+				for _, element := range domain {
+					if element.Application.Name != robot.Spec.EnvironmentConfig.Application.Name {
+						continue
+					}
+
+					if element.Application.Version != robot.Spec.EnvironmentConfig.Application.Version {
+						continue
+					}
+
+					if element.DevSpaceImage.UbuntuDistro != robot.Spec.EnvironmentConfig.DevSpaceImage.UbuntuDistro {
+						continue
+					}
+
+					if element.DevSpaceImage.Desktop != robot.Spec.EnvironmentConfig.DevSpaceImage.Desktop {
+						continue
+					}
+
+					if element.DevSpaceImage.Version != robot.Spec.EnvironmentConfig.DevSpaceImage.Version {
+						continue
+					}
+
+					chosenElement = element
+					repository += "-" + robot.Spec.EnvironmentConfig.Domain
+					tagBuilder.WriteString(chosenElement.Application.Name + "-")
+					tagBuilder.WriteString(cosmodrome.FormatTag(chosenElement.Application.Version) + "-")
+					break
+				}
+
+				if reflect.DeepEqual(chosenElement, Element{}) {
+					return "", errors.New("environment is not supported")
+				}
+
+			} else {
+				return "", errors.New("domain is not supported")
+			}
+		}
+
+		tagBuilder.WriteString(chosenElement.DevSpaceImage.UbuntuDistro + "-")
+		tagBuilder.WriteString(chosenElement.DevSpaceImage.Desktop + "-")
+		tagBuilder.WriteString(chosenElement.DevSpaceImage.Version)
+
+		imageBuilder.WriteString(filepath.Join(organization, repository) + ":")
+		imageBuilder.WriteString(tagBuilder.String())
+
+	}
+
+	return imageBuilder.String(), nil
 }
 
 func getDistroStr(distributions []robotv1alpha1.ROSDistro) string {
@@ -126,9 +224,9 @@ func setPrecisionBetweenDistributions(distributions []robotv1alpha1.ROSDistro) s
 	return ""
 }
 
-func getImageProps(platformVersion, distro string) (Element, error) {
+func getImagePropsForRobot(platformVersion, distro string) (Element, error) {
 
-	resp, err := http.Get("https://raw.githubusercontent.com/robolaunch/robolaunch/main/platform.yaml")
+	resp, err := http.Get(internal.IMAGE_MAP_URL)
 	if err != nil {
 		return Element{}, err
 	}
@@ -153,7 +251,7 @@ func getImageProps(platformVersion, distro string) (Element, error) {
 	var imageProps Element
 	for _, v := range platform.Versions {
 		if v.Version == platformVersion {
-			for _, element := range v.Images.Domains.Robotics {
+			for _, element := range v.Images.Domains["robotics"] {
 				if element.Application.Version == distro {
 					imageProps = element
 					distroFound = true
@@ -165,6 +263,39 @@ func getImageProps(platformVersion, distro string) (Element, error) {
 
 	if !distroFound {
 		return Element{}, errors.New("distro not found in platform versioning map")
+	}
+
+	return imageProps, nil
+}
+
+func getImagePropsForEnvironment(platformVersion string) (Images, error) {
+
+	resp, err := http.Get(internal.IMAGE_MAP_URL)
+	if err != nil {
+		return Images{}, err
+	}
+
+	defer resp.Body.Close()
+
+	var yamlFile []byte
+	if resp.StatusCode == http.StatusOK {
+		yamlFile, err = io.ReadAll(resp.Body)
+		if err != nil {
+			return Images{}, err
+		}
+	}
+
+	var platform Platform
+	err = yaml.Unmarshal(yamlFile, &platform)
+	if err != nil {
+		return Images{}, err
+	}
+
+	var imageProps Images
+	for _, v := range platform.Versions {
+		if v.Version == platformVersion {
+			imageProps = v.Images
+		}
 	}
 
 	return imageProps, nil
