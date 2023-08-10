@@ -214,15 +214,13 @@ type RobotConfig struct {
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=2
-	Distributions []ROSDistro `json:"distributions"`
+	Distributions []ROSDistro `json:"distributions,omitempty"`
 	// RMW implementation selection. Robot operator currently supports only FastRTPS. See https://docs.ros.org/en/foxy/How-To-Guides/Working-with-multiple-RMW-implementations.html.
 	// +kubebuilder:validation:Required
-	// +kubebuilder:default=rmw_fastrtps_cpp
-	RMWImplementation RMWImplementation `json:"rmwImplementation"`
+	RMWImplementation RMWImplementation `json:"rmwImplementation,omitempty"`
 	// ROS domain ID for robot. See https://docs.ros.org/en/foxy/Concepts/About-Domain-ID.html.
 	// +kubebuilder:validation:Minimum=0
 	// +kubebuilder:validation:Maximum=101
-	// +kubebuilder:default=0
 	DomainID int `json:"domainID"`
 	// Discovery server configurational parameters.
 	DiscoveryServerTemplate DiscoveryServerSpec `json:"discoveryServerTemplate,omitempty"`
@@ -388,7 +386,6 @@ type DiscoveryServerSpec struct {
 	// ROS domain ID for robot. See https://docs.ros.org/en/foxy/Concepts/About-Domain-ID.html.
 	// +kubebuilder:validation:Minimum=0
 	// +kubebuilder:validation:Maximum=101
-	// +kubebuilder:default=0
 	DomainID int `json:"domainID"`
 	// Instance type can be either `Server` or `Client`.
 	// If `Server`, instance creates discovery server resources and workloads.
@@ -460,7 +457,6 @@ type ROSBridgeSpec struct {
 	ROS2 BridgeDistro `json:"ros2,omitempty"`
 	// Service type of ROSBridge. `ClusterIP` and `NodePort` is supported.
 	// +kubebuilder:validation:Enum=ClusterIP;NodePort
-	// +kubebuilder:default="NodePort"
 	ServiceType corev1.ServiceType `json:"serviceType,omitempty"`
 	// [*alpha*] ROSBridge will create an Ingress resource if `true`.
 	Ingress bool `json:"ingress,omitempty"`

@@ -186,18 +186,20 @@ func (r *Robot) checkDistributions() error {
 
 func (r *Robot) checkWorkspaces() error {
 
-	for _, ws := range r.Spec.WorkspaceManagerTemplate.Workspaces {
+	if reflect.DeepEqual(r.Spec.Type, TypeRobot) {
+		for _, ws := range r.Spec.WorkspaceManagerTemplate.Workspaces {
 
-		distroExists := false
-		for _, distro := range r.Spec.RobotConfig.Distributions {
-			if ws.Distro == distro {
-				distroExists = true
-				break
+			distroExists := false
+			for _, distro := range r.Spec.RobotConfig.Distributions {
+				if ws.Distro == distro {
+					distroExists = true
+					break
+				}
 			}
-		}
 
-		if !distroExists {
-			return errors.New("workspace " + ws.Name + " has unsupported distro defined in `spec.distributions`")
+			if !distroExists {
+				return errors.New("workspace " + ws.Name + " has unsupported distro defined in `spec.distributions`")
+			}
 		}
 	}
 
@@ -256,7 +258,9 @@ func (r *Robot) setWorkspacesPath() {
 }
 
 func (r *Robot) setDiscoveryServerDomainID() {
-	r.Spec.RobotConfig.DiscoveryServerTemplate.DomainID = r.Spec.RobotConfig.DomainID
+	if reflect.DeepEqual(r.Spec.Type, TypeRobot) {
+		r.Spec.RobotConfig.DiscoveryServerTemplate.DomainID = r.Spec.RobotConfig.DomainID
+	}
 }
 
 // ********************************
