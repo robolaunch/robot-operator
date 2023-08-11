@@ -46,6 +46,12 @@ type RobotList struct {
 //+genclient
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
+//+kubebuilder:printcolumn:name="Type",type=string,JSONPath=`.spec.type`
+//+kubebuilder:printcolumn:name="Domain ID",type=string,JSONPath=`.spec.domainID`
+//+kubebuilder:printcolumn:name="Hostname",type=string,JSONPath=`.spec.hostname`
+//+kubebuilder:printcolumn:name="Subdomain",type=string,JSONPath=`.spec.subdomain`
+//+kubebuilder:printcolumn:name="IP",type=string,JSONPath=`.status.connectionInfo.ip`
+//+kubebuilder:printcolumn:name="URI",type=string,JSONPath=`.status.connectionInfo.uri`
 
 // DiscoveryServer is a custom resource that connects Robots and Fleets
 // both locally and geoghraphically in DDS (UDP multicast) level.
