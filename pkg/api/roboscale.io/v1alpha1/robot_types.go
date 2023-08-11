@@ -52,6 +52,7 @@ type RobotList struct {
 //+kubebuilder:printcolumn:name="Subdomain",type=string,JSONPath=`.spec.subdomain`
 //+kubebuilder:printcolumn:name="IP",type=string,JSONPath=`.status.connectionInfo.ip`
 //+kubebuilder:printcolumn:name="URI",type=string,JSONPath=`.status.connectionInfo.uri`
+//+kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
 
 // DiscoveryServer is a custom resource that connects Robots and Fleets
 // both locally and geoghraphically in DDS (UDP multicast) level.
@@ -77,6 +78,7 @@ type DiscoveryServerList struct {
 //+genclient
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
+//+kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
 
 // ROSBridge is a custom resource that provisions ROS/2 bridge resources and workloads.
 // It could also convert ROS 2 topics to ROS topics using ROS 1 to 2 bridge.
@@ -124,6 +126,9 @@ type RobotArtifactList struct {
 //+genclient
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
+//+kubebuilder:printcolumn:name="Instance",type=string,JSONPath=`.spec.instanceName`
+//+kubebuilder:printcolumn:name="Remote Namespace",type=string,JSONPath=`.spec.remoteNamespace`
+//+kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
 
 // RelayServer is the Schema for the relayservers API
 type RelayServer struct {
