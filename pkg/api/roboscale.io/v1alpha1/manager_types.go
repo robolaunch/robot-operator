@@ -29,6 +29,9 @@ func init() {
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
+//+kubebuilder:printcolumn:name="Path",type=string,JSONPath=`.spec.workspacesPath`
+//+kubebuilder:printcolumn:name="Workspaces",type=string,JSONPath=`.spec.workspaces[].name`
+//+kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
 
 // WorkspaceManager configures the ROS 2 workspaces and repositories by executing Kubernetes jobs.
 type WorkspaceManager struct {
@@ -53,6 +56,8 @@ type WorkspaceManagerList struct {
 //+genclient
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
+//+kubebuilder:printcolumn:name="Steps",type=string,JSONPath=`.spec.steps[].name`
+//+kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
 
 // BuildManager is the Schema for the buildmanagers API
 type BuildManager struct {
@@ -77,6 +82,8 @@ type BuildManagerList struct {
 //+genclient
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
+//+kubebuilder:printcolumn:name="Launches",type=string,JSONPath=`.spec.launches[].name`
+//+kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
 
 // LaunchManager is the Schema for the launchmanagers API
 type LaunchManager struct {

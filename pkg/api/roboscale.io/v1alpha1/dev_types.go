@@ -30,6 +30,10 @@ func init() {
 //+genclient
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
+//+kubebuilder:printcolumn:name="VDI",type=string,JSONPath=`.spec.vdiEnabled`
+//+kubebuilder:printcolumn:name="IDE",type=string,JSONPath=`.spec.ideEnabled`
+//+kubebuilder:printcolumn:name="Remote IDE RS",type=string,JSONPath=`.spec.remoteIDEEnabled`
+//+kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
 
 // RobotDevSuite is a custom resource that creates dynamically configured
 // development environments for robots.
@@ -55,6 +59,10 @@ type RobotDevSuiteList struct {
 //+genclient
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
+//+kubebuilder:printcolumn:name="Display",type=string,JSONPath=`.spec.display`
+//+kubebuilder:printcolumn:name="Privileged",type=string,JSONPath=`.spec.privileged`
+//+kubebuilder:printcolumn:name="GPU",type=string,JSONPath=`.spec.resources.gpuCore`
+//+kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
 
 // RobotIDE creates and manages Cloud IDE resources and workloads.
 type RobotIDE struct {
@@ -79,6 +87,11 @@ type RobotIDEList struct {
 //+genclient
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
+//+kubebuilder:printcolumn:name="Resolution",type=string,JSONPath=`.spec.resolution`
+//+kubebuilder:printcolumn:name="Ports",type=string,JSONPath=`.spec.webrtcPortRange`
+//+kubebuilder:printcolumn:name="Privileged",type=string,JSONPath=`.spec.privileged`
+//+kubebuilder:printcolumn:name="GPU",type=string,JSONPath=`.spec.resources.gpuCore`
+//+kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
 
 // RobotVDI creates and manages Cloud VDI resources and workloads.
 type RobotVDI struct {

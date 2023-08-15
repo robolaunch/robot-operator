@@ -16,7 +16,11 @@ func init() {
 //+genclient
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
-//+kubebuilder:printcolumn:name="Distributions",type=string,JSONPath=`.spec.distributions`
+//+kubebuilder:printcolumn:name="Distributions",type=string,JSONPath=`.spec.robot.distributions`
+//+kubebuilder:printcolumn:name="Application",type=string,JSONPath=`.spec.environment.application.name`
+//+kubebuilder:printcolumn:name="Version",type=string,JSONPath=`.spec.environment.application.version`
+//+kubebuilder:printcolumn:name="Ubuntu",type=string,JSONPath=`.spec.environment.devspace.ubuntuDistro`
+//+kubebuilder:printcolumn:name="DevSpace",type=string,JSONPath=`.spec.environment.devspace.version`
 //+kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
 
 // Robot is the custom resource that contains ROS 2 components (Workloads, Cloud VDI, Cloud IDE, ROS Bridge, Configurational Resources), robolaunch Robot instances can be decomposed and distributed to both cloud instances and physical instances using federation.
@@ -42,6 +46,13 @@ type RobotList struct {
 //+genclient
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
+//+kubebuilder:printcolumn:name="Type",type=string,JSONPath=`.spec.type`
+//+kubebuilder:printcolumn:name="Domain ID",type=string,JSONPath=`.spec.domainID`
+//+kubebuilder:printcolumn:name="Hostname",type=string,JSONPath=`.spec.hostname`
+//+kubebuilder:printcolumn:name="Subdomain",type=string,JSONPath=`.spec.subdomain`
+//+kubebuilder:printcolumn:name="IP",type=string,JSONPath=`.status.connectionInfo.ip`
+//+kubebuilder:printcolumn:name="URI",type=string,JSONPath=`.status.connectionInfo.uri`
+//+kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
 
 // DiscoveryServer is a custom resource that connects Robots and Fleets
 // both locally and geoghraphically in DDS (UDP multicast) level.
@@ -67,6 +78,7 @@ type DiscoveryServerList struct {
 //+genclient
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
+//+kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
 
 // ROSBridge is a custom resource that provisions ROS/2 bridge resources and workloads.
 // It could also convert ROS 2 topics to ROS topics using ROS 1 to 2 bridge.
@@ -114,6 +126,9 @@ type RobotArtifactList struct {
 //+genclient
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
+//+kubebuilder:printcolumn:name="Instance",type=string,JSONPath=`.spec.instanceName`
+//+kubebuilder:printcolumn:name="Remote Namespace",type=string,JSONPath=`.spec.remoteNamespace`
+//+kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
 
 // RelayServer is the Schema for the relayservers API
 type RelayServer struct {
