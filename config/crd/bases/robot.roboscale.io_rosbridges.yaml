@@ -15,7 +15,11 @@ spec:
     singular: rosbridge
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - additionalPrinterColumns:
+    - jsonPath: .status.phase
+      name: Phase
+      type: string
+    name: v1alpha1
     schema:
       openAPIV3Schema:
         description: ROSBridge is a custom resource that provisions ROS/2 bridge resources

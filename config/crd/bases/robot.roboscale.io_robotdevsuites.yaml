@@ -15,7 +15,20 @@ spec:
     singular: robotdevsuite
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - additionalPrinterColumns:
+    - jsonPath: .spec.vdiEnabled
+      name: VDI
+      type: string
+    - jsonPath: .spec.ideEnabled
+      name: IDE
+      type: string
+    - jsonPath: .spec.remoteIDEEnabled
+      name: Remote IDE RS
+      type: string
+    - jsonPath: .status.phase
+      name: Phase
+      type: string
+    name: v1alpha1
     schema:
       openAPIV3Schema:
         description: RobotDevSuite is a custom resource that creates dynamically configured
