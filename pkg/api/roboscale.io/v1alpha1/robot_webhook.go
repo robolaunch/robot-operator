@@ -207,9 +207,9 @@ func (r *Robot) checkRobotDevSuite() error {
 }
 
 func (r *Robot) setDefaultLabels() {
-	r.SetLabels(map[string]string{
-		internal.ROBOT_IMAGE_REGISTRY: "docker.io",
-	})
+	if _, ok := r.Labels[internal.ROBOT_IMAGE_REGISTRY]; !ok {
+		r.Labels[internal.ROBOT_IMAGE_REGISTRY] = "docker.io"
+	}
 }
 
 func (r *Robot) setRepositoryPaths() {
