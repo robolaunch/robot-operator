@@ -19,6 +19,7 @@ const (
 
 // Ready robot label
 const (
+	ROBOT_IMAGE_REGISTRY   = "docker.io"
 	ROBOT_IMAGE_USER       = "robolaunch.io/robot-image-user"
 	ROBOT_IMAGE_REPOSITORY = "robolaunch.io/robot-image-repository"
 	ROBOT_IMAGE_TAG        = "robolaunch.io/robot-image-tag"
