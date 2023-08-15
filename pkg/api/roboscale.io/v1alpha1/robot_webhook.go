@@ -33,6 +33,7 @@ var _ webhook.Defaulter = &Robot{}
 func (r *Robot) Default() {
 	robotlog.Info("default", "name", r.Name)
 
+	r.setDefaultLabels()
 	r.setRepositoryPaths()
 	_ = r.setRepositoryInfo()
 	r.setWorkspacesPath()
@@ -203,6 +204,12 @@ func (r *Robot) checkRobotDevSuite() error {
 	}
 
 	return nil
+}
+
+func (r *Robot) setDefaultLabels() {
+	r.SetLabels(map[string]string{
+		internal.ROBOT_IMAGE_REGISTRY: "docker.io",
+	})
 }
 
 func (r *Robot) setRepositoryPaths() {
