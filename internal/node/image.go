@@ -56,10 +56,10 @@ type ReadyRobotProperties struct {
 func GetReadyRobotProperties(robot robotv1alpha1.Robot) ReadyRobotProperties {
 	labels := robot.GetLabels()
 
-	if registry, hasRegistry := labels[internal.ROBOT_IMAGE_REGISTRY]; hasRegistry {
-		if user, hasUser := labels[internal.ROBOT_IMAGE_USER]; hasUser {
-			if repository, hasRepository := labels[internal.ROBOT_IMAGE_REPOSITORY]; hasRepository {
-				if tag, hasTag := labels[internal.ROBOT_IMAGE_TAG]; hasTag {
+	if registry, hasRegistry := labels[internal.ROBOT_IMAGE_REGISTRY_LABEL_KEY]; hasRegistry {
+		if user, hasUser := labels[internal.ROBOT_IMAGE_USER_LABEL_KEY]; hasUser {
+			if repository, hasRepository := labels[internal.ROBOT_IMAGE_REPOSITORY_LABEL_KEY]; hasRepository {
+				if tag, hasTag := labels[internal.ROBOT_IMAGE_TAG_LABEL_KEY]; hasTag {
 					return ReadyRobotProperties{
 						Enabled: true,
 						Image:   registry + "/" + user + "/" + repository + ":" + tag,
@@ -101,13 +101,18 @@ func GetImageForRobot(node corev1.Node, robot robotv1alpha1.Robot) (string, erro
 			return "", err
 		}
 
+		registry, hasRegistry := robot.Labels[internal.ROBOT_IMAGE_REGISTRY_LABEL_KEY]
+		if !hasRegistry {
+			return "", errors.New("registry is not found in label with key " + internal.ROBOT_IMAGE_REGISTRY_LABEL_KEY)
+		}
+
 		organization := "robolaunchio"
 		repository := "devspace-robotics"
 		tagBuilder.WriteString(imageProps.Application.Name + "-")
 		tagBuilder.WriteString(imageProps.Application.Version)
 		tagBuilder.WriteString("-" + imageProps.DevSpaceImage.UbuntuDistro + "-" + imageProps.DevSpaceImage.Desktop)
 		tagBuilder.WriteString("-" + imageProps.DevSpaceImage.Version)
-		imageBuilder.WriteString(filepath.Join(organization, repository) + ":")
+		imageBuilder.WriteString(filepath.Join(registry, organization, repository) + ":")
 		imageBuilder.WriteString(tagBuilder.String())
 
 	}
@@ -131,6 +136,11 @@ func GetImageForEnvironment(node corev1.Node, robot robotv1alpha1.Robot) (string
 		imageProps, err := getImagePropsForEnvironment(platformVersion)
 		if err != nil {
 			return "", err
+		}
+
+		registry, hasRegistry := robot.Labels[internal.ROBOT_IMAGE_REGISTRY_LABEL_KEY]
+		if !hasRegistry {
+			return "", errors.New("registry is not found in label with key " + internal.ROBOT_IMAGE_REGISTRY_LABEL_KEY)
 		}
 
 		organization := imageProps.Organization
@@ -201,7 +211,7 @@ func GetImageForEnvironment(node corev1.Node, robot robotv1alpha1.Robot) (string
 		tagBuilder.WriteString(chosenElement.DevSpaceImage.Desktop + "-")
 		tagBuilder.WriteString(chosenElement.DevSpaceImage.Version)
 
-		imageBuilder.WriteString(filepath.Join(organization, repository) + ":")
+		imageBuilder.WriteString(filepath.Join(registry, organization, repository) + ":")
 		imageBuilder.WriteString(tagBuilder.String())
 
 	}
