@@ -33,22 +33,11 @@ var _ webhook.Defaulter = &Robot{}
 func (r *Robot) Default() {
 	robotlog.Info("default", "name", r.Name)
 
-	DefaultRepositoryPaths(r)
+	r.setDefaultLabels()
+	r.setRepositoryPaths()
 	_ = r.setRepositoryInfo()
 	r.setWorkspacesPath()
 	r.setDiscoveryServerDomainID()
-}
-
-func DefaultRepositoryPaths(r *Robot) {
-	for wsKey := range r.Spec.WorkspaceManagerTemplate.Workspaces {
-		ws := r.Spec.WorkspaceManagerTemplate.Workspaces[wsKey]
-		for repoKey := range ws.Repositories {
-			repo := ws.Repositories[repoKey]
-			repo.Path = r.Spec.WorkspaceManagerTemplate.WorkspacesPath + "/" + ws.Name + "/src/" + repoKey
-			ws.Repositories[repoKey] = repo
-		}
-		r.Spec.WorkspaceManagerTemplate.Workspaces[wsKey] = ws
-	}
 }
 
 //+kubebuilder:webhook:path=/validate-robot-roboscale-io-v1alpha1-robot,mutating=false,failurePolicy=fail,sideEffects=None,groups=robot.roboscale.io,resources=robots,verbs=create;update,versions=v1alpha1,name=vrobot.kb.io,admissionReviewVersions=v1
@@ -215,6 +204,24 @@ func (r *Robot) checkRobotDevSuite() error {
 	}
 
 	return nil
+}
+
+func (r *Robot) setDefaultLabels() {
+	if _, ok := r.Labels[internal.ROBOT_IMAGE_REGISTRY_LABEL_KEY]; !ok {
+		r.Labels[internal.ROBOT_IMAGE_REGISTRY_LABEL_KEY] = "docker.io"
+	}
+}
+
+func (r *Robot) setRepositoryPaths() {
+	for wsKey := range r.Spec.WorkspaceManagerTemplate.Workspaces {
+		ws := r.Spec.WorkspaceManagerTemplate.Workspaces[wsKey]
+		for repoKey := range ws.Repositories {
+			repo := ws.Repositories[repoKey]
+			repo.Path = r.Spec.WorkspaceManagerTemplate.WorkspacesPath + "/" + ws.Name + "/src/" + repoKey
+			ws.Repositories[repoKey] = repo
+		}
+		r.Spec.WorkspaceManagerTemplate.Workspaces[wsKey] = ws
+	}
 }
 
 func (r *Robot) setRepositoryInfo() error {
