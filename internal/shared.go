@@ -178,7 +178,10 @@ const (
 )
 
 const (
-	IMAGE_MAP_URL = "https://raw.githubusercontent.com/robolaunch/robolaunch/main/platform.yaml"
+	IMAGE_MAP_CONFIG_MAP_NAME      = "platform"
+	IMAGE_MAP_CONFIG_MAP_NAMESPACE = "kube-system"
+	IMAGE_MAP_CONFIG_MAP_DATA_KEY  = "platform.yaml"
+	IMAGE_MAP_URL                  = "https://raw.githubusercontent.com/robolaunch/robolaunch/main/platform.yaml"
 )
 
 // Commands for collecting metrics
