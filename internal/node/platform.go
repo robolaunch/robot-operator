@@ -1,33 +1,75 @@
 package node
 
 import (
+	"context"
 	"errors"
 	"io"
 	"net/http"
 
+	k8sErr "k8s.io/apimachinery/pkg/api/errors"
+
 	"github.com/robolaunch/robot-operator/internal"
 	"gopkg.in/yaml.v2"
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func getImagePropsForRobot(platformVersion, distro string) (Element, error) {
+func getPlatform(ctx context.Context, r client.Client, platformVersion, distro string) (Platform, error) {
 
-	resp, err := http.Get(internal.IMAGE_MAP_URL)
-	if err != nil {
-		return Element{}, err
+	// try config map
+	platformCmNamespacedName := types.NamespacedName{
+		Name:      internal.IMAGE_MAP_CONFIG_MAP_NAME,
+		Namespace: internal.IMAGE_MAP_CONFIG_MAP_NAMESPACE,
 	}
 
-	defer resp.Body.Close()
-
 	var yamlFile []byte
-	if resp.StatusCode == http.StatusOK {
-		yamlFile, err = io.ReadAll(resp.Body)
-		if err != nil {
-			return Element{}, err
+
+	platformCm := &corev1.ConfigMap{}
+	cmErr := r.Get(ctx, platformCmNamespacedName, platformCm)
+	if cmErr != nil {
+		if k8sErr.IsNotFound(cmErr) {
+			// try web
+			resp, webErr := http.Get(internal.IMAGE_MAP_URL)
+			if webErr != nil {
+				return Platform{}, webErr
+			}
+
+			defer resp.Body.Close()
+
+			if resp.StatusCode != http.StatusOK {
+				return Platform{}, errors.New("cannot get platform.yaml from remote location " + internal.IMAGE_MAP_URL)
+			}
+
+			yamlFile, webErr = io.ReadAll(resp.Body)
+			if webErr != nil {
+				return Platform{}, webErr
+			}
+
+		}
+
+		return Platform{}, cmErr
+	} else {
+		if yamlString, ok := platformCm.Data[internal.IMAGE_MAP_CONFIG_MAP_DATA_KEY]; ok {
+			yamlFile = []byte(yamlString)
+		} else {
+			return Platform{}, errors.New("no data with key " + internal.IMAGE_MAP_CONFIG_MAP_DATA_KEY + " in config map " + platformCm.Name + "/" + platformCm.Namespace)
 		}
 	}
 
 	var platform Platform
-	err = yaml.Unmarshal(yamlFile, &platform)
+	err := yaml.Unmarshal(yamlFile, &platform)
+	if err != nil {
+		return Platform{}, err
+	}
+
+	return platform, nil
+
+}
+
+func getImagePropsForRobot(ctx context.Context, r client.Client, platformVersion, distro string) (Element, error) {
+
+	platform, err := getPlatform(ctx, r, platformVersion, distro)
 	if err != nil {
 		return Element{}, err
 	}
