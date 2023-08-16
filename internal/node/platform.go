@@ -6,8 +6,6 @@ import (
 	"io"
 	"net/http"
 
-	k8sErr "k8s.io/apimachinery/pkg/api/errors"
-
 	"github.com/robolaunch/robot-operator/internal"
 	"gopkg.in/yaml.v2"
 	corev1 "k8s.io/api/core/v1"
@@ -28,27 +26,22 @@ func getPlatform(ctx context.Context, r client.Client, platformVersion, distro s
 	platformCm := &corev1.ConfigMap{}
 	cmErr := r.Get(ctx, platformCmNamespacedName, platformCm)
 	if cmErr != nil {
-		if k8sErr.IsNotFound(cmErr) {
-			// try web
-			resp, webErr := http.Get(internal.IMAGE_MAP_URL)
-			if webErr != nil {
-				return Platform{}, webErr
-			}
-
-			defer resp.Body.Close()
-
-			if resp.StatusCode != http.StatusOK {
-				return Platform{}, errors.New("cannot get platform.yaml from remote location " + internal.IMAGE_MAP_URL)
-			}
-
-			yamlFile, webErr = io.ReadAll(resp.Body)
-			if webErr != nil {
-				return Platform{}, webErr
-			}
-
+		// try web
+		resp, webErr := http.Get(internal.IMAGE_MAP_URL)
+		if webErr != nil {
+			return Platform{}, webErr
 		}
 
-		return Platform{}, cmErr
+		defer resp.Body.Close()
+
+		if resp.StatusCode != http.StatusOK {
+			return Platform{}, errors.New("cannot get platform.yaml from remote location " + internal.IMAGE_MAP_URL)
+		}
+
+		yamlFile, webErr = io.ReadAll(resp.Body)
+		if webErr != nil {
+			return Platform{}, webErr
+		}
 	} else {
 		if yamlString, ok := platformCm.Data[internal.IMAGE_MAP_CONFIG_MAP_DATA_KEY]; ok {
 			yamlFile = []byte(yamlString)

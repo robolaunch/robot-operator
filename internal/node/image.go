@@ -1,6 +1,7 @@
 package node
 
 import (
+	"context"
 	"errors"
 	"path/filepath"
 	"reflect"
@@ -10,6 +11,7 @@ import (
 	"github.com/robolaunch/robot-operator/internal"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 type Platform struct {
@@ -71,16 +73,16 @@ func GetReadyRobotProperties(robot robotv1alpha1.Robot) ReadyRobotProperties {
 	}
 }
 
-func GetImage(node corev1.Node, robot robotv1alpha1.Robot) (string, error) {
+func GetImage(ctx context.Context, r client.Client, node corev1.Node, robot robotv1alpha1.Robot) (string, error) {
 	if robot.Spec.Type == robotv1alpha1.TypeRobot {
-		return GetImageForRobot(node, robot)
+		return GetImageForRobot(ctx, r, node, robot)
 	} else if robot.Spec.Type == robotv1alpha1.TypeEnvironment {
 		return GetImageForEnvironment(node, robot)
 	}
 	return "", errors.New("cannot specify the resource type")
 }
 
-func GetImageForRobot(node corev1.Node, robot robotv1alpha1.Robot) (string, error) {
+func GetImageForRobot(ctx context.Context, r client.Client, node corev1.Node, robot robotv1alpha1.Robot) (string, error) {
 	var imageBuilder strings.Builder
 	var tagBuilder strings.Builder
 
@@ -93,7 +95,7 @@ func GetImageForRobot(node corev1.Node, robot robotv1alpha1.Robot) (string, erro
 	} else {
 
 		platformVersion := GetPlatformVersion(node)
-		imageProps, err := getImagePropsForRobot(platformVersion, getDistroStr(robot.Spec.RobotConfig.Distributions))
+		imageProps, err := getImagePropsForRobot(ctx, r, platformVersion, getDistroStr(robot.Spec.RobotConfig.Distributions))
 		if err != nil {
 			return "", err
 		}
