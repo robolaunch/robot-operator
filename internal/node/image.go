@@ -77,7 +77,7 @@ func GetImage(ctx context.Context, r client.Client, node corev1.Node, robot robo
 	if robot.Spec.Type == robotv1alpha1.TypeRobot {
 		return GetImageForRobot(ctx, r, node, robot)
 	} else if robot.Spec.Type == robotv1alpha1.TypeEnvironment {
-		return GetImageForEnvironment(node, robot)
+		return GetImageForEnvironment(ctx, r, node, robot)
 	}
 	return "", errors.New("cannot specify the resource type")
 }
@@ -119,7 +119,7 @@ func GetImageForRobot(ctx context.Context, r client.Client, node corev1.Node, ro
 	return imageBuilder.String(), nil
 }
 
-func GetImageForEnvironment(node corev1.Node, robot robotv1alpha1.Robot) (string, error) {
+func GetImageForEnvironment(ctx context.Context, r client.Client, node corev1.Node, robot robotv1alpha1.Robot) (string, error) {
 	var imageBuilder strings.Builder
 	var tagBuilder strings.Builder
 
@@ -132,7 +132,7 @@ func GetImageForEnvironment(node corev1.Node, robot robotv1alpha1.Robot) (string
 	} else {
 
 		platformVersion := GetPlatformVersion(node)
-		imageProps, err := getImagePropsForEnvironment(platformVersion)
+		imageProps, err := getImagePropsForEnvironment(ctx, r, platformVersion)
 		if err != nil {
 			return "", err
 		}

@@ -13,7 +13,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func getPlatform(ctx context.Context, r client.Client, platformVersion, distro string) (Platform, error) {
+func getPlatform(ctx context.Context, r client.Client, platformVersion string) (Platform, error) {
 
 	// try config map
 	platformCmNamespacedName := types.NamespacedName{
@@ -62,7 +62,7 @@ func getPlatform(ctx context.Context, r client.Client, platformVersion, distro s
 
 func getImagePropsForRobot(ctx context.Context, r client.Client, platformVersion, distro string) (Element, error) {
 
-	platform, err := getPlatform(ctx, r, platformVersion, distro)
+	platform, err := getPlatform(ctx, r, platformVersion)
 	if err != nil {
 		return Element{}, err
 	}
@@ -88,25 +88,9 @@ func getImagePropsForRobot(ctx context.Context, r client.Client, platformVersion
 	return imageProps, nil
 }
 
-func getImagePropsForEnvironment(platformVersion string) (Images, error) {
+func getImagePropsForEnvironment(ctx context.Context, r client.Client, platformVersion string) (Images, error) {
 
-	resp, err := http.Get(internal.IMAGE_MAP_URL)
-	if err != nil {
-		return Images{}, err
-	}
-
-	defer resp.Body.Close()
-
-	var yamlFile []byte
-	if resp.StatusCode == http.StatusOK {
-		yamlFile, err = io.ReadAll(resp.Body)
-		if err != nil {
-			return Images{}, err
-		}
-	}
-
-	var platform Platform
-	err = yaml.Unmarshal(yamlFile, &platform)
+	platform, err := getPlatform(ctx, r, platformVersion)
 	if err != nil {
 		return Images{}, err
 	}
