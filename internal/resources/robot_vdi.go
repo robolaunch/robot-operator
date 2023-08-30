@@ -155,6 +155,10 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 	configure.InjectPodDisplayConfiguration(vdiPod, *robotVDI)
 	configure.InjectRuntimeClass(vdiPod, robot, node)
 
+	if !robotVDI.Spec.DisableNVENC {
+		configure.InjectEncodingOption(vdiPod, robot)
+	}
+
 	if robot.Spec.Type == robotv1alpha1.TypeRobot {
 		configure.InjectGenericRobotEnvironmentVariables(vdiPod, robot)
 		configure.InjectRMWImplementationConfiguration(vdiPod, robot)
