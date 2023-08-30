@@ -27,7 +27,23 @@ spec:
     singular: robotvdi
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - additionalPrinterColumns:
+    - jsonPath: .spec.resolution
+      name: Resolution
+      type: string
+    - jsonPath: .spec.webrtcPortRange
+      name: Ports
+      type: string
+    - jsonPath: .spec.privileged
+      name: Privileged
+      type: string
+    - jsonPath: .spec.resources.gpuCore
+      name: GPU
+      type: string
+    - jsonPath: .status.phase
+      name: Phase
+      type: string
+    name: v1alpha1
     schema:
       openAPIV3Schema:
         description: RobotVDI creates and manages Cloud VDI resources and workloads.
@@ -47,6 +63,9 @@ spec:
           spec:
             description: Specification of the desired behavior of the RobotVDI.
             properties:
+              disableNvenc:
+                description: If true, VDI uses plain h264 instead of nvh264enc.
+                type: boolean
               ingress:
                 description: '[*alpha*] RobotIDE will create an Ingress resource if
                   `true`.'

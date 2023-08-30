@@ -37,7 +37,14 @@ spec:
     singular: buildmanager
   scope: Namespaced
   versions:
-    - name: v1alpha1
+    - additionalPrinterColumns:
+        - jsonPath: .spec.steps[].name
+          name: Steps
+          type: string
+        - jsonPath: .status.phase
+          name: Phase
+          type: string
+      name: v1alpha1
       schema:
         openAPIV3Schema:
           description: BuildManager is the Schema for the buildmanagers API
@@ -387,7 +394,29 @@ spec:
     singular: discoveryserver
   scope: Namespaced
   versions:
-    - name: v1alpha1
+    - additionalPrinterColumns:
+        - jsonPath: .spec.type
+          name: Type
+          type: string
+        - jsonPath: .spec.domainID
+          name: Domain ID
+          type: string
+        - jsonPath: .spec.hostname
+          name: Hostname
+          type: string
+        - jsonPath: .spec.subdomain
+          name: Subdomain
+          type: string
+        - jsonPath: .status.connectionInfo.ip
+          name: IP
+          type: string
+        - jsonPath: .status.connectionInfo.uri
+          name: URI
+          type: string
+        - jsonPath: .status.phase
+          name: Phase
+          type: string
+      name: v1alpha1
       schema:
         openAPIV3Schema:
           description: DiscoveryServer is a custom resource that connects Robots and Fleets both locally and geoghraphically in DDS (UDP multicast) level.
@@ -660,7 +689,14 @@ spec:
     singular: launchmanager
   scope: Namespaced
   versions:
-    - name: v1alpha1
+    - additionalPrinterColumns:
+        - jsonPath: .spec.launches[].name
+          name: Launches
+          type: string
+        - jsonPath: .status.phase
+          name: Phase
+          type: string
+      name: v1alpha1
       schema:
         openAPIV3Schema:
           description: LaunchManager is the Schema for the launchmanagers API
@@ -1533,7 +1569,17 @@ spec:
     singular: relayserver
   scope: Namespaced
   versions:
-    - name: v1alpha1
+    - additionalPrinterColumns:
+        - jsonPath: .spec.instanceName
+          name: Instance
+          type: string
+        - jsonPath: .spec.remoteNamespace
+          name: Remote Namespace
+          type: string
+        - jsonPath: .status.phase
+          name: Phase
+          type: string
+      name: v1alpha1
       schema:
         openAPIV3Schema:
           description: RelayServer is the Schema for the relayservers API
@@ -2000,6 +2046,9 @@ spec:
                     robotVDITemplate:
                       description: Configurational parameters of RobotVDI. Applied if `.spec.vdiEnabled` is set to `true`.
                       properties:
+                        disableNvenc:
+                          description: If true, VDI uses plain h264 instead of nvh264enc.
+                          type: boolean
                         ingress:
                           description: '[*alpha*] RobotIDE will create an Ingress resource if `true`.'
                           type: boolean
@@ -2184,7 +2233,20 @@ spec:
     singular: robotdevsuite
   scope: Namespaced
   versions:
-    - name: v1alpha1
+    - additionalPrinterColumns:
+        - jsonPath: .spec.vdiEnabled
+          name: VDI
+          type: string
+        - jsonPath: .spec.ideEnabled
+          name: IDE
+          type: string
+        - jsonPath: .spec.remoteIDEEnabled
+          name: Remote IDE RS
+          type: string
+        - jsonPath: .status.phase
+          name: Phase
+          type: string
+      name: v1alpha1
       schema:
         openAPIV3Schema:
           description: RobotDevSuite is a custom resource that creates dynamically configured development environments for robots.
@@ -2285,6 +2347,9 @@ spec:
                 robotVDITemplate:
                   description: Configurational parameters of RobotVDI. Applied if `.spec.vdiEnabled` is set to `true`.
                   properties:
+                    disableNvenc:
+                      description: If true, VDI uses plain h264 instead of nvh264enc.
+                      type: boolean
                     ingress:
                       description: '[*alpha*] RobotIDE will create an Ingress resource if `true`.'
                       type: boolean
@@ -2500,7 +2565,20 @@ spec:
     singular: robotide
   scope: Namespaced
   versions:
-    - name: v1alpha1
+    - additionalPrinterColumns:
+        - jsonPath: .spec.display
+          name: Display
+          type: string
+        - jsonPath: .spec.privileged
+          name: Privileged
+          type: string
+        - jsonPath: .spec.resources.gpuCore
+          name: GPU
+          type: string
+        - jsonPath: .status.phase
+          name: Phase
+          type: string
+      name: v1alpha1
       schema:
         openAPIV3Schema:
           description: RobotIDE creates and manages Cloud IDE resources and workloads.
@@ -2754,8 +2832,20 @@ spec:
   scope: Namespaced
   versions:
     - additionalPrinterColumns:
-        - jsonPath: .spec.distributions
+        - jsonPath: .spec.robot.distributions
           name: Distributions
+          type: string
+        - jsonPath: .spec.environment.application.name
+          name: Application
+          type: string
+        - jsonPath: .spec.environment.application.version
+          name: Version
+          type: string
+        - jsonPath: .spec.environment.devspace.ubuntuDistro
+          name: Ubuntu
+          type: string
+        - jsonPath: .spec.environment.devspace.version
+          name: DevSpace
           type: string
         - jsonPath: .status.phase
           name: Phase
@@ -3023,6 +3113,9 @@ spec:
                     robotVDITemplate:
                       description: Configurational parameters of RobotVDI. Applied if `.spec.vdiEnabled` is set to `true`.
                       properties:
+                        disableNvenc:
+                          description: If true, VDI uses plain h264 instead of nvh264enc.
+                          type: boolean
                         ingress:
                           description: '[*alpha*] RobotIDE will create an Ingress resource if `true`.'
                           type: boolean
@@ -4885,7 +4978,23 @@ spec:
     singular: robotvdi
   scope: Namespaced
   versions:
-    - name: v1alpha1
+    - additionalPrinterColumns:
+        - jsonPath: .spec.resolution
+          name: Resolution
+          type: string
+        - jsonPath: .spec.webrtcPortRange
+          name: Ports
+          type: string
+        - jsonPath: .spec.privileged
+          name: Privileged
+          type: string
+        - jsonPath: .spec.resources.gpuCore
+          name: GPU
+          type: string
+        - jsonPath: .status.phase
+          name: Phase
+          type: string
+      name: v1alpha1
       schema:
         openAPIV3Schema:
           description: RobotVDI creates and manages Cloud VDI resources and workloads.
@@ -4901,6 +5010,9 @@ spec:
             spec:
               description: Specification of the desired behavior of the RobotVDI.
               properties:
+                disableNvenc:
+                  description: If true, VDI uses plain h264 instead of nvh264enc.
+                  type: boolean
                 ingress:
                   description: '[*alpha*] RobotIDE will create an Ingress resource if `true`.'
                   type: boolean
@@ -5178,7 +5290,11 @@ spec:
     singular: rosbridge
   scope: Namespaced
   versions:
-    - name: v1alpha1
+    - additionalPrinterColumns:
+        - jsonPath: .status.phase
+          name: Phase
+          type: string
+      name: v1alpha1
       schema:
         openAPIV3Schema:
           description: ROSBridge is a custom resource that provisions ROS/2 bridge resources and workloads. It could also convert ROS 2 topics to ROS topics using ROS 1 to 2 bridge. (see https://github.com/ros2/ros1_bridge)
@@ -5584,7 +5700,17 @@ spec:
     singular: workspacemanager
   scope: Namespaced
   versions:
-    - name: v1alpha1
+    - additionalPrinterColumns:
+        - jsonPath: .spec.workspacesPath
+          name: Path
+          type: string
+        - jsonPath: .spec.workspaces[].name
+          name: Workspaces
+          type: string
+        - jsonPath: .status.phase
+          name: Phase
+          type: string
+      name: v1alpha1
       schema:
         openAPIV3Schema:
           description: WorkspaceManager configures the ROS 2 workspaces and repositories by executing Kubernetes jobs.
@@ -6448,7 +6574,7 @@ spec:
             - --leader-elect
           command:
             - /manager
-          image: robolaunchio/robot-controller-manager:v0.2.6-alpha.1
+          image: robolaunchio/robot-controller-manager:v0.2.6-alpha.2
           livenessProbe:
             httpGet:
               path: /healthz

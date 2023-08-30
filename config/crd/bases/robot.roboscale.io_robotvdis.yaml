@@ -51,6 +51,9 @@ spec:
           spec:
             description: Specification of the desired behavior of the RobotVDI.
             properties:
+              disableNvenc:
+                description: If true, VDI uses plain h264 instead of nvh264enc.
+                type: boolean
               ingress:
                 description: '[*alpha*] RobotIDE will create an Ingress resource if
                   `true`.'

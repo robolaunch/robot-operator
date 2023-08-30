@@ -2,6 +2,14 @@
 ## [Unreleased]
 
 ### Feat
+- **image:** :rocket: use config map for image query
+- **registry:** :rocket: support custom image registries
+- **vdi:** :rocket: add cpu option
+
+
+<a name="v0.2.6-alpha.1"></a>
+## [v0.2.6-alpha.1] - 2023-08-10
+### Feat
 - **environment:** :rocket: support provisioning environments
 - **environment:** :rocket: implement environment api
 
@@ -237,7 +245,8 @@
 - Merge pull request [#24](https://github.com/robolaunch/robot-operator/issues/24) from robolaunch/23-allow-multiple-launches
 
 
-[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.34...HEAD
+[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.1...HEAD
+[v0.2.6-alpha.1]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.34...v0.2.6-alpha.1
 [v0.2.5-alpha.34]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.33...v0.2.5-alpha.34
 [v0.2.5-alpha.33]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.32...v0.2.5-alpha.33
 [v0.2.5-alpha.32]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.31...v0.2.5-alpha.32

@@ -15,7 +15,20 @@ spec:
     singular: robotide
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - additionalPrinterColumns:
+    - jsonPath: .spec.display
+      name: Display
+      type: string
+    - jsonPath: .spec.privileged
+      name: Privileged
+      type: string
+    - jsonPath: .spec.resources.gpuCore
+      name: GPU
+      type: string
+    - jsonPath: .status.phase
+      name: Phase
+      type: string
+    name: v1alpha1
     schema:
       openAPIV3Schema:
         description: RobotIDE creates and manages Cloud IDE resources and workloads.

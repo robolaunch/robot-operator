@@ -336,6 +336,9 @@ spec:
                     description: Configurational parameters of RobotVDI. Applied if
                       `.spec.vdiEnabled` is set to `true`.
                     properties:
+                      disableNvenc:
+                        description: If true, VDI uses plain h264 instead of nvh264enc.
+                        type: boolean
                       ingress:
                         description: '[*alpha*] RobotIDE will create an Ingress resource
                           if `true`.'

@@ -25,7 +25,17 @@ spec:
     singular: relayserver
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - additionalPrinterColumns:
+    - jsonPath: .spec.instanceName
+      name: Instance
+      type: string
+    - jsonPath: .spec.remoteNamespace
+      name: Remote Namespace
+      type: string
+    - jsonPath: .status.phase
+      name: Phase
+      type: string
+    name: v1alpha1
     schema:
       openAPIV3Schema:
         description: RelayServer is the Schema for the relayservers API

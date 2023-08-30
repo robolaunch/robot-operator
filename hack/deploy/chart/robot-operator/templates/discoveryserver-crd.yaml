@@ -15,7 +15,29 @@ spec:
     singular: discoveryserver
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - additionalPrinterColumns:
+    - jsonPath: .spec.type
+      name: Type
+      type: string
+    - jsonPath: .spec.domainID
+      name: Domain ID
+      type: string
+    - jsonPath: .spec.hostname
+      name: Hostname
+      type: string
+    - jsonPath: .spec.subdomain
+      name: Subdomain
+      type: string
+    - jsonPath: .status.connectionInfo.ip
+      name: IP
+      type: string
+    - jsonPath: .status.connectionInfo.uri
+      name: URI
+      type: string
+    - jsonPath: .status.phase
+      name: Phase
+      type: string
+    name: v1alpha1
     schema:
       openAPIV3Schema:
         description: DiscoveryServer is a custom resource that connects Robots and Fleets

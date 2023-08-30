@@ -28,8 +28,20 @@ spec:
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
-    - jsonPath: .spec.distributions
+    - jsonPath: .spec.robot.distributions
       name: Distributions
+      type: string
+    - jsonPath: .spec.environment.application.name
+      name: Application
+      type: string
+    - jsonPath: .spec.environment.application.version
+      name: Version
+      type: string
+    - jsonPath: .spec.environment.devspace.ubuntuDistro
+      name: Ubuntu
+      type: string
+    - jsonPath: .spec.environment.devspace.version
+      name: DevSpace
       type: string
     - jsonPath: .status.phase
       name: Phase
@@ -357,6 +369,9 @@ spec:
                     description: Configurational parameters of RobotVDI. Applied if
                       `.spec.vdiEnabled` is set to `true`.
                     properties:
+                      disableNvenc:
+                        description: If true, VDI uses plain h264 instead of nvh264enc.
+                        type: boolean
                       ingress:
                         description: '[*alpha*] RobotIDE will create an Ingress resource
                           if `true`.'

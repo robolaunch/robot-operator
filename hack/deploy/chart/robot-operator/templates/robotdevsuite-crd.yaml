@@ -27,7 +27,20 @@ spec:
     singular: robotdevsuite
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - additionalPrinterColumns:
+    - jsonPath: .spec.vdiEnabled
+      name: VDI
+      type: string
+    - jsonPath: .spec.ideEnabled
+      name: IDE
+      type: string
+    - jsonPath: .spec.remoteIDEEnabled
+      name: Remote IDE RS
+      type: string
+    - jsonPath: .status.phase
+      name: Phase
+      type: string
+    name: v1alpha1
     schema:
       openAPIV3Schema:
         description: RobotDevSuite is a custom resource that creates dynamically configured
@@ -146,6 +159,9 @@ spec:
                 description: Configurational parameters of RobotVDI. Applied if `.spec.vdiEnabled`
                   is set to `true`.
                 properties:
+                  disableNvenc:
+                    description: If true, VDI uses plain h264 instead of nvh264enc.
+                    type: boolean
                   ingress:
                     description: '[*alpha*] RobotIDE will create an Ingress resource
                       if `true`.'
