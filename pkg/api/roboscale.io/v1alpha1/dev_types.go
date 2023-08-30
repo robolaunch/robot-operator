@@ -226,6 +226,8 @@ type RobotVDISpec struct {
 	Resolution string `json:"resolution,omitempty"`
 	// [*alpha*] RobotIDE will create an Ingress resource if `true`.
 	Ingress bool `json:"ingress,omitempty"`
+	// If true, VDI uses plain h264 instead of nvh264enc.
+	DisableNVENC bool `json:"disableNvenc,omitempty"`
 }
 
 // RobotVDIStatus defines the observed state of RobotVDI.
