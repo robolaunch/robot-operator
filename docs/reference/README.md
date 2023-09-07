@@ -380,6 +380,7 @@ _Appears in:_
 | `webrtcPortRange` _string_ | UDP port range to used in WebRTC connections. |
 | `resolution` _string_ | VDI screen resolution options. Default is `2048x1152`. |
 | `ingress` _boolean_ | [*alpha*] RobotIDE will create an Ingress resource if `true`. |
+| `disableNvenc` _boolean_ | If true, VDI uses plain h264 instead of nvh264enc. |
 
 
 #### RobotVDIStatus
@@ -1146,6 +1147,7 @@ _Appears in:_
 
 | Field | Description |
 | --- | --- |
+| `gpuInstance` _string_ | GPU instance that will be allocated. eg. nvidia.com/mig-1g.5gb. Defaults to "nvidia.com/gpu". |
 | `gpuCore` _integer_ | GPU core number that will be allocated. |
 | `cpu` _string_ | CPU resource limit. |
 | `memory` _string_ | Memory resource limit. |
