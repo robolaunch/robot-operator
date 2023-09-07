@@ -312,7 +312,7 @@ func GetRobotVDIIngress(robotVDI *robotv1alpha1.RobotVDI, ingressNamespacedName 
 func getResourceLimits(resources robotv1alpha1.Resources) corev1.ResourceList {
 	resourceLimits := corev1.ResourceList{}
 	if resources.GPUCore != 0 {
-		resourceLimits["nvidia.com/gpu"] = resource.MustParse(strconv.Itoa(resources.GPUCore))
+		resourceLimits[corev1.ResourceName(resources.GPUInstance)] = resource.MustParse(strconv.Itoa(resources.GPUCore))
 	}
 	if resources.CPU != "" {
 		resourceLimits["cpu"] = resource.MustParse(resources.CPU)
