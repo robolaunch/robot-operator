@@ -191,6 +191,9 @@ type RobotIDEStatus struct {
 
 // VDI resource limits.
 type Resources struct {
+	// GPU instance that will be allocated. eg. mig-1g.5gb. Defaults to "gpu".
+	// +kubebuilder:default="gpu"
+	GPUInstance string `json:"gpuInstance,omitempty"`
 	// GPU core number that will be allocated.
 	GPUCore int `json:"gpuCore,omitempty"`
 	// CPU resource limit.
