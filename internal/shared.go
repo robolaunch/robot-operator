@@ -31,6 +31,13 @@ const (
 	TARGET_VDI_LABEL_KEY   = "robolaunch.io/target-vdi"
 )
 
+// MIG instance labels eg. mig-1g.5gb
+const (
+	VDI_MIG_INSTANCE_LABEL_KEY           = "robolaunch.io/vdi-mig-instance"
+	IDE_MIG_INSTANCE_LABEL_KEY           = "robolaunch.io/ide-mig-instance"
+	LAUNCHMANAGER_MIG_INSTANCE_LABEL_KEY = "robolaunch.io/lm-mig-instance"
+)
+
 // Special escape labels
 const (
 	ROBOT_DEV_SUITE_OWNED = "robolaunch.io/dev-suite-owned"
