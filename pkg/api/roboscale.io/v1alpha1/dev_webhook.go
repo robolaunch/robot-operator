@@ -31,6 +31,7 @@ var _ webhook.Defaulter = &RobotIDE{}
 // Default implements webhook.Defaulter so a webhook will be registered for the type
 func (r *RobotIDE) Default() {
 	robotidelog.Info("default", "name", r.Name)
+	r.setDefaultGPUInstance()
 }
 
 //+kubebuilder:webhook:path=/validate-robot-roboscale-io-v1alpha1-robotide,mutating=false,failurePolicy=fail,sideEffects=None,groups=robot.roboscale.io,resources=robotides,verbs=create;update,versions=v1alpha1,name=vrobotide.kb.io,admissionReviewVersions=v1
@@ -99,6 +100,12 @@ func (r *RobotIDE) checkTargetRobotVDILabel() error {
 	return nil
 }
 
+func (r *RobotIDE) setDefaultGPUInstance() {
+	if r.Spec.Resources.GPUCore > 0 && reflect.DeepEqual(r.Spec.Resources.GPUInstance, "") {
+		r.Spec.Resources.GPUInstance = "nvidia.com/gpu"
+	}
+}
+
 // ********************************
 // RobotVDI webhooks
 // ********************************
@@ -119,6 +126,7 @@ var _ webhook.Defaulter = &RobotVDI{}
 // Default implements webhook.Defaulter so a webhook will be registered for the type
 func (r *RobotVDI) Default() {
 	robotvdilog.Info("default", "name", r.Name)
+	r.setDefaultGPUInstance()
 }
 
 //+kubebuilder:webhook:path=/validate-robot-roboscale-io-v1alpha1-robotvdi,mutating=false,failurePolicy=fail,sideEffects=None,groups=robot.roboscale.io,resources=robotvdis,verbs=create;update,versions=v1alpha1,name=vrobotvdi.kb.io,admissionReviewVersions=v1
@@ -163,6 +171,12 @@ func (r *RobotVDI) checkTargetRobotLabel() error {
 	}
 
 	return nil
+}
+
+func (r *RobotVDI) setDefaultGPUInstance() {
+	if r.Spec.Resources.GPUCore > 0 && reflect.DeepEqual(r.Spec.Resources.GPUInstance, "") {
+		r.Spec.Resources.GPUInstance = "nvidia.com/gpu"
+	}
 }
 
 // ********************************
