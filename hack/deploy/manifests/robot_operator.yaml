@@ -820,7 +820,6 @@ spec:
                                 description: GPU core number that will be allocated.
                                 type: integer
                               gpuInstance:
-                                default: nvidia.com/gpu
                                 description: GPU instance that will be allocated. eg. nvidia.com/mig-1g.5gb. Defaults to "nvidia.com/gpu".
                                 type: string
                               memory:
@@ -2035,7 +2034,6 @@ spec:
                               description: GPU core number that will be allocated.
                               type: integer
                             gpuInstance:
-                              default: nvidia.com/gpu
                               description: GPU instance that will be allocated. eg. nvidia.com/mig-1g.5gb. Defaults to "nvidia.com/gpu".
                               type: string
                             memory:
@@ -2085,7 +2083,6 @@ spec:
                               description: GPU core number that will be allocated.
                               type: integer
                             gpuInstance:
-                              default: nvidia.com/gpu
                               description: GPU instance that will be allocated. eg. nvidia.com/mig-1g.5gb. Defaults to "nvidia.com/gpu".
                               type: string
                             memory:
@@ -2344,7 +2341,6 @@ spec:
                           description: GPU core number that will be allocated.
                           type: integer
                         gpuInstance:
-                          default: nvidia.com/gpu
                           description: GPU instance that will be allocated. eg. nvidia.com/mig-1g.5gb. Defaults to "nvidia.com/gpu".
                           type: string
                         memory:
@@ -2394,7 +2390,6 @@ spec:
                           description: GPU core number that will be allocated.
                           type: integer
                         gpuInstance:
-                          default: nvidia.com/gpu
                           description: GPU instance that will be allocated. eg. nvidia.com/mig-1g.5gb. Defaults to "nvidia.com/gpu".
                           type: string
                         memory:
@@ -2634,7 +2629,6 @@ spec:
                       description: GPU core number that will be allocated.
                       type: integer
                     gpuInstance:
-                      default: nvidia.com/gpu
                       description: GPU instance that will be allocated. eg. nvidia.com/mig-1g.5gb. Defaults to "nvidia.com/gpu".
                       type: string
                     memory:
@@ -3122,7 +3116,6 @@ spec:
                               description: GPU core number that will be allocated.
                               type: integer
                             gpuInstance:
-                              default: nvidia.com/gpu
                               description: GPU instance that will be allocated. eg. nvidia.com/mig-1g.5gb. Defaults to "nvidia.com/gpu".
                               type: string
                             memory:
@@ -3172,7 +3165,6 @@ spec:
                               description: GPU core number that will be allocated.
                               type: integer
                             gpuInstance:
-                              default: nvidia.com/gpu
                               description: GPU instance that will be allocated. eg. nvidia.com/mig-1g.5gb. Defaults to "nvidia.com/gpu".
                               type: string
                             memory:
@@ -5073,7 +5065,6 @@ spec:
                       description: GPU core number that will be allocated.
                       type: integer
                     gpuInstance:
-                      default: nvidia.com/gpu
                       description: GPU instance that will be allocated. eg. nvidia.com/mig-1g.5gb. Defaults to "nvidia.com/gpu".
                       type: string
                     memory:
@@ -6610,7 +6601,7 @@ spec:
             - --leader-elect
           command:
             - /manager
-          image: robolaunchio/robot-controller-manager:v0.2.6-alpha.3
+          image: robolaunchio/robot-controller-manager:v0.2.6-alpha.4
           livenessProbe:
             httpGet:
               path: /healthz

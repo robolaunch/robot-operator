@@ -2,24 +2,15 @@
 ## [Unreleased]
 
 ### Feat
+- **environment:** :rocket: support provisioning environments
+- **environment:** :rocket: implement environment api
 - **gpu:** :rocket: support mig instances
-
-
-<a name="v0.2.6-alpha.2"></a>
-## [v0.2.6-alpha.2] - 2023-08-30
-### Feat
 - **image:** :rocket: use config map for image query
 - **registry:** :rocket: support custom image registries
 - **vdi:** :rocket: add cpu option
 
-
-<a name="v0.2.6-alpha.1"></a>
-## [v0.2.6-alpha.1] - 2023-08-10
-### Feat
-- **environment:** :rocket: support provisioning environments
-- **environment:** :rocket: implement environment api
-
 ### Fix
+- **webhooks:** set gpu instance type if it's not specified
 - **webhooks:** :bug: update webhook condition
 
 
@@ -251,9 +242,7 @@
 - Merge pull request [#24](https://github.com/robolaunch/robot-operator/issues/24) from robolaunch/23-allow-multiple-launches
 
 
-[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.2...HEAD
-[v0.2.6-alpha.2]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.1...v0.2.6-alpha.2
-[v0.2.6-alpha.1]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.34...v0.2.6-alpha.1
+[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.34...HEAD
 [v0.2.5-alpha.34]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.33...v0.2.5-alpha.34
 [v0.2.5-alpha.33]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.32...v0.2.5-alpha.33
 [v0.2.5-alpha.32]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.31...v0.2.5-alpha.32

@@ -200,7 +200,6 @@ spec:
                               description: GPU core number that will be allocated.
                               type: integer
                             gpuInstance:
-                              default: nvidia.com/gpu
                               description: GPU instance that will be allocated. eg.
                                 nvidia.com/mig-1g.5gb. Defaults to "nvidia.com/gpu".
                               type: string
