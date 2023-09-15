@@ -58,6 +58,7 @@ func GetMetricsExporterPod(metricsExporter *robotv1alpha1.MetricsExporter, podNa
 		})
 	}
 
+	configure.InjectImagePullPolicy(&pod)
 	configure.InjectRuntimeClassForMetricsExporter(&pod, node)
 
 	return &pod

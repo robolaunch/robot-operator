@@ -66,6 +66,7 @@ func GetRelayServerPod(relayserver *robotv1alpha1.RelayServer, podNamespacedName
 		},
 	}
 
+	configure.InjectImagePullPolicy(&relayServerPod)
 	configure.SchedulePod(&relayServerPod, label.GetTenancyMap(relayserver))
 
 	return &relayServerPod

@@ -54,6 +54,7 @@ func GetDiscoveryServerPod(discoveryServer *robotv1alpha1.DiscoveryServer, podNa
 		},
 	}
 
+	configure.InjectImagePullPolicy(&discoveryServerPod)
 	configure.SchedulePod(&discoveryServerPod, label.GetTenancyMap(discoveryServer))
 	configure.InjectROSDomainID(&discoveryServerPod, discoveryServer.Spec.DomainID)
 
