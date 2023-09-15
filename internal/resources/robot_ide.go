@@ -90,6 +90,7 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 		},
 	}
 
+	configure.InjectImagePullPolicy(&pod)
 	configure.SchedulePod(&pod, label.GetTenancyMap(robotIDE))
 	configure.InjectGenericEnvironmentVariables(&pod, robot)
 	configure.InjectLinuxUserAndGroup(&pod, robot)
