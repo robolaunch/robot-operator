@@ -1,6 +1,15 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+
+<a name="v0.2.6-alpha.4"></a>
+## [v0.2.6-alpha.4] - 2023-09-08
+### Fix
+- **webhooks:** set gpu instance type if it's not specified
+
+
+<a name="v0.2.6-alpha.3"></a>
+## [v0.2.6-alpha.3] - 2023-09-07
 ### Feat
 - **gpu:** :rocket: support mig instances
 
@@ -251,7 +260,9 @@
 - Merge pull request [#24](https://github.com/robolaunch/robot-operator/issues/24) from robolaunch/23-allow-multiple-launches
 
 
-[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.2...HEAD
+[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.4...HEAD
+[v0.2.6-alpha.4]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.3...v0.2.6-alpha.4
+[v0.2.6-alpha.3]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.2...v0.2.6-alpha.3
 [v0.2.6-alpha.2]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.1...v0.2.6-alpha.2
 [v0.2.6-alpha.1]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.34...v0.2.6-alpha.1
 [v0.2.5-alpha.34]: https://github.com/robolaunch/robot-operator/compare/v0.2.5-alpha.33...v0.2.5-alpha.34
