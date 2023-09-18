@@ -189,6 +189,8 @@ func GetLoaderJobForRobot(robot *robotv1alpha1.Robot, jobNamespacedName *types.N
 	podSpec.RestartPolicy = corev1.RestartPolicyNever
 	podSpec.NodeSelector = label.GetTenancyMap(robot)
 
+	configure.InjectImagePullPolicyForPodSpec(podSpec)
+
 	job := batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      robot.GetLoaderJobMetadata().Name,
@@ -294,6 +296,8 @@ func GetLoaderJobForEnvironment(robot *robotv1alpha1.Robot, jobNamespacedName *t
 
 	podSpec.RestartPolicy = corev1.RestartPolicyNever
 	podSpec.NodeSelector = label.GetTenancyMap(robot)
+
+	configure.InjectImagePullPolicyForPodSpec(podSpec)
 
 	job := batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{

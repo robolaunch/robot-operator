@@ -59,6 +59,7 @@ func GetClonerJob(workspaceManager *robotv1alpha1.WorkspaceManager, jobNamespace
 	podSpec.RestartPolicy = corev1.RestartPolicyNever
 	podSpec.NodeSelector = label.GetTenancyMap(robot)
 
+	configure.InjectImagePullPolicyForPodSpec(podSpec)
 	configure.InjectLinuxUserAndGroupForPodSpec(podSpec, *robot)
 
 	job := batchv1.Job{
