@@ -25,6 +25,11 @@ func placeImagePullPolicy(pod *corev1.Pod) {
 		pod.Spec.Containers[k] = container
 	}
 
+	for k, container := range pod.Spec.InitContainers {
+		container.ImagePullPolicy = corev1.PullIfNotPresent
+		pod.Spec.InitContainers[k] = container
+	}
+
 }
 
 func placeImagePullPolicyForPodSpec(podSpec *corev1.PodSpec) {
@@ -32,6 +37,11 @@ func placeImagePullPolicyForPodSpec(podSpec *corev1.PodSpec) {
 	for k, container := range podSpec.Containers {
 		container.ImagePullPolicy = corev1.PullIfNotPresent
 		podSpec.Containers[k] = container
+	}
+
+	for k, container := range podSpec.InitContainers {
+		container.ImagePullPolicy = corev1.PullIfNotPresent
+		podSpec.InitContainers[k] = container
 	}
 
 }
