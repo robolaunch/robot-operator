@@ -290,6 +290,9 @@ type RobotSpec struct {
 	// Applied if `.spec.type` is `Environment` and must be `nil` otherwise.
 	// +kubebuilder:validation:Optional
 	EnvironmentConfig EnvironmentConfig `json:"environment,omitempty"`
+	// User ID of robolaunch user in image.
+	// +kubebuilder:default=1000
+	UID int64 `json:"uid,omitempty"`
 	// Total storage amount to persist via Robot. Unit of measurement is MB. (eg. `10240` corresponds 10 GB)
 	// This amount is being shared between different components.
 	Storage Storage `json:"storage,omitempty"`
