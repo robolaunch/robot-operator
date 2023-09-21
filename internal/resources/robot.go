@@ -102,18 +102,24 @@ func GetLoaderJobForRobot(robot *robotv1alpha1.Robot, jobNamespacedName *types.N
 
 	readyRobotProp := node.GetReadyRobotProperties(*robot)
 
+	closerStr := "&&"
+
+	if _, ok := robot.Labels[internal.OFFLINE_LABEL_KEY]; ok {
+		closerStr = ";"
+	}
+
 	var preparerCmdBuilder strings.Builder
-	preparerCmdBuilder.WriteString("mv " + filepath.Join("/etc", "apt", "sources.list.d", "ros2.list") + " temp1")
-	preparerCmdBuilder.WriteString(" && mv " + filepath.Join("/etc", "apt", "sources.list") + " temp2")
-	preparerCmdBuilder.WriteString(" && apt-get update")
-	preparerCmdBuilder.WriteString(" && mv temp1 " + filepath.Join("/etc", "apt", "sources.list.d", "ros2.list"))
-	preparerCmdBuilder.WriteString(" && mv temp2 " + filepath.Join("/etc", "apt", "sources.list"))
-	preparerCmdBuilder.WriteString(" && apt-get dist-upgrade -y")
-	preparerCmdBuilder.WriteString(" && apt-get update")
-	preparerCmdBuilder.WriteString(" && chown root:root /usr/bin/sudo")
-	preparerCmdBuilder.WriteString(" && chmod 4755 /usr/bin/sudo")
+	preparerCmdBuilder.WriteString("mv " + filepath.Join("/etc", "apt", "sources.list.d", "ros2.list") + " temp1 ")
+	preparerCmdBuilder.WriteString(closerStr + " mv " + filepath.Join("/etc", "apt", "sources.list") + " temp2 ")
+	preparerCmdBuilder.WriteString(closerStr + " apt-get update")
+	preparerCmdBuilder.WriteString(closerStr + " mv temp1 " + filepath.Join("/etc", "apt", "sources.list.d", "ros2.list "))
+	preparerCmdBuilder.WriteString(closerStr + " mv temp2 " + filepath.Join("/etc", "apt", "sources.list") + " ")
+	preparerCmdBuilder.WriteString(closerStr + " apt-get dist-upgrade -y ")
+	preparerCmdBuilder.WriteString(closerStr + " apt-get update ")
+	preparerCmdBuilder.WriteString(closerStr + " chown root:root /usr/bin/sudo ")
+	preparerCmdBuilder.WriteString(closerStr + " chmod 4755 /usr/bin/sudo ")
 	if !readyRobotProp.Enabled { // do no run rosdep init if ready robot
-		preparerCmdBuilder.WriteString(" && rosdep init")
+		preparerCmdBuilder.WriteString(closerStr + " rosdep init")
 	}
 
 	copierContainer := corev1.Container{
@@ -214,15 +220,21 @@ func GetLoaderJobForEnvironment(robot *robotv1alpha1.Robot, jobNamespacedName *t
 	copierCmdBuilder.WriteString(" yes | cp -rf /etc /environment/;")
 	copierCmdBuilder.WriteString(" echo \"DONE\"")
 
+	closerStr := "&&"
+
+	if _, ok := robot.Labels[internal.OFFLINE_LABEL_KEY]; ok {
+		closerStr = ";"
+	}
+
 	var preparerCmdBuilder strings.Builder
-	preparerCmdBuilder.WriteString("mv " + filepath.Join("/etc", "apt", "sources.list") + " temp")
-	preparerCmdBuilder.WriteString(" && apt-get update")
-	preparerCmdBuilder.WriteString(" && mv temp " + filepath.Join("/etc", "apt", "sources.list"))
-	preparerCmdBuilder.WriteString(" && apt-get update")
-	preparerCmdBuilder.WriteString(" && apt-get dist-upgrade -y")
-	preparerCmdBuilder.WriteString(" && apt-get update")
-	preparerCmdBuilder.WriteString(" && chown root:root /usr/bin/sudo")
-	preparerCmdBuilder.WriteString(" && chmod 4755 /usr/bin/sudo")
+	preparerCmdBuilder.WriteString("mv " + filepath.Join("/etc", "apt", "sources.list") + " temp ")
+	preparerCmdBuilder.WriteString(closerStr + " apt-get update ")
+	preparerCmdBuilder.WriteString(closerStr + " mv temp " + filepath.Join("/etc", "apt", "sources.list") + " ")
+	preparerCmdBuilder.WriteString(closerStr + " apt-get update ")
+	preparerCmdBuilder.WriteString(closerStr + " apt-get dist-upgrade -y ")
+	preparerCmdBuilder.WriteString(closerStr + " apt-get update ")
+	preparerCmdBuilder.WriteString(closerStr + " chown root:root /usr/bin/sudo ")
+	preparerCmdBuilder.WriteString(closerStr + " chmod 4755 /usr/bin/sudo")
 
 	copierContainer := corev1.Container{
 		Name:            "copier",

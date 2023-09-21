@@ -31,6 +31,11 @@ const (
 	TARGET_VDI_LABEL_KEY   = "robolaunch.io/target-vdi"
 )
 
+// Offline labels
+const (
+	OFFLINE_LABEL_KEY = "robolaunch.io/offline"
+)
+
 // Special escape labels
 const (
 	ROBOT_DEV_SUITE_OWNED = "robolaunch.io/dev-suite-owned"
