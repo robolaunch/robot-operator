@@ -7,7 +7,7 @@ import (
 
 func InjectLinuxUserAndGroup(pod *corev1.Pod, robot robotv1alpha1.Robot) *corev1.Pod {
 
-	var user int64 = robot.Spec.UID
+	var user int64 = robot.Status.UID
 	var group int64 = 3000
 
 	for key, cont := range pod.Spec.Containers {
@@ -24,7 +24,7 @@ func InjectLinuxUserAndGroup(pod *corev1.Pod, robot robotv1alpha1.Robot) *corev1
 
 func InjectLinuxUserAndGroupForPodSpec(podSpec *corev1.PodSpec, robot robotv1alpha1.Robot) *corev1.PodSpec {
 
-	var user int64 = robot.Spec.UID
+	var user int64 = robot.Status.UID
 	var group int64 = 3000
 
 	for key, cont := range podSpec.Containers {

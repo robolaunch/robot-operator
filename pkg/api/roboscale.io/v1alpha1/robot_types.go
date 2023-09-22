@@ -290,9 +290,6 @@ type RobotSpec struct {
 	// Applied if `.spec.type` is `Environment` and must be `nil` otherwise.
 	// +kubebuilder:validation:Optional
 	EnvironmentConfig EnvironmentConfig `json:"environment,omitempty"`
-	// User ID of robolaunch user in image.
-	// +kubebuilder:default=1000
-	UID int64 `json:"uid,omitempty"`
 	// Total storage amount to persist via Robot. Unit of measurement is MB. (eg. `10240` corresponds 10 GB)
 	// This amount is being shared between different components.
 	Storage Storage `json:"storage,omitempty"`
@@ -354,6 +351,8 @@ type RobotStatus struct {
 	Phase RobotPhase `json:"phase,omitempty"`
 	// Main image of Robot. It is derived either from the specifications or determined directly over labels.
 	Image string `json:"image,omitempty"`
+	// User ID of robolaunch user in image.
+	UID int64 `json:"uid,omitempty"`
 	// Node that Robot uses. It is selected via tenancy labels.
 	NodeName string `json:"nodeName,omitempty"`
 	// Robot persists some of the directories of underlying OS inside persistent volumes.
