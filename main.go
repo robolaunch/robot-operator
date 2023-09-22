@@ -23,16 +23,13 @@ import (
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
 	"k8s.io/client-go/dynamic"
+	"k8s.io/client-go/kubernetes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
-	"k8s.io/client-go/rest"
 
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/apimachinery/pkg/runtime/serializer"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
@@ -114,19 +111,13 @@ func main() {
 		setupLog.Error(err, "unable to create dynamic client")
 	}
 
-	gvkPod := schema.GroupVersionKind{
-		Group:   "",
-		Version: "v1",
-		Kind:    "Pod",
-	}
-
-	restClient, err := apiutil.RESTClientForGVK(gvkPod, false, mgr.GetConfig(), serializer.NewCodecFactory(mgr.GetScheme()))
+	clientset, err := kubernetes.NewForConfig(mgr.GetConfig())
 	if err != nil {
-		setupLog.Error(err, "unable to create REST client")
+		setupLog.Error(err, "unable to create clientset")
 	}
 
 	// Start controllers and webhooks
-	startRobotCRDsAndWebhooks(mgr, dynamicClient, restClient)
+	startRobotCRDsAndWebhooks(mgr, dynamicClient, *clientset)
 	startManagerCRDsAndWebhooks(mgr, dynamicClient)
 	startDevCRDsAndWebhooks(mgr, dynamicClient)
 	startObserverCRDsAndWebhooks(mgr, dynamicClient)
@@ -154,14 +145,14 @@ func main() {
 // - DiscoveryServer (discoveryservers.robot.roboscale.io/v1alpha1)
 // - ROSBridge (rosbridges.robot.roboscale.io/v1alpha1)
 // - RelayServer (relayservers.robot.roboscale.io/v1alpha1)
-func startRobotCRDsAndWebhooks(mgr manager.Manager, dynamicClient dynamic.Interface, restClient rest.Interface) {
+func startRobotCRDsAndWebhooks(mgr manager.Manager, dynamicClient dynamic.Interface, clientset kubernetes.Clientset) {
 
 	// Start Robot controller & webhook
 	if err := (&robot.RobotReconciler{
 		Client:        mgr.GetClient(),
 		Scheme:        mgr.GetScheme(),
 		DynamicClient: dynamicClient,
-		RESTClient:    restClient,
+		Clientset:     clientset,
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Robot")
 		os.Exit(1)
