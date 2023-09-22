@@ -100,6 +100,9 @@ func GetLoaderJobForRobot(robot *robotv1alpha1.Robot, jobNamespacedName *types.N
 	copierCmdBuilder.WriteString(" yes | cp -rf /etc /ros/;")
 	copierCmdBuilder.WriteString(" echo \"DONE\"")
 
+	var uidGetterCmdBuilder strings.Builder
+	uidGetterCmdBuilder.WriteString("id -u robolaunch")
+
 	readyRobotProp := node.GetReadyRobotProperties(*robot)
 
 	closerStr := "&&"
@@ -135,6 +138,18 @@ func GetLoaderJobForRobot(robot *robotv1alpha1.Robot, jobNamespacedName *types.N
 		},
 	}
 
+	uidGetterContainer := corev1.Container{
+		Name:    "uid-getter",
+		Image:   robot.Status.Image,
+		Command: internal.Bash(uidGetterCmdBuilder.String()),
+		VolumeMounts: []corev1.VolumeMount{
+			configure.GetVolumeMount("", configure.GetVolumeVar(robot)),
+			configure.GetVolumeMount("", configure.GetVolumeUsr(robot)),
+			configure.GetVolumeMount("", configure.GetVolumeOpt(robot)),
+			configure.GetVolumeMount("", configure.GetVolumeEtc(robot)),
+		},
+	}
+
 	preparerContainer := corev1.Container{
 		Name:    "preparer",
 		Image:   "ubuntu:focal",
@@ -150,6 +165,7 @@ func GetLoaderJobForRobot(robot *robotv1alpha1.Robot, jobNamespacedName *types.N
 	podSpec := &corev1.PodSpec{
 		InitContainers: []corev1.Container{
 			copierContainer,
+			uidGetterContainer,
 		},
 		Containers: []corev1.Container{
 			preparerContainer,
@@ -220,6 +236,9 @@ func GetLoaderJobForEnvironment(robot *robotv1alpha1.Robot, jobNamespacedName *t
 	copierCmdBuilder.WriteString(" yes | cp -rf /etc /environment/;")
 	copierCmdBuilder.WriteString(" echo \"DONE\"")
 
+	var uidGetterCmdBuilder strings.Builder
+	uidGetterCmdBuilder.WriteString("id -u robolaunch")
+
 	closerStr := "&&"
 
 	if _, ok := robot.Labels[internal.OFFLINE_LABEL_KEY]; ok {
@@ -249,6 +268,18 @@ func GetLoaderJobForEnvironment(robot *robotv1alpha1.Robot, jobNamespacedName *t
 		},
 	}
 
+	uidGetterContainer := corev1.Container{
+		Name:    "uid-getter",
+		Image:   robot.Status.Image,
+		Command: internal.Bash(uidGetterCmdBuilder.String()),
+		VolumeMounts: []corev1.VolumeMount{
+			configure.GetVolumeMount("", configure.GetVolumeVar(robot)),
+			configure.GetVolumeMount("", configure.GetVolumeUsr(robot)),
+			configure.GetVolumeMount("", configure.GetVolumeOpt(robot)),
+			configure.GetVolumeMount("", configure.GetVolumeEtc(robot)),
+		},
+	}
+
 	preparerContainer := corev1.Container{
 		Name:    "preparer",
 		Image:   "ubuntu:focal",
@@ -264,6 +295,7 @@ func GetLoaderJobForEnvironment(robot *robotv1alpha1.Robot, jobNamespacedName *t
 	podSpec := &corev1.PodSpec{
 		InitContainers: []corev1.Container{
 			copierContainer,
+			uidGetterContainer,
 		},
 		Containers: []corev1.Container{
 			preparerContainer,
