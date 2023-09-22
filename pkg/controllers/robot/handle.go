@@ -1,10 +1,15 @@
 package robot
 
 import (
+	"bytes"
 	"context"
+	"io"
+	"strconv"
+	"strings"
 
 	robotErr "github.com/robolaunch/robot-operator/internal/error"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
 )
 
@@ -124,6 +129,47 @@ func (r *RobotReconciler) reconcileHandleLoaderJob(ctx context.Context, instance
 			ResourceNamespace: instance.GetLoaderJobMetadata().Namespace,
 		}
 
+	}
+
+	if instance.Status.UID == 0 {
+		pods := corev1.PodList{}
+		err := r.List(ctx, &pods)
+		if err != nil {
+			return err
+		}
+
+		podNamespacedName := types.NamespacedName{}
+		for _, pod := range pods.Items {
+			for _, owner := range pod.OwnerReferences {
+				if owner.Name == instance.GetLoaderJobMetadata().Name {
+					podNamespacedName = types.NamespacedName{
+						Namespace: instance.Namespace,
+						Name:      pod.Name,
+					}
+				}
+			}
+		}
+
+		request := r.Clientset.CoreV1().Pods(instance.Namespace).GetLogs(podNamespacedName.Name, &corev1.PodLogOptions{Container: "uid-getter"})
+		podLogs, err := request.Stream(ctx)
+		if err != nil {
+			return err
+		}
+		defer podLogs.Close()
+
+		buf := new(bytes.Buffer)
+		_, err = io.Copy(buf, podLogs)
+		if err != nil {
+			return err
+		}
+
+		uidStr := strings.Replace(buf.String(), "\n", "", 1)
+		uid, err := strconv.Atoi(uidStr)
+		if err != nil {
+			return err
+		}
+
+		instance.Status.UID = int64(uid)
 	}
 
 	return nil

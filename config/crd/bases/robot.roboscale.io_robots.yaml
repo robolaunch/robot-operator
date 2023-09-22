@@ -2407,6 +2407,10 @@ spec:
                         type: object
                     type: object
                 type: object
+              uid:
+                description: User ID of robolaunch user in image.
+                format: int64
+                type: integer
               volumeStatuses:
                 description: Robot persists some of the directories of underlying
                   OS inside persistent volumes. This field exposes persistent volume
