@@ -1,6 +1,12 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+### Fix
+- **image-pull-policy:** :bug: set ipp of initcontainers
+
+
+<a name="v0.2.6-alpha.5"></a>
+## [v0.2.6-alpha.5] - 2023-09-18
 
 <a name="v0.2.6-alpha.4"></a>
 ## [v0.2.6-alpha.4] - 2023-09-08
@@ -260,7 +266,8 @@
 - Merge pull request [#24](https://github.com/robolaunch/robot-operator/issues/24) from robolaunch/23-allow-multiple-launches
 
 
-[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.4...HEAD
+[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.5...HEAD
+[v0.2.6-alpha.5]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.4...v0.2.6-alpha.5
 [v0.2.6-alpha.4]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.3...v0.2.6-alpha.4
 [v0.2.6-alpha.3]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.2...v0.2.6-alpha.3
 [v0.2.6-alpha.2]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.1...v0.2.6-alpha.2
