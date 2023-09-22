@@ -23,6 +23,7 @@ import (
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
 	"k8s.io/client-go/dynamic"
+	"k8s.io/client-go/kubernetes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
 	"k8s.io/apimachinery/pkg/runtime"
@@ -110,8 +111,13 @@ func main() {
 		setupLog.Error(err, "unable to create dynamic client")
 	}
 
+	clientset, err := kubernetes.NewForConfig(mgr.GetConfig())
+	if err != nil {
+		setupLog.Error(err, "unable to create clientset")
+	}
+
 	// Start controllers and webhooks
-	startRobotCRDsAndWebhooks(mgr, dynamicClient)
+	startRobotCRDsAndWebhooks(mgr, dynamicClient, *clientset)
 	startManagerCRDsAndWebhooks(mgr, dynamicClient)
 	startDevCRDsAndWebhooks(mgr, dynamicClient)
 	startObserverCRDsAndWebhooks(mgr, dynamicClient)
@@ -139,13 +145,14 @@ func main() {
 // - DiscoveryServer (discoveryservers.robot.roboscale.io/v1alpha1)
 // - ROSBridge (rosbridges.robot.roboscale.io/v1alpha1)
 // - RelayServer (relayservers.robot.roboscale.io/v1alpha1)
-func startRobotCRDsAndWebhooks(mgr manager.Manager, dynamicClient dynamic.Interface) {
+func startRobotCRDsAndWebhooks(mgr manager.Manager, dynamicClient dynamic.Interface, clientset kubernetes.Clientset) {
 
 	// Start Robot controller & webhook
 	if err := (&robot.RobotReconciler{
 		Client:        mgr.GetClient(),
 		Scheme:        mgr.GetScheme(),
 		DynamicClient: dynamicClient,
+		Clientset:     clientset,
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Robot")
 		os.Exit(1)

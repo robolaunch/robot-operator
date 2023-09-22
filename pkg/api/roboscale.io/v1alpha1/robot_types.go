@@ -351,6 +351,8 @@ type RobotStatus struct {
 	Phase RobotPhase `json:"phase,omitempty"`
 	// Main image of Robot. It is derived either from the specifications or determined directly over labels.
 	Image string `json:"image,omitempty"`
+	// User ID of robolaunch user in image.
+	UID int64 `json:"uid,omitempty"`
 	// Node that Robot uses. It is selected via tenancy labels.
 	NodeName string `json:"nodeName,omitempty"`
 	// Robot persists some of the directories of underlying OS inside persistent volumes.
