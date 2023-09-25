@@ -13,6 +13,15 @@ func InjectGenericEnvironmentVariablesForPodSpec(podSpec *corev1.PodSpec, robot 
 		podSpec.Containers[key] = cont
 	}
 
+	for cfgKey, cfg := range robot.Spec.AdditionalConfigs {
+		if cfg.ConfigType == robotv1alpha1.AdditionalConfigTypeEnv {
+			for key, cont := range podSpec.Containers {
+				cont.Env = append(cont.Env, internal.Env(cfgKey, cfg.Value))
+				podSpec.Containers[key] = cont
+			}
+		}
+	}
+
 	return podSpec
 }
 
@@ -31,6 +40,15 @@ func InjectGenericEnvironmentVariables(pod *corev1.Pod, robot robotv1alpha1.Robo
 	for key, cont := range pod.Spec.Containers {
 		cont.Env = append(cont.Env, internal.Env("WORKSPACES_PATH", robot.Spec.WorkspaceManagerTemplate.WorkspacesPath))
 		pod.Spec.Containers[key] = cont
+	}
+
+	for cfgKey, cfg := range robot.Spec.AdditionalConfigs {
+		if cfg.ConfigType == robotv1alpha1.AdditionalConfigTypeEnv {
+			for key, cont := range pod.Spec.Containers {
+				cont.Env = append(cont.Env, internal.Env(cfgKey, cfg.Value))
+				pod.Spec.Containers[key] = cont
+			}
+		}
 	}
 
 	return pod
