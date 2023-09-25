@@ -285,9 +285,11 @@ const (
 )
 
 type AdditionalConfig struct {
+	// Config type is by default `Operator`. Other options are `Env` and `File`.
 	// +kubebuilder:default=Operator
 	ConfigType AdditionalConfigType `json:"configType,omitempty"`
-	Value      interface{}          `json:"value,omitempty"`
+	// Value of the corresponding config key.
+	Value string `json:"value,omitempty"`
 }
 
 // RobotSpec defines the desired state of Robot.
