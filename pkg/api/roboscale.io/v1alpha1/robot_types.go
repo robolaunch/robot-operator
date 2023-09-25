@@ -276,6 +276,20 @@ type EnvironmentConfig struct {
 	DevSpaceImage DevSpaceImage `json:"devspace"`
 }
 
+type AdditionalConfigType string
+
+const (
+	AdditionalConfigTypeEnv      AdditionalConfigType = "Env"
+	AdditionalConfigTypeOperator AdditionalConfigType = "Operator"
+	AdditionalConfigTypeFile     AdditionalConfigType = "File"
+)
+
+type AdditionalConfig struct {
+	// +kubebuilder:default=Operator
+	ConfigType AdditionalConfigType `json:"configType,omitempty"`
+	Value      interface{}          `json:"value,omitempty"`
+}
+
 // RobotSpec defines the desired state of Robot.
 type RobotSpec struct {
 	// Determines the object type.
@@ -297,6 +311,8 @@ type RobotSpec struct {
 	RobotDevSuiteTemplate RobotDevSuiteSpec `json:"robotDevSuiteTemplate,omitempty"`
 	// Workspace manager template to configure ROS 2 workspaces.
 	WorkspaceManagerTemplate WorkspaceManagerSpec `json:"workspaceManagerTemplate,omitempty"`
+	// Key value pairs that operator uses to extend configuration.
+	AdditionalConfigs map[string]AdditionalConfig `json:"additionalConfigs,omitempty"`
 	// [*alpha*] Root DNS configuration.
 	RootDNSConfig RootDNSConfig `json:"rootDNSConfig,omitempty"`
 	// [*alpha*] TLS secret reference.
