@@ -1,6 +1,15 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+### Feat
+- **gpu:** :rocket: support additional configs
+
+### Fix
+- **env:** :bug: replace containers w/ initcontainers in env config injection
+
+
+<a name="v0.2.6-alpha.6"></a>
+## [v0.2.6-alpha.6] - 2023-09-22
 ### Fix
 - **image-pull-policy:** :bug: set ipp of initcontainers
 
@@ -266,7 +275,8 @@
 - Merge pull request [#24](https://github.com/robolaunch/robot-operator/issues/24) from robolaunch/23-allow-multiple-launches
 
 
-[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.5...HEAD
+[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.6...HEAD
+[v0.2.6-alpha.6]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.5...v0.2.6-alpha.6
 [v0.2.6-alpha.5]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.4...v0.2.6-alpha.5
 [v0.2.6-alpha.4]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.3...v0.2.6-alpha.4
 [v0.2.6-alpha.3]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.2...v0.2.6-alpha.3

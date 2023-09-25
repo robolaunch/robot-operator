@@ -36,6 +36,20 @@ spec:
           template:
             description: Holds Robot's `.spec`.
             properties:
+              additionalConfigs:
+                additionalProperties:
+                  properties:
+                    configType:
+                      default: Operator
+                      description: Config type is by default `Operator`. Other options
+                        are `Env` and `File`.
+                      type: string
+                    value:
+                      description: Value of the corresponding config key.
+                      type: string
+                  type: object
+                description: Key value pairs that operator uses to extend configuration.
+                type: object
               environment:
                 description: Holds environment's configuration. Applied if `.spec.type`
                   is `Environment` and must be `nil` otherwise.
