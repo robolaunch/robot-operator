@@ -378,10 +378,6 @@ type RobotStatus struct {
 	// and value of the target robot's name.
 	// Multiple LaunchManager could work together if they targeted the same Robot.
 	AttachedLaunchObjects []AttachedLaunchObject `json:"attachedLaunchObjects,omitempty"`
-	// [*alpha*] Initial build manager creation status if exists.
-	InitialBuildManagerStatus OwnedResourceStatus `json:"initialBuildManagerStatus,omitempty"`
-	// [*alpha*] Initial launch manager creation status if exists.
-	InitialLaunchManagerStatuses []OwnedResourceStatus `json:"initialLaunchManagerStatuses,omitempty"`
 	// [*alpha*] Attached dev object information.
 	AttachedDevObjects []AttachedDevObject `json:"attachedDevObjects,omitempty"`
 }
