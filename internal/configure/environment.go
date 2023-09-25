@@ -24,14 +24,14 @@ func InjectGenericEnvironmentVariablesForPodSpec(podSpec *corev1.PodSpec, robot 
 
 	for key, cont := range podSpec.InitContainers {
 		cont.Env = append(cont.Env, internal.Env("WORKSPACES_PATH", robot.Spec.WorkspaceManagerTemplate.WorkspacesPath))
-		podSpec.Containers[key] = cont
+		podSpec.InitContainers[key] = cont
 	}
 
 	for cfgKey, cfg := range robot.Spec.AdditionalConfigs {
 		if cfg.ConfigType == robotv1alpha1.AdditionalConfigTypeEnv {
 			for key, cont := range podSpec.InitContainers {
 				cont.Env = append(cont.Env, internal.Env(cfgKey, cfg.Value))
-				podSpec.Containers[key] = cont
+				podSpec.InitContainers[key] = cont
 			}
 		}
 	}
@@ -67,14 +67,14 @@ func InjectGenericEnvironmentVariables(pod *corev1.Pod, robot robotv1alpha1.Robo
 
 	for key, cont := range pod.Spec.InitContainers {
 		cont.Env = append(cont.Env, internal.Env("WORKSPACES_PATH", robot.Spec.WorkspaceManagerTemplate.WorkspacesPath))
-		pod.Spec.Containers[key] = cont
+		pod.Spec.InitContainers[key] = cont
 	}
 
 	for cfgKey, cfg := range robot.Spec.AdditionalConfigs {
 		if cfg.ConfigType == robotv1alpha1.AdditionalConfigTypeEnv {
 			for key, cont := range pod.Spec.InitContainers {
 				cont.Env = append(cont.Env, internal.Env(cfgKey, cfg.Value))
-				pod.Spec.Containers[key] = cont
+				pod.Spec.InitContainers[key] = cont
 			}
 		}
 	}
