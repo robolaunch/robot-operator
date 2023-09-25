@@ -212,6 +212,7 @@ func GetLoaderJobForRobot(robot *robotv1alpha1.Robot, jobNamespacedName *types.N
 	podSpec.NodeSelector = label.GetTenancyMap(robot)
 
 	configure.InjectImagePullPolicyForPodSpec(podSpec)
+	configure.InjectGenericEnvironmentVariablesForPodSpec(podSpec, *robot)
 
 	job := batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
@@ -342,6 +343,7 @@ func GetLoaderJobForEnvironment(robot *robotv1alpha1.Robot, jobNamespacedName *t
 	podSpec.NodeSelector = label.GetTenancyMap(robot)
 
 	configure.InjectImagePullPolicyForPodSpec(podSpec)
+	configure.InjectGenericEnvironmentVariablesForPodSpec(podSpec, *robot)
 
 	job := batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
