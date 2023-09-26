@@ -159,7 +159,7 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 	configure.InjectRuntimeClass(vdiPod, robot, node)
 
 	if !robotVDI.Spec.DisableNVENC {
-		configure.InjectEncodingOption(vdiPod, robot)
+		cfg.InjectEncodingOption(vdiPod, robot)
 	}
 
 	if robot.Spec.Type == robotv1alpha1.TypeRobot {
