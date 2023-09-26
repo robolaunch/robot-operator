@@ -53,7 +53,7 @@ func GetLaunchPod(launchManager *robotv1alpha1.LaunchManager, podNamespacedName 
 	configure.InjectGenericEnvironmentVariables(&launchPod, robot)    // Environment variables
 	configure.InjectLinuxUserAndGroup(&launchPod, robot)              // Linux user and group configuration
 	configure.InjectRMWImplementationConfiguration(&launchPod, robot) // RMW implementation configuration
-	configure.InjectROSDomainID(&launchPod, robot.Spec.RobotConfig.DomainID)
+	cfg.InjectROSDomainID(&launchPod, robot.Spec.RobotConfig.DomainID)
 	cfg.InjectDiscoveryServerConnection(&launchPod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo) // Discovery server configuration
 	configure.InjectRuntimeClass(&launchPod, robot, node)
 

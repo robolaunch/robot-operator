@@ -108,7 +108,7 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 	if robot.Spec.Type == robotv1alpha1.TypeRobot {
 		configure.InjectGenericRobotEnvironmentVariables(&pod, robot)
 		configure.InjectRMWImplementationConfiguration(&pod, robot)
-		configure.InjectROSDomainID(&pod, robot.Spec.RobotConfig.DomainID)
+		cfg.InjectROSDomainID(&pod, robot.Spec.RobotConfig.DomainID)
 		cfg.InjectDiscoveryServerConnection(&pod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo)
 	}
 

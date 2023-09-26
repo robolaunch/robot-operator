@@ -58,7 +58,7 @@ func GetBridgePod(rosbridge *robotv1alpha1.ROSBridge, podNamespacedName *types.N
 	configure.SchedulePod(&bridgePod, label.GetTenancyMap(rosbridge))
 	cfg.InjectDiscoveryServerConnection(&bridgePod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo)
 	configure.InjectRMWImplementationConfiguration(&bridgePod, robot)
-	configure.InjectROSDomainID(&bridgePod, robot.Spec.RobotConfig.DomainID)
+	cfg.InjectROSDomainID(&bridgePod, robot.Spec.RobotConfig.DomainID)
 
 	return &bridgePod
 }
