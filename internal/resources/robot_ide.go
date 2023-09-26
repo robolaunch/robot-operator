@@ -93,7 +93,7 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 	cfg.InjectImagePullPolicy(&pod)
 	configure.SchedulePod(&pod, label.GetTenancyMap(robotIDE))
 	cfg.InjectGenericEnvironmentVariables(&pod, robot)
-	configure.InjectLinuxUserAndGroup(&pod, robot)
+	cfg.InjectLinuxUserAndGroup(&pod, robot)
 	configure.InjectRuntimeClass(&pod, robot, node)
 	if robotIDE.Spec.Display && label.GetTargetRobotVDI(robotIDE) != "" {
 		// TODO: Add control for validating robot VDI

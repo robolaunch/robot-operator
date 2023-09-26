@@ -2,10 +2,11 @@ package configure
 
 import (
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
+	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 )
 
-func InjectLinuxUserAndGroup(pod *corev1.Pod, robot robotv1alpha1.Robot) *corev1.Pod {
+func (cfg *PodConfigInjector) InjectLinuxUserAndGroup(pod *corev1.Pod, robot robotv1alpha1.Robot) *corev1.Pod {
 
 	var user int64 = robot.Status.UID
 	var group int64 = 3000
@@ -22,7 +23,9 @@ func InjectLinuxUserAndGroup(pod *corev1.Pod, robot robotv1alpha1.Robot) *corev1
 	return pod
 }
 
-func InjectLinuxUserAndGroupForPodSpec(podSpec *corev1.PodSpec, robot robotv1alpha1.Robot) *corev1.PodSpec {
+func (cfg *JobConfigInjector) InjectLinuxUserAndGroup(job *batchv1.Job, robot robotv1alpha1.Robot) *batchv1.Job {
+
+	podSpec := job.Spec.Template.Spec
 
 	var user int64 = robot.Status.UID
 	var group int64 = 3000
@@ -35,5 +38,7 @@ func InjectLinuxUserAndGroupForPodSpec(podSpec *corev1.PodSpec, robot robotv1alp
 		podSpec.Containers[key] = cont
 	}
 
-	return podSpec
+	job.Spec.Template.Spec = podSpec
+
+	return job
 }
