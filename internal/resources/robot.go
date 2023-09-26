@@ -93,6 +93,9 @@ func GetLoaderJob(robot *robotv1alpha1.Robot, jobNamespacedName *types.Namespace
 }
 
 func GetLoaderJobForRobot(robot *robotv1alpha1.Robot, jobNamespacedName *types.NamespacedName, hasGPU bool) *batchv1.Job {
+
+	cfg := configure.JobConfigInjector{}
+
 	var copierCmdBuilder strings.Builder
 	copierCmdBuilder.WriteString("yes | cp -rf /var /ros/;")
 	copierCmdBuilder.WriteString(" yes | cp -rf /usr /ros/;")
@@ -212,7 +215,6 @@ func GetLoaderJobForRobot(robot *robotv1alpha1.Robot, jobNamespacedName *types.N
 	podSpec.NodeSelector = label.GetTenancyMap(robot)
 
 	configure.InjectImagePullPolicyForPodSpec(podSpec)
-	configure.InjectGenericEnvironmentVariablesForPodSpec(podSpec, *robot)
 
 	job := batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
@@ -226,10 +228,15 @@ func GetLoaderJobForRobot(robot *robotv1alpha1.Robot, jobNamespacedName *types.N
 		},
 	}
 
+	cfg.InjectGenericEnvironmentVariables(&job, *robot)
+
 	return &job
 }
 
 func GetLoaderJobForEnvironment(robot *robotv1alpha1.Robot, jobNamespacedName *types.NamespacedName, hasGPU bool) *batchv1.Job {
+
+	cfg := configure.JobConfigInjector{}
+
 	var copierCmdBuilder strings.Builder
 	copierCmdBuilder.WriteString("yes | cp -rf /var /environment/;")
 	copierCmdBuilder.WriteString(" yes | cp -rf /usr /environment/;")
@@ -343,7 +350,6 @@ func GetLoaderJobForEnvironment(robot *robotv1alpha1.Robot, jobNamespacedName *t
 	podSpec.NodeSelector = label.GetTenancyMap(robot)
 
 	configure.InjectImagePullPolicyForPodSpec(podSpec)
-	configure.InjectGenericEnvironmentVariablesForPodSpec(podSpec, *robot)
 
 	job := batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
@@ -356,6 +362,8 @@ func GetLoaderJobForEnvironment(robot *robotv1alpha1.Robot, jobNamespacedName *t
 			},
 		},
 	}
+
+	cfg.InjectGenericEnvironmentVariables(&job, *robot)
 
 	return &job
 }

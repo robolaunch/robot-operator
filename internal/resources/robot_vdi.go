@@ -154,7 +154,7 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 
 	configure.InjectImagePullPolicy(vdiPod)
 	configure.SchedulePod(vdiPod, label.GetTenancyMap(robotVDI))
-	configure.InjectGenericEnvironmentVariables(vdiPod, robot)
+	cfg.InjectGenericEnvironmentVariables(vdiPod, robot)
 	cfg.InjectDisplayConfiguration(vdiPod, *robotVDI)
 	configure.InjectRuntimeClass(vdiPod, robot, node)
 
@@ -163,7 +163,7 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 	}
 
 	if robot.Spec.Type == robotv1alpha1.TypeRobot {
-		configure.InjectGenericRobotEnvironmentVariables(vdiPod, robot)
+		cfg.InjectGenericRobotEnvironmentVariables(vdiPod, robot)
 		configure.InjectRMWImplementationConfiguration(vdiPod, robot)
 		cfg.InjectROSDomainID(vdiPod, robot.Spec.RobotConfig.DomainID)
 		cfg.InjectDiscoveryServerConnection(vdiPod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo)

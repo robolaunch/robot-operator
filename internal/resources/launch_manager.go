@@ -50,7 +50,7 @@ func GetLaunchPod(launchManager *robotv1alpha1.LaunchManager, podNamespacedName 
 
 	configure.InjectImagePullPolicy(&launchPod)
 	configure.SchedulePod(&launchPod, label.GetTenancyMap(launchManager))
-	configure.InjectGenericEnvironmentVariables(&launchPod, robot)    // Environment variables
+	cfg.InjectGenericEnvironmentVariables(&launchPod, robot)          // Environment variables
 	configure.InjectLinuxUserAndGroup(&launchPod, robot)              // Linux user and group configuration
 	configure.InjectRMWImplementationConfiguration(&launchPod, robot) // RMW implementation configuration
 	cfg.InjectROSDomainID(&launchPod, robot.Spec.RobotConfig.DomainID)
@@ -75,6 +75,8 @@ func InstanceNeedDisplay(launchManager robotv1alpha1.LaunchManager, robot robotv
 }
 
 func getContainer(launch robotv1alpha1.Launch, launchName string, robot robotv1alpha1.Robot, buildManager robotv1alpha1.BuildManager) corev1.Container {
+
+	cfg := configure.ContainerConfigInjector{}
 
 	container := corev1.Container{
 		Name:    launchName,
@@ -101,7 +103,7 @@ func getContainer(launch robotv1alpha1.Launch, launchName string, robot robotv1a
 		},
 	}
 
-	configure.InjectWorkspaceEnvironmentVariableForContainer(&container, robot, launch.Workspace)
+	cfg.InjectWorkspaceEnvironmentVariable(&container, robot, launch.Workspace)
 
 	return container
 }

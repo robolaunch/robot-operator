@@ -92,7 +92,7 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 
 	configure.InjectImagePullPolicy(&pod)
 	configure.SchedulePod(&pod, label.GetTenancyMap(robotIDE))
-	configure.InjectGenericEnvironmentVariables(&pod, robot)
+	cfg.InjectGenericEnvironmentVariables(&pod, robot)
 	configure.InjectLinuxUserAndGroup(&pod, robot)
 	configure.InjectRuntimeClass(&pod, robot, node)
 	if robotIDE.Spec.Display && label.GetTargetRobotVDI(robotIDE) != "" {
@@ -106,7 +106,7 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 	}
 
 	if robot.Spec.Type == robotv1alpha1.TypeRobot {
-		configure.InjectGenericRobotEnvironmentVariables(&pod, robot)
+		cfg.InjectGenericRobotEnvironmentVariables(&pod, robot)
 		configure.InjectRMWImplementationConfiguration(&pod, robot)
 		cfg.InjectROSDomainID(&pod, robot.Spec.RobotConfig.DomainID)
 		cfg.InjectDiscoveryServerConnection(&pod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo)

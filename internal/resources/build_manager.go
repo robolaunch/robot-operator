@@ -40,6 +40,8 @@ func GetConfigMap(buildManager *robotv1alpha1.BuildManager) (*corev1.ConfigMap, 
 
 func GetBuildJob(buildManager *robotv1alpha1.BuildManager, robot *robotv1alpha1.Robot, step robotv1alpha1.Step) *batchv1.Job {
 
+	cfg := configure.JobConfigInjector{}
+
 	robotSpec := robot.Spec
 
 	var cmdBuilder strings.Builder
@@ -88,9 +90,7 @@ func GetBuildJob(buildManager *robotv1alpha1.BuildManager, robot *robotv1alpha1.
 		NodeSelector:  label.GetTenancyMap(robot),
 	}
 
-	configure.InjectGenericEnvironmentVariablesForPodSpec(&podSpec, *robot)
 	configure.InjectLinuxUserAndGroupForPodSpec(&podSpec, *robot)
-	configure.InjectWorkspaceEnvironmentVariableForPodSpec(&podSpec, *robot, step.Workspace)
 	configure.InjectImagePullPolicyForPodSpec(&podSpec)
 	configure.InjectRMWImplementationConfigurationForPodSpec(&podSpec, *robot)
 
@@ -107,6 +107,9 @@ func GetBuildJob(buildManager *robotv1alpha1.BuildManager, robot *robotv1alpha1.
 			BackoffLimit: &backoffLimit,
 		},
 	}
+
+	cfg.InjectGenericEnvironmentVariables(&job, *robot)
+	cfg.InjectWorkspaceEnvironmentVariable(&job, *robot, step.Workspace)
 
 	return &job
 }
