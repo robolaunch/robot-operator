@@ -97,7 +97,7 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 	configure.InjectRuntimeClass(&pod, robot, node)
 	if robotIDE.Spec.Display && label.GetTargetRobotVDI(robotIDE) != "" {
 		// TODO: Add control for validating robot VDI
-		configure.InjectPodDisplayConfiguration(&pod, robotVDI)
+		cfg.InjectDisplayConfiguration(&pod, robotVDI)
 	}
 
 	if label.GetInstanceType(&robot) == label.InstanceTypePhysicalInstance {

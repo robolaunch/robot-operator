@@ -59,7 +59,7 @@ func GetLaunchPod(launchManager *robotv1alpha1.LaunchManager, podNamespacedName 
 
 	if InstanceNeedDisplay(*launchManager, robot) && label.GetTargetRobotVDI(launchManager) != "" {
 		// TODO: Add control for validating robot VDI
-		configure.InjectLaunchPodDisplayConfiguration(&launchPod, *launchManager, robotVDI) // Display configuration
+		cfg.InjectDisplayConfigurationForLaunch(&launchPod, *launchManager, robotVDI) // Display configuration
 	}
 
 	return &launchPod
