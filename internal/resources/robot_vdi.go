@@ -164,7 +164,7 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 
 	if robot.Spec.Type == robotv1alpha1.TypeRobot {
 		cfg.InjectGenericRobotEnvironmentVariables(vdiPod, robot)
-		configure.InjectRMWImplementationConfiguration(vdiPod, robot)
+		cfg.InjectRMWImplementationConfiguration(vdiPod, robot)
 		cfg.InjectROSDomainID(vdiPod, robot.Spec.RobotConfig.DomainID)
 		cfg.InjectDiscoveryServerConnection(vdiPod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo)
 	}

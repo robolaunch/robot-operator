@@ -90,8 +90,6 @@ func GetBuildJob(buildManager *robotv1alpha1.BuildManager, robot *robotv1alpha1.
 		NodeSelector:  label.GetTenancyMap(robot),
 	}
 
-	configure.InjectRMWImplementationConfigurationForPodSpec(&podSpec, *robot)
-
 	job := batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      buildManager.Name + "-" + step.Name,
@@ -110,6 +108,7 @@ func GetBuildJob(buildManager *robotv1alpha1.BuildManager, robot *robotv1alpha1.
 	cfg.InjectWorkspaceEnvironmentVariable(&job, *robot, step.Workspace)
 	cfg.InjectImagePullPolicy(&job)
 	cfg.InjectLinuxUserAndGroup(&job, *robot)
+	cfg.InjectRMWImplementationConfiguration(&job, *robot)
 
 	return &job
 }
