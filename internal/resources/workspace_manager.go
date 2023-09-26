@@ -73,7 +73,7 @@ func GetClonerJob(workspaceManager *robotv1alpha1.WorkspaceManager, jobNamespace
 		},
 	}
 
-	cfg.InjectImagePullPolicy(podSpec)
+	cfg.InjectImagePullPolicy(&job)
 	cfg.InjectLinuxUserAndGroup(&job, *robot)
 
 	return &job

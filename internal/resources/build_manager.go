@@ -108,7 +108,7 @@ func GetBuildJob(buildManager *robotv1alpha1.BuildManager, robot *robotv1alpha1.
 
 	cfg.InjectGenericEnvironmentVariables(&job, *robot)
 	cfg.InjectWorkspaceEnvironmentVariable(&job, *robot, step.Workspace)
-	cfg.InjectImagePullPolicy(&podSpec)
+	cfg.InjectImagePullPolicy(&job)
 	cfg.InjectLinuxUserAndGroup(&job, *robot)
 
 	return &job

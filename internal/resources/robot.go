@@ -227,7 +227,7 @@ func GetLoaderJobForRobot(robot *robotv1alpha1.Robot, jobNamespacedName *types.N
 	}
 
 	cfg.InjectGenericEnvironmentVariables(&job, *robot)
-	cfg.InjectImagePullPolicy(podSpec)
+	cfg.InjectImagePullPolicy(&job)
 
 	return &job
 }
@@ -361,7 +361,7 @@ func GetLoaderJobForEnvironment(robot *robotv1alpha1.Robot, jobNamespacedName *t
 	}
 
 	cfg.InjectGenericEnvironmentVariables(&job, *robot)
-	cfg.InjectImagePullPolicy(podSpec)
+	cfg.InjectImagePullPolicy(&job)
 
 	return &job
 }
