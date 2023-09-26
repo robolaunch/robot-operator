@@ -102,7 +102,7 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 
 	if label.GetInstanceType(&robot) == label.InstanceTypePhysicalInstance {
 		// apply ONLY if the resource is on physical instance
-		configure.InjectRemoteConfigurationsForPod(&pod, *robotIDE)
+		cfg.InjectRemoteConfigurations(&pod, *robotIDE)
 	}
 
 	if robot.Spec.Type == robotv1alpha1.TypeRobot {
@@ -116,6 +116,8 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 }
 
 func GetRobotIDEService(robotIDE *robotv1alpha1.RobotIDE, svcNamespacedName *types.NamespacedName) *corev1.Service {
+
+	cfg := configure.ServiceConfigInjector{}
 
 	serviceSpec := corev1.ServiceSpec{
 		Type:     robotIDE.Spec.ServiceType,
@@ -142,7 +144,7 @@ func GetRobotIDEService(robotIDE *robotv1alpha1.RobotIDE, svcNamespacedName *typ
 
 	if label.GetInstanceType(robotIDE) == label.InstanceTypePhysicalInstance {
 		// apply ONLY if the resource is on physical instance
-		configure.InjectRemoteConfigurationsForService(&service)
+		cfg.InjectRemoteConfigurations(&service)
 	}
 
 	return &service
