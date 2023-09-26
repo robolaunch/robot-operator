@@ -23,7 +23,7 @@ func GetClonerJob(workspaceManager *robotv1alpha1.WorkspaceManager, jobNamespace
 		var cmdBuilder strings.Builder
 		cmdBuilder.WriteString("mkdir -p " + filepath.Join(workspaceManager.Spec.WorkspacesPath, ws.Name, "src") + " && ")
 		cmdBuilder.WriteString("cd " + filepath.Join(workspaceManager.Spec.WorkspacesPath, ws.Name, "src") + " && ")
-		cmdBuilder.WriteString(GetCloneCommand(workspaceManager.Spec.Workspaces, wsKey))
+		cmdBuilder.WriteString(GetCloneCommand(*robot, workspaceManager.Spec.Workspaces, wsKey))
 		clonerCmdBuilder.WriteString(cmdBuilder.String())
 
 	}

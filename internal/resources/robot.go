@@ -412,11 +412,15 @@ func GetWorkspaceManager(robot *robotv1alpha1.Robot, wsmNamespacedName *types.Na
 
 }
 
-func GetCloneCommand(workspaces []robotv1alpha1.Workspace, wsKey int) string {
+func GetCloneCommand(robot robotv1alpha1.Robot, workspaces []robotv1alpha1.Workspace, wsKey int) string {
 
 	var cmdBuilder strings.Builder
+	closerStr := "&&"
+	if _, ok := robot.Labels[internal.OFFLINE_LABEL_KEY]; ok {
+		closerStr = ";"
+	}
 	for key, repo := range workspaces[wsKey].Repositories {
-		cmdBuilder.WriteString("git clone --recursive " + repo.URL + " -b " + repo.Branch + " " + key + " &&")
+		cmdBuilder.WriteString("git clone --recursive " + repo.URL + " -b " + repo.Branch + " " + key + " " + closerStr)
 	}
 	return cmdBuilder.String()
 }
