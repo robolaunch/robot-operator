@@ -1,6 +1,12 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+### Fix
+- **offline:** :bug: ignore cloning errors in offline mode
+
+
+<a name="v0.2.6-alpha.7"></a>
+## [v0.2.6-alpha.7] - 2023-09-25
 ### Feat
 - **gpu:** :rocket: support additional configs
 
@@ -275,7 +281,8 @@
 - Merge pull request [#24](https://github.com/robolaunch/robot-operator/issues/24) from robolaunch/23-allow-multiple-launches
 
 
-[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.6...HEAD
+[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.7...HEAD
+[v0.2.6-alpha.7]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.6...v0.2.6-alpha.7
 [v0.2.6-alpha.6]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.5...v0.2.6-alpha.6
 [v0.2.6-alpha.5]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.4...v0.2.6-alpha.5
 [v0.2.6-alpha.4]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.3...v0.2.6-alpha.4
