@@ -17,6 +17,8 @@ import (
 
 func GetLaunchPod(launchManager *robotv1alpha1.LaunchManager, podNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot, buildManager robotv1alpha1.BuildManager, robotVDI robotv1alpha1.RobotVDI, node corev1.Node) *corev1.Pod {
 
+	cfg := configure.ConfigInjector{}
+
 	containers := []corev1.Container{}
 	clusterName := label.GetClusterName(&robot)
 	for k, l := range launchManager.Spec.Launches {
@@ -52,7 +54,7 @@ func GetLaunchPod(launchManager *robotv1alpha1.LaunchManager, podNamespacedName 
 	configure.InjectLinuxUserAndGroup(&launchPod, robot)              // Linux user and group configuration
 	configure.InjectRMWImplementationConfiguration(&launchPod, robot) // RMW implementation configuration
 	configure.InjectROSDomainID(&launchPod, robot.Spec.RobotConfig.DomainID)
-	configure.InjectPodDiscoveryServerConnection(&launchPod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo) // Discovery server configuration
+	cfg.InjectDiscoveryServerConnection(&launchPod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo) // Discovery server configuration
 	configure.InjectRuntimeClass(&launchPod, robot, node)
 
 	if InstanceNeedDisplay(*launchManager, robot) && label.GetTargetRobotVDI(launchManager) != "" {

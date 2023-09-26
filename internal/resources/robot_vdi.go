@@ -57,6 +57,8 @@ func GetRobotVDIPVC(robotVDI *robotv1alpha1.RobotVDI, pvcNamespacedName *types.N
 
 func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot, node corev1.Node) *corev1.Pod {
 
+	cfg := configure.ConfigInjector{}
+
 	// add tcp port
 	ports := []corev1.ContainerPort{
 		{
@@ -164,7 +166,7 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 		configure.InjectGenericRobotEnvironmentVariables(vdiPod, robot)
 		configure.InjectRMWImplementationConfiguration(vdiPod, robot)
 		configure.InjectROSDomainID(vdiPod, robot.Spec.RobotConfig.DomainID)
-		configure.InjectPodDiscoveryServerConnection(vdiPod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo)
+		cfg.InjectDiscoveryServerConnection(vdiPod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo)
 	}
 
 	return vdiPod
