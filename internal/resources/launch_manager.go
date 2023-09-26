@@ -17,7 +17,7 @@ import (
 
 func GetLaunchPod(launchManager *robotv1alpha1.LaunchManager, podNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot, buildManager robotv1alpha1.BuildManager, robotVDI robotv1alpha1.RobotVDI, node corev1.Node) *corev1.Pod {
 
-	cfg := configure.ConfigInjector{}
+	cfg := configure.PodConfigInjector{}
 
 	containers := []corev1.Container{}
 	clusterName := label.GetClusterName(&robot)

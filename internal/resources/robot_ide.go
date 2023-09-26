@@ -30,7 +30,7 @@ func getRobotIDESelector(robotIDE robotv1alpha1.RobotIDE) map[string]string {
 
 func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot, robotVDI robotv1alpha1.RobotVDI, node corev1.Node) *corev1.Pod {
 
-	cfg := configure.ConfigInjector{}
+	cfg := configure.PodConfigInjector{}
 
 	var cmdBuilder strings.Builder
 	cmdBuilder.WriteString("code-server " + robot.Spec.WorkspaceManagerTemplate.WorkspacesPath + " --bind-addr 0.0.0.0:$CODE_SERVER_PORT --auth none")

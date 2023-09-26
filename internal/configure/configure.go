@@ -1,3 +1,4 @@
 package configure
 
-type ConfigInjector struct{}
+type PodConfigInjector struct{}
+type JobConfigInjector struct{}

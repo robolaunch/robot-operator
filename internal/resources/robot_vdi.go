@@ -57,7 +57,7 @@ func GetRobotVDIPVC(robotVDI *robotv1alpha1.RobotVDI, pvcNamespacedName *types.N
 
 func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot, node corev1.Node) *corev1.Pod {
 
-	cfg := configure.ConfigInjector{}
+	cfg := configure.PodConfigInjector{}
 
 	// add tcp port
 	ports := []corev1.ContainerPort{

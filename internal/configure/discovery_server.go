@@ -5,7 +5,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
-func (cfg *ConfigInjector) InjectDiscoveryServerConnection(pod *corev1.Pod, connectionInfo robotv1alpha1.ConnectionInfo) *corev1.Pod {
+func (cfg *PodConfigInjector) InjectDiscoveryServerConnection(pod *corev1.Pod, connectionInfo robotv1alpha1.ConnectionInfo) *corev1.Pod {
 
 	cfg.placeDiscoveryServerEnvironmentVariables(pod, connectionInfo)
 	cfg.placeDiscoveryServerConfigFile(pod, connectionInfo)
@@ -13,7 +13,7 @@ func (cfg *ConfigInjector) InjectDiscoveryServerConnection(pod *corev1.Pod, conn
 	return pod
 }
 
-func (cfg *ConfigInjector) placeDiscoveryServerEnvironmentVariables(pod *corev1.Pod, connectionInfo robotv1alpha1.ConnectionInfo) {
+func (cfg *PodConfigInjector) placeDiscoveryServerEnvironmentVariables(pod *corev1.Pod, connectionInfo robotv1alpha1.ConnectionInfo) {
 
 	environmentVariables := []corev1.EnvVar{
 		{
@@ -36,7 +36,7 @@ func (cfg *ConfigInjector) placeDiscoveryServerEnvironmentVariables(pod *corev1.
 
 }
 
-func (cfg *ConfigInjector) placeDiscoveryServerConfigFile(pod *corev1.Pod, connectionInfo robotv1alpha1.ConnectionInfo) {
+func (cfg *PodConfigInjector) placeDiscoveryServerConfigFile(pod *corev1.Pod, connectionInfo robotv1alpha1.ConnectionInfo) {
 
 	var mode int32 = 511
 

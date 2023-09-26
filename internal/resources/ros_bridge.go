@@ -31,7 +31,7 @@ func getROSBridgeSelector(rosbridge robotv1alpha1.ROSBridge) map[string]string {
 
 func GetBridgePod(rosbridge *robotv1alpha1.ROSBridge, podNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot) *corev1.Pod {
 
-	cfg := configure.ConfigInjector{}
+	cfg := configure.PodConfigInjector{}
 
 	bridgePod := corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
