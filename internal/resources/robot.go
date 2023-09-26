@@ -362,6 +362,7 @@ func GetLoaderJobForEnvironment(robot *robotv1alpha1.Robot, jobNamespacedName *t
 
 	cfg.InjectGenericEnvironmentVariables(&job, *robot)
 	cfg.InjectImagePullPolicy(&job)
+	cfg.SchedulePod(&job, robot)
 
 	return &job
 }

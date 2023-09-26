@@ -55,7 +55,7 @@ func GetBridgePod(rosbridge *robotv1alpha1.ROSBridge, podNamespacedName *types.N
 	}
 
 	cfg.InjectImagePullPolicy(&bridgePod)
-	configure.SchedulePod(&bridgePod, label.GetTenancyMap(rosbridge))
+	cfg.SchedulePod(&bridgePod, rosbridge)
 	cfg.InjectDiscoveryServerConnection(&bridgePod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo)
 	cfg.InjectRMWImplementationConfiguration(&bridgePod, robot)
 	cfg.InjectROSDomainID(&bridgePod, robot.Spec.RobotConfig.DomainID)

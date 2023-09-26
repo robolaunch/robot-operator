@@ -109,6 +109,7 @@ func GetBuildJob(buildManager *robotv1alpha1.BuildManager, robot *robotv1alpha1.
 	cfg.InjectImagePullPolicy(&job)
 	cfg.InjectLinuxUserAndGroup(&job, *robot)
 	cfg.InjectRMWImplementationConfiguration(&job, *robot)
+	cfg.SchedulePod(&job, robot)
 
 	return &job
 }

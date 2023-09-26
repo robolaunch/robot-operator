@@ -153,10 +153,10 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 	}
 
 	cfg.InjectImagePullPolicy(vdiPod)
-	configure.SchedulePod(vdiPod, label.GetTenancyMap(robotVDI))
+	cfg.SchedulePod(vdiPod, robotVDI)
 	cfg.InjectGenericEnvironmentVariables(vdiPod, robot)
 	cfg.InjectDisplayConfiguration(vdiPod, *robotVDI)
-	configure.InjectRuntimeClass(vdiPod, robot, node)
+	cfg.InjectRuntimeClass(vdiPod, robot, node)
 
 	if !robotVDI.Spec.DisableNVENC {
 		cfg.InjectEncodingOption(vdiPod, robot)

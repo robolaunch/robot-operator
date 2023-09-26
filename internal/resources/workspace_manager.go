@@ -75,6 +75,7 @@ func GetClonerJob(workspaceManager *robotv1alpha1.WorkspaceManager, jobNamespace
 
 	cfg.InjectImagePullPolicy(&job)
 	cfg.InjectLinuxUserAndGroup(&job, *robot)
+	cfg.SchedulePod(&job, workspaceManager)
 
 	return &job
 }
