@@ -152,7 +152,7 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 		},
 	}
 
-	configure.InjectImagePullPolicy(vdiPod)
+	cfg.InjectImagePullPolicy(vdiPod)
 	configure.SchedulePod(vdiPod, label.GetTenancyMap(robotVDI))
 	cfg.InjectGenericEnvironmentVariables(vdiPod, robot)
 	cfg.InjectDisplayConfiguration(vdiPod, *robotVDI)

@@ -4,21 +4,21 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
-func InjectImagePullPolicy(pod *corev1.Pod) *corev1.Pod {
+func (cfg *PodConfigInjector) InjectImagePullPolicy(pod *corev1.Pod) *corev1.Pod {
 
-	placeImagePullPolicy(pod)
+	cfg.placeImagePullPolicy(pod)
 
 	return pod
 }
 
-func InjectImagePullPolicyForPodSpec(podSpec *corev1.PodSpec) *corev1.PodSpec {
+func (cfg *JobConfigInjector) InjectImagePullPolicy(podSpec *corev1.PodSpec) *corev1.PodSpec {
 
-	placeImagePullPolicyForPodSpec(podSpec)
+	cfg.placeImagePullPolicy(podSpec)
 
 	return podSpec
 }
 
-func placeImagePullPolicy(pod *corev1.Pod) {
+func (cfg *PodConfigInjector) placeImagePullPolicy(pod *corev1.Pod) {
 
 	for k, container := range pod.Spec.Containers {
 		container.ImagePullPolicy = corev1.PullIfNotPresent
@@ -32,7 +32,7 @@ func placeImagePullPolicy(pod *corev1.Pod) {
 
 }
 
-func placeImagePullPolicyForPodSpec(podSpec *corev1.PodSpec) {
+func (cfg *JobConfigInjector) placeImagePullPolicy(podSpec *corev1.PodSpec) {
 
 	for k, container := range podSpec.Containers {
 		container.ImagePullPolicy = corev1.PullIfNotPresent

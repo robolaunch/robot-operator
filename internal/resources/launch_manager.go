@@ -48,7 +48,7 @@ func GetLaunchPod(launchManager *robotv1alpha1.LaunchManager, podNamespacedName 
 		},
 	}
 
-	configure.InjectImagePullPolicy(&launchPod)
+	cfg.InjectImagePullPolicy(&launchPod)
 	configure.SchedulePod(&launchPod, label.GetTenancyMap(launchManager))
 	cfg.InjectGenericEnvironmentVariables(&launchPod, robot)          // Environment variables
 	configure.InjectLinuxUserAndGroup(&launchPod, robot)              // Linux user and group configuration

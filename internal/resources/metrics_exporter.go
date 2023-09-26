@@ -14,6 +14,8 @@ import (
 
 func GetMetricsExporterPod(metricsExporter *robotv1alpha1.MetricsExporter, podNamespacedName *types.NamespacedName, node corev1.Node) *corev1.Pod {
 
+	cfg := configure.PodConfigInjector{}
+
 	pod := corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      podNamespacedName.Name,
@@ -58,7 +60,7 @@ func GetMetricsExporterPod(metricsExporter *robotv1alpha1.MetricsExporter, podNa
 		})
 	}
 
-	configure.InjectImagePullPolicy(&pod)
+	cfg.InjectImagePullPolicy(&pod)
 	configure.InjectRuntimeClassForMetricsExporter(&pod, node)
 
 	return &pod

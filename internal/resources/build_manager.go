@@ -91,7 +91,6 @@ func GetBuildJob(buildManager *robotv1alpha1.BuildManager, robot *robotv1alpha1.
 	}
 
 	configure.InjectLinuxUserAndGroupForPodSpec(&podSpec, *robot)
-	configure.InjectImagePullPolicyForPodSpec(&podSpec)
 	configure.InjectRMWImplementationConfigurationForPodSpec(&podSpec, *robot)
 
 	job := batchv1.Job{
@@ -110,6 +109,7 @@ func GetBuildJob(buildManager *robotv1alpha1.BuildManager, robot *robotv1alpha1.
 
 	cfg.InjectGenericEnvironmentVariables(&job, *robot)
 	cfg.InjectWorkspaceEnvironmentVariable(&job, *robot, step.Workspace)
+	cfg.InjectImagePullPolicy(&podSpec)
 
 	return &job
 }

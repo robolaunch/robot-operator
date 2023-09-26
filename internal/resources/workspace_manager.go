@@ -17,6 +17,8 @@ import (
 
 func GetClonerJob(workspaceManager *robotv1alpha1.WorkspaceManager, jobNamespacedName *types.NamespacedName, robot *robotv1alpha1.Robot) *batchv1.Job {
 
+	cfg := configure.JobConfigInjector{}
+
 	var clonerCmdBuilder strings.Builder
 	for wsKey, ws := range workspaceManager.Spec.Workspaces {
 
@@ -59,7 +61,6 @@ func GetClonerJob(workspaceManager *robotv1alpha1.WorkspaceManager, jobNamespace
 	podSpec.RestartPolicy = corev1.RestartPolicyNever
 	podSpec.NodeSelector = label.GetTenancyMap(robot)
 
-	configure.InjectImagePullPolicyForPodSpec(podSpec)
 	configure.InjectLinuxUserAndGroupForPodSpec(podSpec, *robot)
 
 	job := batchv1.Job{
@@ -73,6 +74,8 @@ func GetClonerJob(workspaceManager *robotv1alpha1.WorkspaceManager, jobNamespace
 			},
 		},
 	}
+
+	cfg.InjectImagePullPolicy(podSpec)
 
 	return &job
 }

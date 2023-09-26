@@ -54,7 +54,7 @@ func GetBridgePod(rosbridge *robotv1alpha1.ROSBridge, podNamespacedName *types.N
 		bridgePod.Spec.Containers = append(bridgePod.Spec.Containers, getROS2BridgeContainer(rosbridge))
 	}
 
-	configure.InjectImagePullPolicy(&bridgePod)
+	cfg.InjectImagePullPolicy(&bridgePod)
 	configure.SchedulePod(&bridgePod, label.GetTenancyMap(rosbridge))
 	cfg.InjectDiscoveryServerConnection(&bridgePod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo)
 	configure.InjectRMWImplementationConfiguration(&bridgePod, robot)
