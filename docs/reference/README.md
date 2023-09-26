@@ -56,6 +56,7 @@ _Appears in:_
 | `storage` _[Storage](#storage)_ | Total storage amount to persist via Robot. Unit of measurement is MB. (eg. `10240` corresponds 10 GB) This amount is being shared between different components. |
 | `robotDevSuiteTemplate` _[RobotDevSuiteSpec](#robotdevsuitespec)_ | Robot development suite template |
 | `workspaceManagerTemplate` _[WorkspaceManagerSpec](#workspacemanagerspec)_ | Workspace manager template to configure ROS 2 workspaces. |
+| `additionalConfigs` _object (keys:string, values:[AdditionalConfig](#additionalconfig))_ | Key value pairs that operator uses to extend configuration. |
 | `rootDNSConfig` _[RootDNSConfig](#rootdnsconfig)_ | [*alpha*] Root DNS configuration. |
 | `tlsSecretRef` _[TLSSecretReference](#tlssecretreference)_ | [*alpha*] TLS secret reference. |
 
@@ -73,6 +74,7 @@ _Appears in:_
 | --- | --- |
 | `phase` _RobotPhase_ | Phase of Robot. It sums the general status of Robot. |
 | `image` _string_ | Main image of Robot. It is derived either from the specifications or determined directly over labels. |
+| `uid` _integer_ | User ID of robolaunch user in image. |
 | `nodeName` _string_ | Node that Robot uses. It is selected via tenancy labels. |
 | `volumeStatuses` _[VolumeStatuses](#volumestatuses)_ | Robot persists some of the directories of underlying OS inside persistent volumes. This field exposes persistent volume claims that dynamically provision PVs. |
 | `discoveryServerStatus` _[DiscoveryServerInstanceStatus](#discoveryserverinstancestatus)_ | Discovery server instance status. |
@@ -82,8 +84,6 @@ _Appears in:_
 | `robotDevSuiteStatus` _[RobotDevSuiteInstanceStatus](#robotdevsuiteinstancestatus)_ | Robot development suite instance status. |
 | `attachedBuildObject` _[AttachedBuildObject](#attachedbuildobject)_ | Attached build object information. A BuildManager can be attached with a label on it with key `robolaunch.io/target-robot` and value of the target robot's name. Robot sorts the BuildManagers targeted itself, and picks the last created object to process. |
 | `attachedLaunchObjects` _[AttachedLaunchObject](#attachedlaunchobject) array_ | Attached launch object information. A LaunchManager can be attached with a label on it with key `robolaunch.io/target-robot` and value of the target robot's name. Multiple LaunchManager could work together if they targeted the same Robot. |
-| `initialBuildManagerStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ | [*alpha*] Initial build manager creation status if exists. |
-| `initialLaunchManagerStatuses` _[OwnedResourceStatus](#ownedresourcestatus) array_ | [*alpha*] Initial launch manager creation status if exists. |
 | `attachedDevObjects` _[AttachedDevObject](#attacheddevobject) array_ | [*alpha*] Attached dev object information. |
 
 
@@ -635,6 +635,32 @@ RobotArtifact is a non-functional resource that holds Robot's specifications. It
 | `kind` _string_ | `RobotArtifact`
 | `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |
 | `template` _[RobotSpec](#robotspec)_ | Holds Robot's `.spec`. |
+
+
+#### AdditionalConfig
+
+
+
+
+
+_Appears in:_
+- [RobotSpec](#robotspec)
+
+| Field | Description |
+| --- | --- |
+| `configType` _[AdditionalConfigType](#additionalconfigtype)_ | Config type is by default `Operator`. Other options are `Env` and `File`. |
+| `value` _string_ | Value of the corresponding config key. |
+
+
+#### AdditionalConfigType
+
+_Underlying type:_ `string`
+
+
+
+_Appears in:_
+- [AdditionalConfig](#additionalconfig)
+
 
 
 #### Application
