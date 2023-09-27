@@ -17,6 +17,8 @@ import (
 
 func GetLaunchPod(launchManager *robotv1alpha1.LaunchManager, podNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot, buildManager robotv1alpha1.BuildManager, robotVDI robotv1alpha1.RobotVDI, node corev1.Node) *corev1.Pod {
 
+	cfg := configure.PodConfigInjector{}
+
 	containers := []corev1.Container{}
 	clusterName := label.GetClusterName(&robot)
 	for k, l := range launchManager.Spec.Launches {
@@ -46,18 +48,18 @@ func GetLaunchPod(launchManager *robotv1alpha1.LaunchManager, podNamespacedName 
 		},
 	}
 
-	configure.InjectImagePullPolicy(&launchPod)
-	configure.SchedulePod(&launchPod, label.GetTenancyMap(launchManager))
-	configure.InjectGenericEnvironmentVariables(&launchPod, robot)    // Environment variables
-	configure.InjectLinuxUserAndGroup(&launchPod, robot)              // Linux user and group configuration
-	configure.InjectRMWImplementationConfiguration(&launchPod, robot) // RMW implementation configuration
-	configure.InjectROSDomainID(&launchPod, robot.Spec.RobotConfig.DomainID)
-	configure.InjectPodDiscoveryServerConnection(&launchPod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo) // Discovery server configuration
-	configure.InjectRuntimeClass(&launchPod, robot, node)
+	cfg.InjectImagePullPolicy(&launchPod)
+	cfg.SchedulePod(&launchPod, launchManager)
+	cfg.InjectGenericEnvironmentVariables(&launchPod, robot)    // Environment variables
+	cfg.InjectLinuxUserAndGroup(&launchPod, robot)              // Linux user and group configuration
+	cfg.InjectRMWImplementationConfiguration(&launchPod, robot) // RMW implementation configuration
+	cfg.InjectROSDomainID(&launchPod, robot.Spec.RobotConfig.DomainID)
+	cfg.InjectDiscoveryServerConnection(&launchPod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo) // Discovery server configuration
+	cfg.InjectRuntimeClass(&launchPod, robot, node)
 
 	if InstanceNeedDisplay(*launchManager, robot) && label.GetTargetRobotVDI(launchManager) != "" {
 		// TODO: Add control for validating robot VDI
-		configure.InjectLaunchPodDisplayConfiguration(&launchPod, *launchManager, robotVDI) // Display configuration
+		cfg.InjectDisplayConfigurationForLaunch(&launchPod, *launchManager, robotVDI) // Display configuration
 	}
 
 	return &launchPod
@@ -73,6 +75,8 @@ func InstanceNeedDisplay(launchManager robotv1alpha1.LaunchManager, robot robotv
 }
 
 func getContainer(launch robotv1alpha1.Launch, launchName string, robot robotv1alpha1.Robot, buildManager robotv1alpha1.BuildManager) corev1.Container {
+
+	cfg := configure.ContainerConfigInjector{}
 
 	container := corev1.Container{
 		Name:    launchName,
@@ -99,7 +103,7 @@ func getContainer(launch robotv1alpha1.Launch, launchName string, robot robotv1a
 		},
 	}
 
-	configure.InjectWorkspaceEnvironmentVariableForContainer(&container, robot, launch.Workspace)
+	cfg.InjectWorkspaceEnvironmentVariable(&container, robot, launch.Workspace)
 
 	return container
 }

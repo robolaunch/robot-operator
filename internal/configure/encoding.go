@@ -6,7 +6,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
-func InjectEncodingOption(pod *corev1.Pod, robot robotv1alpha1.Robot) *corev1.Pod {
+func (cfg *PodConfigInjector) InjectEncodingOption(pod *corev1.Pod, robot robotv1alpha1.Robot) *corev1.Pod {
 
 	environmentVariables := []corev1.EnvVar{
 		internal.Env("NEKO_HWENC", "nvenc"),

@@ -26,6 +26,8 @@ func getDiscoveryServerSelector(discoveryServer robotv1alpha1.DiscoveryServer) m
 
 func GetDiscoveryServerPod(discoveryServer *robotv1alpha1.DiscoveryServer, podNamespacedName *types.NamespacedName) *corev1.Pod {
 
+	cfg := configure.PodConfigInjector{}
+
 	containers := []corev1.Container{
 		{
 			Name:  "discovery-server",
@@ -54,9 +56,9 @@ func GetDiscoveryServerPod(discoveryServer *robotv1alpha1.DiscoveryServer, podNa
 		},
 	}
 
-	configure.InjectImagePullPolicy(&discoveryServerPod)
-	configure.SchedulePod(&discoveryServerPod, label.GetTenancyMap(discoveryServer))
-	configure.InjectROSDomainID(&discoveryServerPod, discoveryServer.Spec.DomainID)
+	cfg.InjectImagePullPolicy(&discoveryServerPod)
+	cfg.SchedulePod(&discoveryServerPod, discoveryServer)
+	cfg.InjectROSDomainID(&discoveryServerPod, discoveryServer.Spec.DomainID)
 
 	return &discoveryServerPod
 }

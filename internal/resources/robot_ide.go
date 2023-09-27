@@ -30,7 +30,7 @@ func getRobotIDESelector(robotIDE robotv1alpha1.RobotIDE) map[string]string {
 
 func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot, robotVDI robotv1alpha1.RobotVDI, node corev1.Node) *corev1.Pod {
 
-	// discovery server
+	cfg := configure.PodConfigInjector{}
 
 	var cmdBuilder strings.Builder
 	cmdBuilder.WriteString("code-server " + robot.Spec.WorkspaceManagerTemplate.WorkspacesPath + " --bind-addr 0.0.0.0:$CODE_SERVER_PORT --auth none")
@@ -90,32 +90,34 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 		},
 	}
 
-	configure.InjectImagePullPolicy(&pod)
-	configure.SchedulePod(&pod, label.GetTenancyMap(robotIDE))
-	configure.InjectGenericEnvironmentVariables(&pod, robot)
-	configure.InjectLinuxUserAndGroup(&pod, robot)
-	configure.InjectRuntimeClass(&pod, robot, node)
+	cfg.InjectImagePullPolicy(&pod)
+	cfg.SchedulePod(&pod, robotIDE)
+	cfg.InjectGenericEnvironmentVariables(&pod, robot)
+	cfg.InjectLinuxUserAndGroup(&pod, robot)
+	cfg.InjectRuntimeClass(&pod, robot, node)
 	if robotIDE.Spec.Display && label.GetTargetRobotVDI(robotIDE) != "" {
 		// TODO: Add control for validating robot VDI
-		configure.InjectPodDisplayConfiguration(&pod, robotVDI)
+		cfg.InjectDisplayConfiguration(&pod, robotVDI)
 	}
 
 	if label.GetInstanceType(&robot) == label.InstanceTypePhysicalInstance {
 		// apply ONLY if the resource is on physical instance
-		configure.InjectRemoteConfigurationsForPod(&pod, *robotIDE)
+		cfg.InjectRemoteConfigurations(&pod, *robotIDE)
 	}
 
 	if robot.Spec.Type == robotv1alpha1.TypeRobot {
-		configure.InjectGenericRobotEnvironmentVariables(&pod, robot)
-		configure.InjectRMWImplementationConfiguration(&pod, robot)
-		configure.InjectROSDomainID(&pod, robot.Spec.RobotConfig.DomainID)
-		configure.InjectPodDiscoveryServerConnection(&pod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo)
+		cfg.InjectGenericRobotEnvironmentVariables(&pod, robot)
+		cfg.InjectRMWImplementationConfiguration(&pod, robot)
+		cfg.InjectROSDomainID(&pod, robot.Spec.RobotConfig.DomainID)
+		cfg.InjectDiscoveryServerConnection(&pod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo)
 	}
 
 	return &pod
 }
 
 func GetRobotIDEService(robotIDE *robotv1alpha1.RobotIDE, svcNamespacedName *types.NamespacedName) *corev1.Service {
+
+	cfg := configure.ServiceConfigInjector{}
 
 	serviceSpec := corev1.ServiceSpec{
 		Type:     robotIDE.Spec.ServiceType,
@@ -142,7 +144,7 @@ func GetRobotIDEService(robotIDE *robotv1alpha1.RobotIDE, svcNamespacedName *typ
 
 	if label.GetInstanceType(robotIDE) == label.InstanceTypePhysicalInstance {
 		// apply ONLY if the resource is on physical instance
-		configure.InjectRemoteConfigurationsForService(&service)
+		cfg.InjectRemoteConfigurations(&service)
 	}
 
 	return &service

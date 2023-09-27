@@ -31,6 +31,8 @@ func getRelayServerSelector(relayserver robotv1alpha1.RelayServer) map[string]st
 
 func GetRelayServerPod(relayserver *robotv1alpha1.RelayServer, podNamespacedName *types.NamespacedName) *corev1.Pod {
 
+	cfg := configure.PodConfigInjector{}
+
 	var cmdBuilder strings.Builder
 	cmdBuilder.WriteString(
 		"socat TCP4-LISTEN:" + strconv.Itoa(RELAY_SERVER_PORT) + ",fork,reuseaddr TCP4:" +
@@ -66,8 +68,8 @@ func GetRelayServerPod(relayserver *robotv1alpha1.RelayServer, podNamespacedName
 		},
 	}
 
-	configure.InjectImagePullPolicy(&relayServerPod)
-	configure.SchedulePod(&relayServerPod, label.GetTenancyMap(relayserver))
+	cfg.InjectImagePullPolicy(&relayServerPod)
+	cfg.SchedulePod(&relayServerPod, relayserver)
 
 	return &relayServerPod
 }

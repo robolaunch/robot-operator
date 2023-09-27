@@ -17,6 +17,8 @@ import (
 
 func GetClonerJob(workspaceManager *robotv1alpha1.WorkspaceManager, jobNamespacedName *types.NamespacedName, robot *robotv1alpha1.Robot) *batchv1.Job {
 
+	cfg := configure.JobConfigInjector{}
+
 	var clonerCmdBuilder strings.Builder
 	for wsKey, ws := range workspaceManager.Spec.Workspaces {
 
@@ -59,9 +61,6 @@ func GetClonerJob(workspaceManager *robotv1alpha1.WorkspaceManager, jobNamespace
 	podSpec.RestartPolicy = corev1.RestartPolicyNever
 	podSpec.NodeSelector = label.GetTenancyMap(robot)
 
-	configure.InjectImagePullPolicyForPodSpec(podSpec)
-	configure.InjectLinuxUserAndGroupForPodSpec(podSpec, *robot)
-
 	job := batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      workspaceManager.GetClonerJobMetadata().Name,
@@ -74,10 +73,16 @@ func GetClonerJob(workspaceManager *robotv1alpha1.WorkspaceManager, jobNamespace
 		},
 	}
 
+	cfg.InjectImagePullPolicy(&job)
+	cfg.InjectLinuxUserAndGroup(&job, *robot)
+	cfg.SchedulePod(&job, workspaceManager)
+
 	return &job
 }
 
 func GetCleanupJob(workspaceManager *robotv1alpha1.WorkspaceManager, jobNamespacedName *types.NamespacedName, robot *robotv1alpha1.Robot) *batchv1.Job {
+
+	cfg := configure.JobConfigInjector{}
 
 	var cmdBuilder strings.Builder
 	cmdBuilder.WriteString("cd " + workspaceManager.Spec.WorkspacesPath + " && ")
@@ -115,8 +120,6 @@ func GetCleanupJob(workspaceManager *robotv1alpha1.WorkspaceManager, jobNamespac
 	podSpec.RestartPolicy = corev1.RestartPolicyNever
 	podSpec.NodeSelector = label.GetTenancyMap(robot)
 
-	configure.InjectLinuxUserAndGroupForPodSpec(podSpec, *robot)
-
 	job := batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      workspaceManager.GetCleanupJobMetadata().Name,
@@ -128,6 +131,8 @@ func GetCleanupJob(workspaceManager *robotv1alpha1.WorkspaceManager, jobNamespac
 			},
 		},
 	}
+
+	cfg.InjectLinuxUserAndGroup(&job, *robot)
 
 	return &job
 }

@@ -31,6 +31,8 @@ func getROSBridgeSelector(rosbridge robotv1alpha1.ROSBridge) map[string]string {
 
 func GetBridgePod(rosbridge *robotv1alpha1.ROSBridge, podNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot) *corev1.Pod {
 
+	cfg := configure.PodConfigInjector{}
+
 	bridgePod := corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      podNamespacedName.Name,
@@ -52,11 +54,11 @@ func GetBridgePod(rosbridge *robotv1alpha1.ROSBridge, podNamespacedName *types.N
 		bridgePod.Spec.Containers = append(bridgePod.Spec.Containers, getROS2BridgeContainer(rosbridge))
 	}
 
-	configure.InjectImagePullPolicy(&bridgePod)
-	configure.SchedulePod(&bridgePod, label.GetTenancyMap(rosbridge))
-	configure.InjectPodDiscoveryServerConnection(&bridgePod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo)
-	configure.InjectRMWImplementationConfiguration(&bridgePod, robot)
-	configure.InjectROSDomainID(&bridgePod, robot.Spec.RobotConfig.DomainID)
+	cfg.InjectImagePullPolicy(&bridgePod)
+	cfg.SchedulePod(&bridgePod, rosbridge)
+	cfg.InjectDiscoveryServerConnection(&bridgePod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo)
+	cfg.InjectRMWImplementationConfiguration(&bridgePod, robot)
+	cfg.InjectROSDomainID(&bridgePod, robot.Spec.RobotConfig.DomainID)
 
 	return &bridgePod
 }

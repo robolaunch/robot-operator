@@ -57,6 +57,8 @@ func GetRobotVDIPVC(robotVDI *robotv1alpha1.RobotVDI, pvcNamespacedName *types.N
 
 func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot, node corev1.Node) *corev1.Pod {
 
+	cfg := configure.PodConfigInjector{}
+
 	// add tcp port
 	ports := []corev1.ContainerPort{
 		{
@@ -150,21 +152,21 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 		},
 	}
 
-	configure.InjectImagePullPolicy(vdiPod)
-	configure.SchedulePod(vdiPod, label.GetTenancyMap(robotVDI))
-	configure.InjectGenericEnvironmentVariables(vdiPod, robot)
-	configure.InjectPodDisplayConfiguration(vdiPod, *robotVDI)
-	configure.InjectRuntimeClass(vdiPod, robot, node)
+	cfg.InjectImagePullPolicy(vdiPod)
+	cfg.SchedulePod(vdiPod, robotVDI)
+	cfg.InjectGenericEnvironmentVariables(vdiPod, robot)
+	cfg.InjectDisplayConfiguration(vdiPod, *robotVDI)
+	cfg.InjectRuntimeClass(vdiPod, robot, node)
 
 	if !robotVDI.Spec.DisableNVENC {
-		configure.InjectEncodingOption(vdiPod, robot)
+		cfg.InjectEncodingOption(vdiPod, robot)
 	}
 
 	if robot.Spec.Type == robotv1alpha1.TypeRobot {
-		configure.InjectGenericRobotEnvironmentVariables(vdiPod, robot)
-		configure.InjectRMWImplementationConfiguration(vdiPod, robot)
-		configure.InjectROSDomainID(vdiPod, robot.Spec.RobotConfig.DomainID)
-		configure.InjectPodDiscoveryServerConnection(vdiPod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo)
+		cfg.InjectGenericRobotEnvironmentVariables(vdiPod, robot)
+		cfg.InjectRMWImplementationConfiguration(vdiPod, robot)
+		cfg.InjectROSDomainID(vdiPod, robot.Spec.RobotConfig.DomainID)
+		cfg.InjectDiscoveryServerConnection(vdiPod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo)
 	}
 
 	return vdiPod
