@@ -260,7 +260,8 @@ func GetLoaderJobForEnvironment(robot *robotv1alpha1.Robot, jobNamespacedName *t
 	preparerCmdBuilder.WriteString(closerStr + " apt-get dist-upgrade -y ")
 	preparerCmdBuilder.WriteString(closerStr + " apt-get update ")
 	preparerCmdBuilder.WriteString(closerStr + " chown root:root /usr/bin/sudo ")
-	preparerCmdBuilder.WriteString(closerStr + " chmod 4755 /usr/bin/sudo")
+	preparerCmdBuilder.WriteString(closerStr + " chmod 4755 /usr/bin/sudo ")
+	preparerCmdBuilder.WriteString(closerStr + " setfacl -R -m u:robolaunch:rwx /opt")
 
 	copierContainer := corev1.Container{
 		Name:            "copier",
