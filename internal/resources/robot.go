@@ -120,10 +120,21 @@ func GetLoaderJobForRobot(robot *robotv1alpha1.Robot, jobNamespacedName *types.N
 	preparerCmdBuilder.WriteString(closerStr + " apt-get update")
 	preparerCmdBuilder.WriteString(closerStr + " mv temp1 " + filepath.Join("/etc", "apt", "sources.list.d", "ros2.list "))
 	preparerCmdBuilder.WriteString(closerStr + " mv temp2 " + filepath.Join("/etc", "apt", "sources.list") + " ")
-	preparerCmdBuilder.WriteString(closerStr + " apt-get dist-upgrade -y ")
 	preparerCmdBuilder.WriteString(closerStr + " apt-get update ")
 	preparerCmdBuilder.WriteString(closerStr + " chown root:root /usr/bin/sudo ")
 	preparerCmdBuilder.WriteString(closerStr + " chmod 4755 /usr/bin/sudo ")
+
+	// grant permission for directories
+	// directories and files can be specified in $PATH format: eg. "/opt:/etc/files:/usr/lib"
+	var paths []string
+	if val, ok := robot.Spec.AdditionalConfigs[internal.GRANT_PERMISSION_KEY]; ok && val.ConfigType == robotv1alpha1.AdditionalConfigTypeOperator {
+		paths = strings.Split(val.Value, ":")
+	}
+
+	for _, v := range paths {
+		preparerCmdBuilder.WriteString(closerStr + " setfacl -R -m u:robolaunch:rwx " + v + " ")
+	}
+
 	if !readyRobotProp.Enabled { // do no run rosdep init if ready robot
 		preparerCmdBuilder.WriteString(closerStr + " rosdep init")
 	}
@@ -257,10 +268,19 @@ func GetLoaderJobForEnvironment(robot *robotv1alpha1.Robot, jobNamespacedName *t
 	preparerCmdBuilder.WriteString(closerStr + " apt-get update ")
 	preparerCmdBuilder.WriteString(closerStr + " mv temp " + filepath.Join("/etc", "apt", "sources.list") + " ")
 	preparerCmdBuilder.WriteString(closerStr + " apt-get update ")
-	preparerCmdBuilder.WriteString(closerStr + " apt-get dist-upgrade -y ")
-	preparerCmdBuilder.WriteString(closerStr + " apt-get update ")
 	preparerCmdBuilder.WriteString(closerStr + " chown root:root /usr/bin/sudo ")
-	preparerCmdBuilder.WriteString(closerStr + " chmod 4755 /usr/bin/sudo")
+	preparerCmdBuilder.WriteString(closerStr + " chmod 4755 /usr/bin/sudo ")
+
+	// grant permission for directories
+	// directories and files can be specified in $PATH format: eg. "/opt:/etc/files:/usr/lib"
+	var paths []string
+	if val, ok := robot.Spec.AdditionalConfigs[internal.GRANT_PERMISSION_KEY]; ok && val.ConfigType == robotv1alpha1.AdditionalConfigTypeOperator {
+		paths = strings.Split(val.Value, ":")
+	}
+
+	for _, v := range paths {
+		preparerCmdBuilder.WriteString(closerStr + " setfacl -R -m u:robolaunch:rwx " + v + " ")
+	}
 
 	copierContainer := corev1.Container{
 		Name:            "copier",
