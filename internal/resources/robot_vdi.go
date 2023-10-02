@@ -104,6 +104,7 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 			Labels:    labels,
 		},
 		Spec: corev1.PodSpec{
+			HostNetwork: robotVDI.Spec.Privileged,
 			Containers: []corev1.Container{
 				{
 					Name:    "vdi",
