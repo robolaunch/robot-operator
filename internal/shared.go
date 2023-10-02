@@ -196,6 +196,10 @@ const (
 	CMD_GET_NETWORK_LOAD = "cat /proc/net/dev | awk -F ' ' '{print $1 $2 \":\" $10}' | tail -n+3"
 )
 
+const (
+	GRANT_PERMISSION_KEY = "GRANT_PERMISSION"
+)
+
 func Bash(command string) []string {
 	return []string{
 		"/bin/bash",
