@@ -334,6 +334,11 @@ type VolumeStatuses struct {
 	Workspace OwnedResourceStatus `json:"workspaceDir,omitempty"`
 }
 
+type PersistentDirectory struct {
+	Path   string              `json:"path,omitempty"`
+	Status OwnedResourceStatus `json:"status,omitempty"`
+}
+
 type JobPhase string
 
 const (
@@ -376,6 +381,8 @@ type RobotStatus struct {
 	// Robot persists some of the directories of underlying OS inside persistent volumes.
 	// This field exposes persistent volume claims that dynamically provision PVs.
 	VolumeStatuses VolumeStatuses `json:"volumeStatuses,omitempty"`
+	// [*alpha*] Status of PVCs of persistent directories.
+	PersistentDirectories []PersistentDirectory `json:"persistentDirs,omitempty"`
 	// Discovery server instance status.
 	DiscoveryServerStatus DiscoveryServerInstanceStatus `json:"discoveryServerStatus,omitempty"`
 	// ROS bridge instance status.
