@@ -2,6 +2,7 @@ package robot
 
 import (
 	"context"
+	"errors"
 	"strconv"
 	"strings"
 
@@ -120,6 +121,8 @@ func (r *RobotReconciler) reconcileCheckPersistentDirectories(ctx context.Contex
 					},
 				})
 			}
+		} else {
+			return errors.New("persistent directories should be specified in additional configs as PERSISTENT_DIRS")
 		}
 	}
 
