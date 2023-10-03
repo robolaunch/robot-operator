@@ -2,7 +2,10 @@ package robot
 
 import (
 	"context"
+	"strconv"
+	"strings"
 
+	"github.com/robolaunch/robot-operator/internal"
 	robotErr "github.com/robolaunch/robot-operator/internal/error"
 	label "github.com/robolaunch/robot-operator/internal/label"
 	nodePkg "github.com/robolaunch/robot-operator/internal/node"
@@ -95,6 +98,28 @@ func (r *RobotReconciler) reconcileCheckImage(ctx context.Context, instance *rob
 		instance.Status.Image, err = nodePkg.GetImage(ctx, r.Client, *node, *instance)
 		if err != nil {
 			return err
+		}
+	}
+
+	return nil
+}
+
+func (r *RobotReconciler) reconcileCheckPersistentDirectories(ctx context.Context, instance *robotv1alpha1.Robot) error {
+
+	if len(instance.Status.PersistentDirectories) == 0 {
+		if dirsConfig, ok := instance.Spec.AdditionalConfigs[internal.PERSISTENT_DIRS_KEY]; ok {
+			dirs := strings.Split(dirsConfig.Value, ":")
+			for k, dirPath := range dirs {
+				instance.Status.PersistentDirectories = append(instance.Status.PersistentDirectories, robotv1alpha1.PersistentDirectory{
+					Path: dirPath,
+					Status: robotv1alpha1.OwnedResourceStatus{
+						Reference: corev1.ObjectReference{
+							Namespace: instance.Namespace,
+							Name:      instance.Name + "-pvc-" + strconv.Itoa(k),
+						},
+					},
+				})
+			}
 		}
 	}
 
