@@ -18,12 +18,12 @@ import (
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 )
 
-func GetPersistentVolumeClaim(robot *robotv1alpha1.Robot, pvcNamespacedName *types.NamespacedName) *corev1.PersistentVolumeClaim {
+func GetPersistentVolumeClaim(robot *robotv1alpha1.Robot, pDir robotv1alpha1.PersistentDirectory) *corev1.PersistentVolumeClaim {
 
 	pvc := corev1.PersistentVolumeClaim{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      pvcNamespacedName.Name,
-			Namespace: pvcNamespacedName.Namespace,
+			Name:      pDir.Status.Reference.Name,
+			Namespace: pDir.Status.Reference.Namespace,
 		},
 		Spec: corev1.PersistentVolumeClaimSpec{
 			StorageClassName: &robot.Spec.Storage.StorageClassConfig.Name,
@@ -32,10 +32,10 @@ func GetPersistentVolumeClaim(robot *robotv1alpha1.Robot, pvcNamespacedName *typ
 			},
 			Resources: corev1.ResourceRequirements{
 				Limits: corev1.ResourceList{
-					corev1.ResourceName(corev1.ResourceStorage): resource.MustParse(getClaimStorage(pvcNamespacedName, robot.Spec.Storage.Amount)),
+					corev1.ResourceName(corev1.ResourceStorage): resource.MustParse(getClaimStorage(pDir, robot.Spec.Storage.Amount, *robot)),
 				},
 				Requests: corev1.ResourceList{
-					corev1.ResourceName(corev1.ResourceStorage): resource.MustParse(getClaimStorage(pvcNamespacedName, robot.Spec.Storage.Amount)),
+					corev1.ResourceName(corev1.ResourceStorage): resource.MustParse(getClaimStorage(pDir, robot.Spec.Storage.Amount, *robot)),
 				},
 			},
 		},
@@ -44,23 +44,23 @@ func GetPersistentVolumeClaim(robot *robotv1alpha1.Robot, pvcNamespacedName *typ
 	return &pvc
 }
 
-func getClaimStorage(pvc *types.NamespacedName, totalStorage int) string {
+func getClaimStorage(pDir robotv1alpha1.PersistentDirectory, totalStorage int, robot robotv1alpha1.Robot) string {
 	storageInt := 0
 
-	if strings.Contains(pvc.Name, "pvc-var") {
+	if pDir.Path == "/var" {
 		storageInt = totalStorage / 20
-	} else if strings.Contains(pvc.Name, "pvc-opt") {
+	} else if pDir.Path == "/opt" {
 		storageInt = 3 * totalStorage / 10
-	} else if strings.Contains(pvc.Name, "pvc-usr") {
+	} else if pDir.Path == "/usr" {
 		storageInt = totalStorage * 5 / 10
-	} else if strings.Contains(pvc.Name, "pvc-etc") {
+	} else if pDir.Path == "/etc" {
 		storageInt = totalStorage / 20
-	} else if strings.Contains(pvc.Name, "pvc-display") {
+	} else if pDir.Path == "/tmp/.X11-unix" {
 		storageInt = 100
-	} else if strings.Contains(pvc.Name, "pvc-workspace") {
+	} else if pDir.Path == robot.Spec.WorkspaceManagerTemplate.WorkspacesPath {
 		storageInt = totalStorage / 10
 	} else {
-		storageInt = 0
+		storageInt = 200
 	}
 	return strconv.Itoa(storageInt) + "M"
 

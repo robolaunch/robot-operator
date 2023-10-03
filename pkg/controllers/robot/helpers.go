@@ -110,6 +110,8 @@ func (r *RobotReconciler) reconcileCheckPersistentDirectories(ctx context.Contex
 	if len(instance.Status.PersistentDirectories) == 0 {
 		if dirsConfig, ok := instance.Spec.AdditionalConfigs[internal.PERSISTENT_DIRS_KEY]; ok {
 			dirs := strings.Split(dirsConfig.Value, ":")
+
+			// volumes for shared linux environment
 			for k, dirPath := range dirs {
 				instance.Status.PersistentDirectories = append(instance.Status.PersistentDirectories, robotv1alpha1.PersistentDirectory{
 					Path: dirPath,
@@ -121,6 +123,17 @@ func (r *RobotReconciler) reconcileCheckPersistentDirectories(ctx context.Contex
 					},
 				})
 			}
+
+			// volume for workspace
+			instance.Status.PersistentDirectories = append(instance.Status.PersistentDirectories, robotv1alpha1.PersistentDirectory{
+				Path: instance.Spec.WorkspaceManagerTemplate.WorkspacesPath,
+				Status: robotv1alpha1.OwnedResourceStatus{
+					Reference: corev1.ObjectReference{
+						Namespace: instance.Namespace,
+						Name:      instance.Name + "-workspace",
+					},
+				},
+			})
 		} else {
 			return errors.New("persistent directories should be specified in additional configs as PERSISTENT_DIRS")
 		}

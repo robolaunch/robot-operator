@@ -14,29 +14,14 @@ import (
 
 func (r *RobotReconciler) reconcileCheckPVCs(ctx context.Context, instance *robotv1alpha1.Robot) error {
 
-	err := r.reconcileCheckPVC(ctx, instance, *instance.GetPVCVarMetadata(), &instance.Status.VolumeStatuses.Var)
-	if err != nil {
-		return err
-	}
-
-	err = r.reconcileCheckPVC(ctx, instance, *instance.GetPVCOptMetadata(), &instance.Status.VolumeStatuses.Opt)
-	if err != nil {
-		return err
-	}
-
-	err = r.reconcileCheckPVC(ctx, instance, *instance.GetPVCEtcMetadata(), &instance.Status.VolumeStatuses.Etc)
-	if err != nil {
-		return err
-	}
-
-	err = r.reconcileCheckPVC(ctx, instance, *instance.GetPVCUsrMetadata(), &instance.Status.VolumeStatuses.Usr)
-	if err != nil {
-		return err
-	}
-
-	err = r.reconcileCheckPVC(ctx, instance, *instance.GetPVCWorkspaceMetadata(), &instance.Status.VolumeStatuses.Workspace)
-	if err != nil {
-		return err
+	for k, pDir := range instance.Status.PersistentDirectories {
+		err := r.reconcileCheckPVC(ctx, instance, types.NamespacedName{
+			Namespace: pDir.Status.Reference.Namespace,
+			Name:      pDir.Status.Reference.Name,
+		}, &instance.Status.PersistentDirectories[k].Status)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
