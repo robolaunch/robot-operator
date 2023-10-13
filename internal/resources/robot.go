@@ -94,7 +94,7 @@ func GetLoaderJob(robot *robotv1alpha1.Robot, jobNamespacedName *types.Namespace
 
 func GetLoaderJobForRobot(robot *robotv1alpha1.Robot, jobNamespacedName *types.NamespacedName, hasGPU bool) *batchv1.Job {
 
-	cfg := configure.JobConfigInjector{}
+	jobCfg := configure.JobConfigInjector{}
 	containerCfg := configure.ContainerConfigInjector{}
 
 	var copierCmdBuilder strings.Builder
@@ -215,16 +215,16 @@ func GetLoaderJobForRobot(robot *robotv1alpha1.Robot, jobNamespacedName *types.N
 		},
 	}
 
-	cfg.InjectGenericEnvironmentVariables(&job, *robot)
-	cfg.InjectImagePullPolicy(&job)
-	cfg.InjectVolumeConfiguration(&job, *robot)
+	jobCfg.InjectGenericEnvironmentVariables(&job, *robot)
+	jobCfg.InjectImagePullPolicy(&job)
+	jobCfg.InjectVolumeConfiguration(&job, *robot)
 
 	return &job
 }
 
 func GetLoaderJobForEnvironment(robot *robotv1alpha1.Robot, jobNamespacedName *types.NamespacedName, hasGPU bool) *batchv1.Job {
 
-	cfg := configure.JobConfigInjector{}
+	jobCfg := configure.JobConfigInjector{}
 	containerCfg := configure.ContainerConfigInjector{}
 
 	var copierCmdBuilder strings.Builder
@@ -337,10 +337,10 @@ func GetLoaderJobForEnvironment(robot *robotv1alpha1.Robot, jobNamespacedName *t
 		},
 	}
 
-	cfg.InjectGenericEnvironmentVariables(&job, *robot)
-	cfg.InjectImagePullPolicy(&job)
-	cfg.SchedulePod(&job, robot)
-	cfg.InjectVolumeConfiguration(&job, *robot)
+	jobCfg.InjectGenericEnvironmentVariables(&job, *robot)
+	jobCfg.InjectImagePullPolicy(&job)
+	jobCfg.SchedulePod(&job, robot)
+	jobCfg.InjectVolumeConfiguration(&job, *robot)
 
 	return &job
 }
