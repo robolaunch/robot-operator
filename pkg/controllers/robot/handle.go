@@ -15,61 +15,29 @@ import (
 
 func (r *RobotReconciler) reconcileHandlePVCs(ctx context.Context, instance *robotv1alpha1.Robot) error {
 
-	if !(instance.Status.VolumeStatuses.Var.Created &&
-		instance.Status.VolumeStatuses.Opt.Created &&
-		instance.Status.VolumeStatuses.Etc.Created &&
-		instance.Status.VolumeStatuses.Usr.Created &&
-		instance.Status.VolumeStatuses.Workspace.Created) {
-		instance.Status.Phase = robotv1alpha1.RobotPhaseCreatingEnvironment
+	for k, pDir := range instance.Status.PersistentDirectories {
+		if !pDir.Status.Created {
+			err := r.reconcileCreatePVC(ctx, instance, pDir)
+			if err != nil {
+				return err
+			}
 
-		err := r.reconcileCreatePVC(ctx, instance, instance.Status.VolumeStatuses.Var, *instance.GetPVCVarMetadata())
-		if err != nil {
-			return err
+			pDir.Status.Created = true
+			instance.Status.PersistentDirectories[k] = pDir
+
+			return &robotErr.CreatingResourceError{
+				ResourceKind:      "PersistentVolumeClaim",
+				ResourceNamespace: instance.Namespace,
+			}
 		}
-
-		instance.Status.VolumeStatuses.Var.Created = true
-
-		err = r.reconcileCreatePVC(ctx, instance, instance.Status.VolumeStatuses.Opt, *instance.GetPVCOptMetadata())
-		if err != nil {
-			return err
-		}
-
-		instance.Status.VolumeStatuses.Opt.Created = true
-
-		err = r.reconcileCreatePVC(ctx, instance, instance.Status.VolumeStatuses.Etc, *instance.GetPVCEtcMetadata())
-		if err != nil {
-			return err
-		}
-
-		instance.Status.VolumeStatuses.Etc.Created = true
-
-		err = r.reconcileCreatePVC(ctx, instance, instance.Status.VolumeStatuses.Usr, *instance.GetPVCUsrMetadata())
-		if err != nil {
-			return err
-		}
-
-		instance.Status.VolumeStatuses.Usr.Created = true
-
-		err = r.reconcileCreatePVC(ctx, instance, instance.Status.VolumeStatuses.Workspace, *instance.GetPVCWorkspaceMetadata())
-		if err != nil {
-			return err
-		}
-
-		instance.Status.VolumeStatuses.Workspace.Created = true
-
-		return &robotErr.CreatingResourceError{
-			ResourceKind:      "PersistentVolumeClaim",
-			ResourceNamespace: instance.Namespace,
-		}
-
 	}
 
 	return nil
 }
 
-func (r *RobotReconciler) reconcileCreatePVC(ctx context.Context, instance *robotv1alpha1.Robot, objStatus robotv1alpha1.OwnedResourceStatus, objNamespacedName types.NamespacedName) error {
-	if !objStatus.Created {
-		err := r.createPVC(ctx, instance, &objNamespacedName)
+func (r *RobotReconciler) reconcileCreatePVC(ctx context.Context, instance *robotv1alpha1.Robot, pDir robotv1alpha1.PersistentDirectory) error {
+	if !pDir.Status.Created {
+		err := r.createPVC(ctx, instance, pDir)
 		if err != nil {
 			return err
 		}

@@ -17,7 +17,8 @@ import (
 
 func GetClonerJob(workspaceManager *robotv1alpha1.WorkspaceManager, jobNamespacedName *types.NamespacedName, robot *robotv1alpha1.Robot) *batchv1.Job {
 
-	cfg := configure.JobConfigInjector{}
+	jobCfg := configure.JobConfigInjector{}
+	containerCfg := configure.ContainerConfigInjector{}
 
 	var clonerCmdBuilder strings.Builder
 	for wsKey, ws := range workspaceManager.Spec.Workspaces {
@@ -36,25 +37,13 @@ func GetClonerJob(workspaceManager *robotv1alpha1.WorkspaceManager, jobNamespace
 		Name:    "cloner",
 		Image:   "ubuntu:focal",
 		Command: internal.Bash(clonerCmdBuilder.String()),
-		VolumeMounts: []corev1.VolumeMount{
-			configure.GetVolumeMount("", configure.GetVolumeVar(robot)),
-			configure.GetVolumeMount("", configure.GetVolumeUsr(robot)),
-			configure.GetVolumeMount("", configure.GetVolumeOpt(robot)),
-			configure.GetVolumeMount("", configure.GetVolumeEtc(robot)),
-			configure.GetVolumeMount(workspaceManager.Spec.WorkspacesPath, configure.GetVolumeWorkspace(robot)),
-		},
 	}
+
+	containerCfg.InjectVolumeMountConfiguration(&clonerContainer, *robot, "")
 
 	podSpec := &corev1.PodSpec{
 		Containers: []corev1.Container{
 			clonerContainer,
-		},
-		Volumes: []corev1.Volume{
-			configure.GetVolumeVar(robot),
-			configure.GetVolumeUsr(robot),
-			configure.GetVolumeOpt(robot),
-			configure.GetVolumeEtc(robot),
-			configure.GetVolumeWorkspace(robot),
 		},
 	}
 
@@ -73,16 +62,18 @@ func GetClonerJob(workspaceManager *robotv1alpha1.WorkspaceManager, jobNamespace
 		},
 	}
 
-	cfg.InjectImagePullPolicy(&job)
-	cfg.InjectLinuxUserAndGroup(&job, *robot)
-	cfg.SchedulePod(&job, workspaceManager)
+	jobCfg.InjectImagePullPolicy(&job)
+	jobCfg.InjectLinuxUserAndGroup(&job, *robot)
+	jobCfg.SchedulePod(&job, workspaceManager)
+	jobCfg.InjectVolumeConfiguration(&job, *robot)
 
 	return &job
 }
 
 func GetCleanupJob(workspaceManager *robotv1alpha1.WorkspaceManager, jobNamespacedName *types.NamespacedName, robot *robotv1alpha1.Robot) *batchv1.Job {
 
-	cfg := configure.JobConfigInjector{}
+	jobCfg := configure.JobConfigInjector{}
+	containerCfg := configure.ContainerConfigInjector{}
 
 	var cmdBuilder strings.Builder
 	cmdBuilder.WriteString("cd " + workspaceManager.Spec.WorkspacesPath + " && ")
@@ -95,25 +86,13 @@ func GetCleanupJob(workspaceManager *robotv1alpha1.WorkspaceManager, jobNamespac
 		Name:    "cleanup",
 		Image:   "ubuntu:focal",
 		Command: internal.Bash(cmdBuilder.String()),
-		VolumeMounts: []corev1.VolumeMount{
-			configure.GetVolumeMount("", configure.GetVolumeVar(robot)),
-			configure.GetVolumeMount("", configure.GetVolumeUsr(robot)),
-			configure.GetVolumeMount("", configure.GetVolumeOpt(robot)),
-			configure.GetVolumeMount("", configure.GetVolumeEtc(robot)),
-			configure.GetVolumeMount(workspaceManager.Spec.WorkspacesPath, configure.GetVolumeWorkspace(robot)),
-		},
 	}
+
+	containerCfg.InjectVolumeMountConfiguration(&cleanupContainer, *robot, "")
 
 	podSpec := &corev1.PodSpec{
 		Containers: []corev1.Container{
 			cleanupContainer,
-		},
-		Volumes: []corev1.Volume{
-			configure.GetVolumeVar(robot),
-			configure.GetVolumeUsr(robot),
-			configure.GetVolumeOpt(robot),
-			configure.GetVolumeEtc(robot),
-			configure.GetVolumeWorkspace(robot),
 		},
 	}
 
@@ -132,7 +111,8 @@ func GetCleanupJob(workspaceManager *robotv1alpha1.WorkspaceManager, jobNamespac
 		},
 	}
 
-	cfg.InjectLinuxUserAndGroup(&job, *robot)
+	jobCfg.InjectLinuxUserAndGroup(&job, *robot)
+	jobCfg.InjectVolumeConfiguration(&job, *robot)
 
 	return &job
 }

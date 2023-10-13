@@ -198,6 +198,7 @@ const (
 
 const (
 	GRANT_PERMISSION_KEY = "GRANT_PERMISSION"
+	PERSISTENT_DIRS_KEY  = "PERSISTENT_DIRS"
 )
 
 func Bash(command string) []string {

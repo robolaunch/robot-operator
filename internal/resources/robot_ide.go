@@ -30,7 +30,8 @@ func getRobotIDESelector(robotIDE robotv1alpha1.RobotIDE) map[string]string {
 
 func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot, robotVDI robotv1alpha1.RobotVDI, node corev1.Node) *corev1.Pod {
 
-	cfg := configure.PodConfigInjector{}
+	podCfg := configure.PodConfigInjector{}
+	containerCfg := configure.ContainerConfigInjector{}
 
 	var cmdBuilder strings.Builder
 	cmdBuilder.WriteString("code-server " + robot.Spec.WorkspaceManagerTemplate.WorkspacesPath + " --bind-addr 0.0.0.0:$CODE_SERVER_PORT --auth none")
@@ -40,7 +41,33 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 		labels[k] = v
 	}
 
-	pod := corev1.Pod{
+	ideContainer := corev1.Container{
+		Name:    "code-server",
+		Image:   robot.Status.Image,
+		Command: internal.Bash(cmdBuilder.String()),
+		Env: []corev1.EnvVar{
+			internal.Env("CODE_SERVER_PORT", strconv.Itoa(ROBOT_IDE_PORT)),
+			internal.Env("ROBOT_NAMESPACE", robot.Namespace),
+			internal.Env("ROBOT_NAME", robot.Name),
+			internal.Env("TERM", "xterm-256color"),
+		},
+		Ports: []corev1.ContainerPort{
+			{
+				Name:          ROBOT_IDE_PORT_NAME,
+				ContainerPort: ROBOT_IDE_PORT,
+			},
+		},
+		Resources: corev1.ResourceRequirements{
+			Limits: getResourceLimits(robotIDE.Spec.Resources),
+		},
+		SecurityContext: &corev1.SecurityContext{
+			Privileged: &robotIDE.Spec.Privileged,
+		},
+	}
+
+	containerCfg.InjectVolumeMountConfiguration(&ideContainer, robot, "")
+
+	idePod := corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      podNamespacedName.Name,
 			Namespace: podNamespacedName.Namespace,
@@ -49,71 +76,36 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 		Spec: corev1.PodSpec{
 			HostNetwork: robotIDE.Spec.Privileged,
 			Containers: []corev1.Container{
-				{
-					Name:    "code-server",
-					Image:   robot.Status.Image,
-					Command: internal.Bash(cmdBuilder.String()),
-					Env: []corev1.EnvVar{
-						internal.Env("CODE_SERVER_PORT", strconv.Itoa(ROBOT_IDE_PORT)),
-						internal.Env("ROBOT_NAMESPACE", robot.Namespace),
-						internal.Env("ROBOT_NAME", robot.Name),
-						internal.Env("TERM", "xterm-256color"),
-					},
-					VolumeMounts: []corev1.VolumeMount{
-						configure.GetVolumeMount("", configure.GetVolumeVar(&robot)),
-						configure.GetVolumeMount("", configure.GetVolumeUsr(&robot)),
-						configure.GetVolumeMount("", configure.GetVolumeOpt(&robot)),
-						configure.GetVolumeMount("", configure.GetVolumeEtc(&robot)),
-						configure.GetVolumeMount(robot.Spec.WorkspaceManagerTemplate.WorkspacesPath, configure.GetVolumeWorkspace(&robot)),
-					},
-					Ports: []corev1.ContainerPort{
-						{
-							Name:          ROBOT_IDE_PORT_NAME,
-							ContainerPort: ROBOT_IDE_PORT,
-						},
-					},
-					Resources: corev1.ResourceRequirements{
-						Limits: getResourceLimits(robotIDE.Spec.Resources),
-					},
-					SecurityContext: &corev1.SecurityContext{
-						Privileged: &robotIDE.Spec.Privileged,
-					},
-				},
-			},
-			Volumes: []corev1.Volume{
-				configure.GetVolumeVar(&robot),
-				configure.GetVolumeUsr(&robot),
-				configure.GetVolumeOpt(&robot),
-				configure.GetVolumeEtc(&robot),
-				configure.GetVolumeWorkspace(&robot),
+				ideContainer,
 			},
 			RestartPolicy: corev1.RestartPolicyNever,
 		},
 	}
 
-	cfg.InjectImagePullPolicy(&pod)
-	cfg.SchedulePod(&pod, robotIDE)
-	cfg.InjectGenericEnvironmentVariables(&pod, robot)
-	cfg.InjectLinuxUserAndGroup(&pod, robot)
-	cfg.InjectRuntimeClass(&pod, robot, node)
+	podCfg.InjectImagePullPolicy(&idePod)
+	podCfg.SchedulePod(&idePod, robotIDE)
+	podCfg.InjectVolumeConfiguration(&idePod, robot)
+	podCfg.InjectGenericEnvironmentVariables(&idePod, robot)
+	podCfg.InjectLinuxUserAndGroup(&idePod, robot)
+	podCfg.InjectRuntimeClass(&idePod, robot, node)
 	if robotIDE.Spec.Display && label.GetTargetRobotVDI(robotIDE) != "" {
 		// TODO: Add control for validating robot VDI
-		cfg.InjectDisplayConfiguration(&pod, robotVDI)
+		podCfg.InjectDisplayConfiguration(&idePod, robotVDI)
 	}
 
 	if label.GetInstanceType(&robot) == label.InstanceTypePhysicalInstance {
 		// apply ONLY if the resource is on physical instance
-		cfg.InjectRemoteConfigurations(&pod, *robotIDE)
+		podCfg.InjectRemoteConfigurations(&idePod, *robotIDE)
 	}
 
 	if robot.Spec.Type == robotv1alpha1.TypeRobot {
-		cfg.InjectGenericRobotEnvironmentVariables(&pod, robot)
-		cfg.InjectRMWImplementationConfiguration(&pod, robot)
-		cfg.InjectROSDomainID(&pod, robot.Spec.RobotConfig.DomainID)
-		cfg.InjectDiscoveryServerConnection(&pod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo)
+		podCfg.InjectGenericRobotEnvironmentVariables(&idePod, robot)
+		podCfg.InjectRMWImplementationConfiguration(&idePod, robot)
+		podCfg.InjectROSDomainID(&idePod, robot.Spec.RobotConfig.DomainID)
+		podCfg.InjectDiscoveryServerConnection(&idePod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo)
 	}
 
-	return &pod
+	return &idePod
 }
 
 func GetRobotIDEService(robotIDE *robotv1alpha1.RobotIDE, svcNamespacedName *types.NamespacedName) *corev1.Service {

@@ -40,9 +40,8 @@ func GetConfigMap(buildManager *robotv1alpha1.BuildManager) (*corev1.ConfigMap, 
 
 func GetBuildJob(buildManager *robotv1alpha1.BuildManager, robot *robotv1alpha1.Robot, step robotv1alpha1.Step) *batchv1.Job {
 
-	cfg := configure.JobConfigInjector{}
-
-	robotSpec := robot.Spec
+	jobCfg := configure.JobConfigInjector{}
+	containerCfg := configure.ContainerConfigInjector{}
 
 	var cmdBuilder strings.Builder
 	var cmd []string
@@ -61,29 +60,23 @@ func GetBuildJob(buildManager *robotv1alpha1.BuildManager, robot *robotv1alpha1.
 
 	var backoffLimit int32 = 1
 
+	buildContainer := corev1.Container{
+		Name:    step.Name,
+		Image:   robot.Status.Image,
+		Command: cmd,
+		VolumeMounts: []corev1.VolumeMount{
+			configure.GetExternalVolumeMount(internal.CUSTOM_SCRIPTS_PATH, configure.GetVolumeConfigMaps(buildManager)),
+		},
+		Env: step.Env,
+	}
+
+	containerCfg.InjectVolumeMountConfiguration(&buildContainer, *robot, "")
+
 	podSpec := corev1.PodSpec{
 		Containers: []corev1.Container{
-			{
-				Name:    step.Name,
-				Image:   robot.Status.Image,
-				Command: cmd,
-				VolumeMounts: []corev1.VolumeMount{
-					configure.GetVolumeMount("", configure.GetVolumeVar(robot)),
-					configure.GetVolumeMount("", configure.GetVolumeUsr(robot)),
-					configure.GetVolumeMount("", configure.GetVolumeOpt(robot)),
-					configure.GetVolumeMount("", configure.GetVolumeEtc(robot)),
-					configure.GetVolumeMount(robotSpec.WorkspaceManagerTemplate.WorkspacesPath, configure.GetVolumeWorkspace(robot)),
-					configure.GetVolumeMount(internal.CUSTOM_SCRIPTS_PATH, configure.GetVolumeConfigMaps(buildManager)),
-				},
-				Env: step.Env,
-			},
+			buildContainer,
 		},
 		Volumes: []corev1.Volume{
-			configure.GetVolumeVar(robot),
-			configure.GetVolumeUsr(robot),
-			configure.GetVolumeOpt(robot),
-			configure.GetVolumeEtc(robot),
-			configure.GetVolumeWorkspace(robot),
 			configure.GetVolumeConfigMaps(buildManager),
 		},
 		RestartPolicy: corev1.RestartPolicyNever,
@@ -104,12 +97,13 @@ func GetBuildJob(buildManager *robotv1alpha1.BuildManager, robot *robotv1alpha1.
 		},
 	}
 
-	cfg.InjectGenericEnvironmentVariables(&job, *robot)
-	cfg.InjectWorkspaceEnvironmentVariable(&job, *robot, step.Workspace)
-	cfg.InjectImagePullPolicy(&job)
-	cfg.InjectLinuxUserAndGroup(&job, *robot)
-	cfg.InjectRMWImplementationConfiguration(&job, *robot)
-	cfg.SchedulePod(&job, robot)
+	jobCfg.InjectGenericEnvironmentVariables(&job, *robot)
+	jobCfg.InjectWorkspaceEnvironmentVariable(&job, *robot, step.Workspace)
+	jobCfg.InjectImagePullPolicy(&job)
+	jobCfg.InjectLinuxUserAndGroup(&job, *robot)
+	jobCfg.InjectRMWImplementationConfiguration(&job, *robot)
+	jobCfg.SchedulePod(&job, robot)
+	jobCfg.InjectVolumeConfiguration(&job, *robot)
 
 	return &job
 }

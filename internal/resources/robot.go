@@ -18,12 +18,12 @@ import (
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 )
 
-func GetPersistentVolumeClaim(robot *robotv1alpha1.Robot, pvcNamespacedName *types.NamespacedName) *corev1.PersistentVolumeClaim {
+func GetPersistentVolumeClaim(robot *robotv1alpha1.Robot, pDir robotv1alpha1.PersistentDirectory) *corev1.PersistentVolumeClaim {
 
 	pvc := corev1.PersistentVolumeClaim{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      pvcNamespacedName.Name,
-			Namespace: pvcNamespacedName.Namespace,
+			Name:      pDir.Status.Reference.Name,
+			Namespace: pDir.Status.Reference.Namespace,
 		},
 		Spec: corev1.PersistentVolumeClaimSpec{
 			StorageClassName: &robot.Spec.Storage.StorageClassConfig.Name,
@@ -32,10 +32,10 @@ func GetPersistentVolumeClaim(robot *robotv1alpha1.Robot, pvcNamespacedName *typ
 			},
 			Resources: corev1.ResourceRequirements{
 				Limits: corev1.ResourceList{
-					corev1.ResourceName(corev1.ResourceStorage): resource.MustParse(getClaimStorage(pvcNamespacedName, robot.Spec.Storage.Amount)),
+					corev1.ResourceName(corev1.ResourceStorage): resource.MustParse(getClaimStorage(pDir, robot.Spec.Storage.Amount, *robot)),
 				},
 				Requests: corev1.ResourceList{
-					corev1.ResourceName(corev1.ResourceStorage): resource.MustParse(getClaimStorage(pvcNamespacedName, robot.Spec.Storage.Amount)),
+					corev1.ResourceName(corev1.ResourceStorage): resource.MustParse(getClaimStorage(pDir, robot.Spec.Storage.Amount, *robot)),
 				},
 			},
 		},
@@ -44,23 +44,23 @@ func GetPersistentVolumeClaim(robot *robotv1alpha1.Robot, pvcNamespacedName *typ
 	return &pvc
 }
 
-func getClaimStorage(pvc *types.NamespacedName, totalStorage int) string {
+func getClaimStorage(pDir robotv1alpha1.PersistentDirectory, totalStorage int, robot robotv1alpha1.Robot) string {
 	storageInt := 0
 
-	if strings.Contains(pvc.Name, "pvc-var") {
+	if pDir.Path == "/var" {
 		storageInt = totalStorage / 20
-	} else if strings.Contains(pvc.Name, "pvc-opt") {
+	} else if pDir.Path == "/opt" {
 		storageInt = 3 * totalStorage / 10
-	} else if strings.Contains(pvc.Name, "pvc-usr") {
+	} else if pDir.Path == "/usr" {
 		storageInt = totalStorage * 5 / 10
-	} else if strings.Contains(pvc.Name, "pvc-etc") {
+	} else if pDir.Path == "/etc" {
 		storageInt = totalStorage / 20
-	} else if strings.Contains(pvc.Name, "pvc-display") {
+	} else if pDir.Path == "/tmp/.X11-unix" {
 		storageInt = 100
-	} else if strings.Contains(pvc.Name, "pvc-workspace") {
+	} else if pDir.Path == robot.Spec.WorkspaceManagerTemplate.WorkspacesPath {
 		storageInt = totalStorage / 10
 	} else {
-		storageInt = 0
+		storageInt = 200
 	}
 	return strconv.Itoa(storageInt) + "M"
 
@@ -94,13 +94,13 @@ func GetLoaderJob(robot *robotv1alpha1.Robot, jobNamespacedName *types.Namespace
 
 func GetLoaderJobForRobot(robot *robotv1alpha1.Robot, jobNamespacedName *types.NamespacedName, hasGPU bool) *batchv1.Job {
 
-	cfg := configure.JobConfigInjector{}
+	jobCfg := configure.JobConfigInjector{}
+	containerCfg := configure.ContainerConfigInjector{}
 
 	var copierCmdBuilder strings.Builder
-	copierCmdBuilder.WriteString("yes | cp -rf /var /ros/;")
-	copierCmdBuilder.WriteString(" yes | cp -rf /usr /ros/;")
-	copierCmdBuilder.WriteString(" yes | cp -rf /opt /ros/;")
-	copierCmdBuilder.WriteString(" yes | cp -rf /etc /ros/;")
+	for _, pDir := range robot.Status.PersistentDirectories {
+		copierCmdBuilder.WriteString(" yes | cp -rf " + pDir.Path + " /ros/;")
+	}
 	copierCmdBuilder.WriteString(" echo \"DONE\"")
 
 	var uidGetterCmdBuilder strings.Builder
@@ -144,37 +144,25 @@ func GetLoaderJobForRobot(robot *robotv1alpha1.Robot, jobNamespacedName *types.N
 		Image:           robot.Status.Image,
 		Command:         internal.Bash(copierCmdBuilder.String()),
 		ImagePullPolicy: corev1.PullAlways,
-		VolumeMounts: []corev1.VolumeMount{
-			configure.GetVolumeMount("/ros/", configure.GetVolumeVar(robot)),
-			configure.GetVolumeMount("/ros/", configure.GetVolumeUsr(robot)),
-			configure.GetVolumeMount("/ros/", configure.GetVolumeOpt(robot)),
-			configure.GetVolumeMount("/ros/", configure.GetVolumeEtc(robot)),
-		},
 	}
+
+	containerCfg.InjectVolumeMountConfiguration(&copierContainer, *robot, "/ros")
 
 	uidGetterContainer := corev1.Container{
 		Name:    "uid-getter",
 		Image:   robot.Status.Image,
 		Command: internal.Bash(uidGetterCmdBuilder.String()),
-		VolumeMounts: []corev1.VolumeMount{
-			configure.GetVolumeMount("", configure.GetVolumeVar(robot)),
-			configure.GetVolumeMount("", configure.GetVolumeUsr(robot)),
-			configure.GetVolumeMount("", configure.GetVolumeOpt(robot)),
-			configure.GetVolumeMount("", configure.GetVolumeEtc(robot)),
-		},
 	}
+
+	containerCfg.InjectVolumeMountConfiguration(&uidGetterContainer, *robot, "")
 
 	preparerContainer := corev1.Container{
 		Name:    "preparer",
 		Image:   "ubuntu:focal",
 		Command: internal.Bash(preparerCmdBuilder.String()),
-		VolumeMounts: []corev1.VolumeMount{
-			configure.GetVolumeMount("", configure.GetVolumeVar(robot)),
-			configure.GetVolumeMount("", configure.GetVolumeUsr(robot)),
-			configure.GetVolumeMount("", configure.GetVolumeOpt(robot)),
-			configure.GetVolumeMount("", configure.GetVolumeEtc(robot)),
-		},
 	}
+
+	containerCfg.InjectVolumeMountConfiguration(&preparerContainer, *robot, "")
 
 	podSpec := &corev1.PodSpec{
 		InitContainers: []corev1.Container{
@@ -184,13 +172,6 @@ func GetLoaderJobForRobot(robot *robotv1alpha1.Robot, jobNamespacedName *types.N
 		Containers: []corev1.Container{
 			preparerContainer,
 			// clonerContainer,
-		},
-		Volumes: []corev1.Volume{
-			configure.GetVolumeVar(robot),
-			configure.GetVolumeUsr(robot),
-			configure.GetVolumeOpt(robot),
-			configure.GetVolumeEtc(robot),
-			configure.GetVolumeWorkspace(robot),
 		},
 	}
 
@@ -210,13 +191,9 @@ func GetLoaderJobForRobot(robot *robotv1alpha1.Robot, jobNamespacedName *types.N
 				internal.Env("NVIDIA_DRIVER_VERSION", "agnostic"),
 				internal.Env("RESOLUTION", robot.Spec.RobotDevSuiteTemplate.RobotVDITemplate.Resolution),
 			},
-			VolumeMounts: []corev1.VolumeMount{
-				configure.GetVolumeMount("", configure.GetVolumeVar(robot)),
-				configure.GetVolumeMount("", configure.GetVolumeUsr(robot)),
-				configure.GetVolumeMount("", configure.GetVolumeOpt(robot)),
-				configure.GetVolumeMount("", configure.GetVolumeEtc(robot)),
-			},
 		}
+
+		containerCfg.InjectVolumeMountConfiguration(&driverInstaller, *robot, "")
 
 		podSpec.InitContainers = append(podSpec.InitContainers, driverInstaller)
 
@@ -237,21 +214,22 @@ func GetLoaderJobForRobot(robot *robotv1alpha1.Robot, jobNamespacedName *types.N
 		},
 	}
 
-	cfg.InjectGenericEnvironmentVariables(&job, *robot)
-	cfg.InjectImagePullPolicy(&job)
+	jobCfg.InjectGenericEnvironmentVariables(&job, *robot)
+	jobCfg.InjectImagePullPolicy(&job)
+	jobCfg.InjectVolumeConfiguration(&job, *robot)
 
 	return &job
 }
 
 func GetLoaderJobForEnvironment(robot *robotv1alpha1.Robot, jobNamespacedName *types.NamespacedName, hasGPU bool) *batchv1.Job {
 
-	cfg := configure.JobConfigInjector{}
+	jobCfg := configure.JobConfigInjector{}
+	containerCfg := configure.ContainerConfigInjector{}
 
 	var copierCmdBuilder strings.Builder
-	copierCmdBuilder.WriteString("yes | cp -rf /var /environment/;")
-	copierCmdBuilder.WriteString(" yes | cp -rf /usr /environment/;")
-	copierCmdBuilder.WriteString(" yes | cp -rf /opt /environment/;")
-	copierCmdBuilder.WriteString(" yes | cp -rf /etc /environment/;")
+	for _, pDir := range robot.Status.PersistentDirectories {
+		copierCmdBuilder.WriteString(" yes | cp -rf " + pDir.Path + " /environment/;")
+	}
 	copierCmdBuilder.WriteString(" echo \"DONE\"")
 
 	var uidGetterCmdBuilder strings.Builder
@@ -287,37 +265,25 @@ func GetLoaderJobForEnvironment(robot *robotv1alpha1.Robot, jobNamespacedName *t
 		Image:           robot.Status.Image,
 		Command:         internal.Bash(copierCmdBuilder.String()),
 		ImagePullPolicy: corev1.PullAlways,
-		VolumeMounts: []corev1.VolumeMount{
-			configure.GetVolumeMount("/environment/", configure.GetVolumeVar(robot)),
-			configure.GetVolumeMount("/environment/", configure.GetVolumeUsr(robot)),
-			configure.GetVolumeMount("/environment/", configure.GetVolumeOpt(robot)),
-			configure.GetVolumeMount("/environment/", configure.GetVolumeEtc(robot)),
-		},
 	}
+
+	containerCfg.InjectVolumeMountConfiguration(&copierContainer, *robot, "/environment")
 
 	uidGetterContainer := corev1.Container{
 		Name:    "uid-getter",
 		Image:   robot.Status.Image,
 		Command: internal.Bash(uidGetterCmdBuilder.String()),
-		VolumeMounts: []corev1.VolumeMount{
-			configure.GetVolumeMount("", configure.GetVolumeVar(robot)),
-			configure.GetVolumeMount("", configure.GetVolumeUsr(robot)),
-			configure.GetVolumeMount("", configure.GetVolumeOpt(robot)),
-			configure.GetVolumeMount("", configure.GetVolumeEtc(robot)),
-		},
 	}
+
+	containerCfg.InjectVolumeMountConfiguration(&uidGetterContainer, *robot, "")
 
 	preparerContainer := corev1.Container{
 		Name:    "preparer",
 		Image:   "ubuntu:focal",
 		Command: internal.Bash(preparerCmdBuilder.String()),
-		VolumeMounts: []corev1.VolumeMount{
-			configure.GetVolumeMount("", configure.GetVolumeVar(robot)),
-			configure.GetVolumeMount("", configure.GetVolumeUsr(robot)),
-			configure.GetVolumeMount("", configure.GetVolumeOpt(robot)),
-			configure.GetVolumeMount("", configure.GetVolumeEtc(robot)),
-		},
 	}
+
+	containerCfg.InjectVolumeMountConfiguration(&preparerContainer, *robot, "")
 
 	podSpec := &corev1.PodSpec{
 		InitContainers: []corev1.Container{
@@ -327,13 +293,6 @@ func GetLoaderJobForEnvironment(robot *robotv1alpha1.Robot, jobNamespacedName *t
 		Containers: []corev1.Container{
 			preparerContainer,
 			// clonerContainer,
-		},
-		Volumes: []corev1.Volume{
-			configure.GetVolumeVar(robot),
-			configure.GetVolumeUsr(robot),
-			configure.GetVolumeOpt(robot),
-			configure.GetVolumeEtc(robot),
-			configure.GetVolumeWorkspace(robot),
 		},
 	}
 
@@ -353,13 +312,9 @@ func GetLoaderJobForEnvironment(robot *robotv1alpha1.Robot, jobNamespacedName *t
 				internal.Env("NVIDIA_DRIVER_VERSION", "agnostic"),
 				internal.Env("RESOLUTION", robot.Spec.RobotDevSuiteTemplate.RobotVDITemplate.Resolution),
 			},
-			VolumeMounts: []corev1.VolumeMount{
-				configure.GetVolumeMount("", configure.GetVolumeVar(robot)),
-				configure.GetVolumeMount("", configure.GetVolumeUsr(robot)),
-				configure.GetVolumeMount("", configure.GetVolumeOpt(robot)),
-				configure.GetVolumeMount("", configure.GetVolumeEtc(robot)),
-			},
 		}
+
+		containerCfg.InjectVolumeMountConfiguration(&driverInstaller, *robot, "")
 
 		podSpec.InitContainers = append(podSpec.InitContainers, driverInstaller)
 
@@ -380,9 +335,10 @@ func GetLoaderJobForEnvironment(robot *robotv1alpha1.Robot, jobNamespacedName *t
 		},
 	}
 
-	cfg.InjectGenericEnvironmentVariables(&job, *robot)
-	cfg.InjectImagePullPolicy(&job)
-	cfg.SchedulePod(&job, robot)
+	jobCfg.InjectGenericEnvironmentVariables(&job, *robot)
+	jobCfg.InjectImagePullPolicy(&job)
+	jobCfg.SchedulePod(&job, robot)
+	jobCfg.InjectVolumeConfiguration(&job, *robot)
 
 	return &job
 }

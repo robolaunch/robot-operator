@@ -11,9 +11,9 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
-func (r *RobotReconciler) createPVC(ctx context.Context, instance *robotv1alpha1.Robot, pvcNamespacedName *types.NamespacedName) error {
+func (r *RobotReconciler) createPVC(ctx context.Context, instance *robotv1alpha1.Robot, pDir robotv1alpha1.PersistentDirectory) error {
 
-	pvc := resources.GetPersistentVolumeClaim(instance, pvcNamespacedName)
+	pvc := resources.GetPersistentVolumeClaim(instance, pDir)
 
 	err := ctrl.SetControllerReference(instance, pvc, r.Scheme)
 	if err != nil {
