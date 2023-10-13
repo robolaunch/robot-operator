@@ -36,11 +36,6 @@ func GetLaunchPod(launchManager *robotv1alpha1.LaunchManager, podNamespacedName 
 		Spec: corev1.PodSpec{
 			Containers: containers,
 			Volumes: []corev1.Volume{
-				configure.GetVolumeVar(&robot),
-				configure.GetVolumeUsr(&robot),
-				configure.GetVolumeOpt(&robot),
-				configure.GetVolumeEtc(&robot),
-				configure.GetVolumeWorkspace(&robot),
 				configure.GetVolumeConfigMaps(&buildManager),
 			},
 			RestartPolicy: corev1.RestartPolicyNever,
@@ -56,6 +51,7 @@ func GetLaunchPod(launchManager *robotv1alpha1.LaunchManager, podNamespacedName 
 	cfg.InjectROSDomainID(&launchPod, robot.Spec.RobotConfig.DomainID)
 	cfg.InjectDiscoveryServerConnection(&launchPod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo) // Discovery server configuration
 	cfg.InjectRuntimeClass(&launchPod, robot, node)
+	cfg.InjectVolumeConfiguration(&launchPod, robot)
 
 	if InstanceNeedDisplay(*launchManager, robot) && label.GetTargetRobotVDI(launchManager) != "" {
 		// TODO: Add control for validating robot VDI
@@ -85,11 +81,6 @@ func getContainer(launch robotv1alpha1.Launch, launchName string, robot robotv1a
 		Stdin:   true,
 		TTY:     true,
 		VolumeMounts: []corev1.VolumeMount{
-			configure.GetVolumeMount("", configure.GetVolumeVar(&robot)),
-			configure.GetVolumeMount("", configure.GetVolumeUsr(&robot)),
-			configure.GetVolumeMount("", configure.GetVolumeOpt(&robot)),
-			configure.GetVolumeMount("", configure.GetVolumeEtc(&robot)),
-			configure.GetVolumeMount(robot.Spec.WorkspaceManagerTemplate.WorkspacesPath, configure.GetVolumeWorkspace(&robot)),
 			configure.GetVolumeMount(internal.CUSTOM_SCRIPTS_PATH, configure.GetVolumeConfigMaps(&buildManager)),
 		},
 		Resources: corev1.ResourceRequirements{
@@ -104,6 +95,7 @@ func getContainer(launch robotv1alpha1.Launch, launchName string, robot robotv1a
 	}
 
 	cfg.InjectWorkspaceEnvironmentVariable(&container, robot, launch.Workspace)
+	cfg.InjectVolumeMountConfiguration(&container, robot, "")
 
 	return container
 }
