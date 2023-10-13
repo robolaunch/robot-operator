@@ -98,10 +98,9 @@ func GetLoaderJobForRobot(robot *robotv1alpha1.Robot, jobNamespacedName *types.N
 	containerCfg := configure.ContainerConfigInjector{}
 
 	var copierCmdBuilder strings.Builder
-	copierCmdBuilder.WriteString("yes | cp -rf /var /ros/;")
-	copierCmdBuilder.WriteString(" yes | cp -rf /usr /ros/;")
-	copierCmdBuilder.WriteString(" yes | cp -rf /opt /ros/;")
-	copierCmdBuilder.WriteString(" yes | cp -rf /etc /ros/;")
+	for _, pDir := range robot.Status.PersistentDirectories {
+		copierCmdBuilder.WriteString(" yes | cp -rf " + pDir.Path + " /ros/;")
+	}
 	copierCmdBuilder.WriteString(" echo \"DONE\"")
 
 	var uidGetterCmdBuilder strings.Builder
@@ -228,10 +227,9 @@ func GetLoaderJobForEnvironment(robot *robotv1alpha1.Robot, jobNamespacedName *t
 	containerCfg := configure.ContainerConfigInjector{}
 
 	var copierCmdBuilder strings.Builder
-	copierCmdBuilder.WriteString("yes | cp -rf /var /environment/;")
-	copierCmdBuilder.WriteString(" yes | cp -rf /usr /environment/;")
-	copierCmdBuilder.WriteString(" yes | cp -rf /opt /environment/;")
-	copierCmdBuilder.WriteString(" yes | cp -rf /etc /environment/;")
+	for _, pDir := range robot.Status.PersistentDirectories {
+		copierCmdBuilder.WriteString(" yes | cp -rf " + pDir.Path + " /environment/;")
+	}
 	copierCmdBuilder.WriteString(" echo \"DONE\"")
 
 	var uidGetterCmdBuilder strings.Builder
