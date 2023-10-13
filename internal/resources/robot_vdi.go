@@ -57,7 +57,8 @@ func GetRobotVDIPVC(robotVDI *robotv1alpha1.RobotVDI, pvcNamespacedName *types.N
 
 func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot, node corev1.Node) *corev1.Pod {
 
-	cfg := configure.PodConfigInjector{}
+	podCfg := configure.PodConfigInjector{}
+	containerCfg := configure.ContainerConfigInjector{}
 
 	// add tcp port
 	ports := []corev1.ContainerPort{
@@ -97,6 +98,37 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 		labels[k] = v
 	}
 
+	vdiContainer := corev1.Container{
+		Name:    "vdi",
+		Image:   robot.Status.Image,
+		Command: internal.Bash(cmdBuilder.String()),
+		Env: []corev1.EnvVar{
+			internal.Env("VIDEO_PORT", "DFP"),
+			internal.Env("NEKO_BIND", ":8055"),
+			internal.Env("NEKO_EPR", robotVDI.Spec.WebRTCPortRange),
+			internal.Env("NEKO_ICELITE", icelite),
+			internal.Env("NEKO_NAT1TO1", robotVDI.Spec.NAT1TO1),
+			internal.Env("RESOLUTION", robotVDI.Spec.Resolution),
+		},
+		Stdin: true,
+		TTY:   true,
+		Ports: ports,
+		VolumeMounts: []corev1.VolumeMount{
+			configure.GetVolumeMount("/dev/shm", configure.GetVolumeDshm()),
+			configure.GetVolumeMount("/cache", configure.GetVolumeXglCache()),
+		},
+		Resources: corev1.ResourceRequirements{
+			Limits: getResourceLimits(robotVDI.Spec.Resources),
+		},
+		ImagePullPolicy:          corev1.PullAlways,
+		TerminationMessagePolicy: corev1.TerminationMessageReadFile,
+		SecurityContext: &corev1.SecurityContext{
+			Privileged: &robotVDI.Spec.Privileged,
+		},
+	}
+
+	containerCfg.InjectVolumeMountConfiguration(&vdiContainer, robot, "")
+
 	vdiPod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      podNamespacedName.Name,
@@ -106,46 +138,9 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 		Spec: corev1.PodSpec{
 			HostNetwork: robotVDI.Spec.Privileged,
 			Containers: []corev1.Container{
-				{
-					Name:    "vdi",
-					Image:   robot.Status.Image,
-					Command: internal.Bash(cmdBuilder.String()),
-					Env: []corev1.EnvVar{
-						internal.Env("VIDEO_PORT", "DFP"),
-						internal.Env("NEKO_BIND", ":8055"),
-						internal.Env("NEKO_EPR", robotVDI.Spec.WebRTCPortRange),
-						internal.Env("NEKO_ICELITE", icelite),
-						internal.Env("NEKO_NAT1TO1", robotVDI.Spec.NAT1TO1),
-						internal.Env("RESOLUTION", robotVDI.Spec.Resolution),
-					},
-					Stdin: true,
-					TTY:   true,
-					Ports: ports,
-					VolumeMounts: []corev1.VolumeMount{
-						configure.GetVolumeMount("", configure.GetVolumeVar(&robot)),
-						configure.GetVolumeMount("", configure.GetVolumeUsr(&robot)),
-						configure.GetVolumeMount("", configure.GetVolumeOpt(&robot)),
-						configure.GetVolumeMount("", configure.GetVolumeEtc(&robot)),
-						configure.GetVolumeMount(robot.Spec.WorkspaceManagerTemplate.WorkspacesPath, configure.GetVolumeWorkspace(&robot)),
-						configure.GetVolumeMount("/dev/shm", configure.GetVolumeDshm()),
-						configure.GetVolumeMount("/cache", configure.GetVolumeXglCache()),
-					},
-					Resources: corev1.ResourceRequirements{
-						Limits: getResourceLimits(robotVDI.Spec.Resources),
-					},
-					ImagePullPolicy:          corev1.PullAlways,
-					TerminationMessagePolicy: corev1.TerminationMessageReadFile,
-					SecurityContext: &corev1.SecurityContext{
-						Privileged: &robotVDI.Spec.Privileged,
-					},
-				},
+				vdiContainer,
 			},
 			Volumes: []corev1.Volume{
-				configure.GetVolumeVar(&robot),
-				configure.GetVolumeUsr(&robot),
-				configure.GetVolumeOpt(&robot),
-				configure.GetVolumeEtc(&robot),
-				configure.GetVolumeWorkspace(&robot),
 				configure.GetVolumeDshm(),
 				configure.GetVolumeXglCache(),
 			},
@@ -153,21 +148,22 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 		},
 	}
 
-	cfg.InjectImagePullPolicy(vdiPod)
-	cfg.SchedulePod(vdiPod, robotVDI)
-	cfg.InjectGenericEnvironmentVariables(vdiPod, robot)
-	cfg.InjectDisplayConfiguration(vdiPod, *robotVDI)
-	cfg.InjectRuntimeClass(vdiPod, robot, node)
+	podCfg.InjectImagePullPolicy(vdiPod)
+	podCfg.SchedulePod(vdiPod, robotVDI)
+	podCfg.InjectGenericEnvironmentVariables(vdiPod, robot)
+	podCfg.InjectDisplayConfiguration(vdiPod, *robotVDI)
+	podCfg.InjectRuntimeClass(vdiPod, robot, node)
+	podCfg.InjectVolumeConfiguration(vdiPod, robot)
 
 	if !robotVDI.Spec.DisableNVENC {
-		cfg.InjectEncodingOption(vdiPod, robot)
+		podCfg.InjectEncodingOption(vdiPod, robot)
 	}
 
 	if robot.Spec.Type == robotv1alpha1.TypeRobot {
-		cfg.InjectGenericRobotEnvironmentVariables(vdiPod, robot)
-		cfg.InjectRMWImplementationConfiguration(vdiPod, robot)
-		cfg.InjectROSDomainID(vdiPod, robot.Spec.RobotConfig.DomainID)
-		cfg.InjectDiscoveryServerConnection(vdiPod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo)
+		podCfg.InjectGenericRobotEnvironmentVariables(vdiPod, robot)
+		podCfg.InjectRMWImplementationConfiguration(vdiPod, robot)
+		podCfg.InjectROSDomainID(vdiPod, robot.Spec.RobotConfig.DomainID)
+		podCfg.InjectDiscoveryServerConnection(vdiPod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo)
 	}
 
 	return vdiPod
