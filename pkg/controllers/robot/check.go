@@ -177,19 +177,19 @@ func (r *RobotReconciler) reconcileCheckWorkspaceManager(ctx context.Context, in
 		reference.SetReference(&instance.Status.WorkspaceManagerStatus.Resource.Reference, workspaceManagerQuery.TypeMeta, workspaceManagerQuery.ObjectMeta)
 		instance.Status.WorkspaceManagerStatus.Status = workspaceManagerQuery.Status
 
-		if !reflect.DeepEqual(instance.Spec.WorkspaceManagerTemplate.Workspaces, workspaceManagerQuery.Spec.Workspaces) {
-			workspaceManagerQuery.Spec = instance.Spec.WorkspaceManagerTemplate
-			workspaceManagerQuery.Spec.UpdateNeeded = true
-			err = r.Update(ctx, workspaceManagerQuery)
-			if err != nil {
-				return err
-			}
+		// if !reflect.DeepEqual(instance.Spec.WorkspaceManagerTemplate.Workspaces, workspaceManagerQuery.Spec.Workspaces) {
+		// 	workspaceManagerQuery.Spec = instance.Spec.WorkspaceManagerTemplate
+		// 	workspaceManagerQuery.Spec.UpdateNeeded = true
+		// 	err = r.Update(ctx, workspaceManagerQuery)
+		// 	if err != nil {
+		// 		return err
+		// 	}
 
-			// set phase configuring
-			instance.Status.WorkspaceManagerStatus.Resource.Created = true
-			instance.Status.WorkspaceManagerStatus.Status = robotv1alpha1.WorkspaceManagerStatus{}
-			instance.Status.WorkspaceManagerStatus.Status.Phase = robotv1alpha1.WorkspaceManagerPhaseConfiguringWorkspaces
-		}
+		// 	// set phase configuring
+		// 	instance.Status.WorkspaceManagerStatus.Resource.Created = true
+		// 	instance.Status.WorkspaceManagerStatus.Status = robotv1alpha1.WorkspaceManagerStatus{}
+		// 	instance.Status.WorkspaceManagerStatus.Status.Phase = robotv1alpha1.WorkspaceManagerPhaseConfiguringWorkspaces
+		// }
 
 	}
 
