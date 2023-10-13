@@ -8,7 +8,7 @@ import (
 
 func (cfg *ContainerConfigInjector) InjectVolumeMountConfiguration(container *corev1.Container, robot robotv1alpha1.Robot, mountPrefix string) *corev1.Container {
 
-	container.VolumeMounts = append(container.VolumeMounts, getVolumeMountsForPersistentDirs(robot, "")...)
+	container.VolumeMounts = append(container.VolumeMounts, getVolumeMountsForPersistentDirs(robot, mountPrefix)...)
 
 	return container
 }
