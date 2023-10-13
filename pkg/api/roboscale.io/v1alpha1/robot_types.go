@@ -321,19 +321,6 @@ type RobotSpec struct {
 	TLSSecretReference TLSSecretReference `json:"tlsSecretRef,omitempty"`
 }
 
-type VolumeStatuses struct {
-	// Holds PVC status of the `/var` directory of underlying OS.
-	Var OwnedResourceStatus `json:"varDir,omitempty"`
-	// Holds PVC status of the `/etc` directory of underlying OS.
-	Etc OwnedResourceStatus `json:"etcDir,omitempty"`
-	// Holds PVC status of the `/usr` directory of underlying OS.
-	Usr OwnedResourceStatus `json:"usrDir,omitempty"`
-	// Holds PVC status of the `/opt` directory of underlying OS.
-	Opt OwnedResourceStatus `json:"optDir,omitempty"`
-	// Holds PVC status of the workspaces directory of underlying OS.
-	Workspace OwnedResourceStatus `json:"workspaceDir,omitempty"`
-}
-
 type PersistentDirectory struct {
 	Path   string              `json:"path,omitempty"`
 	Status OwnedResourceStatus `json:"status,omitempty"`
@@ -378,9 +365,6 @@ type RobotStatus struct {
 	UID int64 `json:"uid,omitempty"`
 	// Node that Robot uses. It is selected via tenancy labels.
 	NodeName string `json:"nodeName,omitempty"`
-	// Robot persists some of the directories of underlying OS inside persistent volumes.
-	// This field exposes persistent volume claims that dynamically provision PVs.
-	VolumeStatuses VolumeStatuses `json:"volumeStatuses,omitempty"`
 	// [*alpha*] Status of PVCs of persistent directories.
 	PersistentDirectories []PersistentDirectory `json:"persistentDirs,omitempty"`
 	// Discovery server instance status.
