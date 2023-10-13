@@ -77,66 +77,6 @@ func getVolumeMountForPersistentDir(
 	return volumeMount
 }
 
-// *Deprecated*
-func GetVolumeVar(robot *robotv1alpha1.Robot) corev1.Volume {
-
-	volume := corev1.Volume{
-		Name: "var",
-		VolumeSource: corev1.VolumeSource{
-			PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-				ClaimName: robot.GetPVCVarMetadata().Name,
-			},
-		},
-	}
-
-	return volume
-}
-
-// *Deprecated*
-func GetVolumeOpt(robot *robotv1alpha1.Robot) corev1.Volume {
-
-	volume := corev1.Volume{
-		Name: "opt",
-		VolumeSource: corev1.VolumeSource{
-			PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-				ClaimName: robot.GetPVCOptMetadata().Name,
-			},
-		},
-	}
-
-	return volume
-}
-
-// *Deprecated*
-func GetVolumeUsr(robot *robotv1alpha1.Robot) corev1.Volume {
-
-	volume := corev1.Volume{
-		Name: "usr",
-		VolumeSource: corev1.VolumeSource{
-			PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-				ClaimName: robot.GetPVCUsrMetadata().Name,
-			},
-		},
-	}
-
-	return volume
-}
-
-// *Deprecated*
-func GetVolumeEtc(robot *robotv1alpha1.Robot) corev1.Volume {
-
-	volume := corev1.Volume{
-		Name: "etc",
-		VolumeSource: corev1.VolumeSource{
-			PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-				ClaimName: robot.GetPVCEtcMetadata().Name,
-			},
-		},
-	}
-
-	return volume
-}
-
 func GetVolumeX11Unix(robotVDI *robotv1alpha1.RobotVDI) corev1.Volume {
 
 	volume := corev1.Volume{
@@ -191,29 +131,12 @@ func GetVolumeXglCache() corev1.Volume {
 	return volume
 }
 
-// *Deprecated*
-func GetVolumeMount(
+func GetExternalVolumeMount(
 	mountPrefix string,
 	volume corev1.Volume,
 ) corev1.VolumeMount {
-	mountPath := mountPrefix + volume.Name
 
-	if volume.Name == "workspace" {
-		mountPath = mountPrefix
-	}
-	if volume.Name == "config-volume" {
-		mountPath = mountPrefix
-	}
-	if volume.Name == "x11-unix" {
-		mountPath = mountPrefix
-	}
-	if volume.Name == "dshm" {
-		mountPath = mountPrefix
-	}
-	if volume.Name == "xgl-cache-vol" {
-		mountPath = mountPrefix
-	}
-
+	mountPath := mountPrefix
 	volumeMount := corev1.VolumeMount{
 		Name:      volume.Name,
 		MountPath: mountPath,

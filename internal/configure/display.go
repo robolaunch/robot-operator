@@ -40,7 +40,7 @@ func (cfg *PodConfigInjector) configurePod(pod *corev1.Pod, robotVDI robotv1alph
 
 func (cfg *PodConfigInjector) configureContainer(container *corev1.Container, robotVDI robotv1alpha1.RobotVDI) {
 	volume := GetVolumeX11Unix(&robotVDI)
-	volumeMount := GetVolumeMount(internal.X11_UNIX_PATH, volume)
+	volumeMount := GetExternalVolumeMount(internal.X11_UNIX_PATH, volume)
 	environmentVariables := []corev1.EnvVar{
 		internal.Env("DISPLAY", ":0"),
 	}
