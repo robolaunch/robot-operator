@@ -65,7 +65,7 @@ func GetBuildJob(buildManager *robotv1alpha1.BuildManager, robot *robotv1alpha1.
 		Image:   robot.Status.Image,
 		Command: cmd,
 		VolumeMounts: []corev1.VolumeMount{
-			configure.GetVolumeMount(internal.CUSTOM_SCRIPTS_PATH, configure.GetVolumeConfigMaps(buildManager)),
+			configure.GetExternalVolumeMount(internal.CUSTOM_SCRIPTS_PATH, configure.GetVolumeConfigMaps(buildManager)),
 		},
 		Env: step.Env,
 	}

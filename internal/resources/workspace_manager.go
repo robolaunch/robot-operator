@@ -94,13 +94,6 @@ func GetCleanupJob(workspaceManager *robotv1alpha1.WorkspaceManager, jobNamespac
 		Containers: []corev1.Container{
 			cleanupContainer,
 		},
-		Volumes: []corev1.Volume{
-			configure.GetVolumeVar(robot),
-			configure.GetVolumeUsr(robot),
-			configure.GetVolumeOpt(robot),
-			configure.GetVolumeEtc(robot),
-			configure.GetVolumeWorkspace(robot),
-		},
 	}
 
 	podSpec.RestartPolicy = corev1.RestartPolicyNever

@@ -114,8 +114,8 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 		TTY:   true,
 		Ports: ports,
 		VolumeMounts: []corev1.VolumeMount{
-			configure.GetVolumeMount("/dev/shm", configure.GetVolumeDshm()),
-			configure.GetVolumeMount("/cache", configure.GetVolumeXglCache()),
+			configure.GetExternalVolumeMount("/dev/shm", configure.GetVolumeDshm()),
+			configure.GetExternalVolumeMount("/cache", configure.GetVolumeXglCache()),
 		},
 		Resources: corev1.ResourceRequirements{
 			Limits: getResourceLimits(robotVDI.Spec.Resources),

@@ -81,7 +81,7 @@ func getContainer(launch robotv1alpha1.Launch, launchName string, robot robotv1a
 		Stdin:   true,
 		TTY:     true,
 		VolumeMounts: []corev1.VolumeMount{
-			configure.GetVolumeMount(internal.CUSTOM_SCRIPTS_PATH, configure.GetVolumeConfigMaps(&buildManager)),
+			configure.GetExternalVolumeMount(internal.CUSTOM_SCRIPTS_PATH, configure.GetVolumeConfigMaps(&buildManager)),
 		},
 		Resources: corev1.ResourceRequirements{
 			Limits: getResourceLimits(launch.Container.Resources),
