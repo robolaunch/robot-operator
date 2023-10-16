@@ -1,6 +1,15 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+### Feat
+- **persistency:** :rocket: enable choosing directories to make them persistent
+
+### Fix
+- **injections:** fix func arguments for ipp injection
+
+
+<a name="v0.2.6-alpha.8"></a>
+## [v0.2.6-alpha.8] - 2023-09-26
 ### Fix
 - **offline:** :bug: ignore cloning errors in offline mode
 
@@ -281,7 +290,8 @@
 - Merge pull request [#24](https://github.com/robolaunch/robot-operator/issues/24) from robolaunch/23-allow-multiple-launches
 
 
-[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.7...HEAD
+[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.8...HEAD
+[v0.2.6-alpha.8]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.7...v0.2.6-alpha.8
 [v0.2.6-alpha.7]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.6...v0.2.6-alpha.7
 [v0.2.6-alpha.6]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.5...v0.2.6-alpha.6
 [v0.2.6-alpha.5]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.4...v0.2.6-alpha.5
