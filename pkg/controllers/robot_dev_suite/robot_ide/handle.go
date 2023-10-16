@@ -3,6 +3,7 @@ package robot_ide
 import (
 	"context"
 
+	"github.com/robolaunch/robot-operator/internal"
 	robotErr "github.com/robolaunch/robot-operator/internal/error"
 	"github.com/robolaunch/robot-operator/internal/label"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
@@ -93,6 +94,58 @@ func (r *RobotIDEReconciler) reconcileHandleServiceExport(ctx context.Context, i
 				ResourceKind:      "ServiceExport",
 				ResourceName:      instance.GetRobotIDEServiceExportMetadata().Name,
 				ResourceNamespace: instance.GetRobotIDEServiceExportMetadata().Namespace,
+			}
+		}
+	}
+
+	return nil
+}
+
+func (r *RobotIDEReconciler) reconcileHandleCustomService(ctx context.Context, instance *robotv1alpha1.RobotIDE) error {
+
+	robot, err := r.reconcileGetTargetRobot(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	if _, ok := robot.Spec.AdditionalConfigs[internal.IDE_CUSTOM_PORT_RANGE_KEY]; ok {
+		if !instance.Status.CustomPortServiceStatus.Resource.Created {
+			instance.Status.Phase = robotv1alpha1.RobotIDEPhaseCreatingCustomPortService
+
+			// create service for custom ports
+
+			instance.Status.CustomPortServiceStatus.Resource.Created = true
+
+			return &robotErr.CreatingResourceError{
+				ResourceKind:      "Service",
+				ResourceName:      instance.GetRobotIDECustomServiceMetadata().Name,
+				ResourceNamespace: instance.GetRobotIDECustomServiceMetadata().Namespace,
+			}
+		}
+	}
+
+	return nil
+}
+
+func (r *RobotIDEReconciler) reconcileHandleCustomIngress(ctx context.Context, instance *robotv1alpha1.RobotIDE) error {
+
+	robot, err := r.reconcileGetTargetRobot(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	if _, ok := robot.Spec.AdditionalConfigs[internal.IDE_CUSTOM_PORT_RANGE_KEY]; ok {
+		if !instance.Status.CustomPortIngressStatus.Created {
+			instance.Status.Phase = robotv1alpha1.RobotIDEPhaseCreatingCustomPortIngress
+
+			// create ingress for custom ports service
+
+			instance.Status.CustomPortIngressStatus.Created = true
+
+			return &robotErr.CreatingResourceError{
+				ResourceKind:      "Ingress",
+				ResourceName:      instance.GetRobotIDECustomIngressMetadata().Name,
+				ResourceNamespace: instance.GetRobotIDECustomIngressMetadata().Namespace,
 			}
 		}
 	}

@@ -83,9 +83,11 @@ const (
 
 // RobotIDE owned resources' postfixes
 const (
-	SVC_IDE_POSTFIX     = ""
-	POD_IDE_POSTFIX     = ""
-	INGRESS_IDE_POSTFIX = ""
+	SVC_IDE_POSTFIX                 = ""
+	POD_IDE_POSTFIX                 = ""
+	INGRESS_IDE_POSTFIX             = ""
+	CUSTOM_PORT_SVC_IDE_POSTFIX     = "-custom"
+	CUSTOM_PORT_INGRESS_IDE_POSTFIX = "-custom"
 )
 
 // RobotDevSuite owned resources' postfixes

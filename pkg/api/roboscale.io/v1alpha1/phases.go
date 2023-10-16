@@ -104,10 +104,12 @@ const (
 type RobotIDEPhase string
 
 const (
-	RobotIDEPhaseCreatingService RobotIDEPhase = "CreatingService"
-	RobotIDEPhaseCreatingPod     RobotIDEPhase = "CreatingPod"
-	RobotIDEPhaseCreatingIngress RobotIDEPhase = "CreatingIngress"
-	RobotIDEPhaseRunning         RobotIDEPhase = "Running"
+	RobotIDEPhaseCreatingService           RobotIDEPhase = "CreatingService"
+	RobotIDEPhaseCreatingPod               RobotIDEPhase = "CreatingPod"
+	RobotIDEPhaseCreatingIngress           RobotIDEPhase = "CreatingIngress"
+	RobotIDEPhaseCreatingCustomPortService RobotIDEPhase = "CreatingCustomPortService"
+	RobotIDEPhaseCreatingCustomPortIngress RobotIDEPhase = "CreatingCustomPortIngress"
+	RobotIDEPhaseRunning                   RobotIDEPhase = "Running"
 )
 
 type RobotVDIPhase string
