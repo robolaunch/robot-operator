@@ -108,6 +108,7 @@ func buildContainerEntrypoint(launch robotv1alpha1.Launch, robot robotv1alpha1.R
 	workspace, _ := robot.GetWorkspaceByName(launch.Workspace)
 
 	var cmdBuilder strings.Builder
+	cmdBuilder.WriteString(configure.GetGrantPermissionCmd(robot))
 	cmdBuilder.WriteString("echo \"Starting node in " + sleepTime + " seconds...\" && ")
 	cmdBuilder.WriteString("sleep " + sleepTime + " && ")
 	if !disableSourcingWs {

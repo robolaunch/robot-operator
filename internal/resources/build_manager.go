@@ -45,6 +45,9 @@ func GetBuildJob(buildManager *robotv1alpha1.BuildManager, robot *robotv1alpha1.
 
 	var cmdBuilder strings.Builder
 	var cmd []string
+
+	cmdBuilder.WriteString(configure.GetGrantPermissionCmd(*robot))
+
 	if step.Command != "" {
 		cmdBuilder.WriteString("cd $WORKSPACES_PATH/" + step.Workspace + " && ")
 		cmdBuilder.WriteString(step.Command)
