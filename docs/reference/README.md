@@ -76,7 +76,7 @@ _Appears in:_
 | `image` _string_ | Main image of Robot. It is derived either from the specifications or determined directly over labels. |
 | `uid` _integer_ | User ID of robolaunch user in image. |
 | `nodeName` _string_ | Node that Robot uses. It is selected via tenancy labels. |
-| `volumeStatuses` _[VolumeStatuses](#volumestatuses)_ | Robot persists some of the directories of underlying OS inside persistent volumes. This field exposes persistent volume claims that dynamically provision PVs. |
+| `persistentDirs` _[PersistentDirectory](#persistentdirectory) array_ | [*alpha*] Status of PVCs of persistent directories. |
 | `discoveryServerStatus` _[DiscoveryServerInstanceStatus](#discoveryserverinstancestatus)_ | Discovery server instance status. |
 | `rosBridgeStatus` _[ROSBridgeInstanceStatus](#rosbridgeinstancestatus)_ | ROS bridge instance status. |
 | `loaderJobStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ | Status of loader job that configures environment. |
@@ -1049,6 +1049,7 @@ _Appears in:_
 - [OwnedPodStatus](#ownedpodstatus)
 - [OwnedRobotServiceStatus](#ownedrobotservicestatus)
 - [OwnedServiceStatus](#ownedservicestatus)
+- [PersistentDirectory](#persistentdirectory)
 - [ROSBridgeInstanceStatus](#rosbridgeinstancestatus)
 - [ROSBridgeStatus](#rosbridgestatus)
 - [RelayServerStatus](#relayserverstatus)
@@ -1057,7 +1058,6 @@ _Appears in:_
 - [RobotStatus](#robotstatus)
 - [RobotVDIStatus](#robotvdistatus)
 - [StepStatus](#stepstatus)
-- [VolumeStatuses](#volumestatuses)
 - [WorkspaceManagerInstanceStatus](#workspacemanagerinstancestatus)
 - [WorkspaceManagerStatus](#workspacemanagerstatus)
 
@@ -1099,6 +1099,21 @@ _Appears in:_
 | --- | --- |
 | `resource` _[OwnedResourceStatus](#ownedresourcestatus)_ | Generic status for any owned resource. |
 | `url` _string_ | Connection URL. |
+
+
+#### PersistentDirectory
+
+
+
+
+
+_Appears in:_
+- [RobotStatus](#robotstatus)
+
+| Field | Description |
+| --- | --- |
+| `path` _string_ |  |
+| `status` _[OwnedResourceStatus](#ownedresourcestatus)_ |  |
 
 
 #### RMWImplementation
@@ -1365,24 +1380,6 @@ _Appears in:_
 | --- | --- |
 | `gpu` _[GPUUtilizationStatus](#gpuutilizationstatus)_ | GPU usage information. |
 | `network` _[NetworkLoadStatus](#networkloadstatus)_ | Network usage information. |
-
-
-#### VolumeStatuses
-
-
-
-
-
-_Appears in:_
-- [RobotStatus](#robotstatus)
-
-| Field | Description |
-| --- | --- |
-| `varDir` _[OwnedResourceStatus](#ownedresourcestatus)_ | Holds PVC status of the `/var` directory of underlying OS. |
-| `etcDir` _[OwnedResourceStatus](#ownedresourcestatus)_ | Holds PVC status of the `/etc` directory of underlying OS. |
-| `usrDir` _[OwnedResourceStatus](#ownedresourcestatus)_ | Holds PVC status of the `/usr` directory of underlying OS. |
-| `optDir` _[OwnedResourceStatus](#ownedresourcestatus)_ | Holds PVC status of the `/opt` directory of underlying OS. |
-| `workspaceDir` _[OwnedResourceStatus](#ownedresourcestatus)_ | Holds PVC status of the workspaces directory of underlying OS. |
 
 
 #### Workspace
