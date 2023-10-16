@@ -34,6 +34,7 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 	containerCfg := configure.ContainerConfigInjector{}
 
 	var cmdBuilder strings.Builder
+	cmdBuilder.WriteString(configure.GetGrantPermissionCmd(robot))
 	cmdBuilder.WriteString("code-server " + robot.Spec.WorkspaceManagerTemplate.WorkspacesPath + " --bind-addr 0.0.0.0:$CODE_SERVER_PORT --auth none")
 
 	labels := getRobotIDESelector(*robotIDE)
