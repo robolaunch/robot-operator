@@ -196,11 +196,3 @@ func getWsSubDir(distro robotv1alpha1.ROSDistro) string {
 	}
 	return "install"
 }
-
-func getWorkspaceSourceFilePath(workspacesPath string, wsName string, distro robotv1alpha1.ROSDistro) string {
-	return filepath.Join(workspacesPath, wsName, getWsSubDir(distro), "setup.bash")
-}
-
-func getLaunchfilePathAbsolute(workspacesPath string, wsName string, repoName string, lfRelativePath string) string {
-	return filepath.Join(workspacesPath, wsName, "src", repoName, lfRelativePath)
-}
