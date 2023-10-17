@@ -400,6 +400,8 @@ _Appears in:_
 | `serviceUDPStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ | Status of Cloud VDI UDP service. |
 | `ingressStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ | Status of Cloud VDI Ingress. |
 | `pvcStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ | Status of Cloud VDI persistent volume claim. This PVC dynamically provisions a volume that is a shared between RobotVDI workloads and other workloads that requests display. |
+| `customPortServiceStatus` _[OwnedServiceStatus](#ownedservicestatus)_ | Status of Cloud IDE service for custom ports. Created only if the robot has an additional config with key `IDE_CUSTOM_PORT_RANGE`. |
+| `customPortIngressStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ | Status of Cloud IDE ingress for custom ports service. Created only if the robot has an additional config with key `IDE_CUSTOM_PORT_RANGE` and `.spec.ingress` is `true`. |
 
 
 #### RobotIDE
@@ -454,6 +456,8 @@ _Appears in:_
 | `serviceStatus` _[OwnedServiceStatus](#ownedservicestatus)_ | Status of Cloud IDE service. |
 | `ingressStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ | Status of Cloud IDE Ingress. |
 | `serviceExportStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ | Status of Cloud IDE ServiceExport. Created only if the instance type is Physical Instance. |
+| `customPortServiceStatus` _[OwnedServiceStatus](#ownedservicestatus)_ | Status of Cloud IDE service for custom ports. Created only if the robot has an additional config with key `IDE_CUSTOM_PORT_RANGE`. |
+| `customPortIngressStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ | Status of Cloud IDE ingress for custom ports service. Created only if the robot has an additional config with key `IDE_CUSTOM_PORT_RANGE` and `.spec.ingress` is `true`. |
 
 
 #### DiscoveryServer

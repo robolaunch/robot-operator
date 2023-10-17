@@ -2,6 +2,12 @@
 ## [Unreleased]
 
 ### Feat
+- **ports:** :rocket: specify custom ports for ide and vdi container
+
+
+<a name="v0.2.6-alpha.9"></a>
+## [v0.2.6-alpha.9] - 2023-10-16
+### Feat
 - **persistency:** :rocket: enable choosing directories to make them persistent
 
 ### Fix
@@ -290,7 +296,8 @@
 - Merge pull request [#24](https://github.com/robolaunch/robot-operator/issues/24) from robolaunch/23-allow-multiple-launches
 
 
-[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.8...HEAD
+[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.9...HEAD
+[v0.2.6-alpha.9]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.8...v0.2.6-alpha.9
 [v0.2.6-alpha.8]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.7...v0.2.6-alpha.8
 [v0.2.6-alpha.7]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.6...v0.2.6-alpha.7
 [v0.2.6-alpha.6]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.5...v0.2.6-alpha.6
