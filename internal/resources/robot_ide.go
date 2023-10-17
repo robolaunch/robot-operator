@@ -66,6 +66,18 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 		},
 	}
 
+	// add custom ports defined by user
+	if portsStr, ok := robot.Spec.AdditionalConfigs[internal.IDE_CUSTOM_PORT_RANGE_KEY]; ok {
+		portsSlice := strings.Split(portsStr.Value, ":")
+		for key, p := range portsSlice {
+			portVal, _ := strconv.ParseInt(p, 10, 64)
+			ideContainer.Ports = append(ideContainer.Ports, corev1.ContainerPort{
+				Name:          "port-" + strconv.Itoa(key),
+				ContainerPort: int32(portVal),
+			})
+		}
+	}
+
 	containerCfg.InjectVolumeMountConfiguration(&ideContainer, robot, "")
 
 	idePod := corev1.Pod{
@@ -222,4 +234,40 @@ func GetRobotIDEServiceExport(robotIDE *robotv1alpha1.RobotIDE, svcExportNamespa
 	}
 
 	return &serviceExport
+}
+
+func GetRobotIDECustomService(robotIDE *robotv1alpha1.RobotIDE, svcNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot) *corev1.Service {
+
+	var ports []corev1.ServicePort
+
+	if portsStr, ok := robot.Spec.AdditionalConfigs[internal.IDE_CUSTOM_PORT_RANGE_KEY]; ok {
+		portsSlice := strings.Split(portsStr.Value, ":")
+		for key, p := range portsSlice {
+			portVal, _ := strconv.ParseInt(p, 10, 64)
+			ports = append(ports, corev1.ServicePort{
+				Port: int32(portVal),
+				TargetPort: intstr.IntOrString{
+					IntVal: int32(portVal),
+				},
+				Protocol: corev1.ProtocolTCP,
+				Name:     "port-" + strconv.Itoa(key),
+			})
+		}
+	}
+
+	serviceSpec := corev1.ServiceSpec{
+		Type:     corev1.ServiceTypeNodePort, // robotIDE.Spec.ServiceType,
+		Selector: getRobotIDESelector(*robotIDE),
+		Ports:    ports,
+	}
+
+	service := corev1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      svcNamespacedName.Name,
+			Namespace: svcNamespacedName.Namespace,
+		},
+		Spec: serviceSpec,
+	}
+
+	return &service
 }
