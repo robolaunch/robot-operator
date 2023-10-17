@@ -45,7 +45,7 @@ helm upgrade -i robot-operator robolaunch/robot-operator  \
 Or you can specify a version (remove the `v` letter at the beginning of the release or tag name):
 
 ```bash
-VERSION="0.2.5-alpha.6"
+VERSION="0.2.6-alpha.10"
 helm upgrade -i robot-operator robolaunch/robot-operator  \
 --namespace robot-system \
 --create-namespace \
@@ -58,7 +58,7 @@ Deploy Robot Operator one-file YAML using the command below:
 
 ```bash
 # select a tag
-TAG="v0.2.5-alpha.6"
+TAG="v0.2.6-alpha.10"
 kubectl apply -f https://raw.githubusercontent.com/robolaunch/robot-operator/$TAG/hack/deploy/manifests/robot_operator.yaml
 ```
 
@@ -74,6 +74,6 @@ kubectl delete ns robot-system
 To uninstall Robot Operator installed with one-file YAML, run the following commands:
 ```bash
 # find the tag you installed
-TAG="v0.2.5-alpha.6"
+TAG="v0.2.6-alpha.10"
 kubectl delete -f https://raw.githubusercontent.com/robolaunch/robot-operator/$TAG/hack/deploy/manifests/robot_operator.yaml
 ```
