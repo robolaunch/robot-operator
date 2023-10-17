@@ -219,7 +219,7 @@ func (r *Robot) checkRobotDevSuite() error {
 
 func (r *Robot) checkAdditionalConfigs() error {
 
-	if val, ok := r.Spec.AdditionalConfigs[internal.IDE_CUSTOM_PORT_RANGE_KEY]; ok {
+	if val, ok := r.Spec.AdditionalConfigs[internal.IDE_CUSTOM_PORT_RANGE_KEY]; ok && val.ConfigType == AdditionalConfigTypeOperator {
 		matched, err := regexp.MatchString("^([a-z0-9]{4}-[0-9]{5}:[0-9]{2,5}/)*([a-z0-9]{4}-[0-9]{5}:[0-9]{2,5})$", val.Value)
 		if !matched {
 			return errors.New("cannot validate ide ports, use this pattern ^([a-z0-9]{4}-[0-9]{5}:[0-9]{2,5}/)*([a-z0-9]{4}-[0-9]{5}:[0-9]{2,5})$")
@@ -229,7 +229,7 @@ func (r *Robot) checkAdditionalConfigs() error {
 		}
 	}
 
-	if val, ok := r.Spec.AdditionalConfigs[internal.VDI_CUSTOM_PORT_RANGE_KEY]; ok {
+	if val, ok := r.Spec.AdditionalConfigs[internal.VDI_CUSTOM_PORT_RANGE_KEY]; ok && val.ConfigType == AdditionalConfigTypeOperator {
 		matched, err := regexp.MatchString("^([a-z0-9]{4}-[0-9]{5}:[0-9]{2,5}/)*([a-z0-9]{4}-[0-9]{5}:[0-9]{2,5})$", val.Value)
 		if !matched {
 			return errors.New("cannot validate ide ports, use this pattern ^([a-z0-9]{4}-[0-9]{5}:[0-9]{2,5}/)*([a-z0-9]{4}-[0-9]{5}:[0-9]{2,5})$")

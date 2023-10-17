@@ -113,7 +113,7 @@ func (r *RobotIDEReconciler) reconcileCheckCustomService(ctx context.Context, in
 		return err
 	}
 
-	if _, ok := robot.Spec.AdditionalConfigs[internal.IDE_CUSTOM_PORT_RANGE_KEY]; ok {
+	if config, ok := robot.Spec.AdditionalConfigs[internal.IDE_CUSTOM_PORT_RANGE_KEY]; ok && config.ConfigType == robotv1alpha1.AdditionalConfigTypeOperator {
 		customSvcQuery := &corev1.Service{}
 		err := r.Get(ctx, *instance.GetRobotIDECustomServiceMetadata(), customSvcQuery)
 		if err != nil {
@@ -134,18 +134,27 @@ func (r *RobotIDEReconciler) reconcileCheckCustomService(ctx context.Context, in
 func (r *RobotIDEReconciler) reconcileCheckCustomIngress(ctx context.Context, instance *robotv1alpha1.RobotIDE) error {
 
 	if instance.Spec.Ingress {
-		customIngressQuery := &networkingv1.Ingress{}
-		err := r.Get(ctx, *instance.GetRobotIDECustomIngressMetadata(), customIngressQuery)
+
+		robot, err := r.reconcileGetTargetRobot(ctx, instance)
 		if err != nil {
-			if errors.IsNotFound(err) {
-				instance.Status.CustomPortIngressStatus = robotv1alpha1.OwnedResourceStatus{}
-			} else {
-				return err
-			}
-		} else {
-			instance.Status.CustomPortIngressStatus.Created = true
-			reference.SetReference(&instance.Status.CustomPortIngressStatus.Reference, customIngressQuery.TypeMeta, customIngressQuery.ObjectMeta)
+			return err
 		}
+
+		if config, ok := robot.Spec.AdditionalConfigs[internal.IDE_CUSTOM_PORT_RANGE_KEY]; ok && config.ConfigType == robotv1alpha1.AdditionalConfigTypeOperator {
+			customIngressQuery := &networkingv1.Ingress{}
+			err := r.Get(ctx, *instance.GetRobotIDECustomIngressMetadata(), customIngressQuery)
+			if err != nil {
+				if errors.IsNotFound(err) {
+					instance.Status.CustomPortIngressStatus = robotv1alpha1.OwnedResourceStatus{}
+				} else {
+					return err
+				}
+			} else {
+				instance.Status.CustomPortIngressStatus.Created = true
+				reference.SetReference(&instance.Status.CustomPortIngressStatus.Reference, customIngressQuery.TypeMeta, customIngressQuery.ObjectMeta)
+			}
+		}
+
 	}
 
 	return nil

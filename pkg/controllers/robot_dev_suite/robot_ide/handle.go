@@ -108,7 +108,7 @@ func (r *RobotIDEReconciler) reconcileHandleCustomService(ctx context.Context, i
 		return err
 	}
 
-	if _, ok := robot.Spec.AdditionalConfigs[internal.IDE_CUSTOM_PORT_RANGE_KEY]; ok {
+	if config, ok := robot.Spec.AdditionalConfigs[internal.IDE_CUSTOM_PORT_RANGE_KEY]; ok && config.ConfigType == robotv1alpha1.AdditionalConfigTypeOperator {
 		if !instance.Status.CustomPortServiceStatus.Resource.Created {
 			instance.Status.Phase = robotv1alpha1.RobotIDEPhaseCreatingCustomPortService
 			err := r.reconcileCreateCustomService(ctx, instance)
@@ -137,7 +137,7 @@ func (r *RobotIDEReconciler) reconcileHandleCustomIngress(ctx context.Context, i
 			return err
 		}
 
-		if _, ok := robot.Spec.AdditionalConfigs[internal.IDE_CUSTOM_PORT_RANGE_KEY]; ok {
+		if config, ok := robot.Spec.AdditionalConfigs[internal.IDE_CUSTOM_PORT_RANGE_KEY]; ok && config.ConfigType == robotv1alpha1.AdditionalConfigTypeOperator {
 			if !instance.Status.CustomPortIngressStatus.Created {
 				instance.Status.Phase = robotv1alpha1.RobotIDEPhaseCreatingCustomPortIngress
 				err := r.reconcileCreateCustomIngress(ctx, instance)
