@@ -115,10 +115,12 @@ const (
 type RobotVDIPhase string
 
 const (
-	RobotVDIPhaseCreatingPVC        RobotVDIPhase = "CreatingPVC"
-	RobotVDIPhaseCreatingTCPService RobotVDIPhase = "CreatingTCPService"
-	RobotVDIPhaseCreatingUDPService RobotVDIPhase = "CreatingUDPService"
-	RobotVDIPhaseCreatingPod        RobotVDIPhase = "CreatingPod"
-	RobotVDIPhaseCreatingIngress    RobotVDIPhase = "CreatingIngress"
-	RobotVDIPhaseRunning            RobotVDIPhase = "Running"
+	RobotVDIPhaseCreatingPVC               RobotVDIPhase = "CreatingPVC"
+	RobotVDIPhaseCreatingTCPService        RobotVDIPhase = "CreatingTCPService"
+	RobotVDIPhaseCreatingUDPService        RobotVDIPhase = "CreatingUDPService"
+	RobotVDIPhaseCreatingPod               RobotVDIPhase = "CreatingPod"
+	RobotVDIPhaseCreatingIngress           RobotVDIPhase = "CreatingIngress"
+	RobotVDIPhaseCreatingCustomPortService RobotVDIPhase = "CreatingCustomPortService"
+	RobotVDIPhaseCreatingCustomPortIngress RobotVDIPhase = "CreatingCustomPortIngress"
+	RobotVDIPhaseRunning                   RobotVDIPhase = "Running"
 )

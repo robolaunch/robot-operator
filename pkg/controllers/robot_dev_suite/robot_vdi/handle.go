@@ -3,6 +3,7 @@ package robot_vdi
 import (
 	"context"
 
+	"github.com/robolaunch/robot-operator/internal"
 	robotErr "github.com/robolaunch/robot-operator/internal/error"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
@@ -111,6 +112,63 @@ func (r *RobotVDIReconciler) reconcileHandleIngress(ctx context.Context, instanc
 				ResourceKind:      "Ingress",
 				ResourceName:      instance.GetRobotVDIIngressMetadata().Name,
 				ResourceNamespace: instance.GetRobotVDIIngressMetadata().Namespace,
+			}
+		}
+	}
+
+	return nil
+}
+
+func (r *RobotVDIReconciler) reconcileHandleCustomService(ctx context.Context, instance *robotv1alpha1.RobotVDI) error {
+
+	robot, err := r.reconcileGetTargetRobot(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	if _, ok := robot.Spec.AdditionalConfigs[internal.VDI_CUSTOM_PORT_RANGE_KEY]; ok {
+		if !instance.Status.CustomPortServiceStatus.Resource.Created {
+			instance.Status.Phase = robotv1alpha1.RobotVDIPhaseCreatingCustomPortService
+			err := r.reconcileCreateCustomService(ctx, instance)
+			if err != nil {
+				return err
+			}
+			instance.Status.CustomPortServiceStatus.Resource.Created = true
+
+			return &robotErr.CreatingResourceError{
+				ResourceKind:      "Service",
+				ResourceName:      instance.GetRobotVDICustomServiceMetadata().Name,
+				ResourceNamespace: instance.GetRobotVDICustomServiceMetadata().Namespace,
+			}
+		}
+	}
+
+	return nil
+}
+
+func (r *RobotVDIReconciler) reconcileHandleCustomIngress(ctx context.Context, instance *robotv1alpha1.RobotVDI) error {
+
+	if instance.Spec.Ingress {
+
+		robot, err := r.reconcileGetTargetRobot(ctx, instance)
+		if err != nil {
+			return err
+		}
+
+		if _, ok := robot.Spec.AdditionalConfigs[internal.VDI_CUSTOM_PORT_RANGE_KEY]; ok {
+			if !instance.Status.CustomPortIngressStatus.Created {
+				instance.Status.Phase = robotv1alpha1.RobotVDIPhaseCreatingCustomPortIngress
+				err := r.reconcileCreateCustomIngress(ctx, instance)
+				if err != nil {
+					return err
+				}
+				instance.Status.CustomPortIngressStatus.Created = true
+
+				return &robotErr.CreatingResourceError{
+					ResourceKind:      "Ingress",
+					ResourceName:      instance.GetRobotVDICustomIngressMetadata().Name,
+					ResourceNamespace: instance.GetRobotVDICustomIngressMetadata().Namespace,
+				}
 			}
 		}
 	}

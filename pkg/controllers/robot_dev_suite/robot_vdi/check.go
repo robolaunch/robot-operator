@@ -4,6 +4,7 @@ import (
 	"context"
 	"strconv"
 
+	"github.com/robolaunch/robot-operator/internal"
 	"github.com/robolaunch/robot-operator/internal/handle"
 	"github.com/robolaunch/robot-operator/internal/reference"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
@@ -111,6 +112,51 @@ func (r *RobotVDIReconciler) reconcileCheckIngress(ctx context.Context, instance
 		} else {
 			instance.Status.IngressStatus.Created = true
 			reference.SetReference(&instance.Status.IngressStatus.Reference, ingressQuery.TypeMeta, ingressQuery.ObjectMeta)
+		}
+	}
+
+	return nil
+}
+
+func (r *RobotVDIReconciler) reconcileCheckCustomService(ctx context.Context, instance *robotv1alpha1.RobotVDI) error {
+
+	robot, err := r.reconcileGetTargetRobot(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	if _, ok := robot.Spec.AdditionalConfigs[internal.VDI_CUSTOM_PORT_RANGE_KEY]; ok {
+		customSvcQuery := &corev1.Service{}
+		err := r.Get(ctx, *instance.GetRobotVDICustomServiceMetadata(), customSvcQuery)
+		if err != nil {
+			if errors.IsNotFound(err) {
+				instance.Status.CustomPortServiceStatus = robotv1alpha1.OwnedServiceStatus{}
+			} else {
+				return err
+			}
+		} else {
+			instance.Status.CustomPortServiceStatus.Resource.Created = true
+			reference.SetReference(&instance.Status.CustomPortServiceStatus.Resource.Reference, customSvcQuery.TypeMeta, customSvcQuery.ObjectMeta)
+		}
+	}
+
+	return nil
+}
+
+func (r *RobotVDIReconciler) reconcileCheckCustomIngress(ctx context.Context, instance *robotv1alpha1.RobotVDI) error {
+
+	if instance.Spec.Ingress {
+		customIngressQuery := &networkingv1.Ingress{}
+		err := r.Get(ctx, *instance.GetRobotVDICustomIngressMetadata(), customIngressQuery)
+		if err != nil {
+			if errors.IsNotFound(err) {
+				instance.Status.CustomPortIngressStatus = robotv1alpha1.OwnedResourceStatus{}
+			} else {
+				return err
+			}
+		} else {
+			instance.Status.CustomPortIngressStatus.Created = true
+			reference.SetReference(&instance.Status.CustomPortIngressStatus.Reference, customIngressQuery.TypeMeta, customIngressQuery.ObjectMeta)
 		}
 	}
 
