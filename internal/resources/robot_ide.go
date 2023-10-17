@@ -271,3 +271,79 @@ func GetRobotIDECustomService(robotIDE *robotv1alpha1.RobotIDE, svcNamespacedNam
 
 	return &service
 }
+
+func GetRobotIDECustomIngress(robotIDE *robotv1alpha1.RobotIDE, ingressNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot) *networkingv1.Ingress {
+
+	tenancy := label.GetTenancy(&robot)
+
+	rootDNSConfig := robot.Spec.RootDNSConfig
+	secretName := robot.Spec.TLSSecretReference.Name
+
+	annotations := map[string]string{
+		internal.INGRESS_AUTH_URL_KEY:                fmt.Sprintf(internal.INGRESS_AUTH_URL_VAL, tenancy.CloudInstanceAlias, rootDNSConfig.Host),
+		internal.INGRESS_AUTH_SIGNIN_KEY:             fmt.Sprintf(internal.INGRESS_AUTH_SIGNIN_VAL, tenancy.CloudInstanceAlias, rootDNSConfig.Host),
+		internal.INGRESS_AUTH_RESPONSE_HEADERS_KEY:   internal.INGRESS_AUTH_RESPONSE_HEADERS_VAL,
+		internal.INGRESS_CONFIGURATION_SNIPPET_KEY:   internal.INGRESS_IDE_CONFIGURATION_SNIPPET_VAL,
+		internal.INGRESS_CERT_MANAGER_KEY:            internal.INGRESS_CERT_MANAGER_VAL,
+		internal.INGRESS_NGINX_PROXY_BUFFER_SIZE_KEY: internal.INGRESS_NGINX_PROXY_BUFFER_SIZE_VAL,
+		internal.INGRESS_NGINX_REWRITE_TARGET_KEY:    internal.INGRESS_NGINX_REWRITE_TARGET_VAL,
+		internal.INGRESS_PROXY_READ_TIMEOUT_KEY:      internal.INGRESS_PROXY_READ_TIMEOUT_VAL,
+	}
+
+	pathTypePrefix := networkingv1.PathTypePrefix
+	ingressClassNameNginx := "nginx"
+
+	var ingressPaths []networkingv1.HTTPIngressPath
+
+	if portsStr, ok := robot.Spec.AdditionalConfigs[internal.IDE_CUSTOM_PORT_RANGE_KEY]; ok {
+		portsSlice := strings.Split(portsStr.Value, ":")
+		for key, p := range portsSlice {
+			portVal, _ := strconv.ParseInt(p, 10, 64)
+			ingressPaths = append(ingressPaths, networkingv1.HTTPIngressPath{
+				Path:     robotv1alpha1.GetRobotServicePath(robot, "/") + strconv.Itoa(key) + "(/|$)(.*)",
+				PathType: &pathTypePrefix,
+				Backend: networkingv1.IngressBackend{
+					Service: &networkingv1.IngressServiceBackend{
+						Name: robotIDE.GetRobotIDECustomServiceMetadata().Name,
+						Port: networkingv1.ServiceBackendPort{
+							Number: int32(portVal),
+						},
+					},
+				},
+			})
+		}
+	}
+
+	ingressSpec := networkingv1.IngressSpec{
+		TLS: []networkingv1.IngressTLS{
+			{
+				Hosts: []string{
+					tenancy.CloudInstanceAlias + "." + rootDNSConfig.Host,
+				},
+				SecretName: secretName,
+			},
+		},
+		Rules: []networkingv1.IngressRule{
+			{
+				Host: tenancy.CloudInstanceAlias + "." + rootDNSConfig.Host,
+				IngressRuleValue: networkingv1.IngressRuleValue{
+					HTTP: &networkingv1.HTTPIngressRuleValue{
+						Paths: ingressPaths,
+					},
+				},
+			},
+		},
+		IngressClassName: &ingressClassNameNginx,
+	}
+
+	ingress := &networkingv1.Ingress{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:        ingressNamespacedName.Name,
+			Namespace:   ingressNamespacedName.Namespace,
+			Annotations: annotations,
+		},
+		Spec: ingressSpec,
+	}
+
+	return ingress
+}
