@@ -4,6 +4,7 @@ import (
 	"context"
 	"strconv"
 
+	"github.com/robolaunch/robot-operator/internal"
 	"github.com/robolaunch/robot-operator/internal/handle"
 	"github.com/robolaunch/robot-operator/internal/reference"
 	mcsv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/external/apis/mcsv1alpha1/v1alpha1"
@@ -100,6 +101,51 @@ func (r *RobotIDEReconciler) reconcileCheckServiceExport(ctx context.Context, in
 	} else {
 		instance.Status.ServiceExportStatus.Created = true
 		reference.SetReference(&instance.Status.ServiceExportStatus.Reference, serviceExportQuery.TypeMeta, serviceExportQuery.ObjectMeta)
+	}
+
+	return nil
+}
+
+func (r *RobotIDEReconciler) reconcileCheckCustomService(ctx context.Context, instance *robotv1alpha1.RobotIDE) error {
+
+	robot, err := r.reconcileGetTargetRobot(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	if _, ok := robot.Spec.AdditionalConfigs[internal.IDE_CUSTOM_PORT_RANGE_KEY]; ok {
+		customSvcQuery := &corev1.Service{}
+		err := r.Get(ctx, *instance.GetRobotIDECustomServiceMetadata(), customSvcQuery)
+		if err != nil {
+			if errors.IsNotFound(err) {
+				instance.Status.CustomPortServiceStatus = robotv1alpha1.OwnedServiceStatus{}
+			} else {
+				return err
+			}
+		} else {
+			instance.Status.CustomPortServiceStatus.Resource.Created = true
+			reference.SetReference(&instance.Status.CustomPortServiceStatus.Resource.Reference, customSvcQuery.TypeMeta, customSvcQuery.ObjectMeta)
+		}
+	}
+
+	return nil
+}
+
+func (r *RobotIDEReconciler) reconcileCheckCustomIngress(ctx context.Context, instance *robotv1alpha1.RobotIDE) error {
+
+	if instance.Spec.Ingress {
+		customIngressQuery := &networkingv1.Ingress{}
+		err := r.Get(ctx, *instance.GetRobotIDECustomIngressMetadata(), customIngressQuery)
+		if err != nil {
+			if errors.IsNotFound(err) {
+				instance.Status.CustomPortIngressStatus = robotv1alpha1.OwnedResourceStatus{}
+			} else {
+				return err
+			}
+		} else {
+			instance.Status.CustomPortIngressStatus.Created = true
+			reference.SetReference(&instance.Status.CustomPortIngressStatus.Reference, customIngressQuery.TypeMeta, customIngressQuery.ObjectMeta)
+		}
 	}
 
 	return nil

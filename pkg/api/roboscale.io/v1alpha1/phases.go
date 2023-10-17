@@ -104,19 +104,23 @@ const (
 type RobotIDEPhase string
 
 const (
-	RobotIDEPhaseCreatingService RobotIDEPhase = "CreatingService"
-	RobotIDEPhaseCreatingPod     RobotIDEPhase = "CreatingPod"
-	RobotIDEPhaseCreatingIngress RobotIDEPhase = "CreatingIngress"
-	RobotIDEPhaseRunning         RobotIDEPhase = "Running"
+	RobotIDEPhaseCreatingService           RobotIDEPhase = "CreatingService"
+	RobotIDEPhaseCreatingPod               RobotIDEPhase = "CreatingPod"
+	RobotIDEPhaseCreatingIngress           RobotIDEPhase = "CreatingIngress"
+	RobotIDEPhaseCreatingCustomPortService RobotIDEPhase = "CreatingCustomPortService"
+	RobotIDEPhaseCreatingCustomPortIngress RobotIDEPhase = "CreatingCustomPortIngress"
+	RobotIDEPhaseRunning                   RobotIDEPhase = "Running"
 )
 
 type RobotVDIPhase string
 
 const (
-	RobotVDIPhaseCreatingPVC        RobotVDIPhase = "CreatingPVC"
-	RobotVDIPhaseCreatingTCPService RobotVDIPhase = "CreatingTCPService"
-	RobotVDIPhaseCreatingUDPService RobotVDIPhase = "CreatingUDPService"
-	RobotVDIPhaseCreatingPod        RobotVDIPhase = "CreatingPod"
-	RobotVDIPhaseCreatingIngress    RobotVDIPhase = "CreatingIngress"
-	RobotVDIPhaseRunning            RobotVDIPhase = "Running"
+	RobotVDIPhaseCreatingPVC               RobotVDIPhase = "CreatingPVC"
+	RobotVDIPhaseCreatingTCPService        RobotVDIPhase = "CreatingTCPService"
+	RobotVDIPhaseCreatingUDPService        RobotVDIPhase = "CreatingUDPService"
+	RobotVDIPhaseCreatingPod               RobotVDIPhase = "CreatingPod"
+	RobotVDIPhaseCreatingIngress           RobotVDIPhase = "CreatingIngress"
+	RobotVDIPhaseCreatingCustomPortService RobotVDIPhase = "CreatingCustomPortService"
+	RobotVDIPhaseCreatingCustomPortIngress RobotVDIPhase = "CreatingCustomPortIngress"
+	RobotVDIPhaseRunning                   RobotVDIPhase = "Running"
 )

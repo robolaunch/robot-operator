@@ -3,6 +3,7 @@ package v1alpha1
 import (
 	"errors"
 	"reflect"
+	"regexp"
 
 	"github.com/robolaunch/robot-operator/internal"
 	corev1 "k8s.io/api/core/v1"
@@ -73,6 +74,11 @@ func (r *Robot) ValidateCreate() error {
 		return err
 	}
 
+	err = r.checkAdditionalConfigs()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -101,6 +107,11 @@ func (r *Robot) ValidateUpdate(old runtime.Object) error {
 	}
 
 	err = r.checkDistributions()
+	if err != nil {
+		return err
+	}
+
+	err = r.checkAdditionalConfigs()
 	if err != nil {
 		return err
 	}
@@ -201,6 +212,31 @@ func (r *Robot) checkRobotDevSuite() error {
 
 	if dst.IDEEnabled && dst.RobotIDETemplate.Display && !dst.VDIEnabled {
 		return errors.New("cannot open an ide with a display when vdi disabled")
+	}
+
+	return nil
+}
+
+func (r *Robot) checkAdditionalConfigs() error {
+
+	if val, ok := r.Spec.AdditionalConfigs[internal.IDE_CUSTOM_PORT_RANGE_KEY]; ok {
+		matched, err := regexp.MatchString("^([a-z0-9]{4}-[0-9]{5}:[0-9]{2,5}/)*([a-z0-9]{4}-[0-9]{5}:[0-9]{2,5})$", val.Value)
+		if !matched {
+			return errors.New("cannot validate ide ports, use this pattern ^([a-z0-9]{4}-[0-9]{5}:[0-9]{2,5}/)*([a-z0-9]{4}-[0-9]{5}:[0-9]{2,5})$")
+		}
+		if err != nil {
+			return err
+		}
+	}
+
+	if val, ok := r.Spec.AdditionalConfigs[internal.VDI_CUSTOM_PORT_RANGE_KEY]; ok {
+		matched, err := regexp.MatchString("^([a-z0-9]{4}-[0-9]{5}:[0-9]{2,5}/)*([a-z0-9]{4}-[0-9]{5}:[0-9]{2,5})$", val.Value)
+		if !matched {
+			return errors.New("cannot validate ide ports, use this pattern ^([a-z0-9]{4}-[0-9]{5}:[0-9]{2,5}/)*([a-z0-9]{4}-[0-9]{5}:[0-9]{2,5})$")
+		}
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

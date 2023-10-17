@@ -83,9 +83,11 @@ const (
 
 // RobotIDE owned resources' postfixes
 const (
-	SVC_IDE_POSTFIX     = ""
-	POD_IDE_POSTFIX     = ""
-	INGRESS_IDE_POSTFIX = ""
+	SVC_IDE_POSTFIX                 = ""
+	POD_IDE_POSTFIX                 = ""
+	INGRESS_IDE_POSTFIX             = ""
+	CUSTOM_PORT_SVC_IDE_POSTFIX     = "-custom"
+	CUSTOM_PORT_INGRESS_IDE_POSTFIX = "-custom"
 )
 
 // RobotDevSuite owned resources' postfixes
@@ -197,8 +199,10 @@ const (
 )
 
 const (
-	GRANT_PERMISSION_KEY = "GRANT_PERMISSION"
-	PERSISTENT_DIRS_KEY  = "PERSISTENT_DIRS"
+	GRANT_PERMISSION_KEY      = "GRANT_PERMISSION"
+	PERSISTENT_DIRS_KEY       = "PERSISTENT_DIRS"
+	IDE_CUSTOM_PORT_RANGE_KEY = "IDE_CUSTOM_PORT_RANGE"
+	VDI_CUSTOM_PORT_RANGE_KEY = "VDI_CUSTOM_PORT_RANGE"
 )
 
 func Bash(command string) []string {

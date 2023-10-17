@@ -115,6 +115,16 @@ func (r *RobotIDEReconciler) reconcileCheckStatus(ctx context.Context, instance 
 		return robotErr.CheckCreatingOrWaitingError(result, err)
 	}
 
+	err = r.reconcileHandleCustomService(ctx, instance)
+	if err != nil {
+		return robotErr.CheckCreatingOrWaitingError(result, err)
+	}
+
+	err = r.reconcileHandleCustomIngress(ctx, instance)
+	if err != nil {
+		return robotErr.CheckCreatingOrWaitingError(result, err)
+	}
+
 	instance.Status.Phase = robotv1alpha1.RobotIDEPhaseRunning
 
 	return nil
@@ -142,6 +152,16 @@ func (r *RobotIDEReconciler) reconcileCheckResources(ctx context.Context, instan
 		if err != nil {
 			return err
 		}
+	}
+
+	err = r.reconcileCheckCustomService(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	err = r.reconcileCheckCustomIngress(ctx, instance)
+	if err != nil {
+		return err
 	}
 
 	return nil

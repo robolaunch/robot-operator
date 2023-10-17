@@ -133,3 +133,55 @@ func (r *RobotVDIReconciler) reconcileCreateIngress(ctx context.Context, instanc
 
 	return nil
 }
+
+func (r *RobotVDIReconciler) reconcileCreateCustomService(ctx context.Context, instance *robotv1alpha1.RobotVDI) error {
+
+	robot, err := r.reconcileGetTargetRobot(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	vdiService := resources.GetRobotVDICustomService(instance, instance.GetRobotVDICustomServiceMetadata(), *robot)
+
+	err = ctrl.SetControllerReference(instance, vdiService, r.Scheme)
+	if err != nil {
+		return err
+	}
+
+	err = r.Create(ctx, vdiService)
+	if err != nil && errors.IsAlreadyExists(err) {
+		return nil
+	} else if err != nil {
+		return err
+	}
+
+	logger.Info("STATUS: VDI custom service is created.")
+
+	return nil
+}
+
+func (r *RobotVDIReconciler) reconcileCreateCustomIngress(ctx context.Context, instance *robotv1alpha1.RobotVDI) error {
+
+	robot, err := r.reconcileGetTargetRobot(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	vdiIngress := resources.GetRobotVDICustomIngress(instance, instance.GetRobotVDICustomIngressMetadata(), *robot)
+
+	err = ctrl.SetControllerReference(instance, vdiIngress, r.Scheme)
+	if err != nil {
+		return err
+	}
+
+	err = r.Create(ctx, vdiIngress)
+	if err != nil && errors.IsAlreadyExists(err) {
+		return nil
+	} else if err != nil {
+		return err
+	}
+
+	logger.Info("STATUS: VDI custom ingress is created.")
+
+	return nil
+}
