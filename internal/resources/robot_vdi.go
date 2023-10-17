@@ -128,23 +128,11 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 		},
 	}
 
-	// add custom ports defined by user
-	if portsStr, ok := robot.Spec.AdditionalConfigs[internal.VDI_CUSTOM_PORT_RANGE_KEY]; ok {
-		portsSlice := strings.Split(portsStr.Value, "/")
-		for _, p := range portsSlice {
-			portInfo := strings.Split(p, "-")
-			portName := portInfo[0]
-			fwdStr := strings.Split(portInfo[1], ":")
-			// nodePortVal, _ := strconv.ParseInt(fwdStr[0], 10, 64)
-			containerPortVal, _ := strconv.ParseInt(fwdStr[1], 10, 64)
-			vdiContainer.Ports = append(vdiContainer.Ports, corev1.ContainerPort{
-				Name:          portName,
-				ContainerPort: int32(containerPortVal),
-			})
-		}
-	}
-
 	containerCfg.InjectVolumeMountConfiguration(&vdiContainer, robot, "")
+	// add custom ports defined by user
+	if ports, ok := robot.Spec.AdditionalConfigs[internal.VDI_CUSTOM_PORT_RANGE_KEY]; ok {
+		containerCfg.InjectCustomPortConfiguration(&vdiContainer, ports)
+	}
 
 	vdiPod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
