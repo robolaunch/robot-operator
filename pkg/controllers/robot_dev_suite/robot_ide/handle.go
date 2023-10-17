@@ -130,23 +130,27 @@ func (r *RobotIDEReconciler) reconcileHandleCustomService(ctx context.Context, i
 
 func (r *RobotIDEReconciler) reconcileHandleCustomIngress(ctx context.Context, instance *robotv1alpha1.RobotIDE) error {
 
-	robot, err := r.reconcileGetTargetRobot(ctx, instance)
-	if err != nil {
-		return err
-	}
+	if instance.Spec.Ingress {
 
-	if _, ok := robot.Spec.AdditionalConfigs[internal.IDE_CUSTOM_PORT_RANGE_KEY]; ok {
-		if !instance.Status.CustomPortIngressStatus.Created {
-			instance.Status.Phase = robotv1alpha1.RobotIDEPhaseCreatingCustomPortIngress
+		robot, err := r.reconcileGetTargetRobot(ctx, instance)
+		if err != nil {
+			return err
+		}
 
-			// create ingress for custom ports service
+		if _, ok := robot.Spec.AdditionalConfigs[internal.IDE_CUSTOM_PORT_RANGE_KEY]; ok {
+			if !instance.Status.CustomPortIngressStatus.Created {
+				instance.Status.Phase = robotv1alpha1.RobotIDEPhaseCreatingCustomPortIngress
+				err := r.reconcileCreateCustomIngress(ctx, instance)
+				if err != nil {
+					return err
+				}
+				instance.Status.CustomPortIngressStatus.Created = true
 
-			instance.Status.CustomPortIngressStatus.Created = true
-
-			return &robotErr.CreatingResourceError{
-				ResourceKind:      "Ingress",
-				ResourceName:      instance.GetRobotIDECustomIngressMetadata().Name,
-				ResourceNamespace: instance.GetRobotIDECustomIngressMetadata().Namespace,
+				return &robotErr.CreatingResourceError{
+					ResourceKind:      "Ingress",
+					ResourceName:      instance.GetRobotIDECustomIngressMetadata().Name,
+					ResourceNamespace: instance.GetRobotIDECustomIngressMetadata().Namespace,
+				}
 			}
 		}
 	}

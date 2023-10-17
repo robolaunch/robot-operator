@@ -124,7 +124,27 @@ func (r *RobotIDEReconciler) reconcileCheckCustomService(ctx context.Context, in
 			}
 		} else {
 			instance.Status.CustomPortServiceStatus.Resource.Created = true
-			reference.SetReference(&instance.Status.IngressStatus.Reference, customSvcQuery.TypeMeta, customSvcQuery.ObjectMeta)
+			reference.SetReference(&instance.Status.CustomPortServiceStatus.Resource.Reference, customSvcQuery.TypeMeta, customSvcQuery.ObjectMeta)
+		}
+	}
+
+	return nil
+}
+
+func (r *RobotIDEReconciler) reconcileCheckCustomIngress(ctx context.Context, instance *robotv1alpha1.RobotIDE) error {
+
+	if instance.Spec.Ingress {
+		customIngressQuery := &networkingv1.Ingress{}
+		err := r.Get(ctx, *instance.GetRobotIDECustomIngressMetadata(), customIngressQuery)
+		if err != nil {
+			if errors.IsNotFound(err) {
+				instance.Status.CustomPortIngressStatus = robotv1alpha1.OwnedResourceStatus{}
+			} else {
+				return err
+			}
+		} else {
+			instance.Status.CustomPortIngressStatus.Created = true
+			reference.SetReference(&instance.Status.CustomPortIngressStatus.Reference, customIngressQuery.TypeMeta, customIngressQuery.ObjectMeta)
 		}
 	}
 

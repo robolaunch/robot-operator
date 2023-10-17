@@ -142,3 +142,29 @@ func (r *RobotIDEReconciler) reconcileCreateCustomService(ctx context.Context, i
 
 	return nil
 }
+
+func (r *RobotIDEReconciler) reconcileCreateCustomIngress(ctx context.Context, instance *robotv1alpha1.RobotIDE) error {
+
+	robot, err := r.reconcileGetTargetRobot(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	ideIngress := resources.GetRobotIDECustomIngress(instance, instance.GetRobotIDECustomIngressMetadata(), *robot)
+
+	err = ctrl.SetControllerReference(instance, ideIngress, r.Scheme)
+	if err != nil {
+		return err
+	}
+
+	err = r.Create(ctx, ideIngress)
+	if err != nil && errors.IsAlreadyExists(err) {
+		return nil
+	} else if err != nil {
+		return err
+	}
+
+	logger.Info("STATUS: IDE custom ingress is created.")
+
+	return nil
+}
