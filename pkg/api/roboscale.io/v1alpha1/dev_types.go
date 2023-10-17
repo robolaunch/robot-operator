@@ -254,4 +254,8 @@ type RobotVDIStatus struct {
 	// between RobotVDI workloads and other workloads that requests
 	// display.
 	PVCStatus OwnedResourceStatus `json:"pvcStatus,omitempty"`
+	// Status of Cloud IDE service for custom ports. Created only if the robot has an additional config with key `IDE_CUSTOM_PORT_RANGE`.
+	CustomPortServiceStatus OwnedServiceStatus `json:"customPortServiceStatus,omitempty"`
+	// Status of Cloud IDE ingress for custom ports service. Created only if the robot has an additional config with key `IDE_CUSTOM_PORT_RANGE` and `.spec.ingress` is `true`.
+	CustomPortIngressStatus OwnedResourceStatus `json:"customPortIngressStatus,omitempty"`
 }
