@@ -128,6 +128,22 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 		},
 	}
 
+	// add custom ports defined by user
+	if portsStr, ok := robot.Spec.AdditionalConfigs[internal.VDI_CUSTOM_PORT_RANGE_KEY]; ok {
+		portsSlice := strings.Split(portsStr.Value, "/")
+		for _, p := range portsSlice {
+			portInfo := strings.Split(p, "-")
+			portName := portInfo[0]
+			fwdStr := strings.Split(portInfo[1], ":")
+			// nodePortVal, _ := strconv.ParseInt(fwdStr[0], 10, 64)
+			containerPortVal, _ := strconv.ParseInt(fwdStr[1], 10, 64)
+			vdiContainer.Ports = append(vdiContainer.Ports, corev1.ContainerPort{
+				Name:          portName,
+				ContainerPort: int32(containerPortVal),
+			})
+		}
+	}
+
 	containerCfg.InjectVolumeMountConfiguration(&vdiContainer, robot, "")
 
 	vdiPod := &corev1.Pod{
@@ -291,6 +307,127 @@ func GetRobotVDIIngress(robotVDI *robotv1alpha1.RobotVDI, ingressNamespacedName 
 								},
 							},
 						},
+					},
+				},
+			},
+		},
+		IngressClassName: &ingressClassNameNginx,
+	}
+
+	ingress := &networkingv1.Ingress{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:        ingressNamespacedName.Name,
+			Namespace:   ingressNamespacedName.Namespace,
+			Annotations: annotations,
+		},
+		Spec: ingressSpec,
+	}
+
+	return ingress
+}
+
+func GetRobotVDICustomService(robotVDI *robotv1alpha1.RobotVDI, svcNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot) *corev1.Service {
+
+	var ports []corev1.ServicePort
+
+	if portsStr, ok := robot.Spec.AdditionalConfigs[internal.VDI_CUSTOM_PORT_RANGE_KEY]; ok {
+		portsSlice := strings.Split(portsStr.Value, "/")
+		for _, p := range portsSlice {
+			portInfo := strings.Split(p, "-")
+			portName := portInfo[0]
+			fwdStr := strings.Split(portInfo[1], ":")
+			nodePortVal, _ := strconv.ParseInt(fwdStr[0], 10, 64)
+			containerPortVal, _ := strconv.ParseInt(fwdStr[1], 10, 64)
+			ports = append(ports, corev1.ServicePort{
+				Port: int32(containerPortVal),
+				TargetPort: intstr.IntOrString{
+					IntVal: int32(containerPortVal),
+				},
+				NodePort: int32(nodePortVal),
+				Protocol: corev1.ProtocolTCP,
+				Name:     portName,
+			})
+		}
+	}
+
+	serviceSpec := corev1.ServiceSpec{
+		Type:     corev1.ServiceTypeNodePort, // robotVDI.Spec.ServiceType,
+		Selector: getRobotVDISelector(*robotVDI),
+		Ports:    ports,
+	}
+
+	service := corev1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      svcNamespacedName.Name,
+			Namespace: svcNamespacedName.Namespace,
+		},
+		Spec: serviceSpec,
+	}
+
+	return &service
+}
+
+func GetRobotVDICustomIngress(robotVDI *robotv1alpha1.RobotVDI, ingressNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot) *networkingv1.Ingress {
+
+	tenancy := label.GetTenancy(&robot)
+
+	rootDNSConfig := robot.Spec.RootDNSConfig
+	secretName := robot.Spec.TLSSecretReference.Name
+
+	annotations := map[string]string{
+		internal.INGRESS_AUTH_URL_KEY:                fmt.Sprintf(internal.INGRESS_AUTH_URL_VAL, tenancy.CloudInstanceAlias, rootDNSConfig.Host),
+		internal.INGRESS_AUTH_SIGNIN_KEY:             fmt.Sprintf(internal.INGRESS_AUTH_SIGNIN_VAL, tenancy.CloudInstanceAlias, rootDNSConfig.Host),
+		internal.INGRESS_AUTH_RESPONSE_HEADERS_KEY:   internal.INGRESS_AUTH_RESPONSE_HEADERS_VAL,
+		internal.INGRESS_CONFIGURATION_SNIPPET_KEY:   internal.INGRESS_IDE_CONFIGURATION_SNIPPET_VAL,
+		internal.INGRESS_CERT_MANAGER_KEY:            internal.INGRESS_CERT_MANAGER_VAL,
+		internal.INGRESS_NGINX_PROXY_BUFFER_SIZE_KEY: internal.INGRESS_NGINX_PROXY_BUFFER_SIZE_VAL,
+		internal.INGRESS_NGINX_REWRITE_TARGET_KEY:    internal.INGRESS_NGINX_REWRITE_TARGET_VAL,
+		internal.INGRESS_PROXY_READ_TIMEOUT_KEY:      internal.INGRESS_PROXY_READ_TIMEOUT_VAL,
+	}
+
+	pathTypePrefix := networkingv1.PathTypePrefix
+	ingressClassNameNginx := "nginx"
+
+	var ingressPaths []networkingv1.HTTPIngressPath
+
+	if portsStr, ok := robot.Spec.AdditionalConfigs[internal.VDI_CUSTOM_PORT_RANGE_KEY]; ok {
+		portsSlice := strings.Split(portsStr.Value, "/")
+		for _, p := range portsSlice {
+			portInfo := strings.Split(p, "-")
+			portName := portInfo[0]
+			fwdStr := strings.Split(portInfo[1], ":")
+			// nodePortVal, _ := strconv.ParseInt(fwdStr[0], 10, 64)
+			containerPortVal, _ := strconv.ParseInt(fwdStr[1], 10, 64)
+			ingressPaths = append(ingressPaths, networkingv1.HTTPIngressPath{
+				Path:     robotv1alpha1.GetRobotServicePath(robot, "/custom/vdi/"+portName) + "(/|$)(.*)",
+				PathType: &pathTypePrefix,
+				Backend: networkingv1.IngressBackend{
+					Service: &networkingv1.IngressServiceBackend{
+						Name: robotVDI.GetRobotVDICustomServiceMetadata().Name,
+						Port: networkingv1.ServiceBackendPort{
+							Number: int32(containerPortVal),
+						},
+					},
+				},
+			})
+		}
+	}
+
+	ingressSpec := networkingv1.IngressSpec{
+		TLS: []networkingv1.IngressTLS{
+			{
+				Hosts: []string{
+					tenancy.CloudInstanceAlias + "." + rootDNSConfig.Host,
+				},
+				SecretName: secretName,
+			},
+		},
+		Rules: []networkingv1.IngressRule{
+			{
+				Host: tenancy.CloudInstanceAlias + "." + rootDNSConfig.Host,
+				IngressRuleValue: networkingv1.IngressRuleValue{
+					HTTP: &networkingv1.HTTPIngressRuleValue{
+						Paths: ingressPaths,
 					},
 				},
 			},

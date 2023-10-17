@@ -313,7 +313,7 @@ func GetRobotIDECustomIngress(robotIDE *robotv1alpha1.RobotIDE, ingressNamespace
 			// nodePortVal, _ := strconv.ParseInt(fwdStr[0], 10, 64)
 			containerPortVal, _ := strconv.ParseInt(fwdStr[1], 10, 64)
 			ingressPaths = append(ingressPaths, networkingv1.HTTPIngressPath{
-				Path:     robotv1alpha1.GetRobotServicePath(robot, "/"+portName) + "(/|$)(.*)",
+				Path:     robotv1alpha1.GetRobotServicePath(robot, "/custom/ide/"+portName) + "(/|$)(.*)",
 				PathType: &pathTypePrefix,
 				Backend: networkingv1.IngressBackend{
 					Service: &networkingv1.IngressServiceBackend{

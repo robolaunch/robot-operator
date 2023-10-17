@@ -127,3 +127,17 @@ func (robotvdi *RobotVDI) GetRobotVDIIngressMetadata() *types.NamespacedName {
 		Name:      robotvdi.Name + internal.INGRESS_VDI_POSTFIX,
 	}
 }
+
+func (robotvdi *RobotVDI) GetRobotVDICustomServiceMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Namespace: robotvdi.Namespace,
+		Name:      robotvdi.Name + internal.CUSTOM_PORT_SVC_IDE_POSTFIX,
+	}
+}
+
+func (robotvdi *RobotVDI) GetRobotVDICustomIngressMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Namespace: robotvdi.Namespace,
+		Name:      robotvdi.Name + internal.CUSTOM_PORT_INGRESS_IDE_POSTFIX,
+	}
+}
