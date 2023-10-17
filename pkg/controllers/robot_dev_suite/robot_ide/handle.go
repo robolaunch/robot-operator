@@ -111,9 +111,10 @@ func (r *RobotIDEReconciler) reconcileHandleCustomService(ctx context.Context, i
 	if _, ok := robot.Spec.AdditionalConfigs[internal.IDE_CUSTOM_PORT_RANGE_KEY]; ok {
 		if !instance.Status.CustomPortServiceStatus.Resource.Created {
 			instance.Status.Phase = robotv1alpha1.RobotIDEPhaseCreatingCustomPortService
-
-			// create service for custom ports
-
+			err := r.reconcileCreateCustomService(ctx, instance)
+			if err != nil {
+				return err
+			}
 			instance.Status.CustomPortServiceStatus.Resource.Created = true
 
 			return &robotErr.CreatingResourceError{

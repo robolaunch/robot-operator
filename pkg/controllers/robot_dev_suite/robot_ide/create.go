@@ -116,3 +116,29 @@ func (r *RobotIDEReconciler) reconcileCreateServiceExport(ctx context.Context, i
 
 	return nil
 }
+
+func (r *RobotIDEReconciler) reconcileCreateCustomService(ctx context.Context, instance *robotv1alpha1.RobotIDE) error {
+
+	robot, err := r.reconcileGetTargetRobot(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	ideService := resources.GetRobotIDECustomService(instance, instance.GetRobotIDECustomServiceMetadata(), *robot)
+
+	err = ctrl.SetControllerReference(instance, ideService, r.Scheme)
+	if err != nil {
+		return err
+	}
+
+	err = r.Create(ctx, ideService)
+	if err != nil && errors.IsAlreadyExists(err) {
+		return nil
+	} else if err != nil {
+		return err
+	}
+
+	logger.Info("STATUS: IDE custom service is created.")
+
+	return nil
+}
