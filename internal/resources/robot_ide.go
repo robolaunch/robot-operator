@@ -68,12 +68,16 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 
 	// add custom ports defined by user
 	if portsStr, ok := robot.Spec.AdditionalConfigs[internal.IDE_CUSTOM_PORT_RANGE_KEY]; ok {
-		portsSlice := strings.Split(portsStr.Value, ":")
-		for key, p := range portsSlice {
-			portVal, _ := strconv.ParseInt(p, 10, 64)
+		portsSlice := strings.Split(portsStr.Value, "/")
+		for _, p := range portsSlice {
+			portInfo := strings.Split(p, "-")
+			portName := portInfo[0]
+			fwdStr := strings.Split(portInfo[1], ":")
+			// nodePortVal, _ := strconv.ParseInt(fwdStr[0], 10, 64)
+			containerPortVal, _ := strconv.ParseInt(fwdStr[1], 10, 64)
 			ideContainer.Ports = append(ideContainer.Ports, corev1.ContainerPort{
-				Name:          "port-" + strconv.Itoa(key),
-				ContainerPort: int32(portVal),
+				Name:          portName,
+				ContainerPort: int32(containerPortVal),
 			})
 		}
 	}
@@ -241,16 +245,21 @@ func GetRobotIDECustomService(robotIDE *robotv1alpha1.RobotIDE, svcNamespacedNam
 	var ports []corev1.ServicePort
 
 	if portsStr, ok := robot.Spec.AdditionalConfigs[internal.IDE_CUSTOM_PORT_RANGE_KEY]; ok {
-		portsSlice := strings.Split(portsStr.Value, ":")
-		for key, p := range portsSlice {
-			portVal, _ := strconv.ParseInt(p, 10, 64)
+		portsSlice := strings.Split(portsStr.Value, "/")
+		for _, p := range portsSlice {
+			portInfo := strings.Split(p, "-")
+			portName := portInfo[0]
+			fwdStr := strings.Split(portInfo[1], ":")
+			nodePortVal, _ := strconv.ParseInt(fwdStr[0], 10, 64)
+			containerPortVal, _ := strconv.ParseInt(fwdStr[1], 10, 64)
 			ports = append(ports, corev1.ServicePort{
-				Port: int32(portVal),
+				Port: int32(containerPortVal),
 				TargetPort: intstr.IntOrString{
-					IntVal: int32(portVal),
+					IntVal: int32(containerPortVal),
 				},
+				NodePort: int32(nodePortVal),
 				Protocol: corev1.ProtocolTCP,
-				Name:     "port-" + strconv.Itoa(key),
+				Name:     portName,
 			})
 		}
 	}
@@ -296,17 +305,21 @@ func GetRobotIDECustomIngress(robotIDE *robotv1alpha1.RobotIDE, ingressNamespace
 	var ingressPaths []networkingv1.HTTPIngressPath
 
 	if portsStr, ok := robot.Spec.AdditionalConfigs[internal.IDE_CUSTOM_PORT_RANGE_KEY]; ok {
-		portsSlice := strings.Split(portsStr.Value, ":")
-		for key, p := range portsSlice {
-			portVal, _ := strconv.ParseInt(p, 10, 64)
+		portsSlice := strings.Split(portsStr.Value, "/")
+		for _, p := range portsSlice {
+			portInfo := strings.Split(p, "-")
+			portName := portInfo[0]
+			fwdStr := strings.Split(portInfo[1], ":")
+			// nodePortVal, _ := strconv.ParseInt(fwdStr[0], 10, 64)
+			containerPortVal, _ := strconv.ParseInt(fwdStr[1], 10, 64)
 			ingressPaths = append(ingressPaths, networkingv1.HTTPIngressPath{
-				Path:     robotv1alpha1.GetRobotServicePath(robot, "/") + strconv.Itoa(key) + "(/|$)(.*)",
+				Path:     robotv1alpha1.GetRobotServicePath(robot, "/"+portName) + "(/|$)(.*)",
 				PathType: &pathTypePrefix,
 				Backend: networkingv1.IngressBackend{
 					Service: &networkingv1.IngressServiceBackend{
 						Name: robotIDE.GetRobotIDECustomServiceMetadata().Name,
 						Port: networkingv1.ServiceBackendPort{
-							Number: int32(portVal),
+							Number: int32(containerPortVal),
 						},
 					},
 				},
