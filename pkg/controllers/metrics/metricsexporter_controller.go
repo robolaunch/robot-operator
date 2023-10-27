@@ -71,7 +71,12 @@ func (r *MetricsExporterReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 		return ctrl.Result{}, nil
 	}
 
-	err = r.reconcileCheckNodeCapacity(ctx, instance)
+	err = r.reconcileCheckGPUCapacities(ctx, instance)
+	if err != nil {
+		return result, err
+	}
+
+	err = r.reconcileCheckGPUConsumingPods(ctx, instance)
 	if err != nil {
 		return result, err
 	}

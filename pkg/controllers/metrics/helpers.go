@@ -2,8 +2,10 @@ package metrics
 
 import (
 	"context"
+	"strconv"
 	"strings"
 
+	"github.com/robolaunch/robot-operator/internal"
 	robotErr "github.com/robolaunch/robot-operator/internal/error"
 	"github.com/robolaunch/robot-operator/internal/label"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
@@ -82,7 +84,7 @@ func (r *MetricsExporterReconciler) reconcileCheckNode(ctx context.Context, inst
 	return &nodes.Items[0], nil
 }
 
-func (r *MetricsExporterReconciler) reconcileCheckNodeCapacity(ctx context.Context, instance *robotv1alpha1.MetricsExporter) error {
+func (r *MetricsExporterReconciler) reconcileCheckGPUCapacities(ctx context.Context, instance *robotv1alpha1.MetricsExporter) error {
 	activeNode, err := r.reconcileCheckNode(ctx, instance)
 	if err != nil {
 		return err
@@ -99,6 +101,51 @@ func (r *MetricsExporterReconciler) reconcileCheckNodeCapacity(ctx context.Conte
 	}
 
 	instance.Status.Usage.GPUInstanceUsage = gpuInstanceUsages
+
+	return nil
+}
+
+func (r *MetricsExporterReconciler) reconcileCheckGPUConsumingPods(ctx context.Context, instance *robotv1alpha1.MetricsExporter) error {
+
+	// Get attached build objects for this robot
+	requirements := []labels.Requirement{}
+	newReq, err := labels.NewRequirement(internal.ORGANIZATION_LABEL_KEY, selection.DoesNotExist, []string{})
+	if err != nil {
+		return err
+	}
+	requirements = append(requirements, *newReq)
+
+	podSelector := labels.NewSelector().Add(requirements...)
+
+	podList := corev1.PodList{}
+
+	err = r.List(ctx, &podList, &client.ListOptions{LabelSelector: podSelector})
+	if err != nil {
+		return nil
+	}
+
+	usages := map[string]int64{}
+
+	for _, pod := range podList.Items {
+		for _, container := range pod.Spec.Containers {
+			for resourceType, vCore := range container.Resources.Limits {
+				if _, isGPUResource := instance.Status.Usage.GPUInstanceUsage[resourceType.String()]; isGPUResource {
+					if val, ok := usages[resourceType.String()]; ok {
+						usages[resourceType.String()] = val + vCore.ToDec().Value()
+					} else {
+						usages[resourceType.String()] = vCore.ToDec().Value()
+					}
+				}
+			}
+		}
+	}
+
+	for resourceType, vCore := range usages {
+		if gpuInstanceStatus, ok := instance.Status.Usage.GPUInstanceUsage[resourceType]; ok {
+			gpuInstanceStatus.Allocated = strconv.Itoa(int(vCore))
+			instance.Status.Usage.GPUInstanceUsage[resourceType] = gpuInstanceStatus
+		}
+	}
 
 	return nil
 }
