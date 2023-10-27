@@ -23,9 +23,13 @@ import (
 	rbacv1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/log"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	"github.com/go-logr/logr"
 	robotErr "github.com/robolaunch/robot-operator/internal/error"
@@ -158,5 +162,39 @@ func (r *MetricsExporterReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Owns(&rbacv1.RoleBinding{}).
 		Owns(&corev1.ServiceAccount{}).
 		Owns(&corev1.Pod{}).
+		Watches(
+			&source.Kind{Type: &corev1.Node{}},
+			handler.EnqueueRequestsFromMapFunc(r.watchNodes),
+		).
 		Complete(r)
+}
+
+func (r *MetricsExporterReconciler) watchNodes(o client.Object) []reconcile.Request {
+
+	obj := o.(*corev1.Node)
+
+	metricsExporterList := &robotv1alpha1.MetricsExporterList{}
+	err := r.List(context.TODO(), metricsExporterList)
+	if err != nil {
+		return []reconcile.Request{}
+	}
+
+	requests := []reconcile.Request{}
+
+	for _, me := range metricsExporterList.Items {
+		activeNode, err := r.reconcileCheckNode(context.TODO(), &me)
+		if err != nil {
+			return []reconcile.Request{}
+		}
+		if obj.Name == activeNode.Name {
+			requests = append(requests, reconcile.Request{
+				NamespacedName: types.NamespacedName{
+					Name:      me.Name,
+					Namespace: me.Namespace,
+				},
+			})
+		}
+	}
+
+	return requests
 }
