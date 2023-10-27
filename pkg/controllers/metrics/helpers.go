@@ -107,7 +107,8 @@ func (r *MetricsExporterReconciler) reconcileCheckGPUCapacities(ctx context.Cont
 
 func (r *MetricsExporterReconciler) reconcileCheckGPUConsumingPods(ctx context.Context, instance *robotv1alpha1.MetricsExporter) error {
 
-	// Get attached build objects for this robot
+	// Check pods' GPU resource allocations excluding Robot-owned pods
+
 	requirements := []labels.Requirement{}
 	newReq, err := labels.NewRequirement(internal.ORGANIZATION_LABEL_KEY, selection.DoesNotExist, []string{})
 	if err != nil {
@@ -136,6 +137,35 @@ func (r *MetricsExporterReconciler) reconcileCheckGPUConsumingPods(ctx context.C
 						usages[resourceType.String()] = vCore.ToDec().Value()
 					}
 				}
+			}
+		}
+	}
+
+	// Check Robots' GPU resource allocations
+
+	robotList := robotv1alpha1.RobotList{}
+
+	err = r.List(ctx, &robotList)
+	if err != nil {
+		return err
+	}
+
+	for _, robot := range robotList.Items {
+		if robot.Spec.RobotDevSuiteTemplate.VDIEnabled {
+			vdiSpec := robot.Spec.RobotDevSuiteTemplate.RobotVDITemplate
+			if val, ok := usages[vdiSpec.Resources.GPUInstance]; ok {
+				usages[vdiSpec.Resources.GPUInstance] = val + int64(vdiSpec.Resources.GPUCore)
+			} else {
+				usages[vdiSpec.Resources.GPUInstance] = int64(vdiSpec.Resources.GPUCore)
+			}
+		}
+
+		if robot.Spec.RobotDevSuiteTemplate.IDEEnabled {
+			ideSpec := robot.Spec.RobotDevSuiteTemplate.RobotIDETemplate
+			if val, ok := usages[ideSpec.Resources.GPUInstance]; ok {
+				usages[ideSpec.Resources.GPUInstance] = val + int64(ideSpec.Resources.GPUCore)
+			} else {
+				usages[ideSpec.Resources.GPUInstance] = int64(ideSpec.Resources.GPUCore)
 			}
 		}
 	}
