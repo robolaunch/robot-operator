@@ -23,9 +23,13 @@ import (
 	rbacv1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/log"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	"github.com/go-logr/logr"
 	robotErr "github.com/robolaunch/robot-operator/internal/error"
@@ -42,6 +46,7 @@ type MetricsExporterReconciler struct {
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=metricsexporters/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=metricsexporters/finalizers,verbs=update
 
+//+kubebuilder:rbac:groups=core,resources=nodes,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=core,resources=pods,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=core,resources=serviceaccounts,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=rbac.authorization.k8s.io,resources=roles,verbs=get;list;watch;create;update;patch;delete
@@ -64,6 +69,16 @@ func (r *MetricsExporterReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 
 	if !instance.DeletionTimestamp.IsZero() {
 		return ctrl.Result{}, nil
+	}
+
+	err = r.reconcileCheckGPUCapacities(ctx, instance)
+	if err != nil {
+		return result, err
+	}
+
+	err = r.reconcileCheckGPUConsumingPods(ctx, instance)
+	if err != nil {
+		return result, err
 	}
 
 	err = r.reconcileCheckStatus(ctx, instance, &result)
@@ -152,5 +167,107 @@ func (r *MetricsExporterReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Owns(&rbacv1.RoleBinding{}).
 		Owns(&corev1.ServiceAccount{}).
 		Owns(&corev1.Pod{}).
+		Watches(
+			&source.Kind{Type: &corev1.Node{}},
+			handler.EnqueueRequestsFromMapFunc(r.watchNodes),
+		).
+		Watches(
+			&source.Kind{Type: &corev1.Pod{}},
+			handler.EnqueueRequestsFromMapFunc(r.watchPods),
+		).
+		Watches(
+			&source.Kind{Type: &robotv1alpha1.Robot{}},
+			handler.EnqueueRequestsFromMapFunc(r.watchRobots),
+		).
 		Complete(r)
+}
+
+func (r *MetricsExporterReconciler) watchNodes(o client.Object) []reconcile.Request {
+
+	obj := o.(*corev1.Node)
+
+	metricsExporterList := &robotv1alpha1.MetricsExporterList{}
+	err := r.List(context.TODO(), metricsExporterList)
+	if err != nil {
+		return []reconcile.Request{}
+	}
+
+	requests := []reconcile.Request{}
+
+	for _, me := range metricsExporterList.Items {
+		activeNode, err := r.reconcileCheckNode(context.TODO(), &me)
+		if err != nil {
+			return []reconcile.Request{}
+		}
+		if obj.Name == activeNode.Name {
+			requests = append(requests, reconcile.Request{
+				NamespacedName: types.NamespacedName{
+					Name:      me.Name,
+					Namespace: me.Namespace,
+				},
+			})
+		}
+	}
+
+	return requests
+}
+
+func (r *MetricsExporterReconciler) watchPods(o client.Object) []reconcile.Request {
+
+	obj := o.(*corev1.Pod)
+
+	metricsExporterList := &robotv1alpha1.MetricsExporterList{}
+	err := r.List(context.TODO(), metricsExporterList)
+	if err != nil {
+		return []reconcile.Request{}
+	}
+
+	requests := []reconcile.Request{}
+
+	for _, me := range metricsExporterList.Items {
+		activeNode, err := r.reconcileCheckNode(context.TODO(), &me)
+		if err != nil {
+			return []reconcile.Request{}
+		}
+		if obj.Name == activeNode.Name {
+			requests = append(requests, reconcile.Request{
+				NamespacedName: types.NamespacedName{
+					Name:      me.Name,
+					Namespace: me.Namespace,
+				},
+			})
+		}
+	}
+
+	return requests
+}
+
+func (r *MetricsExporterReconciler) watchRobots(o client.Object) []reconcile.Request {
+
+	obj := o.(*robotv1alpha1.Robot)
+
+	metricsExporterList := &robotv1alpha1.MetricsExporterList{}
+	err := r.List(context.TODO(), metricsExporterList)
+	if err != nil {
+		return []reconcile.Request{}
+	}
+
+	requests := []reconcile.Request{}
+
+	for _, me := range metricsExporterList.Items {
+		activeNode, err := r.reconcileCheckNode(context.TODO(), &me)
+		if err != nil {
+			return []reconcile.Request{}
+		}
+		if obj.Name == activeNode.Name {
+			requests = append(requests, reconcile.Request{
+				NamespacedName: types.NamespacedName{
+					Name:      me.Name,
+					Namespace: me.Namespace,
+				},
+			})
+		}
+	}
+
+	return requests
 }
