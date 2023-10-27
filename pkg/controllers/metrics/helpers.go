@@ -2,6 +2,7 @@ package metrics
 
 import (
 	"context"
+	"strings"
 
 	robotErr "github.com/robolaunch/robot-operator/internal/error"
 	"github.com/robolaunch/robot-operator/internal/label"
@@ -79,4 +80,25 @@ func (r *MetricsExporterReconciler) reconcileCheckNode(ctx context.Context, inst
 	}
 
 	return &nodes.Items[0], nil
+}
+
+func (r *MetricsExporterReconciler) reconcileCheckNodeCapacity(ctx context.Context, instance *robotv1alpha1.MetricsExporter) error {
+	activeNode, err := r.reconcileCheckNode(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	gpuInstanceUsages := make(map[string]robotv1alpha1.GPUInstanceStatus)
+
+	for name, capacity := range activeNode.Status.Capacity {
+		if strings.Contains(name.String(), "nvidia.com") {
+			gpuInstanceStatus := robotv1alpha1.GPUInstanceStatus{}
+			gpuInstanceStatus.Capacity = capacity.String()
+			gpuInstanceUsages[name.String()] = gpuInstanceStatus
+		}
+	}
+
+	instance.Status.Usage.GPUInstanceUsage = gpuInstanceUsages
+
+	return nil
 }

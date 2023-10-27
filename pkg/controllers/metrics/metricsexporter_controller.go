@@ -42,6 +42,7 @@ type MetricsExporterReconciler struct {
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=metricsexporters/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=metricsexporters/finalizers,verbs=update
 
+//+kubebuilder:rbac:groups=core,resources=nodes,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=core,resources=pods,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=core,resources=serviceaccounts,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=rbac.authorization.k8s.io,resources=roles,verbs=get;list;watch;create;update;patch;delete
@@ -64,6 +65,11 @@ func (r *MetricsExporterReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 
 	if !instance.DeletionTimestamp.IsZero() {
 		return ctrl.Result{}, nil
+	}
+
+	err = r.reconcileCheckNodeCapacity(ctx, instance)
+	if err != nil {
+		return result, err
 	}
 
 	err = r.reconcileCheckStatus(ctx, instance, &result)
