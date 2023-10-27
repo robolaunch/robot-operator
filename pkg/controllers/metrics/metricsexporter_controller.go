@@ -171,12 +171,80 @@ func (r *MetricsExporterReconciler) SetupWithManager(mgr ctrl.Manager) error {
 			&source.Kind{Type: &corev1.Node{}},
 			handler.EnqueueRequestsFromMapFunc(r.watchNodes),
 		).
+		Watches(
+			&source.Kind{Type: &corev1.Pod{}},
+			handler.EnqueueRequestsFromMapFunc(r.watchPods),
+		).
+		Watches(
+			&source.Kind{Type: &robotv1alpha1.Robot{}},
+			handler.EnqueueRequestsFromMapFunc(r.watchRobots),
+		).
 		Complete(r)
 }
 
 func (r *MetricsExporterReconciler) watchNodes(o client.Object) []reconcile.Request {
 
 	obj := o.(*corev1.Node)
+
+	metricsExporterList := &robotv1alpha1.MetricsExporterList{}
+	err := r.List(context.TODO(), metricsExporterList)
+	if err != nil {
+		return []reconcile.Request{}
+	}
+
+	requests := []reconcile.Request{}
+
+	for _, me := range metricsExporterList.Items {
+		activeNode, err := r.reconcileCheckNode(context.TODO(), &me)
+		if err != nil {
+			return []reconcile.Request{}
+		}
+		if obj.Name == activeNode.Name {
+			requests = append(requests, reconcile.Request{
+				NamespacedName: types.NamespacedName{
+					Name:      me.Name,
+					Namespace: me.Namespace,
+				},
+			})
+		}
+	}
+
+	return requests
+}
+
+func (r *MetricsExporterReconciler) watchPods(o client.Object) []reconcile.Request {
+
+	obj := o.(*corev1.Pod)
+
+	metricsExporterList := &robotv1alpha1.MetricsExporterList{}
+	err := r.List(context.TODO(), metricsExporterList)
+	if err != nil {
+		return []reconcile.Request{}
+	}
+
+	requests := []reconcile.Request{}
+
+	for _, me := range metricsExporterList.Items {
+		activeNode, err := r.reconcileCheckNode(context.TODO(), &me)
+		if err != nil {
+			return []reconcile.Request{}
+		}
+		if obj.Name == activeNode.Name {
+			requests = append(requests, reconcile.Request{
+				NamespacedName: types.NamespacedName{
+					Name:      me.Name,
+					Namespace: me.Namespace,
+				},
+			})
+		}
+	}
+
+	return requests
+}
+
+func (r *MetricsExporterReconciler) watchRobots(o client.Object) []reconcile.Request {
+
+	obj := o.(*robotv1alpha1.Robot)
 
 	metricsExporterList := &robotv1alpha1.MetricsExporterList{}
 	err := r.List(context.TODO(), metricsExporterList)
