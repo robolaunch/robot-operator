@@ -40,7 +40,8 @@ func GetMetricsExporterPod(metricsExporter *robotv1alpha1.MetricsExporter, podNa
 			},
 			Resources: corev1.ResourceRequirements{
 				Limits: getResourceLimits(robotv1alpha1.Resources{
-					GPUCore: 1,
+					GPUInstance: "nvidia.com/gpu",
+					GPUCore:     1,
 				}),
 			},
 		})
