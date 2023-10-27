@@ -78,6 +78,14 @@ type MetricsExporterSpec struct {
 	Network NetworkMetrics `json:"network,omitempty"`
 }
 
+// Current usage of GPU cores belongs to a GPU instance (eg. mig-1g.10gb).
+type GPUInstanceStatus struct {
+	// Number of total virtual cores.
+	Capacity string `json:"capacity,omitempty"`
+	// Number of allocated virtual cores.
+	Allocated string `json:"allocated,omitempty"`
+}
+
 type GPUUtilizationStatus struct {
 	// Volatile GPU utilization. Shows a percentage gathered from `nvidia-smi` command.
 	Utilization string `json:"utilization,omitempty"`
@@ -101,7 +109,10 @@ type NetworkLoadStatus struct {
 
 type Usage struct {
 	// GPU usage information.
+	// Will be deprecated after implementing checks for each GPU instance.
 	GPU GPUUtilizationStatus `json:"gpu,omitempty"`
+	// GPU virtual cores.
+	GPUInstanceUsage map[string]GPUInstanceStatus `json:"gpuInstanceUsage,omitempty"`
 	// Network usage information.
 	Network NetworkLoadStatus `json:"network,omitempty"`
 }
