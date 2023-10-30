@@ -827,6 +827,21 @@ _Appears in:_
 | `devspace` _[DevSpaceImage](#devspaceimage)_ | DevSpace image properties. |
 
 
+#### GPUInstanceStatus
+
+
+
+Current usage of GPU cores belongs to a GPU instance (eg. mig-1g.10gb).
+
+_Appears in:_
+- [Usage](#usage)
+
+| Field | Description |
+| --- | --- |
+| `capacity` _string_ | Number of total virtual cores. |
+| `allocated` _string_ | Number of allocated virtual cores. |
+
+
 #### GPUMetrics
 
 
@@ -1382,7 +1397,8 @@ _Appears in:_
 
 | Field | Description |
 | --- | --- |
-| `gpu` _[GPUUtilizationStatus](#gpuutilizationstatus)_ | GPU usage information. |
+| `gpu` _[GPUUtilizationStatus](#gpuutilizationstatus)_ | GPU usage information. Will be deprecated after implementing checks for each GPU instance. |
+| `gpuInstanceUsage` _object (keys:string, values:[GPUInstanceStatus](#gpuinstancestatus))_ | GPU virtual cores. |
 | `network` _[NetworkLoadStatus](#networkloadstatus)_ | Network usage information. |
 
 
