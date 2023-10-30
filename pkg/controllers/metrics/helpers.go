@@ -90,6 +90,12 @@ func (r *MetricsExporterReconciler) reconcileCheckGPUCapacities(ctx context.Cont
 		return err
 	}
 
+	if gpuName, ok := activeNode.Labels["nvidia.com/gpu.product"]; ok {
+		instance.Status.Usage.GPUModel = gpuName
+	} else {
+		instance.Status.Usage.GPUModel = "no-gpu-feature-discovery-found"
+	}
+
 	gpuInstanceUsages := make(map[string]robotv1alpha1.GPUInstanceStatus)
 
 	for name, capacity := range activeNode.Status.Capacity {

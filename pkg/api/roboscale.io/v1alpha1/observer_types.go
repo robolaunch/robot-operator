@@ -108,6 +108,8 @@ type NetworkLoadStatus struct {
 }
 
 type Usage struct {
+	// GPU model
+	GPUModel string `json:"gpuModel,omitempty"`
 	// GPU usage information.
 	// Will be deprecated after implementing checks for each GPU instance.
 	GPU GPUUtilizationStatus `json:"gpu,omitempty"`
