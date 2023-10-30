@@ -1534,6 +1534,9 @@ spec:
                         type: object
                       description: GPU virtual cores.
                       type: object
+                    gpuModel:
+                      description: GPU model
+                      type: string
                     network:
                       description: Network usage information.
                       properties:
@@ -6604,7 +6607,7 @@ spec:
             - --leader-elect
           command:
             - /manager
-          image: robolaunchio/robot-controller-manager:v0.2.6-alpha.11
+          image: robolaunchio/robot-controller-manager:v0.2.6-alpha.12
           livenessProbe:
             httpGet:
               path: /healthz

@@ -296,6 +296,9 @@ spec:
                       type: object
                     description: GPU virtual cores.
                     type: object
+                  gpuModel:
+                    description: GPU model
+                    type: string
                   network:
                     description: Network usage information.
                     properties:
