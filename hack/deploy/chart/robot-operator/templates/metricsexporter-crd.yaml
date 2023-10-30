@@ -271,7 +271,8 @@ spec:
                 description: Usage metrics.
                 properties:
                   gpu:
-                    description: GPU usage information.
+                    description: GPU usage information. Will be deprecated after implementing
+                      checks for each GPU instance.
                     properties:
                       lastUpdateTimestamp:
                         description: Last update time.
@@ -280,6 +281,20 @@ spec:
                         description: Volatile GPU utilization. Shows a percentage gathered
                           from `nvidia-smi` command.
                         type: string
+                    type: object
+                  gpuInstanceUsage:
+                    additionalProperties:
+                      description: Current usage of GPU cores belongs to a GPU instance
+                        (eg. mig-1g.10gb).
+                      properties:
+                        allocated:
+                          description: Number of allocated virtual cores.
+                          type: string
+                        capacity:
+                          description: Number of total virtual cores.
+                          type: string
+                      type: object
+                    description: GPU virtual cores.
                     type: object
                   network:
                     description: Network usage information.
