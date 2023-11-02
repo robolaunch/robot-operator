@@ -1526,6 +1526,7 @@ spec:
                         description: Current usage of GPU cores belongs to a GPU instance (eg. mig-1g.10gb).
                         properties:
                           allocated:
+                            default: "0"
                             description: Number of allocated virtual cores.
                             type: string
                           capacity:
@@ -6607,7 +6608,7 @@ spec:
             - --leader-elect
           command:
             - /manager
-          image: robolaunchio/robot-controller-manager:v0.2.6-alpha.12
+          image: robolaunchio/robot-controller-manager:v0.2.6-alpha.12.1
           livenessProbe:
             httpGet:
               path: /healthz

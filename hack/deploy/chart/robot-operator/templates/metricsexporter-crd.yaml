@@ -288,6 +288,7 @@ spec:
                         (eg. mig-1g.10gb).
                       properties:
                         allocated:
+                          default: "0"
                           description: Number of allocated virtual cores.
                           type: string
                         capacity:

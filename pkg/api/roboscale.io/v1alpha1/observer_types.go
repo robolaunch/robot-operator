@@ -83,6 +83,7 @@ type GPUInstanceStatus struct {
 	// Number of total virtual cores.
 	Capacity string `json:"capacity,omitempty"`
 	// Number of allocated virtual cores.
+	// +kubebuilder:default="0"
 	Allocated string `json:"allocated,omitempty"`
 }
 
