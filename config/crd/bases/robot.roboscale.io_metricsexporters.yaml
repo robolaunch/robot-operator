@@ -336,9 +336,6 @@ spec:
                       lastUpdateTimestamp:
                         description: Last update time.
                         type: string
-                      totalPercentage:
-                        description: Total usage percentage of all filesystems.
-                        type: string
                       usage:
                         additionalProperties:
                           properties:

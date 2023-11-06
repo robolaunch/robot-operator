@@ -130,8 +130,6 @@ type StorageUsage struct {
 }
 
 type StorageStatus struct {
-	// Total usage percentage of all filesystems.
-	TotalPercentage string `json:"totalPercentage,omitempty"`
 	// Usage values of filesystems.
 	Usage map[string]StorageUsage `json:"usage,omitempty"`
 	// Last update time.

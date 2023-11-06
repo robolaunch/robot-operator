@@ -12,7 +12,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 )
 
-var metricsPatcherImage = "robolaunchio/custom-metrics-patcher:focal-v1.24.10"
+var metricsPatcherImage = "robolaunchio/custom-metrics-patcher-dev:focal-v1.24.10-0.1.0"
 
 func GetMetricsExporterPod(metricsExporter *robotv1alpha1.MetricsExporter, podNamespacedName *types.NamespacedName, node corev1.Node) *corev1.Pod {
 
@@ -27,6 +27,16 @@ func GetMetricsExporterPod(metricsExporter *robotv1alpha1.MetricsExporter, podNa
 			RestartPolicy:      corev1.RestartPolicyNever,
 			ServiceAccountName: metricsExporter.GetMetricsExporterServiceAccountMetadata().Name,
 			HostNetwork:        true,
+			Volumes: []corev1.Volume{
+				{
+					Name: "fstab",
+					VolumeSource: corev1.VolumeSource{
+						HostPath: &corev1.HostPathVolumeSource{
+							Path: "/etc/fstab",
+						},
+					},
+				},
+			},
 		},
 	}
 
@@ -64,6 +74,7 @@ func GetMetricsExporterPod(metricsExporter *robotv1alpha1.MetricsExporter, podNa
 	}
 
 	if metricsExporter.Spec.Storage.Track {
+		privileged := true
 		pod.Spec.Containers = append(pod.Spec.Containers, corev1.Container{
 			Name:    "storage-usage",
 			Image:   metricsPatcherImage,
@@ -72,6 +83,15 @@ func GetMetricsExporterPod(metricsExporter *robotv1alpha1.MetricsExporter, podNa
 				internal.Env("METRICS_EXPORTER_NAME", metricsExporter.Name),
 				internal.Env("METRICS_EXPORTER_NAMESPACE", metricsExporter.Namespace),
 				internal.Env("INTERVAL", strconv.Itoa(metricsExporter.Spec.Network.Interval)),
+			},
+			SecurityContext: &corev1.SecurityContext{
+				Privileged: &privileged,
+			},
+			VolumeMounts: []corev1.VolumeMount{
+				{
+					Name:      "fstab",
+					MountPath: "/etc/fstab",
+				},
 			},
 		})
 	}
