@@ -19,14 +19,37 @@ fi
 
 while [ true ]
 do
+    RESPONSE=$(cat /etc/fstab);
+    IFS=$'\n';
+    INDEX=0;
+    LINES=( $RESPONSE );
+    FS_ARR=()
+    for LINE in "${LINES[@]}";
+    do
+        IFS=" ";
+        LINE_ARR=( $LINE );
+        
+        # getting fs fields, calculating percentage
+        FS_UUID=$(echo ${LINE_ARR[0]} | xargs)
+        FS_MOUNTED_ON=$(echo ${LINE_ARR[1]} | xargs)
+        if [[ "$FS_UUID" == "#" ]]; then
+            continue;
+        elif [[ "$FS_MOUNTED_ON" == "none" ]]; then
+            continue;
+        elif [[ "$FS_MOUNTED_ON" == "" ]]; then
+            continue;
+        fi
+
+        FS_ARR+=($FS_MOUNTED_ON)
+    done
+
     RESPONSE=$(df);
     IFS=$'\n';
     INDEX=0;
     LINES=( $RESPONSE );
     LINES=( "${LINES[@]:1}" );
     COLLECTIVE_LOAD=""
-    SUM_TOTAL=0
-    SUM_USED=0
+
     for LINE in "${LINES[@]}";
     do
         IFS=" ";
@@ -37,7 +60,14 @@ do
         FS_SIZE=$(echo ${LINE_ARR[1]} | xargs)
         FS_USED=$(echo ${LINE_ARR[2]} | xargs)
         FS_MOUNTED_ON=$(echo ${LINE_ARR[5]} | xargs)
+        
+        if [[ ! ${FS_ARR[@]} =~ $FS_MOUNTED_ON ]]
+        then
+            continue;
+        fi
+
         FS_PERCENTAGE="$(((FS_USED * 100 + FS_SIZE - 1 ) / FS_SIZE))"
+        
         if [[ $INDEX -ne 0 ]]; then
             COLLECTIVE_LOAD="$COLLECTIVE_LOAD, "
         fi
@@ -51,17 +81,13 @@ do
                 }"
 
 
-        # calculating total percentage
-        SUM_TOTAL="$((SUM_TOTAL + FS_SIZE))"
-        SUM_USED="$((SUM_USED + FS_USED))"
-
         INDEX=$((INDEX+1))
     done
-    TOTAL_PERCENTAGE="$(((SUM_USED * 100 + SUM_TOTAL - 1 ) / SUM_TOTAL))";        
+
     IFS=" ";
     COLLECTIVE_LOAD="{$COLLECTIVE_LOAD}"
     sleep "$INTERVAL";
-    PATCH_BODY="{\"status\": {\"usage\": {\"storage\": {\"totalPercentage\": \"$TOTAL_PERCENTAGE\", \"usage\": $COLLECTIVE_LOAD}}}}";
+    PATCH_BODY="{\"status\": {\"usage\": {\"storage\": {\"usage\": $COLLECTIVE_LOAD}}}}";
 
     kubectl patch metricsexporter $METRICS_EXPORTER_NAME \
         --type=merge \
