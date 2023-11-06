@@ -70,12 +70,22 @@ type NetworkMetrics struct {
 	Interfaces []string `json:"interfaces,omitempty"`
 }
 
+type StorageMetrics struct {
+	// MetricsExporter watches storage usage in the host machine
+	// if it's set to `true`.
+	Track bool `json:"track,omitempty"`
+	// Watching latency.
+	Interval int `json:"interval,omitempty"`
+}
+
 // MetricsExporterSpec defines the desired state of MetricsExporter.
 type MetricsExporterSpec struct {
 	// Configurational parameters about GPU metrics collection.
 	GPU GPUMetrics `json:"gpu,omitempty"`
 	// Configurational parameters about network metrics collection.
 	Network NetworkMetrics `json:"network,omitempty"`
+	// Configurational parameters about storage metrics collection.
+	Storage StorageMetrics `json:"storage,omitempty"`
 }
 
 // Current usage of GPU cores belongs to a GPU instance (eg. mig-1g.10gb).
@@ -108,6 +118,24 @@ type NetworkLoadStatus struct {
 	LastUpdateTimestamp string `json:"lastUpdateTimestamp,omitempty"`
 }
 
+type StorageUsage struct {
+	// Size of the filesystem.
+	Size string `json:"size,omitempty"`
+	// Size of the used parts of a filesystem.
+	Used string `json:"used,omitempty"`
+	// Usage percentage of a filesystem.
+	Percentage string `json:"percentage,omitempty"`
+	// Directory that the filesystem mounted on.
+	MountedOn string `json:"mountedOn,omitempty"`
+}
+
+type StorageStatus struct {
+	// Usage values of filesystems.
+	Usage map[string]StorageUsage `json:"usage,omitempty"`
+	// Last update time.
+	LastUpdateTimestamp string `json:"lastUpdateTimestamp,omitempty"`
+}
+
 type Usage struct {
 	// GPU model
 	GPUModel string `json:"gpuModel,omitempty"`
@@ -118,6 +146,8 @@ type Usage struct {
 	GPUInstanceUsage map[string]GPUInstanceStatus `json:"gpuInstanceUsage,omitempty"`
 	// Network usage information.
 	Network NetworkLoadStatus `json:"network,omitempty"`
+	// Storage usage information
+	Storage StorageStatus `json:"storage,omitempty"`
 }
 
 type MetricsExporterPhase string
