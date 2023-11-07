@@ -326,6 +326,12 @@ type PersistentDirectory struct {
 	Status OwnedResourceStatus `json:"status,omitempty"`
 }
 
+type HostDirectory struct {
+	Name      string `json:"name,omitempty"`
+	HostPath  string `json:"hostPath,omitempty"`
+	MountPath string `json:"internalPath,omitempty"`
+}
+
 type JobPhase string
 
 const (
@@ -367,6 +373,8 @@ type RobotStatus struct {
 	NodeName string `json:"nodeName,omitempty"`
 	// [*alpha*] Status of PVCs of persistent directories.
 	PersistentDirectories []PersistentDirectory `json:"persistentDirs,omitempty"`
+	// [*alpha*] List of directories mounted from host.
+	HostDirectories []HostDirectory `json:"hostDirs,omitempty"`
 	// Discovery server instance status.
 	DiscoveryServerStatus DiscoveryServerInstanceStatus `json:"discoveryServerStatus,omitempty"`
 	// ROS bridge instance status.

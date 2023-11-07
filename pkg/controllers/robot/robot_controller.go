@@ -75,6 +75,11 @@ func (r *RobotReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 		return ctrl.Result{}, err
 	}
 
+	err = r.reconcileCheckHostDirectories(ctx, instance)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
 	err = r.reconcileCheckStatus(ctx, instance, &result)
 	if err != nil {
 		return result, err
