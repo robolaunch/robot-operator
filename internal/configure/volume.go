@@ -27,6 +27,7 @@ func (cfg *JobConfigInjector) InjectVolumeConfiguration(job *batchv1.Job, robot 
 	podSpec := job.Spec.Template.Spec
 
 	podSpec.Volumes = append(podSpec.Volumes, getVolumesForPersistentDirs(robot)...)
+	podSpec.Volumes = append(podSpec.Volumes, getVolumesForHostDirs(robot)...)
 
 	job.Spec.Template.Spec = podSpec
 
