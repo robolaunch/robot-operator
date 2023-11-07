@@ -146,14 +146,15 @@ func (r *RobotReconciler) reconcileCheckHostDirectories(ctx context.Context, ins
 	if len(instance.Status.HostDirectories) == 0 {
 		if dirsConfig, ok := instance.Spec.AdditionalConfigs[internal.HOST_DIRS_KEY]; ok {
 			conversions := strings.Split(dirsConfig.Value, ",")
-			for _, conversionStr := range conversions {
+			for k, conversionStr := range conversions {
 				conversion := strings.Split(conversionStr, ":")
 				if len(conversion) != 2 {
 					return errors.New("configuration for host directories is not parseable")
 				}
 				instance.Status.HostDirectories = append(instance.Status.HostDirectories, robotv1alpha1.HostDirectory{
-					HostPath:     conversion[0],
-					InternalPath: conversion[1],
+					Name:      "hostdir-" + strconv.Itoa(k),
+					HostPath:  conversion[0],
+					MountPath: conversion[1],
 				})
 			}
 

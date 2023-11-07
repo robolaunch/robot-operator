@@ -9,6 +9,7 @@ import (
 func (cfg *ContainerConfigInjector) InjectVolumeMountConfiguration(container *corev1.Container, robot robotv1alpha1.Robot, mountPrefix string) *corev1.Container {
 
 	container.VolumeMounts = append(container.VolumeMounts, getVolumeMountsForPersistentDirs(robot, mountPrefix)...)
+	container.VolumeMounts = append(container.VolumeMounts, getVolumeMountsForHostDirs(robot)...)
 
 	return container
 }
@@ -16,6 +17,7 @@ func (cfg *ContainerConfigInjector) InjectVolumeMountConfiguration(container *co
 func (cfg *PodConfigInjector) InjectVolumeConfiguration(pod *corev1.Pod, robot robotv1alpha1.Robot) *corev1.Pod {
 
 	pod.Spec.Volumes = append(pod.Spec.Volumes, getVolumesForPersistentDirs(robot)...)
+	pod.Spec.Volumes = append(pod.Spec.Volumes, getVolumesForHostDirs(robot)...)
 
 	return pod
 }
@@ -41,11 +43,31 @@ func getVolumesForPersistentDirs(robot robotv1alpha1.Robot) []corev1.Volume {
 	return volumes
 }
 
+func getVolumesForHostDirs(robot robotv1alpha1.Robot) []corev1.Volume {
+
+	volumes := []corev1.Volume{}
+	for _, hDir := range robot.Status.HostDirectories {
+		volumes = append(volumes, getVolumeForHostDir(hDir))
+	}
+
+	return volumes
+}
+
 func getVolumeMountsForPersistentDirs(robot robotv1alpha1.Robot, mountPrefix string) []corev1.VolumeMount {
 
 	volumeMounts := []corev1.VolumeMount{}
 	for _, pDir := range robot.Status.PersistentDirectories {
 		volumeMounts = append(volumeMounts, getVolumeMountForPersistentDir(mountPrefix, pDir))
+	}
+
+	return volumeMounts
+}
+
+func getVolumeMountsForHostDirs(robot robotv1alpha1.Robot) []corev1.VolumeMount {
+
+	volumeMounts := []corev1.VolumeMount{}
+	for _, hDir := range robot.Status.HostDirectories {
+		volumeMounts = append(volumeMounts, getVolumeMountForHostDir(hDir))
 	}
 
 	return volumeMounts
@@ -64,6 +86,19 @@ func getVolumeForPersistentDir(pDir robotv1alpha1.PersistentDirectory) corev1.Vo
 	return volume
 }
 
+func getVolumeForHostDir(hDir robotv1alpha1.HostDirectory) corev1.Volume {
+	volume := corev1.Volume{
+		Name: hDir.Name,
+		VolumeSource: corev1.VolumeSource{
+			HostPath: &corev1.HostPathVolumeSource{
+				Path: hDir.HostPath,
+			},
+		},
+	}
+
+	return volume
+}
+
 func getVolumeMountForPersistentDir(
 	mountPrefix string,
 	pDir robotv1alpha1.PersistentDirectory,
@@ -72,6 +107,18 @@ func getVolumeMountForPersistentDir(
 	volumeMount := corev1.VolumeMount{
 		Name:      pDir.Status.Reference.Name,
 		MountPath: mountPrefix + pDir.Path,
+	}
+
+	return volumeMount
+}
+
+func getVolumeMountForHostDir(
+	hDir robotv1alpha1.HostDirectory,
+) corev1.VolumeMount {
+
+	volumeMount := corev1.VolumeMount{
+		Name:      hDir.Name,
+		MountPath: hDir.MountPath,
 	}
 
 	return volumeMount

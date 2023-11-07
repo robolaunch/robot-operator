@@ -327,8 +327,9 @@ type PersistentDirectory struct {
 }
 
 type HostDirectory struct {
-	HostPath     string `json:"hostPath,omitempty"`
-	InternalPath string `json:"internalPath,omitempty"`
+	Name      string `json:"name,omitempty"`
+	HostPath  string `json:"hostPath,omitempty"`
+	MountPath string `json:"internalPath,omitempty"`
 }
 
 type JobPhase string
