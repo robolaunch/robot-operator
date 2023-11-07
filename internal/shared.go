@@ -206,6 +206,14 @@ const (
 	VDI_CUSTOM_PORT_RANGE_KEY = "VDI_CUSTOM_PORT_RANGE"
 )
 
+// regex
+const (
+	GRANT_PERMISSION_REGEX  = "^(/([a-z0-9./_-])+:)*(/[a-z0-9./_-]+)$"
+	PERSISTENT_DIRS_REGEX   = "^(/([a-z0-9./_-])+:)*(/[a-z0-9./_-]+)$"
+	HOST_DIRS_REGEX         = "^(((/[a-z0-9./_-]+):(/[a-z0-9./_-]+))+,)*(((/[a-z0-9./_-]+):(/[a-z0-9./_-]+))+)$"
+	CUSTOM_PORT_RANGE_REGEX = "^([a-z0-9]{4}-[0-9]{5}:[0-9]{2,5}/)*([a-z0-9]{4}-[0-9]{5}:[0-9]{2,5})$"
+)
+
 func Bash(command string) []string {
 	return []string{
 		"/bin/bash",
