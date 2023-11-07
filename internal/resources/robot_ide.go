@@ -79,7 +79,7 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 			Labels:    labels,
 		},
 		Spec: corev1.PodSpec{
-			HostNetwork: robotIDE.Spec.Privileged,
+			// HostNetwork: robotIDE.Spec.Privileged,
 			Containers: []corev1.Container{
 				ideContainer,
 			},
