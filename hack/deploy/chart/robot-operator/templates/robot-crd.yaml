@@ -1757,6 +1757,18 @@ spec:
                         type: object
                     type: object
                 type: object
+              hostDirs:
+                description: '[*alpha*] List of directories mounted from host.'
+                items:
+                  properties:
+                    hostPath:
+                      type: string
+                    internalPath:
+                      type: string
+                    name:
+                      type: string
+                  type: object
+                type: array
               image:
                 description: Main image of Robot. It is derived either from the specifications
                   or determined directly over labels.

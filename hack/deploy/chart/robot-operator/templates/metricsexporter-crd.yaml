@@ -63,6 +63,17 @@ spec:
                       if it's set to `true`.
                     type: boolean
                 type: object
+              storage:
+                description: Configurational parameters about storage metrics collection.
+                properties:
+                  interval:
+                    description: Watching latency.
+                    type: integer
+                  track:
+                    description: MetricsExporter watches storage usage in the host machine
+                      if it's set to `true`.
+                    type: boolean
+                type: object
             type: object
           status:
             description: Most recently observed status of the MetricsExporter.
@@ -317,6 +328,31 @@ spec:
                               type: string
                           type: object
                         description: Loads values of network interfaces.
+                        type: object
+                    type: object
+                  storage:
+                    description: Storage usage information
+                    properties:
+                      lastUpdateTimestamp:
+                        description: Last update time.
+                        type: string
+                      usage:
+                        additionalProperties:
+                          properties:
+                            mountedOn:
+                              description: Directory that the filesystem mounted on.
+                              type: string
+                            percentage:
+                              description: Usage percentage of a filesystem.
+                              type: string
+                            size:
+                              description: Size of the filesystem.
+                              type: string
+                            used:
+                              description: Size of the used parts of a filesystem.
+                              type: string
+                          type: object
+                        description: Usage values of filesystems.
                         type: object
                     type: object
                 type: object

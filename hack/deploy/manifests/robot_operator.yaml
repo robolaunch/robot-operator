@@ -1349,6 +1349,16 @@ spec:
                       description: MetricsExporter watches network loads in the host machine if it's set to `true`.
                       type: boolean
                   type: object
+                storage:
+                  description: Configurational parameters about storage metrics collection.
+                  properties:
+                    interval:
+                      description: Watching latency.
+                      type: integer
+                    track:
+                      description: MetricsExporter watches storage usage in the host machine if it's set to `true`.
+                      type: boolean
+                  type: object
               type: object
             status:
               description: Most recently observed status of the MetricsExporter.
@@ -1555,6 +1565,31 @@ spec:
                                 type: string
                             type: object
                           description: Loads values of network interfaces.
+                          type: object
+                      type: object
+                    storage:
+                      description: Storage usage information
+                      properties:
+                        lastUpdateTimestamp:
+                          description: Last update time.
+                          type: string
+                        usage:
+                          additionalProperties:
+                            properties:
+                              mountedOn:
+                                description: Directory that the filesystem mounted on.
+                                type: string
+                              percentage:
+                                description: Usage percentage of a filesystem.
+                                type: string
+                              size:
+                                description: Size of the filesystem.
+                                type: string
+                              used:
+                                description: Size of the used parts of a filesystem.
+                                type: string
+                            type: object
+                          description: Usage values of filesystems.
                           type: object
                       type: object
                   type: object
@@ -4295,6 +4330,18 @@ spec:
                           type: object
                       type: object
                   type: object
+                hostDirs:
+                  description: '[*alpha*] List of directories mounted from host.'
+                  items:
+                    properties:
+                      hostPath:
+                        type: string
+                      internalPath:
+                        type: string
+                      name:
+                        type: string
+                    type: object
+                  type: array
                 image:
                   description: Main image of Robot. It is derived either from the specifications or determined directly over labels.
                   type: string
@@ -6608,7 +6655,7 @@ spec:
             - --leader-elect
           command:
             - /manager
-          image: robolaunchio/robot-controller-manager:v0.2.6-alpha.12.1
+          image: robolaunchio/robot-controller-manager:v0.2.6-alpha.13
           livenessProbe:
             httpGet:
               path: /healthz
