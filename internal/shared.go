@@ -208,9 +208,9 @@ const (
 
 // regex
 const (
-	GRANT_PERMISSION_REGEX  = "^(/([a-z0-9./_-])+:)*(/[a-z0-9./_-]+)$"
-	PERSISTENT_DIRS_REGEX   = "^(/([a-z0-9./_-])+:)*(/[a-z0-9./_-]+)$"
-	HOST_DIRS_REGEX         = "^(((/[a-z0-9./_-]+):(/[a-z0-9./_-]+))+,)*(((/[a-z0-9./_-]+):(/[a-z0-9./_-]+))+)$"
+	GRANT_PERMISSION_REGEX  = "^(/([A-Za-z0-9./_-])+:)*(/[A-Za-z0-9./_-]+)$"
+	PERSISTENT_DIRS_REGEX   = "^(/([A-Za-z0-9./_-])+:)*(/[A-Za-z0-9./_-]+)$"
+	HOST_DIRS_REGEX         = "^(((/[A-Za-z0-9./_-]+):(/[A-Za-z0-9./_-]+))+,)*(((/[A-Za-z0-9./_-]+):(/[A-Za-z0-9./_-]+))+)$"
 	CUSTOM_PORT_RANGE_REGEX = "^([a-z0-9]{4}-[0-9]{5}:[0-9]{2,5}/)*([a-z0-9]{4}-[0-9]{5}:[0-9]{2,5})$"
 )
 
