@@ -25,12 +25,12 @@ fi
 
 while [ true ]
 do
-    PERCENTAGE=$(nvidia-smi | grep "%" | awk '{print $13}');
+    MODEL=$(nvidia-smi --query-gpu=gpu_name --format=csv | sed -n 2p);
     sleep "$INTERVAL";
     kubectl patch metricsexporter $METRICS_EXPORTER_NAME \
         --type=merge \
         --subresource status \
         -n $METRICS_EXPORTER_NAMESPACE \
         --patch \
-        "{\"status\": {\"usage\": {\"gpu\": {\"utilization\": \"$PERCENTAGE\"}}}}";
+        "{\"status\": {\"usage\": {\"gpuModel\": \"$MODEL\"}}}";
 done
