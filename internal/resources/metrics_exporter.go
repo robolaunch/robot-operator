@@ -12,7 +12,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 )
 
-var metricsPatcherImage = "robolaunchio/custom-metrics-patcher-dev:focal-v1.24.10-0.1.0"
+var metricsPatcherImage = "robolaunchio/custom-metrics-patcher-dev:focal-v1.24.10-0.1.2"
 
 func GetMetricsExporterPod(metricsExporter *robotv1alpha1.MetricsExporter, podNamespacedName *types.NamespacedName, node corev1.Node) *corev1.Pod {
 
@@ -42,9 +42,9 @@ func GetMetricsExporterPod(metricsExporter *robotv1alpha1.MetricsExporter, podNa
 
 	if metricsExporter.Spec.GPU.Track {
 		pod.Spec.Containers = append(pod.Spec.Containers, corev1.Container{
-			Name:    "gpu-util",
+			Name:    "gpu-model",
 			Image:   metricsPatcherImage,
-			Command: internal.Bash("./gpu-util.sh"),
+			Command: internal.Bash("./gpu-model.sh"),
 			Env: []corev1.EnvVar{
 				internal.Env("METRICS_EXPORTER_NAME", metricsExporter.Name),
 				internal.Env("METRICS_EXPORTER_NAMESPACE", metricsExporter.Namespace),
