@@ -97,6 +97,27 @@ type GPUInstanceStatus struct {
 	Allocated string `json:"allocated,omitempty"`
 }
 
+type GPUDevice struct {
+	// GPU device number.
+	GPU string `json:"gpu,omitempty"`
+	// GPU device UUID.
+	UUID string `json:"uuid,omitempty"`
+	// GPU device model.
+	Model string `json:"model,omitempty"`
+	// GPU temperature (in C).
+	Temp string `json:"temp,omitempty"`
+	// Power draw (in W).
+	PowerUsage string `json:"powerUsage,omitempty"`
+	// GPU utilization (in %).
+	GPUUtil string `json:"gpuUtil,omitempty"`
+	// Memory utilization (in %).
+	MemoryUtil string `json:"memoryUtil,omitempty"`
+	// Framebuffer memory free (in MiB).
+	FramebufferMemoryFree string `json:"fbMemoryFree,omitempty"`
+	// Framebuffer memory used (in MiB).
+	FramebufferMemoryUsed string `json:"fbMemoryUsed,omitempty"`
+}
+
 type GPUUtilizationStatus struct {
 	// Volatile GPU utilization. Shows a percentage gathered from `nvidia-smi` command.
 	Utilization string `json:"utilization,omitempty"`
@@ -139,9 +160,8 @@ type StorageStatus struct {
 type Usage struct {
 	// GPU model
 	GPUModel string `json:"gpuModel,omitempty"`
-	// GPU usage information.
-	// Will be deprecated after implementing checks for each GPU instance.
-	GPU GPUUtilizationStatus `json:"gpu,omitempty"`
+	// GPU device information.
+	GPUDevices map[string]GPUDevice `json:"gpuDevices,omitempty"`
 	// GPU virtual cores.
 	GPUInstanceUsage map[string]GPUInstanceStatus `json:"gpuInstanceUsage,omitempty"`
 	// Network usage information.
