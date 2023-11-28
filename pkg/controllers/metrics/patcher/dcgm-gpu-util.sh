@@ -33,11 +33,9 @@ declare -A keys=(
 
 exists(){
   if [ "$2" != in ]; then
-    echo "Incorrect usage."
-    echo "Correct usage: exists {key} in {array}"
     return
   fi   
-  eval '[ ${'$3'[$1]+muahaha} ]'  
+  eval '[ ${'$3'[$1]+ok} ]'  
 }
 
 while [ true ]
@@ -168,10 +166,11 @@ do
     echo "$request_body";
 
     sleep "$INTERVAL";
-    # kubectl patch metricsexporter $METRICS_EXPORTER_NAME \
-    #     --type=merge \
-    #     --subresource status \
-    #     -n $METRICS_EXPORTER_NAMESPACE \
-    #     --patch \
-    #     "{\"status\": {\"usage\": {\"gpu\": {\"utilization\": \"$PERCENTAGE\"}}}}";
+    
+    kubectl patch metricsexporter $METRICS_EXPORTER_NAME \
+        --type=merge \
+        --subresource status \
+        -n $METRICS_EXPORTER_NAMESPACE \
+        --patch \
+        "{\"status\": {\"usage\": {\"gpuDeviceStatuses\": $request_body}}}";
 done
