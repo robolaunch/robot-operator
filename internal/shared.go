@@ -201,8 +201,17 @@ const (
 const (
 	GRANT_PERMISSION_KEY      = "GRANT_PERMISSION"
 	PERSISTENT_DIRS_KEY       = "PERSISTENT_DIRS"
+	HOST_DIRS_KEY             = "HOST_DIRS"
 	IDE_CUSTOM_PORT_RANGE_KEY = "IDE_CUSTOM_PORT_RANGE"
 	VDI_CUSTOM_PORT_RANGE_KEY = "VDI_CUSTOM_PORT_RANGE"
+)
+
+// regex
+const (
+	GRANT_PERMISSION_REGEX  = "^(/([A-Za-z0-9./_-])+:)*(/[A-Za-z0-9./_-]+)$"
+	PERSISTENT_DIRS_REGEX   = "^(/([A-Za-z0-9./_-])+:)*(/[A-Za-z0-9./_-]+)$"
+	HOST_DIRS_REGEX         = "^(((/[A-Za-z0-9./_-]+):(/[A-Za-z0-9./_-]+))+,)*(((/[A-Za-z0-9./_-]+):(/[A-Za-z0-9./_-]+))+)$"
+	CUSTOM_PORT_RANGE_REGEX = "^([a-z0-9]{4}-[0-9]{5}:[0-9]{2,5}/)*([a-z0-9]{4}-[0-9]{5}:[0-9]{2,5})$"
 )
 
 func Bash(command string) []string {

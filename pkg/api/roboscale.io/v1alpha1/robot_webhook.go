@@ -220,9 +220,9 @@ func (r *Robot) checkRobotDevSuite() error {
 func (r *Robot) checkAdditionalConfigs() error {
 
 	if val, ok := r.Spec.AdditionalConfigs[internal.IDE_CUSTOM_PORT_RANGE_KEY]; ok && val.ConfigType == AdditionalConfigTypeOperator {
-		matched, err := regexp.MatchString("^([a-z0-9]{4}-[0-9]{5}:[0-9]{2,5}/)*([a-z0-9]{4}-[0-9]{5}:[0-9]{2,5})$", val.Value)
+		matched, err := regexp.MatchString(internal.CUSTOM_PORT_RANGE_REGEX, val.Value)
 		if !matched {
-			return errors.New("cannot validate ide ports, use this pattern ^([a-z0-9]{4}-[0-9]{5}:[0-9]{2,5}/)*([a-z0-9]{4}-[0-9]{5}:[0-9]{2,5})$")
+			return errors.New("cannot validate ide ports, use this pattern " + internal.CUSTOM_PORT_RANGE_REGEX)
 		}
 		if err != nil {
 			return err
@@ -230,9 +230,9 @@ func (r *Robot) checkAdditionalConfigs() error {
 	}
 
 	if val, ok := r.Spec.AdditionalConfigs[internal.VDI_CUSTOM_PORT_RANGE_KEY]; ok && val.ConfigType == AdditionalConfigTypeOperator {
-		matched, err := regexp.MatchString("^([a-z0-9]{4}-[0-9]{5}:[0-9]{2,5}/)*([a-z0-9]{4}-[0-9]{5}:[0-9]{2,5})$", val.Value)
+		matched, err := regexp.MatchString(internal.CUSTOM_PORT_RANGE_REGEX, val.Value)
 		if !matched {
-			return errors.New("cannot validate ide ports, use this pattern ^([a-z0-9]{4}-[0-9]{5}:[0-9]{2,5}/)*([a-z0-9]{4}-[0-9]{5}:[0-9]{2,5})$")
+			return errors.New("cannot validate ide ports, use this pattern " + internal.CUSTOM_PORT_RANGE_REGEX)
 		}
 		if err != nil {
 			return err
@@ -240,9 +240,9 @@ func (r *Robot) checkAdditionalConfigs() error {
 	}
 
 	if val, ok := r.Spec.AdditionalConfigs[internal.PERSISTENT_DIRS_KEY]; ok && val.ConfigType == AdditionalConfigTypeOperator {
-		matched, err := regexp.MatchString("^(/([a-z0-9/])+:)*(/[a-z0-9/]+)$", val.Value)
+		matched, err := regexp.MatchString(internal.PERSISTENT_DIRS_REGEX, val.Value)
 		if !matched {
-			return errors.New("cannot set persistent directories, use this pattern ^(/([a-z0-9/])+:)*(/[a-z0-9/]+)$")
+			return errors.New("cannot set persistent directories, use this pattern " + internal.PERSISTENT_DIRS_REGEX)
 		}
 		if err != nil {
 			return err
@@ -250,9 +250,19 @@ func (r *Robot) checkAdditionalConfigs() error {
 	}
 
 	if val, ok := r.Spec.AdditionalConfigs[internal.GRANT_PERMISSION_KEY]; ok && val.ConfigType == AdditionalConfigTypeOperator {
-		matched, err := regexp.MatchString("^(/([a-z0-9/])+:)*(/[a-z0-9/]+)$", val.Value)
+		matched, err := regexp.MatchString(internal.GRANT_PERMISSION_REGEX, val.Value)
 		if !matched {
-			return errors.New("cannot set persistent directories, use this pattern ^(/([a-z0-9/])+:)*(/[a-z0-9/]+)$")
+			return errors.New("cannot set persistent directories, use this pattern " + internal.GRANT_PERMISSION_REGEX)
+		}
+		if err != nil {
+			return err
+		}
+	}
+
+	if val, ok := r.Spec.AdditionalConfigs[internal.HOST_DIRS_KEY]; ok && val.ConfigType == AdditionalConfigTypeOperator {
+		matched, err := regexp.MatchString(internal.HOST_DIRS_REGEX, val.Value)
+		if !matched {
+			return errors.New("cannot set host directories, use this pattern " + internal.HOST_DIRS_REGEX)
 		}
 		if err != nil {
 			return err

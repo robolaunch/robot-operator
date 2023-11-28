@@ -12,7 +12,9 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 )
 
+
 var metricsPatcherImage = "robolaunchio/custom-metrics-patcher-dev:focal-v1.24.10-0.1.3"
+
 
 func GetMetricsExporterPod(metricsExporter *robotv1alpha1.MetricsExporter, podNamespacedName *types.NamespacedName, node corev1.Node) *corev1.Pod {
 
