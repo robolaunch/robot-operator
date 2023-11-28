@@ -160,7 +160,7 @@ type StorageStatus struct {
 	LastUpdateTimestamp string `json:"lastUpdateTimestamp,omitempty"`
 }
 
-type GPUStatus struct {
+type GPUDeviceStatuses struct {
 	// Available GPU devices.
 	Devices map[string]GPUDevice `json:"devices,omitempty"`
 	// GPU device metrics from DCGM exporter.
@@ -171,7 +171,7 @@ type Usage struct {
 	// GPU model
 	GPUModel string `json:"gpuModel,omitempty"`
 	// GPU device information.
-	GPUDevices map[string]GPUDevice `json:"gpuDevices,omitempty"`
+	GPUDeviceStatuses GPUDeviceStatuses `json:"gpuDeviceStatuses,omitempty"`
 	// GPU virtual cores.
 	GPUInstanceUsage map[string]GPUInstanceStatus `json:"gpuInstanceUsage,omitempty"`
 	// Network usage information.
