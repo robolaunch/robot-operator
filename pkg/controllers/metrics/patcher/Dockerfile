@@ -11,7 +11,7 @@ COPY . .
 RUN set eux; \
     apt-get update; \
     apt-get install -y ifstat curl; \
-    chmod +x gpu-util.sh network-load.sh
+    chmod +x dcgm-gpu-util.sh network-load.sh storage-usage.sh
 
 RUN set eux; \
     curl -LO https://dl.k8s.io/release/v1.24.10/bin/linux/amd64/kubectl; \
