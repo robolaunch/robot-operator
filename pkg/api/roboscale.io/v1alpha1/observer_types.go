@@ -98,12 +98,15 @@ type GPUInstanceStatus struct {
 }
 
 type GPUDevice struct {
-	// GPU device number.
-	GPU string `json:"gpu,omitempty"`
+	// GPU device name.
+	Device string `json:"device,omitempty"`
 	// GPU device UUID.
 	UUID string `json:"uuid,omitempty"`
 	// GPU device model.
 	Model string `json:"model,omitempty"`
+}
+
+type GPUDeviceMetrics struct {
 	// GPU temperature (in C).
 	Temp string `json:"temp,omitempty"`
 	// Power draw (in W).
@@ -155,6 +158,13 @@ type StorageStatus struct {
 	Usage map[string]StorageUsage `json:"usage,omitempty"`
 	// Last update time.
 	LastUpdateTimestamp string `json:"lastUpdateTimestamp,omitempty"`
+}
+
+type GPUStatus struct {
+	// Available GPU devices.
+	Devices map[string]GPUDevice `json:"devices,omitempty"`
+	// GPU device metrics from DCGM exporter.
+	GPUMetrics map[string]GPUDeviceMetrics `json:"metrics,omitempty"`
 }
 
 type Usage struct {
