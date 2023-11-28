@@ -161,6 +161,8 @@ type StorageStatus struct {
 }
 
 type GPUDeviceStatuses struct {
+	// DCGM endpoint.
+	DCGMEndpoint string `json:"dcgmEndpoint,omitempty"`
 	// Available GPU devices.
 	Devices map[string]GPUDevice `json:"devices,omitempty"`
 	// GPU device metrics from DCGM exporter.
