@@ -44,6 +44,7 @@ do
     
     METRIC_KEY=""
     gpus_json_body=""
+    metrics_json_body=""
     gpus=()
     while IFS= read -r line
     do
@@ -99,14 +100,13 @@ do
             if (( ${#gpus[@]} > 1 )); then
                 gpus_json_body="$gpus_json_body,"
             fi
-            gpus_json_body="$gpus_json_body \"$gpu\": {\"device\": \"$deviceName\", \"UUID\": \"$UUID\", \"model\": \"$modelName\"}"
+            gpus_json_body="$gpus_json_body \"$gpu\": {\"device\": \"$deviceName\", \"uuid\": \"$UUID\", \"model\": \"$modelName\"}"
         fi
 
         IFS=$TEMP_IFS;
     done <<< "$DCGM_RESPONSE_RAW" > ./metrics.local
 
     METRIC_KEY=""
-    metrics_json_body=""
     while IFS= read -r line
     do
 
