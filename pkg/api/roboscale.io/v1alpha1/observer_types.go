@@ -168,8 +168,6 @@ type GPUDeviceStatuses struct {
 }
 
 type Usage struct {
-	// GPU model
-	GPUModel string `json:"gpuModel,omitempty"`
 	// GPU device information.
 	GPUDeviceStatuses GPUDeviceStatuses `json:"gpuDeviceStatuses,omitempty"`
 	// GPU virtual cores.
