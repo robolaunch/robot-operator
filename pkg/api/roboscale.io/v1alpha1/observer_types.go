@@ -108,17 +108,17 @@ type GPUDevice struct {
 
 type GPUDeviceMetrics struct {
 	// GPU temperature (in C).
-	Temp string `json:"temp,omitempty"`
+	Temp map[string]string `json:"temp,omitempty"`
 	// Power draw (in W).
-	PowerUsage string `json:"powerUsage,omitempty"`
+	PowerUsage map[string]string `json:"powerUsage,omitempty"`
 	// GPU utilization (in %).
-	GPUUtil string `json:"gpuUtil,omitempty"`
+	GPUUtil map[string]string `json:"gpuUtil,omitempty"`
 	// Memory utilization (in %).
-	MemoryUtil string `json:"memoryUtil,omitempty"`
+	MemoryUtil map[string]string `json:"memoryUtil,omitempty"`
 	// Framebuffer memory free (in MiB).
-	FramebufferMemoryFree string `json:"fbMemoryFree,omitempty"`
+	FramebufferMemoryFree map[string]string `json:"fbMemoryFree,omitempty"`
 	// Framebuffer memory used (in MiB).
-	FramebufferMemoryUsed string `json:"fbMemoryUsed,omitempty"`
+	FramebufferMemoryUsed map[string]string `json:"fbMemoryUsed,omitempty"`
 }
 
 type GPUUtilizationStatus struct {
