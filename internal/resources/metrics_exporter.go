@@ -12,7 +12,9 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 )
 
-var metricsPatcherImage = "robolaunchio/custom-metrics-patcher-dev:focal-v1.24.10-0.1.2"
+
+var metricsPatcherImage = "robolaunchio/custom-metrics-patcher-dev:focal-v1.24.10-0.1.3"
+
 
 func GetMetricsExporterPod(metricsExporter *robotv1alpha1.MetricsExporter, podNamespacedName *types.NamespacedName, node corev1.Node) *corev1.Pod {
 
@@ -42,19 +44,15 @@ func GetMetricsExporterPod(metricsExporter *robotv1alpha1.MetricsExporter, podNa
 
 	if metricsExporter.Spec.GPU.Track {
 		pod.Spec.Containers = append(pod.Spec.Containers, corev1.Container{
-			Name:    "gpu-model",
+			Name:    "dcgm-gpu-util",
 			Image:   metricsPatcherImage,
-			Command: internal.Bash("./gpu-model.sh"),
+			Command: internal.Bash("./dcgm-gpu-util.sh"),
 			Env: []corev1.EnvVar{
 				internal.Env("METRICS_EXPORTER_NAME", metricsExporter.Name),
 				internal.Env("METRICS_EXPORTER_NAMESPACE", metricsExporter.Namespace),
 				internal.Env("INTERVAL", strconv.Itoa(metricsExporter.Spec.GPU.Interval)),
-			},
-			Resources: corev1.ResourceRequirements{
-				Limits: getResourceLimits(robotv1alpha1.Resources{
-					GPUInstance: "nvidia.com/gpu",
-					GPUCore:     1,
-				}),
+				// TODO: add DCGM endpoint as env variable
+				internal.Env("DCGM_METRICS_ENDPOINT", "http://172.16.44.101:30736/metrics"),
 			},
 		})
 	}
