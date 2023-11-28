@@ -183,48 +183,50 @@ func (r *MetricsExporterReconciler) reconcileCheckGPUConsumingPods(ctx context.C
 
 func (r *MetricsExporterReconciler) reconcileCheckDCGMEndpoint(ctx context.Context, instance *robotv1alpha1.MetricsExporter) error {
 
-	tenancy := label.GetTenancy(instance)
+	if instance.Spec.GPU.Track {
+		tenancy := label.GetTenancy(instance)
 
-	requirements := []labels.Requirement{}
-	newReq, err := labels.NewRequirement("app.kubernetes.io/component", selection.In, []string{"dcgm-exporter"})
-	if err != nil {
-		return err
-	}
-	requirements = append(requirements, *newReq)
-
-	dcgmLabelSelector := labels.NewSelector().Add(requirements...)
-
-	services := &corev1.ServiceList{}
-	err = r.List(ctx, services, &client.ListOptions{
-		LabelSelector: dcgmLabelSelector,
-	})
-	if err != nil {
-		return err
-	}
-
-	if len(services.Items) == 0 {
-		return errors.New("no service found for dcgm exporter")
-	} else if len(services.Items) > 1 {
-		return errors.New("multiple services found for dcgm exporter")
-	}
-
-	svc := services.Items[0]
-	portObj := corev1.ServicePort{}
-	for _, svcPort := range svc.Spec.Ports {
-		if svcPort.Name == "metrics" {
-			portObj = svcPort
+		requirements := []labels.Requirement{}
+		newReq, err := labels.NewRequirement("app.kubernetes.io/component", selection.In, []string{"dcgm-exporter"})
+		if err != nil {
+			return err
 		}
-	}
+		requirements = append(requirements, *newReq)
 
-	if portObj.Port == 0 {
-		return errors.New("cannot get dcgm metrics port")
-	}
+		dcgmLabelSelector := labels.NewSelector().Add(requirements...)
 
-	if tenancy.CloudInstance == "" {
-		return errors.New("cannot identify the cloud instance")
-	}
+		services := &corev1.ServiceList{}
+		err = r.List(ctx, services, &client.ListOptions{
+			LabelSelector: dcgmLabelSelector,
+		})
+		if err != nil {
+			return err
+		}
 
-	instance.Status.Usage.GPUDeviceStatuses.DCGMEndpoint = "http://" + svc.Name + "." + svc.Namespace + ".svc." + tenancy.CloudInstance + ".local:" + strconv.Itoa(int(portObj.Port)) + "/metrics"
+		if len(services.Items) == 0 {
+			return errors.New("no service found for dcgm exporter")
+		} else if len(services.Items) > 1 {
+			return errors.New("multiple services found for dcgm exporter")
+		}
+
+		svc := services.Items[0]
+		portObj := corev1.ServicePort{}
+		for _, svcPort := range svc.Spec.Ports {
+			if svcPort.Name == "metrics" {
+				portObj = svcPort
+			}
+		}
+
+		if portObj.Port == 0 {
+			return errors.New("cannot get dcgm metrics port")
+		}
+
+		if tenancy.CloudInstance == "" {
+			return errors.New("cannot identify the cloud instance")
+		}
+
+		instance.Status.Usage.GPUDeviceStatuses.DCGMEndpoint = "http://" + svc.Name + "." + svc.Namespace + ".svc." + tenancy.CloudInstance + ".local:" + strconv.Itoa(int(portObj.Port)) + "/metrics"
+	}
 
 	return nil
 }
