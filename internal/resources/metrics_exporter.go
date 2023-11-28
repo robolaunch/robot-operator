@@ -50,7 +50,7 @@ func GetMetricsExporterPod(metricsExporter *robotv1alpha1.MetricsExporter, podNa
 				internal.Env("METRICS_EXPORTER_NAMESPACE", metricsExporter.Namespace),
 				internal.Env("INTERVAL", strconv.Itoa(metricsExporter.Spec.GPU.Interval)),
 				// TODO: add DCGM endpoint as env variable
-				internal.Env("DCGM_METRICS_ENDPOINT", ""),
+				internal.Env("DCGM_METRICS_ENDPOINT", "http://172.16.44.101:30736/metrics"),
 			},
 		})
 	}

@@ -150,7 +150,6 @@ do
             if [[ "$OLD_METRIC_KEY" == "" ]]; then
                 metrics_json_body="\"$readable_key\": {\"$gpu\": \"$METRIC_VALUE\""
             else
-                echo "OMK: '$OLD_METRIC_KEY'";
                 metrics_json_body="$metrics_json_body}, \"$readable_key\": {\"$gpu\": \"$METRIC_VALUE\""
             fi
         fi
@@ -163,7 +162,7 @@ do
     metrics_json_body="$metrics_json_body}"
   
     request_body="{\"devices\": {$gpus_json_body}, \"metrics\": {$metrics_json_body}}";
-    # echo "$request_body";
+    echo "$request_body";
 
     sleep "$INTERVAL";
     

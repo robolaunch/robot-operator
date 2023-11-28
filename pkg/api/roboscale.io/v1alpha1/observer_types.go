@@ -164,7 +164,7 @@ type GPUDeviceStatuses struct {
 	// Available GPU devices.
 	Devices map[string]GPUDevice `json:"devices,omitempty"`
 	// GPU device metrics from DCGM exporter.
-	GPUMetrics map[string]GPUDeviceMetrics `json:"metrics,omitempty"`
+	Metrics GPUDeviceMetrics `json:"metrics,omitempty"`
 }
 
 type Usage struct {

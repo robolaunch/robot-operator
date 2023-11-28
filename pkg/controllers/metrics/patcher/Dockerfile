@@ -1,5 +1,5 @@
 #
-#   Image: robolaunchio/custom-metrics-patcher:focal-v1.24.10
+#   docker build --progress=plain . -t robolaunchio/custom-metrics-patcher-dev:focal-v1.24.10-0.1.3 --no-cache
 #
 
 FROM ubuntu:focal
