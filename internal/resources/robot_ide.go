@@ -210,6 +210,18 @@ func GetRobotIDEIngress(robotIDE *robotv1alpha1.RobotIDE, ingressNamespacedName 
 									},
 								},
 							},
+							{
+								Path:     robotv1alpha1.GetRobotServicePath(robot, "/file-browser/ide") + "(/|$)(.*)",
+								PathType: &pathTypePrefix,
+								Backend: networkingv1.IngressBackend{
+									Service: &networkingv1.IngressServiceBackend{
+										Name: robotIDE.GetRobotIDEServiceMetadata().Name,
+										Port: networkingv1.ServiceBackendPort{
+											Number: internal.FILE_BROWSER_PORT,
+										},
+									},
+								},
+							},
 						},
 					},
 				},

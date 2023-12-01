@@ -308,6 +308,18 @@ func GetRobotVDIIngress(robotVDI *robotv1alpha1.RobotVDI, ingressNamespacedName 
 									},
 								},
 							},
+							{
+								Path:     robotv1alpha1.GetRobotServicePath(robot, "/file-browser/vdi") + "(/|$)(.*)",
+								PathType: &pathTypePrefix,
+								Backend: networkingv1.IngressBackend{
+									Service: &networkingv1.IngressServiceBackend{
+										Name: robotVDI.GetRobotVDIServiceTCPMetadata().Name,
+										Port: networkingv1.ServiceBackendPort{
+											Number: int32(internal.FILE_BROWSER_PORT),
+										},
+									},
+								},
+							},
 						},
 					},
 				},
