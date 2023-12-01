@@ -19,10 +19,8 @@ import (
 )
 
 const (
-	ROBOT_VDI_PORT_NAME    = "http"
-	ROBOT_VDI_PORT         = 8055
-	FILE_BROWSER_PORT_NAME = "filebrowser"
-	FILE_BROWSER_PORT      = 2000
+	ROBOT_VDI_PORT_NAME = "http"
+	ROBOT_VDI_PORT      = 8055
 )
 
 func getRobotVDISelector(robotVDI robotv1alpha1.RobotVDI) map[string]string {
@@ -70,8 +68,8 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 			Protocol:      corev1.ProtocolTCP,
 		},
 		{
-			Name:          FILE_BROWSER_PORT_NAME,
-			ContainerPort: FILE_BROWSER_PORT,
+			Name:          internal.FILE_BROWSER_PORT_NAME,
+			ContainerPort: internal.FILE_BROWSER_PORT,
 			Protocol:      corev1.ProtocolTCP,
 		},
 	}
@@ -117,7 +115,7 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 			internal.Env("NEKO_ICELITE", icelite),
 			internal.Env("NEKO_NAT1TO1", robotVDI.Spec.NAT1TO1),
 			internal.Env("RESOLUTION", robotVDI.Spec.Resolution),
-			internal.Env("FILE_BROWSER_PORT", strconv.Itoa(FILE_BROWSER_PORT)),
+			internal.Env("FILE_BROWSER_PORT", strconv.Itoa(internal.FILE_BROWSER_PORT)),
 		},
 		Stdin: true,
 		TTY:   true,
@@ -194,12 +192,12 @@ func GetRobotVDIServiceTCP(robotVDI *robotv1alpha1.RobotVDI, svcNamespacedName *
 			Name:     ROBOT_VDI_PORT_NAME,
 		},
 		{
-			Port: FILE_BROWSER_PORT,
+			Port: internal.FILE_BROWSER_PORT,
 			TargetPort: intstr.IntOrString{
-				IntVal: int32(FILE_BROWSER_PORT),
+				IntVal: int32(internal.FILE_BROWSER_PORT),
 			},
 			Protocol: corev1.ProtocolTCP,
-			Name:     FILE_BROWSER_PORT_NAME,
+			Name:     internal.FILE_BROWSER_PORT_NAME,
 		},
 	}
 
