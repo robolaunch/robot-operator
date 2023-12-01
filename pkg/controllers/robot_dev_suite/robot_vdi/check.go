@@ -50,9 +50,11 @@ func (r *RobotVDIReconciler) reconcileCheckServices(ctx context.Context, instanc
 		instance.Status.ServiceTCPStatus.Resource.Created = true
 		reference.SetReference(&instance.Status.ServiceTCPStatus.Resource.Reference, serviceTCPQuery.TypeMeta, serviceTCPQuery.ObjectMeta)
 		if instance.Spec.Ingress {
-			instance.Status.ServiceTCPStatus.URL = robotv1alpha1.GetRobotServiceDNS(*robot, "https://", "/vdi/")
+			instance.Status.ServiceTCPStatus.URLs["vdi"] = robotv1alpha1.GetRobotServiceDNS(*robot, "https://", "/vdi/")
+			instance.Status.ServiceTCPStatus.URLs["vdi-file-browser"] = robotv1alpha1.GetRobotServiceDNS(*robot, "https://", "/file-browser/vdi/")
 		} else if instance.Spec.ServiceType == corev1.ServiceTypeNodePort {
-			instance.Status.ServiceTCPStatus.URL = robotv1alpha1.GetRobotServiceDNSWithNodePort(*robot, "http://", strconv.Itoa(int(serviceTCPQuery.Spec.Ports[0].NodePort)))
+			instance.Status.ServiceTCPStatus.URLs["vdi"] = robotv1alpha1.GetRobotServiceDNSWithNodePort(*robot, "http://", strconv.Itoa(int(serviceTCPQuery.Spec.Ports[0].NodePort)))
+			instance.Status.ServiceTCPStatus.URLs["vdi-file-browser"] = robotv1alpha1.GetRobotServiceDNSWithNodePort(*robot, "http://", strconv.Itoa(int(serviceTCPQuery.Spec.Ports[0].NodePort)))
 		}
 	}
 

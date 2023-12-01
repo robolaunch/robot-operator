@@ -19,14 +19,14 @@ type OwnedRobotServiceStatus struct {
 	// Generic status for any owned resource.
 	Resource OwnedResourceStatus `json:"resource,omitempty"`
 	// Address of the robot service that can be reached from outside.
-	Connection string `json:"connection,omitempty"`
+	Connections map[string]string `json:"connections,omitempty"`
 }
 
 type OwnedServiceStatus struct {
 	// Generic status for any owned resource.
 	Resource OwnedResourceStatus `json:"resource,omitempty"`
 	// Connection URL.
-	URL string `json:"url,omitempty"`
+	URLs map[string]string `json:"urls,omitempty"`
 }
 
 type OwnedPodStatus struct {
