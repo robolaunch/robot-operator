@@ -30,6 +30,7 @@ func (r *ROSBridgeReconciler) reconcileCheckService(ctx context.Context, instanc
 		instance.Status.ServiceStatus.Resource.Created = true
 		reference.SetReference(&instance.Status.ServiceStatus.Resource.Reference, bridgeServiceQuery.TypeMeta, bridgeServiceQuery.ObjectMeta)
 		if instance.Spec.Ingress {
+			instance.Status.ServiceStatus.URLs = map[string]string{}
 			instance.Status.ServiceStatus.URLs["bridge"] = robotv1alpha1.GetRobotServiceDNS(*robot, "wss://", "/bridge")
 		} else if instance.Spec.ServiceType == corev1.ServiceTypeNodePort {
 			var port int32 = 0
@@ -38,6 +39,7 @@ func (r *ROSBridgeReconciler) reconcileCheckService(ctx context.Context, instanc
 					port = v.NodePort
 				}
 			}
+			instance.Status.ServiceStatus.URLs = map[string]string{}
 			instance.Status.ServiceStatus.URLs["bridge"] = robotv1alpha1.GetRobotServiceDNSWithNodePort(*robot, "ws://", strconv.Itoa(int(port)))
 		}
 	}
