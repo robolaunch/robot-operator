@@ -19,8 +19,10 @@ import (
 )
 
 const (
-	ROBOT_VDI_PORT_NAME = "http"
-	ROBOT_VDI_PORT      = 8055
+	ROBOT_VDI_PORT_NAME    = "http"
+	ROBOT_VDI_PORT         = 8055
+	FILE_BROWSER_PORT_NAME = "filebrowser"
+	FILE_BROWSER_PORT      = 2000
 )
 
 func getRobotVDISelector(robotVDI robotv1alpha1.RobotVDI) map[string]string {
@@ -67,6 +69,11 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 			ContainerPort: ROBOT_VDI_PORT,
 			Protocol:      corev1.ProtocolTCP,
 		},
+		{
+			Name:          FILE_BROWSER_PORT_NAME,
+			ContainerPort: FILE_BROWSER_PORT,
+			Protocol:      corev1.ProtocolTCP,
+		},
 	}
 
 	// add udp ports
@@ -92,7 +99,7 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 	var cmdBuilder strings.Builder
 	cmdBuilder.WriteString(configure.GetGrantPermissionCmd(robot))
 	cmdBuilder.WriteString(filepath.Join("/etc", "vdi", "generate-xorg.sh") + " && ")
-	cmdBuilder.WriteString("supervisord -c " + filepath.Join("/etc", "vdi", "supervisord.conf"))
+	cmdBuilder.WriteString("supervisord -c " + filepath.Join("/etc", "robolaunch", "services", "vdi.conf"))
 
 	labels := getRobotVDISelector(*robotVDI)
 	for k, v := range robotVDI.Labels {
@@ -110,6 +117,7 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 			internal.Env("NEKO_ICELITE", icelite),
 			internal.Env("NEKO_NAT1TO1", robotVDI.Spec.NAT1TO1),
 			internal.Env("RESOLUTION", robotVDI.Spec.Resolution),
+			internal.Env("FILE_BROWSER_PORT", strconv.Itoa(FILE_BROWSER_PORT)),
 		},
 		Stdin: true,
 		TTY:   true,
@@ -184,6 +192,14 @@ func GetRobotVDIServiceTCP(robotVDI *robotv1alpha1.RobotVDI, svcNamespacedName *
 			},
 			Protocol: corev1.ProtocolTCP,
 			Name:     ROBOT_VDI_PORT_NAME,
+		},
+		{
+			Port: FILE_BROWSER_PORT,
+			TargetPort: intstr.IntOrString{
+				IntVal: int32(FILE_BROWSER_PORT),
+			},
+			Protocol: corev1.ProtocolTCP,
+			Name:     FILE_BROWSER_PORT_NAME,
 		},
 	}
 
