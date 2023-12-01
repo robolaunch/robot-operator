@@ -98,7 +98,6 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 	podCfg.SchedulePod(&idePod, robotIDE)
 	podCfg.InjectVolumeConfiguration(&idePod, robot)
 	podCfg.InjectGenericEnvironmentVariables(&idePod, robot)
-	podCfg.InjectLinuxUserAndGroup(&idePod, robot)
 	podCfg.InjectRuntimeClass(&idePod, robot, node)
 	if robotIDE.Spec.Display && label.GetTargetRobotVDI(robotIDE) != "" {
 		// TODO: Add control for validating robot VDI
