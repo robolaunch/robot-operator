@@ -34,7 +34,7 @@ func (r *RobotDevSuiteReconciler) reconcileCheckRobotVDI(ctx context.Context, in
 			instance.Status.RobotVDIStatus.Resource.Created = true
 			reference.SetReference(&instance.Status.RobotVDIStatus.Resource.Reference, robotVDIQuery.TypeMeta, robotVDIQuery.ObjectMeta)
 			instance.Status.RobotVDIStatus.Resource.Phase = string(robotVDIQuery.Status.Phase)
-			instance.Status.RobotVDIStatus.Connection = robotVDIQuery.Status.ServiceTCPStatus.URL
+			instance.Status.RobotVDIStatus.Connections = robotVDIQuery.Status.ServiceTCPStatus.URLs
 
 		} else {
 
@@ -75,7 +75,7 @@ func (r *RobotDevSuiteReconciler) reconcileCheckRobotIDE(ctx context.Context, in
 			instance.Status.RobotIDEStatus.Resource.Created = true
 			reference.SetReference(&instance.Status.RobotIDEStatus.Resource.Reference, robotIDEQuery.TypeMeta, robotIDEQuery.ObjectMeta)
 			instance.Status.RobotIDEStatus.Resource.Phase = string(robotIDEQuery.Status.Phase)
-			instance.Status.RobotIDEStatus.Connection = robotIDEQuery.Status.ServiceStatus.URL
+			instance.Status.RobotIDEStatus.Connections = robotIDEQuery.Status.ServiceStatus.URLs
 
 		} else {
 
@@ -116,7 +116,7 @@ func (r *RobotDevSuiteReconciler) reconcileCheckRemoteIDERelayServer(ctx context
 			instance.Status.RemoteIDERelayServerStatus.Resource.Created = true
 			reference.SetReference(&instance.Status.RemoteIDERelayServerStatus.Resource.Reference, remoteIDERelayServerQuery.TypeMeta, remoteIDERelayServerQuery.ObjectMeta)
 			instance.Status.RemoteIDERelayServerStatus.Resource.Phase = string(remoteIDERelayServerQuery.Status.Phase)
-			instance.Status.RemoteIDERelayServerStatus.Connection = remoteIDERelayServerQuery.Status.ServiceStatus.URL
+			instance.Status.RemoteIDERelayServerStatus.Connections = remoteIDERelayServerQuery.Status.ServiceStatus.URLs
 
 		} else {
 

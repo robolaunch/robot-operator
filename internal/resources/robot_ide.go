@@ -2,6 +2,7 @@ package resources
 
 import (
 	"fmt"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -35,7 +36,7 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 
 	var cmdBuilder strings.Builder
 	cmdBuilder.WriteString(configure.GetGrantPermissionCmd(robot))
-	cmdBuilder.WriteString("code-server " + robot.Spec.WorkspaceManagerTemplate.WorkspacesPath + " --bind-addr 0.0.0.0:$CODE_SERVER_PORT --auth none")
+	cmdBuilder.WriteString("supervisord -c " + filepath.Join("/etc", "robolaunch", "services", "code-server.conf"))
 
 	labels := getRobotIDESelector(*robotIDE)
 	for k, v := range robotIDE.Labels {
@@ -48,14 +49,20 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 		Command: internal.Bash(cmdBuilder.String()),
 		Env: []corev1.EnvVar{
 			internal.Env("CODE_SERVER_PORT", strconv.Itoa(ROBOT_IDE_PORT)),
+			internal.Env("FILE_BROWSER_PORT", strconv.Itoa(internal.FILE_BROWSER_PORT)),
 			internal.Env("ROBOT_NAMESPACE", robot.Namespace),
 			internal.Env("ROBOT_NAME", robot.Name),
+			internal.Env("WORKSPACES_PATH", robot.Spec.WorkspaceManagerTemplate.WorkspacesPath),
 			internal.Env("TERM", "xterm-256color"),
 		},
 		Ports: []corev1.ContainerPort{
 			{
 				Name:          ROBOT_IDE_PORT_NAME,
 				ContainerPort: ROBOT_IDE_PORT,
+			},
+			{
+				Name:          internal.FILE_BROWSER_PORT_NAME,
+				ContainerPort: internal.FILE_BROWSER_PORT,
 			},
 		},
 		Resources: corev1.ResourceRequirements{
@@ -91,7 +98,6 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 	podCfg.SchedulePod(&idePod, robotIDE)
 	podCfg.InjectVolumeConfiguration(&idePod, robot)
 	podCfg.InjectGenericEnvironmentVariables(&idePod, robot)
-	podCfg.InjectLinuxUserAndGroup(&idePod, robot)
 	podCfg.InjectRuntimeClass(&idePod, robot, node)
 	if robotIDE.Spec.Display && label.GetTargetRobotVDI(robotIDE) != "" {
 		// TODO: Add control for validating robot VDI
@@ -128,6 +134,14 @@ func GetRobotIDEService(robotIDE *robotv1alpha1.RobotIDE, svcNamespacedName *typ
 				},
 				Protocol: corev1.ProtocolTCP,
 				Name:     ROBOT_IDE_PORT_NAME,
+			},
+			{
+				Port: internal.FILE_BROWSER_PORT,
+				TargetPort: intstr.IntOrString{
+					IntVal: internal.FILE_BROWSER_PORT,
+				},
+				Protocol: corev1.ProtocolTCP,
+				Name:     internal.FILE_BROWSER_PORT_NAME,
 			},
 		},
 	}
@@ -192,6 +206,18 @@ func GetRobotIDEIngress(robotIDE *robotv1alpha1.RobotIDE, ingressNamespacedName 
 										Name: robotIDE.GetRobotIDEServiceMetadata().Name,
 										Port: networkingv1.ServiceBackendPort{
 											Number: ROBOT_IDE_PORT,
+										},
+									},
+								},
+							},
+							{
+								Path:     robotv1alpha1.GetRobotServicePath(robot, "/file-browser/ide") + "(/|$)(.*)",
+								PathType: &pathTypePrefix,
+								Backend: networkingv1.IngressBackend{
+									Service: &networkingv1.IngressServiceBackend{
+										Name: robotIDE.GetRobotIDEServiceMetadata().Name,
+										Port: networkingv1.ServiceBackendPort{
+											Number: internal.FILE_BROWSER_PORT,
 										},
 									},
 								},

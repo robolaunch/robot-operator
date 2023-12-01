@@ -216,9 +216,11 @@ spec:
                     required:
                     - created
                     type: object
-                  url:
+                  urls:
+                    additionalProperties:
+                      type: string
                     description: Connection URL.
-                    type: string
+                    type: object
                 type: object
               ingressStatus:
                 description: Status of Cloud VDI Ingress.
@@ -433,9 +435,11 @@ spec:
                     required:
                     - created
                     type: object
-                  url:
+                  urls:
+                    additionalProperties:
+                      type: string
                     description: Connection URL.
-                    type: string
+                    type: object
                 type: object
               serviceUDPStatus:
                 description: Status of Cloud VDI UDP service.

@@ -214,6 +214,12 @@ const (
 	CUSTOM_PORT_RANGE_REGEX = "^([a-z0-9]{4}-[0-9]{5}:[0-9]{2,5}/)*([a-z0-9]{4}-[0-9]{5}:[0-9]{2,5})$"
 )
 
+// file browser ports
+const (
+	FILE_BROWSER_PORT_NAME = "filebrowser"
+	FILE_BROWSER_PORT      = 2000
+)
+
 func Bash(command string) []string {
 	return []string{
 		"/bin/bash",

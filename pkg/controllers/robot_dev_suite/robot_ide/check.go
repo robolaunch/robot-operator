@@ -33,9 +33,13 @@ func (r *RobotIDEReconciler) reconcileCheckService(ctx context.Context, instance
 		instance.Status.ServiceStatus.Resource.Created = true
 		reference.SetReference(&instance.Status.ServiceStatus.Resource.Reference, serviceQuery.TypeMeta, serviceQuery.ObjectMeta)
 		if instance.Spec.Ingress {
-			instance.Status.ServiceStatus.URL = robotv1alpha1.GetRobotServiceDNS(*robot, "https://", "/ide/")
+			instance.Status.ServiceStatus.URLs = map[string]string{}
+			instance.Status.ServiceStatus.URLs["code-server"] = robotv1alpha1.GetRobotServiceDNS(*robot, "https://", "/ide/")
+			instance.Status.ServiceStatus.URLs["code-server-file-browser"] = robotv1alpha1.GetRobotServiceDNS(*robot, "https://", "/file-browser/ide/")
 		} else if instance.Spec.ServiceType == corev1.ServiceTypeNodePort {
-			instance.Status.ServiceStatus.URL = robotv1alpha1.GetRobotServiceDNSWithNodePort(*robot, "http://", strconv.Itoa(int(serviceQuery.Spec.Ports[0].NodePort)))
+			instance.Status.ServiceStatus.URLs = map[string]string{}
+			instance.Status.ServiceStatus.URLs["code-server"] = robotv1alpha1.GetRobotServiceDNSWithNodePort(*robot, "http://", strconv.Itoa(int(serviceQuery.Spec.Ports[0].NodePort)))
+			instance.Status.ServiceStatus.URLs["code-server-file-browser"] = robotv1alpha1.GetRobotServiceDNSWithNodePort(*robot, "http://", strconv.Itoa(int(serviceQuery.Spec.Ports[1].NodePort)))
 		}
 	}
 

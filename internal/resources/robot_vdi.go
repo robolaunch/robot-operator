@@ -67,6 +67,11 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 			ContainerPort: ROBOT_VDI_PORT,
 			Protocol:      corev1.ProtocolTCP,
 		},
+		{
+			Name:          internal.FILE_BROWSER_PORT_NAME,
+			ContainerPort: internal.FILE_BROWSER_PORT,
+			Protocol:      corev1.ProtocolTCP,
+		},
 	}
 
 	// add udp ports
@@ -92,7 +97,7 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 	var cmdBuilder strings.Builder
 	cmdBuilder.WriteString(configure.GetGrantPermissionCmd(robot))
 	cmdBuilder.WriteString(filepath.Join("/etc", "vdi", "generate-xorg.sh") + " && ")
-	cmdBuilder.WriteString("supervisord -c " + filepath.Join("/etc", "vdi", "supervisord.conf"))
+	cmdBuilder.WriteString("supervisord -c " + filepath.Join("/etc", "robolaunch", "services", "vdi.conf"))
 
 	labels := getRobotVDISelector(*robotVDI)
 	for k, v := range robotVDI.Labels {
@@ -110,6 +115,7 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 			internal.Env("NEKO_ICELITE", icelite),
 			internal.Env("NEKO_NAT1TO1", robotVDI.Spec.NAT1TO1),
 			internal.Env("RESOLUTION", robotVDI.Spec.Resolution),
+			internal.Env("FILE_BROWSER_PORT", strconv.Itoa(internal.FILE_BROWSER_PORT)),
 		},
 		Stdin: true,
 		TTY:   true,
@@ -184,6 +190,14 @@ func GetRobotVDIServiceTCP(robotVDI *robotv1alpha1.RobotVDI, svcNamespacedName *
 			},
 			Protocol: corev1.ProtocolTCP,
 			Name:     ROBOT_VDI_PORT_NAME,
+		},
+		{
+			Port: internal.FILE_BROWSER_PORT,
+			TargetPort: intstr.IntOrString{
+				IntVal: int32(internal.FILE_BROWSER_PORT),
+			},
+			Protocol: corev1.ProtocolTCP,
+			Name:     internal.FILE_BROWSER_PORT_NAME,
 		},
 	}
 
@@ -290,6 +304,18 @@ func GetRobotVDIIngress(robotVDI *robotv1alpha1.RobotVDI, ingressNamespacedName 
 										Name: robotVDI.GetRobotVDIServiceTCPMetadata().Name,
 										Port: networkingv1.ServiceBackendPort{
 											Number: int32(ROBOT_VDI_PORT),
+										},
+									},
+								},
+							},
+							{
+								Path:     robotv1alpha1.GetRobotServicePath(robot, "/file-browser/vdi") + "(/|$)(.*)",
+								PathType: &pathTypePrefix,
+								Backend: networkingv1.IngressBackend{
+									Service: &networkingv1.IngressServiceBackend{
+										Name: robotVDI.GetRobotVDIServiceTCPMetadata().Name,
+										Port: networkingv1.ServiceBackendPort{
+											Number: int32(internal.FILE_BROWSER_PORT),
 										},
 									},
 								},

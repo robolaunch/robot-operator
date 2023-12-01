@@ -50,7 +50,8 @@ func (r *RelayServerReconciler) reconcileCheckService(ctx context.Context, insta
 
 		instance.Status.ServiceStatus.Resource.Created = true
 		reference.SetReference(&instance.Status.ServiceStatus.Resource.Reference, serviceQuery.TypeMeta, serviceQuery.ObjectMeta)
-		instance.Status.ServiceStatus.URL = robotv1alpha1.GetRelayServerServiceDNS(*instance, "https://", "/relay/")
+		instance.Status.ServiceStatus.URLs = map[string]string{}
+		instance.Status.ServiceStatus.URLs["relay-server"] = robotv1alpha1.GetRelayServerServiceDNS(*instance, "https://", "/relay/")
 	}
 
 	return nil
