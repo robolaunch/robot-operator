@@ -77,6 +77,7 @@ _Appears in:_
 | `uid` _integer_ | User ID of robolaunch user in image. |
 | `nodeName` _string_ | Node that Robot uses. It is selected via tenancy labels. |
 | `persistentDirs` _[PersistentDirectory](#persistentdirectory) array_ | [*alpha*] Status of PVCs of persistent directories. |
+| `hostDirs` _[HostDirectory](#hostdirectory) array_ | [*alpha*] List of directories mounted from host. |
 | `discoveryServerStatus` _[DiscoveryServerInstanceStatus](#discoveryserverinstancestatus)_ | Discovery server instance status. |
 | `rosBridgeStatus` _[ROSBridgeInstanceStatus](#rosbridgeinstancestatus)_ | ROS bridge instance status. |
 | `loaderJobStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ | Status of loader job that configures environment. |
@@ -323,6 +324,7 @@ _Appears in:_
 | --- | --- |
 | `gpu` _[GPUMetrics](#gpumetrics)_ | Configurational parameters about GPU metrics collection. |
 | `network` _[NetworkMetrics](#networkmetrics)_ | Configurational parameters about network metrics collection. |
+| `storage` _[StorageMetrics](#storagemetrics)_ | Configurational parameters about storage metrics collection. |
 
 
 #### MetricsExporterStatus
@@ -827,6 +829,57 @@ _Appears in:_
 | `devspace` _[DevSpaceImage](#devspaceimage)_ | DevSpace image properties. |
 
 
+#### GPUDevice
+
+
+
+
+
+_Appears in:_
+- [GPUDeviceStatuses](#gpudevicestatuses)
+
+| Field | Description |
+| --- | --- |
+| `device` _string_ | GPU device name. |
+| `uuid` _string_ | GPU device UUID. |
+| `model` _string_ | GPU device model. |
+
+
+#### GPUDeviceMetrics
+
+
+
+
+
+_Appears in:_
+- [GPUDeviceStatuses](#gpudevicestatuses)
+
+| Field | Description |
+| --- | --- |
+| `temp` _object (keys:string, values:string)_ | GPU temperature (in C). |
+| `powerUsage` _object (keys:string, values:string)_ | Power draw (in W). |
+| `gpuUtil` _object (keys:string, values:string)_ | GPU utilization (in %). |
+| `memoryUtil` _object (keys:string, values:string)_ | Memory utilization (in %). |
+| `fbMemoryFree` _object (keys:string, values:string)_ | Framebuffer memory free (in MiB). |
+| `fbMemoryUsed` _object (keys:string, values:string)_ | Framebuffer memory used (in MiB). |
+
+
+#### GPUDeviceStatuses
+
+
+
+
+
+_Appears in:_
+- [Usage](#usage)
+
+| Field | Description |
+| --- | --- |
+| `dcgmEndpoint` _string_ | DCGM endpoint. |
+| `devices` _object (keys:string, values:[GPUDevice](#gpudevice))_ | Available GPU devices. |
+| `metrics` _[GPUDeviceMetrics](#gpudevicemetrics)_ | GPU device metrics from DCGM exporter. |
+
+
 #### GPUInstanceStatus
 
 
@@ -857,19 +910,22 @@ _Appears in:_
 | `interval` _integer_ | Watching latency. |
 
 
-#### GPUUtilizationStatus
+
+
+#### HostDirectory
 
 
 
 
 
 _Appears in:_
-- [Usage](#usage)
+- [RobotStatus](#robotstatus)
 
 | Field | Description |
 | --- | --- |
-| `utilization` _string_ | Volatile GPU utilization. Shows a percentage gathered from `nvidia-smi` command. |
-| `lastUpdateTimestamp` _string_ | Last update time. |
+| `name` _string_ |  |
+| `hostPath` _string_ |  |
+| `internalPath` _string_ |  |
 
 
 #### Launch
@@ -1099,7 +1155,7 @@ _Appears in:_
 | Field | Description |
 | --- | --- |
 | `resource` _[OwnedResourceStatus](#ownedresourcestatus)_ | Generic status for any owned resource. |
-| `connection` _string_ | Address of the robot service that can be reached from outside. |
+| `connections` _object (keys:string, values:string)_ | Address of the robot service that can be reached from outside. |
 
 
 #### OwnedServiceStatus
@@ -1117,7 +1173,7 @@ _Appears in:_
 | Field | Description |
 | --- | --- |
 | `resource` _[OwnedResourceStatus](#ownedresourcestatus)_ | Generic status for any owned resource. |
-| `url` _string_ | Connection URL. |
+| `urls` _object (keys:string, values:string)_ | Connection URL. |
 
 
 #### PersistentDirectory
@@ -1359,6 +1415,53 @@ _Appears in:_
 | `accessMode` _[PersistentVolumeAccessMode](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#persistentvolumeaccessmode-v1-core)_ | PVC access modes. Currently, only `ReadWriteOnce` is supported. |
 
 
+#### StorageMetrics
+
+
+
+
+
+_Appears in:_
+- [MetricsExporterSpec](#metricsexporterspec)
+
+| Field | Description |
+| --- | --- |
+| `track` _boolean_ | MetricsExporter watches storage usage in the host machine if it's set to `true`. |
+| `interval` _integer_ | Watching latency. |
+
+
+#### StorageStatus
+
+
+
+
+
+_Appears in:_
+- [Usage](#usage)
+
+| Field | Description |
+| --- | --- |
+| `usage` _object (keys:string, values:[StorageUsage](#storageusage))_ | Usage values of filesystems. |
+| `lastUpdateTimestamp` _string_ | Last update time. |
+
+
+#### StorageUsage
+
+
+
+
+
+_Appears in:_
+- [StorageStatus](#storagestatus)
+
+| Field | Description |
+| --- | --- |
+| `size` _string_ | Size of the filesystem. |
+| `used` _string_ | Size of the used parts of a filesystem. |
+| `percentage` _string_ | Usage percentage of a filesystem. |
+| `mountedOn` _string_ | Directory that the filesystem mounted on. |
+
+
 #### TLSSecretReference
 
 
@@ -1397,9 +1500,10 @@ _Appears in:_
 
 | Field | Description |
 | --- | --- |
-| `gpu` _[GPUUtilizationStatus](#gpuutilizationstatus)_ | GPU usage information. Will be deprecated after implementing checks for each GPU instance. |
+| `gpuDeviceStatuses` _[GPUDeviceStatuses](#gpudevicestatuses)_ | GPU device information. |
 | `gpuInstanceUsage` _object (keys:string, values:[GPUInstanceStatus](#gpuinstancestatus))_ | GPU virtual cores. |
 | `network` _[NetworkLoadStatus](#networkloadstatus)_ | Network usage information. |
+| `storage` _[StorageStatus](#storagestatus)_ | Storage usage information |
 
 
 #### Workspace
