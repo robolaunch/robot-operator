@@ -240,10 +240,12 @@ spec:
                 description: Status of remote Cloud IDE RelayServer. Created only if
                   the instance type is Physical Instance.
                 properties:
-                  connection:
+                  connections:
+                    additionalProperties:
+                      type: string
                     description: Address of the robot service that can be reached from
                       outside.
-                    type: string
+                    type: object
                   resource:
                     description: Generic status for any owned resource.
                     properties:
@@ -298,10 +300,12 @@ spec:
               robotIDEStatus:
                 description: Status of RobotIDE.
                 properties:
-                  connection:
+                  connections:
+                    additionalProperties:
+                      type: string
                     description: Address of the robot service that can be reached from
                       outside.
-                    type: string
+                    type: object
                   resource:
                     description: Generic status for any owned resource.
                     properties:
@@ -356,10 +360,12 @@ spec:
               robotVDIStatus:
                 description: Status of RobotVDI.
                 properties:
-                  connection:
+                  connections:
+                    additionalProperties:
+                      type: string
                     description: Address of the robot service that can be reached from
                       outside.
-                    type: string
+                    type: object
                   resource:
                     description: Generic status for any owned resource.
                     properties:

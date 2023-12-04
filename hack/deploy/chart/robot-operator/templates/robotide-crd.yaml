@@ -200,9 +200,11 @@ spec:
                     required:
                     - created
                     type: object
-                  url:
+                  urls:
+                    additionalProperties:
+                      type: string
                     description: Connection URL.
-                    type: string
+                    type: object
                 type: object
               ingressStatus:
                 description: Status of Cloud IDE Ingress.
@@ -416,9 +418,11 @@ spec:
                     required:
                     - created
                     type: object
-                  url:
+                  urls:
+                    additionalProperties:
+                      type: string
                     description: Connection URL.
-                    type: string
+                    type: object
                 type: object
             type: object
         type: object

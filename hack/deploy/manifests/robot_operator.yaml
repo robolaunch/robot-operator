@@ -1521,15 +1521,61 @@ spec:
                 usage:
                   description: Usage metrics.
                   properties:
-                    gpu:
-                      description: GPU usage information. Will be deprecated after implementing checks for each GPU instance.
+                    gpuDeviceStatuses:
+                      description: GPU device information.
                       properties:
-                        lastUpdateTimestamp:
-                          description: Last update time.
+                        dcgmEndpoint:
+                          description: DCGM endpoint.
                           type: string
-                        utilization:
-                          description: Volatile GPU utilization. Shows a percentage gathered from `nvidia-smi` command.
-                          type: string
+                        devices:
+                          additionalProperties:
+                            properties:
+                              device:
+                                description: GPU device name.
+                                type: string
+                              model:
+                                description: GPU device model.
+                                type: string
+                              uuid:
+                                description: GPU device UUID.
+                                type: string
+                            type: object
+                          description: Available GPU devices.
+                          type: object
+                        metrics:
+                          description: GPU device metrics from DCGM exporter.
+                          properties:
+                            fbMemoryFree:
+                              additionalProperties:
+                                type: string
+                              description: Framebuffer memory free (in MiB).
+                              type: object
+                            fbMemoryUsed:
+                              additionalProperties:
+                                type: string
+                              description: Framebuffer memory used (in MiB).
+                              type: object
+                            gpuUtil:
+                              additionalProperties:
+                                type: string
+                              description: GPU utilization (in %).
+                              type: object
+                            memoryUtil:
+                              additionalProperties:
+                                type: string
+                              description: Memory utilization (in %).
+                              type: object
+                            powerUsage:
+                              additionalProperties:
+                                type: string
+                              description: Power draw (in W).
+                              type: object
+                            temp:
+                              additionalProperties:
+                                type: string
+                              description: GPU temperature (in C).
+                              type: object
+                          type: object
                       type: object
                     gpuInstanceUsage:
                       additionalProperties:
@@ -1545,9 +1591,6 @@ spec:
                         type: object
                       description: GPU virtual cores.
                       type: object
-                    gpuModel:
-                      description: GPU model
-                      type: string
                     network:
                       description: Network usage information.
                       properties:
@@ -1812,9 +1855,11 @@ spec:
                       required:
                         - created
                       type: object
-                    url:
+                    urls:
+                      additionalProperties:
+                        type: string
                       description: Connection URL.
-                      type: string
+                      type: object
                   type: object
               type: object
           type: object
@@ -2495,9 +2540,11 @@ spec:
                 remoteIDERelayServerStatus:
                   description: Status of remote Cloud IDE RelayServer. Created only if the instance type is Physical Instance.
                   properties:
-                    connection:
+                    connections:
+                      additionalProperties:
+                        type: string
                       description: Address of the robot service that can be reached from outside.
-                      type: string
+                      type: object
                     resource:
                       description: Generic status for any owned resource.
                       properties:
@@ -2540,9 +2587,11 @@ spec:
                 robotIDEStatus:
                   description: Status of RobotIDE.
                   properties:
-                    connection:
+                    connections:
+                      additionalProperties:
+                        type: string
                       description: Address of the robot service that can be reached from outside.
-                      type: string
+                      type: object
                     resource:
                       description: Generic status for any owned resource.
                       properties:
@@ -2585,9 +2634,11 @@ spec:
                 robotVDIStatus:
                   description: Status of RobotVDI.
                   properties:
-                    connection:
+                    connections:
+                      additionalProperties:
+                        type: string
                       description: Address of the robot service that can be reached from outside.
-                      type: string
+                      type: object
                     resource:
                       description: Generic status for any owned resource.
                       properties:
@@ -2797,9 +2848,11 @@ spec:
                       required:
                         - created
                       type: object
-                    url:
+                    urls:
+                      additionalProperties:
+                        type: string
                       description: Connection URL.
-                      type: string
+                      type: object
                   type: object
                 ingressStatus:
                   description: Status of Cloud IDE Ingress.
@@ -2966,9 +3019,11 @@ spec:
                       required:
                         - created
                       type: object
-                    url:
+                    urls:
+                      additionalProperties:
+                        type: string
                       description: Connection URL.
-                      type: string
+                      type: object
                   type: object
               type: object
           type: object
@@ -3736,9 +3791,11 @@ spec:
                           remoteIDERelayServerStatus:
                             description: Status of remote Cloud IDE RelayServer. Created only if the instance type is Physical Instance.
                             properties:
-                              connection:
+                              connections:
+                                additionalProperties:
+                                  type: string
                                 description: Address of the robot service that can be reached from outside.
-                                type: string
+                                type: object
                               resource:
                                 description: Generic status for any owned resource.
                                 properties:
@@ -3781,9 +3838,11 @@ spec:
                           robotIDEStatus:
                             description: Status of RobotIDE.
                             properties:
-                              connection:
+                              connections:
+                                additionalProperties:
+                                  type: string
                                 description: Address of the robot service that can be reached from outside.
-                                type: string
+                                type: object
                               resource:
                                 description: Generic status for any owned resource.
                                 properties:
@@ -3826,9 +3885,11 @@ spec:
                           robotVDIStatus:
                             description: Status of RobotVDI.
                             properties:
-                              connection:
+                              connections:
+                                additionalProperties:
+                                  type: string
                                 description: Address of the robot service that can be reached from outside.
-                                type: string
+                                type: object
                               resource:
                                 description: Generic status for any owned resource.
                                 properties:
@@ -4488,9 +4549,11 @@ spec:
                         remoteIDERelayServerStatus:
                           description: Status of remote Cloud IDE RelayServer. Created only if the instance type is Physical Instance.
                           properties:
-                            connection:
+                            connections:
+                              additionalProperties:
+                                type: string
                               description: Address of the robot service that can be reached from outside.
-                              type: string
+                              type: object
                             resource:
                               description: Generic status for any owned resource.
                               properties:
@@ -4533,9 +4596,11 @@ spec:
                         robotIDEStatus:
                           description: Status of RobotIDE.
                           properties:
-                            connection:
+                            connections:
+                              additionalProperties:
+                                type: string
                               description: Address of the robot service that can be reached from outside.
-                              type: string
+                              type: object
                             resource:
                               description: Generic status for any owned resource.
                               properties:
@@ -4578,9 +4643,11 @@ spec:
                         robotVDIStatus:
                           description: Status of RobotVDI.
                           properties:
-                            connection:
+                            connections:
+                              additionalProperties:
+                                type: string
                               description: Address of the robot service that can be reached from outside.
-                              type: string
+                              type: object
                             resource:
                               description: Generic status for any owned resource.
                               properties:
@@ -4789,9 +4856,11 @@ spec:
                               required:
                                 - created
                               type: object
-                            url:
+                            urls:
+                              additionalProperties:
+                                type: string
                               description: Connection URL.
-                              type: string
+                              type: object
                           type: object
                       type: object
                   type: object
@@ -5125,9 +5194,11 @@ spec:
                       required:
                         - created
                       type: object
-                    url:
+                    urls:
+                      additionalProperties:
+                        type: string
                       description: Connection URL.
-                      type: string
+                      type: object
                   type: object
                 ingressStatus:
                   description: Status of Cloud VDI Ingress.
@@ -5294,9 +5365,11 @@ spec:
                       required:
                         - created
                       type: object
-                    url:
+                    urls:
+                      additionalProperties:
+                        type: string
                       description: Connection URL.
-                      type: string
+                      type: object
                   type: object
                 serviceUDPStatus:
                   description: Status of Cloud VDI UDP service.
@@ -5540,9 +5613,11 @@ spec:
                       required:
                         - created
                       type: object
-                    url:
+                    urls:
+                      additionalProperties:
+                        type: string
                       description: Connection URL.
-                      type: string
+                      type: object
                   type: object
               type: object
           type: object
@@ -6655,7 +6730,7 @@ spec:
             - --leader-elect
           command:
             - /manager
-          image: robolaunchio/robot-controller-manager:v0.2.6-alpha.13.3
+          image: robolaunchio/robot-controller-manager:v0.2.6-alpha.14
           livenessProbe:
             httpGet:
               path: /healthz
