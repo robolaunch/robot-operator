@@ -109,6 +109,7 @@ const (
 	RobotIDEPhaseCreatingIngress           RobotIDEPhase = "CreatingIngress"
 	RobotIDEPhaseCreatingCustomPortService RobotIDEPhase = "CreatingCustomPortService"
 	RobotIDEPhaseCreatingCustomPortIngress RobotIDEPhase = "CreatingCustomPortIngress"
+	RobotIDEPhaseCreatingConfigMap         RobotIDEPhase = "CreatingConfigMap"
 	RobotIDEPhaseRunning                   RobotIDEPhase = "Running"
 )
 
