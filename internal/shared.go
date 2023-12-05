@@ -88,6 +88,7 @@ const (
 	INGRESS_IDE_POSTFIX             = ""
 	CUSTOM_PORT_SVC_IDE_POSTFIX     = "-custom"
 	CUSTOM_PORT_INGRESS_IDE_POSTFIX = "-custom"
+	CONFIGMAP_IDE_POSTFIX           = ""
 )
 
 // RobotDevSuite owned resources' postfixes
@@ -104,6 +105,82 @@ const (
 	HELPERS_PATH        = "/var/lib/robolaunch-helpers/"
 	X11_UNIX_PATH       = "/tmp/.X11-unix"
 )
+
+const (
+	IMAGE_MAP_CONFIG_MAP_NAME      = "platform"
+	IMAGE_MAP_CONFIG_MAP_NAMESPACE = "kube-system"
+	IMAGE_MAP_CONFIG_MAP_DATA_KEY  = "platform.yaml"
+	IMAGE_MAP_URL                  = "https://raw.githubusercontent.com/robolaunch/robolaunch/main/platform.yaml"
+)
+
+// Commands for collecting metrics
+const (
+	CMD_GET_CPU          = "cat /sys/fs/cgroup/cpu/cpuacct.usage"
+	CMD_GET_MEMORY       = "cat /sys/fs/cgroup/memory/memory.usage_in_bytes"
+	CMD_GET_NETWORK_LOAD = "cat /proc/net/dev | awk -F ' ' '{print $1 $2 \":\" $10}' | tail -n+3"
+)
+
+const (
+	GRANT_PERMISSION_KEY      = "GRANT_PERMISSION"
+	PERSISTENT_DIRS_KEY       = "PERSISTENT_DIRS"
+	HOST_DIRS_KEY             = "HOST_DIRS"
+	IDE_CUSTOM_PORT_RANGE_KEY = "IDE_CUSTOM_PORT_RANGE"
+	VDI_CUSTOM_PORT_RANGE_KEY = "VDI_CUSTOM_PORT_RANGE"
+)
+
+// regex
+const (
+	GRANT_PERMISSION_REGEX  = "^(/([A-Za-z0-9./_-])+:)*(/[A-Za-z0-9./_-]+)$"
+	PERSISTENT_DIRS_REGEX   = "^(/([A-Za-z0-9./_-])+:)*(/[A-Za-z0-9./_-]+)$"
+	HOST_DIRS_REGEX         = "^(((/[A-Za-z0-9./_-]+):(/[A-Za-z0-9./_-]+))+,)*(((/[A-Za-z0-9./_-]+):(/[A-Za-z0-9./_-]+))+)$"
+	CUSTOM_PORT_RANGE_REGEX = "^([a-z0-9]{4}-[0-9]{5}:[0-9]{2,5}/)*([a-z0-9]{4}-[0-9]{5}:[0-9]{2,5})$"
+)
+
+// file browser ports
+const (
+	FILE_BROWSER_PORT_NAME = "filebrowser"
+	FILE_BROWSER_PORT      = 2000
+)
+
+// Ingress annotations
+const (
+	INGRESS_AUTH_URL_KEY                  = "nginx.ingress.kubernetes.io/auth-url"
+	INGRESS_AUTH_URL_VAL                  = "https://%s.%s/oauth2/auth"
+	INGRESS_AUTH_SIGNIN_KEY               = "nginx.ingress.kubernetes.io/auth-signin"
+	INGRESS_AUTH_SIGNIN_VAL               = "https://%s.%s/oauth2/start?rd=$scheme://$best_http_host$request_uri"
+	INGRESS_AUTH_RESPONSE_HEADERS_KEY     = "nginx.ingress.kubernetes.io/auth-response-headers"
+	INGRESS_AUTH_RESPONSE_HEADERS_VAL     = "x-auth-request-user, x-auth-request-email, x-auth-request-access-token"
+	INGRESS_CONFIGURATION_SNIPPET_KEY     = "nginx.ingress.kubernetes.io/configuration-snippet"
+	INGRESS_PROXY_READ_TIMEOUT_KEY        = "nginx.ingress.kubernetes.io/proxy-read-timeout"
+	INGRESS_PROXY_READ_TIMEOUT_VAL        = "7200"
+	INGRESS_PROXY_SEND_TIMEOUT_KEY        = "nginx.ingress.kubernetes.io/proxy-send-timeout"
+	INGRESS_PROXY_SEND_TIMEOUT_VAL        = "7200"
+	INGRESS_VDI_CONFIGURATION_SNIPPET_VAL = "" +
+		"        #proxy_set_header Host $host;\n" +
+		"		proxy_set_header X-Real-IP $remote_addr;\n" +
+		"		proxy_set_header X-Forwarded-For $remote_addr;\n" +
+		"		proxy_set_header X-Forwarded-Host $host;\n" +
+		"		proxy_set_header X-Forwarded-Port $server_port;\n" +
+		"		proxy_set_header X-Forwarded-Protocol $scheme;\n"
+	INGRESS_CERT_MANAGER_KEY                   = "acme.cert-manager.io/http01-edit-in-place"
+	INGRESS_CERT_MANAGER_VAL                   = "true"
+	INGRESS_NGINX_PROXY_BUFFER_SIZE_KEY        = "nginx.ingress.kubernetes.io/proxy-buffer-size"
+	INGRESS_NGINX_PROXY_BUFFER_SIZE_VAL        = "16k"
+	INGRESS_NGINX_PROXY_BUFFERS_NUMBER_KEY     = "nginx.ingress.kubernetes.io/proxy-buffers-number"
+	INGRESS_VDI_NGINX_PROXY_BUFFERS_NUMBER_VAL = "4"
+	INGRESS_NGINX_REWRITE_TARGET_KEY           = "nginx.ingress.kubernetes.io/rewrite-target"
+	INGRESS_NGINX_REWRITE_TARGET_VAL           = "/$2"
+
+	INGRESS_IDE_CONFIGURATION_SNIPPET_VAL = "" +
+		"auth_request_set $name_upstream_1 $upstream_cookie_name_1;" +
+		"access_by_lua_block {" +
+		"  if ngx.var.name_upstream_1 ~= \"\" then" +
+		"	ngx.header[\"Set-Cookie\"] = \"name_1=\" .. ngx.var.name_upstream_1 .. ngx.var.auth_cookie:match(\"(; .*)\")" +
+		"  end" +
+		"}"
+)
+
+// File contents
 
 // Super client configuration
 const (
@@ -146,78 +223,26 @@ const (
 		"</dds>"
 )
 
-// Ingress annotations
 const (
-	INGRESS_AUTH_URL_KEY                  = "nginx.ingress.kubernetes.io/auth-url"
-	INGRESS_AUTH_URL_VAL                  = "https://%s.%s/oauth2/auth"
-	INGRESS_AUTH_SIGNIN_KEY               = "nginx.ingress.kubernetes.io/auth-signin"
-	INGRESS_AUTH_SIGNIN_VAL               = "https://%s.%s/oauth2/start?rd=$scheme://$best_http_host$request_uri"
-	INGRESS_AUTH_RESPONSE_HEADERS_KEY     = "nginx.ingress.kubernetes.io/auth-response-headers"
-	INGRESS_AUTH_RESPONSE_HEADERS_VAL     = "x-auth-request-user, x-auth-request-email, x-auth-request-access-token"
-	INGRESS_CONFIGURATION_SNIPPET_KEY     = "nginx.ingress.kubernetes.io/configuration-snippet"
-	INGRESS_PROXY_READ_TIMEOUT_KEY        = "nginx.ingress.kubernetes.io/proxy-read-timeout"
-	INGRESS_PROXY_READ_TIMEOUT_VAL        = "7200"
-	INGRESS_PROXY_SEND_TIMEOUT_KEY        = "nginx.ingress.kubernetes.io/proxy-send-timeout"
-	INGRESS_PROXY_SEND_TIMEOUT_VAL        = "7200"
-	INGRESS_VDI_CONFIGURATION_SNIPPET_VAL = "" +
-		"        #proxy_set_header Host $host;\n" +
-		"		proxy_set_header X-Real-IP $remote_addr;\n" +
-		"		proxy_set_header X-Forwarded-For $remote_addr;\n" +
-		"		proxy_set_header X-Forwarded-Host $host;\n" +
-		"		proxy_set_header X-Forwarded-Port $server_port;\n" +
-		"		proxy_set_header X-Forwarded-Protocol $scheme;\n"
-	INGRESS_CERT_MANAGER_KEY                   = "acme.cert-manager.io/http01-edit-in-place"
-	INGRESS_CERT_MANAGER_VAL                   = "true"
-	INGRESS_NGINX_PROXY_BUFFER_SIZE_KEY        = "nginx.ingress.kubernetes.io/proxy-buffer-size"
-	INGRESS_NGINX_PROXY_BUFFER_SIZE_VAL        = "16k"
-	INGRESS_NGINX_PROXY_BUFFERS_NUMBER_KEY     = "nginx.ingress.kubernetes.io/proxy-buffers-number"
-	INGRESS_VDI_NGINX_PROXY_BUFFERS_NUMBER_VAL = "4"
-	INGRESS_NGINX_REWRITE_TARGET_KEY           = "nginx.ingress.kubernetes.io/rewrite-target"
-	INGRESS_NGINX_REWRITE_TARGET_VAL           = "/$2"
-
-	INGRESS_IDE_CONFIGURATION_SNIPPET_VAL = "" +
-		"auth_request_set $name_upstream_1 $upstream_cookie_name_1;" +
-		"access_by_lua_block {" +
-		"  if ngx.var.name_upstream_1 ~= \"\" then" +
-		"	ngx.header[\"Set-Cookie\"] = \"name_1=\" .. ngx.var.name_upstream_1 .. ngx.var.auth_cookie:match(\"(; .*)\")" +
-		"  end" +
-		"}"
-)
-
-const (
-	IMAGE_MAP_CONFIG_MAP_NAME      = "platform"
-	IMAGE_MAP_CONFIG_MAP_NAMESPACE = "kube-system"
-	IMAGE_MAP_CONFIG_MAP_DATA_KEY  = "platform.yaml"
-	IMAGE_MAP_URL                  = "https://raw.githubusercontent.com/robolaunch/robolaunch/main/platform.yaml"
-)
-
-// Commands for collecting metrics
-const (
-	CMD_GET_CPU          = "cat /sys/fs/cgroup/cpu/cpuacct.usage"
-	CMD_GET_MEMORY       = "cat /sys/fs/cgroup/memory/memory.usage_in_bytes"
-	CMD_GET_NETWORK_LOAD = "cat /proc/net/dev | awk -F ' ' '{print $1 $2 \":\" $10}' | tail -n+3"
-)
-
-const (
-	GRANT_PERMISSION_KEY      = "GRANT_PERMISSION"
-	PERSISTENT_DIRS_KEY       = "PERSISTENT_DIRS"
-	HOST_DIRS_KEY             = "HOST_DIRS"
-	IDE_CUSTOM_PORT_RANGE_KEY = "IDE_CUSTOM_PORT_RANGE"
-	VDI_CUSTOM_PORT_RANGE_KEY = "VDI_CUSTOM_PORT_RANGE"
-)
-
-// regex
-const (
-	GRANT_PERMISSION_REGEX  = "^(/([A-Za-z0-9./_-])+:)*(/[A-Za-z0-9./_-]+)$"
-	PERSISTENT_DIRS_REGEX   = "^(/([A-Za-z0-9./_-])+:)*(/[A-Za-z0-9./_-]+)$"
-	HOST_DIRS_REGEX         = "^(((/[A-Za-z0-9./_-]+):(/[A-Za-z0-9./_-]+))+,)*(((/[A-Za-z0-9./_-]+):(/[A-Za-z0-9./_-]+))+)$"
-	CUSTOM_PORT_RANGE_REGEX = "^([a-z0-9]{4}-[0-9]{5}:[0-9]{2,5}/)*([a-z0-9]{4}-[0-9]{5}:[0-9]{2,5})$"
-)
-
-// file browser ports
-const (
-	FILE_BROWSER_PORT_NAME = "filebrowser"
-	FILE_BROWSER_PORT      = 2000
+	CUSTOM_SUPERVISORD_CONFIG = "" +
+		"# replace your daemon's configuration" + "\n" +
+		"# for reference, see http://supervisord.org/configuration.html" + "\n" +
+		"[program:custom]" + "\n" +
+		"environment=HOME='/home/robolaunch',USER='robolaunch',FILE_BROWSER_PORT='%(ENV_FILE_BROWSER_PORT)s'" + "\n" +
+		"command=/bin/bash /etc/robolaunch/services/custom/custom.sh" + "\n" +
+		"stopsignal=INT" + "\n" +
+		"stopwaitsecs=5" + "\n" +
+		"autorestart=true" + "\n" +
+		"priority=800" + "\n" +
+		"user=robolaunch" + "\n" +
+		"stdout_logfile=/var/log/services/custom.log" + "\n" +
+		"stdout_logfile_maxbytes=100MB" + "\n" +
+		"stdout_logfile_backups=10" + "\n" +
+		"redirect_stderr=true" + "\n"
+	CUSTOM_BACKGROUND_SCRIPT = "" +
+		"#!/bin/bash" + "\n" +
+		"# replace your autostart script" + "\n" +
+		"sleep infinity" + "\n"
 )
 
 func Bash(command string) []string {

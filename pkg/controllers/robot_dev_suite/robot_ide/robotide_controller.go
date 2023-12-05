@@ -95,7 +95,12 @@ func (r *RobotIDEReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 
 func (r *RobotIDEReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha1.RobotIDE, result *ctrl.Result) error {
 
-	err := r.reconcileHandleService(ctx, instance)
+	err := r.reconcileHandleConfigMap(ctx, instance)
+	if err != nil {
+		return robotErr.CheckCreatingOrWaitingError(result, err)
+	}
+
+	err = r.reconcileHandleService(ctx, instance)
 	if err != nil {
 		return robotErr.CheckCreatingOrWaitingError(result, err)
 	}
@@ -132,7 +137,12 @@ func (r *RobotIDEReconciler) reconcileCheckStatus(ctx context.Context, instance 
 
 func (r *RobotIDEReconciler) reconcileCheckResources(ctx context.Context, instance *robotv1alpha1.RobotIDE) error {
 
-	err := r.reconcileCheckService(ctx, instance)
+	err := r.reconcileCheckConfigMap(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	err = r.reconcileCheckService(ctx, instance)
 	if err != nil {
 		return err
 	}
@@ -175,5 +185,6 @@ func (r *RobotIDEReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Owns(&corev1.Service{}).
 		Owns(&networkingv1.Ingress{}).
 		Owns(&mcsv1alpha1.ServiceExport{}).
+		Owns(&corev1.ConfigMap{}).
 		Complete(r)
 }

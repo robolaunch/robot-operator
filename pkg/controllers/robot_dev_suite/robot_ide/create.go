@@ -6,6 +6,7 @@ import (
 	"github.com/robolaunch/robot-operator/internal/label"
 	"github.com/robolaunch/robot-operator/internal/resources"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
@@ -51,7 +52,13 @@ func (r *RobotIDEReconciler) reconcileCreatePod(ctx context.Context, instance *r
 		return err
 	}
 
-	idePod := resources.GetRobotIDEPod(instance, instance.GetRobotIDEPodMetadata(), *robot, *robotVDI, *activeNode)
+	cm := corev1.ConfigMap{}
+	err = r.Get(ctx, *instance.GetRobotIDEConfigMapMetadata(), &cm)
+	if err != nil {
+		return err
+	}
+
+	idePod := resources.GetRobotIDEPod(instance, instance.GetRobotIDEPodMetadata(), *robot, *robotVDI, *activeNode, cm)
 
 	err = ctrl.SetControllerReference(instance, idePod, r.Scheme)
 	if err != nil {
@@ -165,6 +172,27 @@ func (r *RobotIDEReconciler) reconcileCreateCustomIngress(ctx context.Context, i
 	}
 
 	logger.Info("STATUS: IDE custom ingress is created.")
+
+	return nil
+}
+
+func (r *RobotIDEReconciler) reconcileCreateConfigMap(ctx context.Context, instance *robotv1alpha1.RobotIDE) error {
+
+	ideCm := resources.GetRobotIDEConfigMap(instance, instance.GetRobotIDEConfigMapMetadata())
+
+	err := ctrl.SetControllerReference(instance, ideCm, r.Scheme)
+	if err != nil {
+		return err
+	}
+
+	err = r.Create(ctx, ideCm)
+	if err != nil && errors.IsAlreadyExists(err) {
+		return nil
+	} else if err != nil {
+		return err
+	}
+
+	logger.Info("STATUS: IDE config map is created.")
 
 	return nil
 }

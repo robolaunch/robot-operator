@@ -157,3 +157,23 @@ func (r *RobotIDEReconciler) reconcileHandleCustomIngress(ctx context.Context, i
 
 	return nil
 }
+
+func (r *RobotIDEReconciler) reconcileHandleConfigMap(ctx context.Context, instance *robotv1alpha1.RobotIDE) error {
+
+	if !instance.Status.ConfigMapStatus.Created {
+		instance.Status.Phase = robotv1alpha1.RobotIDEPhaseCreatingConfigMap
+		err := r.reconcileCreateConfigMap(ctx, instance)
+		if err != nil {
+			return err
+		}
+		instance.Status.ConfigMapStatus.Created = true
+
+		return &robotErr.CreatingResourceError{
+			ResourceKind:      "ConfigMap",
+			ResourceName:      instance.GetRobotIDEConfigMapMetadata().Name,
+			ResourceNamespace: instance.GetRobotIDEConfigMapMetadata().Namespace,
+		}
+	}
+
+	return nil
+}

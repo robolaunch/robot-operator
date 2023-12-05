@@ -163,3 +163,21 @@ func (r *RobotIDEReconciler) reconcileCheckCustomIngress(ctx context.Context, in
 
 	return nil
 }
+
+func (r *RobotIDEReconciler) reconcileCheckConfigMap(ctx context.Context, instance *robotv1alpha1.RobotIDE) error {
+
+	cmQuery := &corev1.ConfigMap{}
+	err := r.Get(ctx, *instance.GetRobotIDEConfigMapMetadata(), cmQuery)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			instance.Status.ConfigMapStatus = robotv1alpha1.OwnedResourceStatus{}
+		} else {
+			return err
+		}
+	} else {
+		instance.Status.ConfigMapStatus.Created = true
+		reference.SetReference(&instance.Status.IngressStatus.Reference, cmQuery.TypeMeta, cmQuery.ObjectMeta)
+	}
+
+	return nil
+}

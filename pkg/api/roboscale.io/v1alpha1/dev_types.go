@@ -187,6 +187,8 @@ type RobotIDEStatus struct {
 	CustomPortServiceStatus OwnedServiceStatus `json:"customPortServiceStatus,omitempty"`
 	// Status of Cloud IDE ingress for custom ports service. Created only if the robot has an additional config with key `IDE_CUSTOM_PORT_RANGE` and `.spec.ingress` is `true`.
 	CustomPortIngressStatus OwnedResourceStatus `json:"customPortIngressStatus,omitempty"`
+	// Config map status. It's used to add background apps.
+	ConfigMapStatus OwnedResourceStatus `json:"configMapStatus,omitempty"`
 }
 
 // ********************************
