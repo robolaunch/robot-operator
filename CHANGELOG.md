@@ -2,6 +2,12 @@
 ## [Unreleased]
 
 ### Feat
+- **background:** support custom background processes in ide
+
+
+<a name="v0.2.6-alpha.14"></a>
+## [v0.2.6-alpha.14] - 2023-12-04
+### Feat
 - **dcgm:** get gpu device information from dcgm
 - **file-browser:** support file browser in robots/applications
 
@@ -343,7 +349,8 @@
 - Merge pull request [#24](https://github.com/robolaunch/robot-operator/issues/24) from robolaunch/23-allow-multiple-launches
 
 
-[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.13.3...HEAD
+[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.14...HEAD
+[v0.2.6-alpha.14]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.13.3...v0.2.6-alpha.14
 [v0.2.6-alpha.13.3]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.13.2-hostnetwork-enabled...v0.2.6-alpha.13.3
 [v0.2.6-alpha.13.2-hostnetwork-enabled]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.13.1...v0.2.6-alpha.13.2-hostnetwork-enabled
 [v0.2.6-alpha.13.1]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.13...v0.2.6-alpha.13.1

@@ -460,6 +460,7 @@ _Appears in:_
 | `serviceExportStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ | Status of Cloud IDE ServiceExport. Created only if the instance type is Physical Instance. |
 | `customPortServiceStatus` _[OwnedServiceStatus](#ownedservicestatus)_ | Status of Cloud IDE service for custom ports. Created only if the robot has an additional config with key `IDE_CUSTOM_PORT_RANGE`. |
 | `customPortIngressStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ | Status of Cloud IDE ingress for custom ports service. Created only if the robot has an additional config with key `IDE_CUSTOM_PORT_RANGE` and `.spec.ingress` is `true`. |
+| `configMapStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ | Config map status. It's used to add background apps. |
 
 
 #### DiscoveryServer
