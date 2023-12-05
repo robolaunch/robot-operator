@@ -27,24 +27,15 @@ func (cfg *PodConfigInjector) placeTimezone(pod *corev1.Pod, node corev1.Node) {
 		return
 	}
 
-	volume := corev1.Volume{
-		Name: "tz-config",
-		VolumeSource: corev1.VolumeSource{
-			HostPath: &corev1.HostPathVolumeSource{
-				Path: "/usr/share/zoneinfo/" + timezone.Continent + "/" + timezone.City,
-			},
+	environmentVariables := []corev1.EnvVar{
+		{
+			Name:  "TZ",
+			Value: timezone.Continent + "/" + timezone.City,
 		},
 	}
 
-	pod.Spec.Volumes = append(pod.Spec.Volumes, volume)
-
-	volumeMount := corev1.VolumeMount{
-		Name:      "tz-config",
-		MountPath: "/etc/localtime",
-	}
-
 	for k, container := range pod.Spec.Containers {
-		container.VolumeMounts = append(container.VolumeMounts, volumeMount)
+		container.Env = append(container.Env, environmentVariables...)
 		pod.Spec.Containers[k] = container
 	}
 
@@ -59,24 +50,15 @@ func (cfg *JobConfigInjector) placeTimezone(job *batchv1.Job, node corev1.Node) 
 		return
 	}
 
-	volume := corev1.Volume{
-		Name: "tz-config",
-		VolumeSource: corev1.VolumeSource{
-			HostPath: &corev1.HostPathVolumeSource{
-				Path: "/usr/share/zoneinfo/" + timezone.Continent + "/" + timezone.City,
-			},
+	environmentVariables := []corev1.EnvVar{
+		{
+			Name:  "TZ",
+			Value: timezone.Continent + "/" + timezone.City,
 		},
 	}
 
-	podSpec.Volumes = append(podSpec.Volumes, volume)
-
-	volumeMount := corev1.VolumeMount{
-		Name:      "tz-config",
-		MountPath: "/etc/localtime",
-	}
-
 	for k, container := range podSpec.Containers {
-		container.VolumeMounts = append(container.VolumeMounts, volumeMount)
+		container.Env = append(container.Env, environmentVariables...)
 		podSpec.Containers[k] = container
 	}
 
