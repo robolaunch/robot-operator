@@ -14,6 +14,11 @@ type Tenancy struct {
 	PhysicalInstance   string
 }
 
+type Timezone struct {
+	Continent string
+	City      string
+}
+
 func GetTenancy(obj metav1.Object) *Tenancy {
 	tenancy := &Tenancy{}
 	labels := obj.GetLabels()
@@ -43,6 +48,22 @@ func GetTenancy(obj metav1.Object) *Tenancy {
 	}
 
 	return tenancy
+}
+
+func GetTimezone(obj metav1.Object) *Timezone {
+
+	timezone := &Timezone{}
+	labels := obj.GetLabels()
+
+	if continent, ok := labels[internal.TZ_CONTINENT_LABEL_KEY]; ok {
+		timezone.Continent = continent
+	}
+
+	if city, ok := labels[internal.TZ_CITY_LABEL_KEY]; ok {
+		timezone.City = city
+	}
+
+	return timezone
 }
 
 func GetTenancyMap(obj metav1.Object) map[string]string {
