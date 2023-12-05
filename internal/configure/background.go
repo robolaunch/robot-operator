@@ -38,7 +38,7 @@ func (cfg *PodConfigInjector) placeBackgroundConfigFiles(pod *corev1.Pod, config
 
 	volumeMount := corev1.VolumeMount{
 		Name:      "background-config",
-		MountPath: "/etc/robolaunch/services/config/",
+		MountPath: "/etc/robolaunch/services/custom/",
 	}
 
 	for k, container := range pod.Spec.Containers {

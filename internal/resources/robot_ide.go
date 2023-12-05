@@ -29,7 +29,7 @@ func getRobotIDESelector(robotIDE robotv1alpha1.RobotIDE) map[string]string {
 	}
 }
 
-func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot, robotVDI robotv1alpha1.RobotVDI, node corev1.Node) *corev1.Pod {
+func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot, robotVDI robotv1alpha1.RobotVDI, node corev1.Node, cm corev1.ConfigMap) *corev1.Pod {
 
 	podCfg := configure.PodConfigInjector{}
 	containerCfg := configure.ContainerConfigInjector{}
@@ -97,6 +97,7 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 	podCfg.InjectImagePullPolicy(&idePod)
 	podCfg.SchedulePod(&idePod, robotIDE)
 	podCfg.InjectVolumeConfiguration(&idePod, robot)
+	podCfg.InjectBackgroundConfigFiles(&idePod, cm)
 	podCfg.InjectGenericEnvironmentVariables(&idePod, robot)
 	podCfg.InjectRuntimeClass(&idePod, robot, node)
 	if robotIDE.Spec.Display && label.GetTargetRobotVDI(robotIDE) != "" {
@@ -375,7 +376,7 @@ func GetRobotIDECustomIngress(robotIDE *robotv1alpha1.RobotIDE, ingressNamespace
 	return ingress
 }
 
-func GetRobotIDEConfigMap(robotIDE *robotv1alpha1.RobotIDE, cmNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot) *corev1.ConfigMap {
+func GetRobotIDEConfigMap(robotIDE *robotv1alpha1.RobotIDE, cmNamespacedName *types.NamespacedName) *corev1.ConfigMap {
 
 	cm := &corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
