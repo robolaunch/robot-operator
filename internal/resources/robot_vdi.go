@@ -165,6 +165,7 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 	podCfg.InjectDisplayConfiguration(vdiPod, *robotVDI)
 	podCfg.InjectRuntimeClass(vdiPod, robot, node)
 	podCfg.InjectVolumeConfiguration(vdiPod, robot)
+	podCfg.InjectTimezone(vdiPod, node)
 
 	if !robotVDI.Spec.DisableNVENC {
 		podCfg.InjectEncodingOption(vdiPod, robot)

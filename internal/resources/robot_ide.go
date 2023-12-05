@@ -100,6 +100,7 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 	podCfg.InjectBackgroundConfigFiles(&idePod, cm)
 	podCfg.InjectGenericEnvironmentVariables(&idePod, robot)
 	podCfg.InjectRuntimeClass(&idePod, robot, node)
+	podCfg.InjectTimezone(&idePod, node)
 	if robotIDE.Spec.Display && label.GetTargetRobotVDI(robotIDE) != "" {
 		// TODO: Add control for validating robot VDI
 		podCfg.InjectDisplayConfiguration(&idePod, robotVDI)

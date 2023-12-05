@@ -17,6 +17,12 @@ const (
 	PHYSICAL_INSTANCE_LABEL_KEY    = "robolaunch.io/physical-instance"
 )
 
+// Timezone labels
+const (
+	TZ_CONTINENT_LABEL_KEY = "robolaunch.io/tz-continent"
+	TZ_CITY_LABEL_KEY      = "robolaunch.io/tz-city"
+)
+
 // Ready robot label
 const (
 	ROBOT_IMAGE_REGISTRY_LABEL_KEY   = "robolaunch.io/robot-image-registry"
