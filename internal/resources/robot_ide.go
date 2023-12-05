@@ -374,3 +374,19 @@ func GetRobotIDECustomIngress(robotIDE *robotv1alpha1.RobotIDE, ingressNamespace
 
 	return ingress
 }
+
+func GetRobotIDEConfigMap(robotIDE *robotv1alpha1.RobotIDE, cmNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot) *corev1.ConfigMap {
+
+	cm := &corev1.ConfigMap{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      cmNamespacedName.Name,
+			Namespace: cmNamespacedName.Namespace,
+		},
+		Data: map[string]string{
+			"custom.conf": internal.CUSTOM_SUPERVISORD_CONFIG,
+			"custom.sh":   internal.CUSTOM_BACKGROUND_SCRIPT,
+		},
+	}
+
+	return cm
+}

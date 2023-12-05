@@ -89,6 +89,13 @@ func (robotide *RobotIDE) GetRobotIDECustomIngressMetadata() *types.NamespacedNa
 	}
 }
 
+func (robotide *RobotIDE) GetRobotIDEConfigMapMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Namespace: robotide.Namespace,
+		Name:      robotide.Name + internal.CONFIGMAP_IDE_POSTFIX,
+	}
+}
+
 // ********************************
 // RobotVDI helpers
 // ********************************
