@@ -1,6 +1,9 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+
+<a name="v0.2.6-alpha.14.1"></a>
+## [v0.2.6-alpha.14.1] - 2023-12-05
 ### Feat
 - **background:** support custom background processes in ide
 
@@ -349,7 +352,8 @@
 - Merge pull request [#24](https://github.com/robolaunch/robot-operator/issues/24) from robolaunch/23-allow-multiple-launches
 
 
-[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.14...HEAD
+[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.14.1...HEAD
+[v0.2.6-alpha.14.1]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.14...v0.2.6-alpha.14.1
 [v0.2.6-alpha.14]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.13.3...v0.2.6-alpha.14
 [v0.2.6-alpha.13.3]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.13.2-hostnetwork-enabled...v0.2.6-alpha.13.3
 [v0.2.6-alpha.13.2-hostnetwork-enabled]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.13.1...v0.2.6-alpha.13.2-hostnetwork-enabled
