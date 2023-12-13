@@ -2,6 +2,9 @@
 ## [Unreleased]
 
 
+<a name="v0.2.6-alpha.14.2"></a>
+## [v0.2.6-alpha.14.2] - 2023-12-06
+
 <a name="v0.2.6-alpha.14.1"></a>
 ## [v0.2.6-alpha.14.1] - 2023-12-05
 ### Feat
@@ -352,7 +355,8 @@
 - Merge pull request [#24](https://github.com/robolaunch/robot-operator/issues/24) from robolaunch/23-allow-multiple-launches
 
 
-[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.14.1...HEAD
+[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.14.2...HEAD
+[v0.2.6-alpha.14.2]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.14.1...v0.2.6-alpha.14.2
 [v0.2.6-alpha.14.1]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.14...v0.2.6-alpha.14.1
 [v0.2.6-alpha.14]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.13.3...v0.2.6-alpha.14
 [v0.2.6-alpha.13.3]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.13.2-hostnetwork-enabled...v0.2.6-alpha.13.3
