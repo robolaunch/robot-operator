@@ -117,6 +117,7 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 			internal.Env("RESOLUTION", robotVDI.Spec.Resolution),
 			internal.Env("FILE_BROWSER_PORT", strconv.Itoa(internal.FILE_BROWSER_PORT)),
 			internal.Env("FILE_BROWSER_SERVICE", "vdi"),
+			internal.Env("FILE_BROWSER_BASE_URL", robotv1alpha1.GetRobotServicePath(robot, "/file-browser/vdi")),
 		},
 		Stdin: true,
 		TTY:   true,
