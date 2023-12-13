@@ -176,7 +176,7 @@ func (r *RobotIDEReconciler) reconcileCheckConfigMap(ctx context.Context, instan
 		}
 	} else {
 		instance.Status.ConfigMapStatus.Created = true
-		reference.SetReference(&instance.Status.IngressStatus.Reference, cmQuery.TypeMeta, cmQuery.ObjectMeta)
+		reference.SetReference(&instance.Status.ConfigMapStatus.Reference, cmQuery.TypeMeta, cmQuery.ObjectMeta)
 	}
 
 	return nil
