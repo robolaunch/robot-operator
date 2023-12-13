@@ -21,5 +21,7 @@ func GetGrantPermissionCmd(robot robotv1alpha1.Robot) string {
 		permissionCmdBuilder.WriteString("sudo setfacl -R -m u:robolaunch:rwx " + v + closerStr + " ")
 	}
 
+	permissionCmdBuilder.WriteString("sudo setfacl -R -m u:robolaunch:rwx " + "/etc/robolaunch" + closerStr + " ")
+
 	return permissionCmdBuilder.String()
 }
