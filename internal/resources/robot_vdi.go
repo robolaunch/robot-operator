@@ -116,6 +116,7 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 			internal.Env("NEKO_NAT1TO1", robotVDI.Spec.NAT1TO1),
 			internal.Env("RESOLUTION", robotVDI.Spec.Resolution),
 			internal.Env("FILE_BROWSER_PORT", strconv.Itoa(internal.FILE_BROWSER_PORT)),
+			internal.Env("FILE_BROWSER_SERVICE", "vdi"),
 		},
 		Stdin: true,
 		TTY:   true,
