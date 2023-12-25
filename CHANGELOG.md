@@ -1,7 +1,11 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+
+<a name="v0.2.6-alpha.14.6"></a>
+## [v0.2.6-alpha.14.6] - 2023-12-13
 ### Fix
+- **filebrowser:** add base url to the file browser
 - **filebrowser:** add file browser base url as env variable to services
 
 
@@ -370,7 +374,8 @@
 - Merge pull request [#24](https://github.com/robolaunch/robot-operator/issues/24) from robolaunch/23-allow-multiple-launches
 
 
-[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.14.5...HEAD
+[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.14.6...HEAD
+[v0.2.6-alpha.14.6]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.14.5...v0.2.6-alpha.14.6
 [v0.2.6-alpha.14.5]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.14.4...v0.2.6-alpha.14.5
 [v0.2.6-alpha.14.4]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.14.3...v0.2.6-alpha.14.4
 [v0.2.6-alpha.14.3]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.14.2...v0.2.6-alpha.14.3
