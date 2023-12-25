@@ -75,7 +75,7 @@ type StepStatus struct {
 
 func GetRobotServiceDNSWithNodePort(robot Robot, prefix, port string) string {
 	tenancy := label.GetTenancy(&robot)
-	connectionStr := tenancy.CloudInstanceAlias + "." + robot.Spec.RootDNSConfig.Host + ":" + port
+	connectionStr := tenancy.CloudInstance + "." + robot.Spec.RootDNSConfig.Host + ":" + port
 
 	if prefix != "" {
 		connectionStr = prefix + connectionStr
@@ -86,7 +86,7 @@ func GetRobotServiceDNSWithNodePort(robot Robot, prefix, port string) string {
 
 func GetRobotServiceDNS(robot Robot, prefix, postfix string) string {
 	tenancy := label.GetTenancy(&robot)
-	connectionStr := tenancy.CloudInstanceAlias + "." + robot.Spec.RootDNSConfig.Host + GetRobotServicePath(robot, postfix)
+	connectionStr := tenancy.CloudInstance + "." + robot.Spec.RootDNSConfig.Host + GetRobotServicePath(robot, postfix)
 
 	if prefix != "" {
 		connectionStr = prefix + connectionStr
@@ -97,7 +97,7 @@ func GetRobotServiceDNS(robot Robot, prefix, postfix string) string {
 
 func GetRelayServerServiceDNS(rs RelayServer, prefix, postfix string) string {
 	tenancy := label.GetTenancy(&rs)
-	connectionStr := tenancy.CloudInstanceAlias + "." + rs.Spec.RootDNSConfig.Host + GetRelayServerServicePath(rs, postfix)
+	connectionStr := tenancy.CloudInstance + "." + rs.Spec.RootDNSConfig.Host + GetRelayServerServicePath(rs, postfix)
 
 	if prefix != "" {
 		connectionStr = prefix + connectionStr
@@ -110,7 +110,7 @@ func GetRobotServicePath(robot Robot, postfix string) string {
 	tenancy := label.GetTenancy(&robot)
 	connectionStr := "/" + tenancy.Team +
 		"/" + tenancy.Region +
-		"/" + tenancy.CloudInstance +
+		"/" + tenancy.CloudInstanceAlias +
 		"/" + robot.Namespace +
 		"/" + robot.Name
 
