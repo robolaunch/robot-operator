@@ -34,12 +34,12 @@ func (r *NotebookReconciler) reconcileCheckService(ctx context.Context, instance
 		reference.SetReference(&instance.Status.ServiceStatus.Resource.Reference, serviceQuery.TypeMeta, serviceQuery.ObjectMeta)
 		if instance.Spec.Ingress {
 			instance.Status.ServiceStatus.URLs = map[string]string{}
-			instance.Status.ServiceStatus.URLs["code-server"] = robotv1alpha1.GetRobotServiceDNS(*robot, "https://", "/notebook/")
-			instance.Status.ServiceStatus.URLs["code-server-file-browser"] = robotv1alpha1.GetRobotServiceDNS(*robot, "https://", "/file-browser/notebook/")
+			instance.Status.ServiceStatus.URLs["notebook"] = robotv1alpha1.GetRobotServiceDNS(*robot, "https://", "/notebook/")
+			instance.Status.ServiceStatus.URLs["notebook-file-browser"] = robotv1alpha1.GetRobotServiceDNS(*robot, "https://", "/file-browser/notebook/")
 		} else if instance.Spec.ServiceType == corev1.ServiceTypeNodePort {
 			instance.Status.ServiceStatus.URLs = map[string]string{}
-			instance.Status.ServiceStatus.URLs["code-server"] = robotv1alpha1.GetRobotServiceDNSWithNodePort(*robot, "http://", strconv.Itoa(int(serviceQuery.Spec.Ports[0].NodePort)))
-			instance.Status.ServiceStatus.URLs["code-server-file-browser"] = robotv1alpha1.GetRobotServiceDNSWithNodePort(*robot, "http://", strconv.Itoa(int(serviceQuery.Spec.Ports[1].NodePort)))
+			instance.Status.ServiceStatus.URLs["notebook"] = robotv1alpha1.GetRobotServiceDNSWithNodePort(*robot, "http://", strconv.Itoa(int(serviceQuery.Spec.Ports[0].NodePort)))
+			instance.Status.ServiceStatus.URLs["notebook-file-browser"] = robotv1alpha1.GetRobotServiceDNSWithNodePort(*robot, "http://", strconv.Itoa(int(serviceQuery.Spec.Ports[1].NodePort)))
 		}
 	}
 
