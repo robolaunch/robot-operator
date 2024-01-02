@@ -150,6 +150,10 @@ type RobotDevSuiteSpec struct {
 	IDEEnabled bool `json:"ideEnabled,omitempty"`
 	// Configurational parameters of RobotIDE. Applied if `.spec.ideEnabled` is set to `true`.
 	RobotIDETemplate RobotIDESpec `json:"robotIDETemplate,omitempty"`
+	// If `true`, a Notebook will be provisioned inside development suite.
+	NotebookEnabled bool `json:"notebookEnabled,omitempty"`
+	// Configurational parameters of Notebook. Applied if `.spec.notebookEnabled` is set to `true`.
+	NotebookTemplate NotebookSpec `json:"notebookTemplate,omitempty"`
 	// If `true`, a relay server for remote Cloud IDE will be provisioned inside development suite.
 	RemoteIDEEnabled bool `json:"remoteIDEEnabled,omitempty"`
 	// Configurational parameters of remote IDE. Applied if `.spec.remoteIDEEnabled` is set to `true`.
@@ -164,6 +168,8 @@ type RobotDevSuiteStatus struct {
 	RobotVDIStatus OwnedRobotServiceStatus `json:"robotVDIStatus,omitempty"`
 	// Status of RobotIDE.
 	RobotIDEStatus OwnedRobotServiceStatus `json:"robotIDEStatus,omitempty"`
+	// Status of Notebook.
+	NotebookStatus OwnedRobotServiceStatus `json:"notebookStatus,omitempty"`
 	// Status of remote Cloud IDE RelayServer. Created only if the instance type is Physical Instance.
 	RemoteIDERelayServerStatus OwnedRobotServiceStatus `json:"remoteIDERelayServerStatus,omitempty"`
 	// [*alpha*] Indicates if RobotDevSuite is attached to a Robot and actively provisioned it's resources.
