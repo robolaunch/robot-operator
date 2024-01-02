@@ -125,3 +125,15 @@ const (
 	RobotVDIPhaseCreatingCustomPortIngress RobotVDIPhase = "CreatingCustomPortIngress"
 	RobotVDIPhaseRunning                   RobotVDIPhase = "Running"
 )
+
+type NotebookPhase string
+
+const (
+	NotebookPhaseCreatingService           NotebookPhase = "CreatingService"
+	NotebookPhaseCreatingPod               NotebookPhase = "CreatingPod"
+	NotebookPhaseCreatingIngress           NotebookPhase = "CreatingIngress"
+	NotebookPhaseCreatingCustomPortService NotebookPhase = "CreatingCustomPortService"
+	NotebookPhaseCreatingCustomPortIngress NotebookPhase = "CreatingCustomPortIngress"
+	NotebookPhaseCreatingConfigMap         NotebookPhase = "CreatingConfigMap"
+	NotebookPhaseRunning                   NotebookPhase = "Running"
+)

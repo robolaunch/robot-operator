@@ -312,7 +312,7 @@ type NotebookSpec struct {
 // NotebookStatus defines the observed state of Notebook.
 type NotebookStatus struct {
 	// Phase of Notebook.
-	Phase RobotIDEPhase `json:"phase,omitempty"`
+	Phase NotebookPhase `json:"phase,omitempty"`
 	// Status of Notebook pod.
 	PodStatus OwnedPodStatus `json:"podStatus,omitempty"`
 	// Status of Notebook service.
