@@ -19,8 +19,8 @@ import (
 )
 
 const (
-	NOTEBOOK_PORT_NAME = "code-server"
-	NOTEBOOK_PORT      = 9000
+	NOTEBOOK_PORT_NAME = "notebook"
+	NOTEBOOK_PORT      = 8888
 )
 
 func getNotebookSelector(notebook robotv1alpha1.Notebook) map[string]string {
@@ -36,7 +36,7 @@ func GetNotebookPod(notebook *robotv1alpha1.Notebook, podNamespacedName *types.N
 
 	var cmdBuilder strings.Builder
 	cmdBuilder.WriteString(configure.GetGrantPermissionCmd(robot))
-	cmdBuilder.WriteString("supervisord -c " + filepath.Join("/etc", "robolaunch", "services", "code-server.conf"))
+	cmdBuilder.WriteString("supervisord -c " + filepath.Join("/etc", "robolaunch", "services", "notebook.conf"))
 
 	labels := getNotebookSelector(*notebook)
 	for k, v := range notebook.Labels {
@@ -44,13 +44,13 @@ func GetNotebookPod(notebook *robotv1alpha1.Notebook, podNamespacedName *types.N
 	}
 
 	nbContainer := corev1.Container{
-		Name:    "code-server",
+		Name:    "notebook",
 		Image:   robot.Status.Image,
 		Command: internal.Bash(cmdBuilder.String()),
 		Env: []corev1.EnvVar{
-			internal.Env("CODE_SERVER_PORT", strconv.Itoa(NOTEBOOK_PORT)),
+			internal.Env("NOTEBOOK_PORT", strconv.Itoa(NOTEBOOK_PORT)),
 			internal.Env("FILE_BROWSER_PORT", strconv.Itoa(internal.FILE_BROWSER_PORT)),
-			internal.Env("FILE_BROWSER_SERVICE", "code-server"),
+			internal.Env("FILE_BROWSER_SERVICE", "notebook"),
 			internal.Env("FILE_BROWSER_BASE_URL", robotv1alpha1.GetRobotServicePath(robot, "/file-browser/nb")),
 			internal.Env("ROBOT_NAMESPACE", robot.Namespace),
 			internal.Env("ROBOT_NAME", robot.Name),
