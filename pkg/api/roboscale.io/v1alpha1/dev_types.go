@@ -291,8 +291,40 @@ type RobotVDIStatus struct {
 
 // NotebookSpec defines the desired state of Notebook.
 type NotebookSpec struct {
+	// Resource limitations of Notebook.
+	Resources Resources `json:"resources,omitempty"`
+	// Service type of Notebook. `ClusterIP` and `NodePort` is supported.
+	// +kubebuilder:validation:Enum=ClusterIP;NodePort
+	// +kubebuilder:default="NodePort"
+	ServiceType corev1.ServiceType `json:"serviceType,omitempty"`
+	// If `true`, containers of Notebook will be privileged containers.
+	// It can be used in physical instances where it's necessary to access
+	// I/O devices on the host machine.
+	// Not recommended to activate this field on cloud instances.
+	Privileged bool `json:"privileged,omitempty"`
+	// Notebook connects an X11 socket if it's set to `true` and a target Notebook resource is set in labels with key `robolaunch.io/target-vdi`.
+	// Applications that requires GUI can be executed such as VLC.
+	Display bool `json:"display,omitempty"`
+	// [*alpha*] Notebook will create an Ingress resource if `true`.
+	Ingress bool `json:"ingress,omitempty"`
 }
 
 // NotebookStatus defines the observed state of Notebook.
 type NotebookStatus struct {
+	// Phase of Notebook.
+	Phase RobotIDEPhase `json:"phase,omitempty"`
+	// Status of Notebook pod.
+	PodStatus OwnedPodStatus `json:"podStatus,omitempty"`
+	// Status of Notebook service.
+	ServiceStatus OwnedServiceStatus `json:"serviceStatus,omitempty"`
+	// Status of Notebook Ingress.
+	IngressStatus OwnedResourceStatus `json:"ingressStatus,omitempty"`
+	// Status of Notebook ServiceExport. Created only if the instance type is Physical Instance.
+	ServiceExportStatus OwnedResourceStatus `json:"serviceExportStatus,omitempty"`
+	// Status of Notebook service for custom ports. Created only if the robot has an additional config with key `IDE_CUSTOM_PORT_RANGE`.
+	CustomPortServiceStatus OwnedServiceStatus `json:"customPortServiceStatus,omitempty"`
+	// Status of Notebook ingress for custom ports service. Created only if the robot has an additional config with key `IDE_CUSTOM_PORT_RANGE` and `.spec.ingress` is `true`.
+	CustomPortIngressStatus OwnedResourceStatus `json:"customPortIngressStatus,omitempty"`
+	// Config map status. It's used to add background apps.
+	ConfigMapStatus OwnedResourceStatus `json:"configMapStatus,omitempty"`
 }
