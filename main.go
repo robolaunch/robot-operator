@@ -45,6 +45,7 @@ import (
 	relayServer "github.com/robolaunch/robot-operator/pkg/controllers/robot/relay_server"
 	rosBridge "github.com/robolaunch/robot-operator/pkg/controllers/robot/ros_bridge"
 	robotDevSuite "github.com/robolaunch/robot-operator/pkg/controllers/robot_dev_suite"
+	"github.com/robolaunch/robot-operator/pkg/controllers/robot_dev_suite/notebook"
 	robotIDE "github.com/robolaunch/robot-operator/pkg/controllers/robot_dev_suite/robot_ide"
 	robotVDI "github.com/robolaunch/robot-operator/pkg/controllers/robot_dev_suite/robot_vdi"
 	workspaceManager "github.com/robolaunch/robot-operator/pkg/controllers/workspace_manager"
@@ -286,6 +287,18 @@ func startDevCRDsAndWebhooks(mgr manager.Manager, dynamicClient dynamic.Interfac
 	}
 	if err := (&robotv1alpha1.RobotIDE{}).SetupWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "RobotIDE")
+		os.Exit(1)
+	}
+
+	if err := (&notebook.NotebookReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "Notebook")
+		os.Exit(1)
+	}
+	if err := (&robotv1alpha1.Notebook{}).SetupWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create webhook", "webhook", "Notebook")
 		os.Exit(1)
 	}
 }

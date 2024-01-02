@@ -25,6 +25,7 @@ func init() {
 	SchemeBuilder.Register(&RobotDevSuite{}, &RobotDevSuiteList{})
 	SchemeBuilder.Register(&RobotIDE{}, &RobotIDEList{})
 	SchemeBuilder.Register(&RobotVDI{}, &RobotVDIList{})
+	SchemeBuilder.Register(&Notebook{}, &NotebookList{})
 }
 
 //+genclient
@@ -111,6 +112,28 @@ type RobotVDIList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []RobotVDI `json:"items"`
+}
+
+//+genclient
+//+kubebuilder:object:root=true
+//+kubebuilder:subresource:status
+
+// Notebook is the Schema for the notebooks API.
+type Notebook struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   NotebookSpec   `json:"spec,omitempty"`
+	Status NotebookStatus `json:"status,omitempty"`
+}
+
+//+kubebuilder:object:root=true
+
+// NotebookList contains a list of Notebook.
+type NotebookList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []Notebook `json:"items"`
 }
 
 // ********************************
@@ -260,4 +283,16 @@ type RobotVDIStatus struct {
 	CustomPortServiceStatus OwnedServiceStatus `json:"customPortServiceStatus,omitempty"`
 	// Status of Cloud IDE ingress for custom ports service. Created only if the robot has an additional config with key `IDE_CUSTOM_PORT_RANGE` and `.spec.ingress` is `true`.
 	CustomPortIngressStatus OwnedResourceStatus `json:"customPortIngressStatus,omitempty"`
+}
+
+// ********************************
+// Notebook types
+// ********************************
+
+// NotebookSpec defines the desired state of Notebook.
+type NotebookSpec struct {
+}
+
+// NotebookStatus defines the observed state of Notebook.
+type NotebookStatus struct {
 }
