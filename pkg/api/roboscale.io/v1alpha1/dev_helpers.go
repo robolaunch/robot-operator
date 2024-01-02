@@ -148,3 +148,68 @@ func (robotvdi *RobotVDI) GetRobotVDICustomIngressMetadata() *types.NamespacedNa
 		Name:      robotvdi.Name + internal.CUSTOM_PORT_INGRESS_IDE_POSTFIX,
 	}
 }
+
+// ********************************
+// Notebook helpers
+// ********************************
+
+func (notebook *Notebook) GetNotebookPodMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Namespace: notebook.Namespace,
+		Name:      notebook.Name + internal.POD_NOTEBOOK_POSTFIX,
+	}
+}
+
+func (notebook *Notebook) GetNotebookServiceMetadata() *types.NamespacedName {
+	instanceType := label.GetInstanceType(notebook)
+	if instanceType == label.InstanceTypeCloudInstance {
+		return &types.NamespacedName{
+			Namespace: notebook.Namespace,
+			Name:      notebook.Name + internal.SVC_NOTEBOOK_POSTFIX,
+		}
+	} else {
+
+		tenancy := label.GetTenancy(notebook)
+
+		return &types.NamespacedName{
+			Namespace: notebook.Namespace,
+			Name:      notebook.Name + internal.SVC_NOTEBOOK_POSTFIX + "-" + tenancy.PhysicalInstance,
+		}
+	}
+}
+
+func (notebook *Notebook) GetNotebookServiceExportMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Namespace: notebook.Namespace,
+		Name:      notebook.GetNotebookServiceMetadata().Name,
+	}
+
+}
+
+func (notebook *Notebook) GetNotebookIngressMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Namespace: notebook.Namespace,
+		Name:      notebook.Name + internal.INGRESS_NOTEBOOK_POSTFIX,
+	}
+}
+
+func (notebook *Notebook) GetNotebookCustomServiceMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Namespace: notebook.Namespace,
+		Name:      notebook.Name + internal.CUSTOM_PORT_SVC_NOTEBOOK_POSTFIX,
+	}
+}
+
+func (notebook *Notebook) GetNotebookCustomIngressMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Namespace: notebook.Namespace,
+		Name:      notebook.Name + internal.CUSTOM_PORT_INGRESS_NOTEBOOK_POSTFIX,
+	}
+}
+
+func (notebook *Notebook) GetNotebookConfigMapMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Namespace: notebook.Namespace,
+		Name:      notebook.Name + internal.CONFIGMAP_NOTEBOOK_POSTFIX,
+	}
+}

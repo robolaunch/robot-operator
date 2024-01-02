@@ -97,6 +97,16 @@ const (
 	CONFIGMAP_IDE_POSTFIX           = ""
 )
 
+// Notebook owned resources' postfixes
+const (
+	SVC_NOTEBOOK_POSTFIX                 = ""
+	POD_NOTEBOOK_POSTFIX                 = ""
+	INGRESS_NOTEBOOK_POSTFIX             = ""
+	CUSTOM_PORT_SVC_NOTEBOOK_POSTFIX     = "-custom"
+	CUSTOM_PORT_INGRESS_NOTEBOOK_POSTFIX = "-custom"
+	CONFIGMAP_NOTEBOOK_POSTFIX           = ""
+)
+
 // RobotDevSuite owned resources' postfixes
 const (
 	ROBOT_VDI_POSTFIX               = "-vdi"
@@ -127,11 +137,12 @@ const (
 )
 
 const (
-	GRANT_PERMISSION_KEY      = "GRANT_PERMISSION"
-	PERSISTENT_DIRS_KEY       = "PERSISTENT_DIRS"
-	HOST_DIRS_KEY             = "HOST_DIRS"
-	IDE_CUSTOM_PORT_RANGE_KEY = "IDE_CUSTOM_PORT_RANGE"
-	VDI_CUSTOM_PORT_RANGE_KEY = "VDI_CUSTOM_PORT_RANGE"
+	GRANT_PERMISSION_KEY           = "GRANT_PERMISSION"
+	PERSISTENT_DIRS_KEY            = "PERSISTENT_DIRS"
+	HOST_DIRS_KEY                  = "HOST_DIRS"
+	IDE_CUSTOM_PORT_RANGE_KEY      = "IDE_CUSTOM_PORT_RANGE"
+	VDI_CUSTOM_PORT_RANGE_KEY      = "VDI_CUSTOM_PORT_RANGE"
+	NOTEBOOK_CUSTOM_PORT_RANGE_KEY = "NOTEBOOK_CUSTOM_PORT_RANGE"
 )
 
 // regex
