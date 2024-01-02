@@ -255,6 +255,59 @@ spec:
                     description: If `true`, a Cloud IDE will be provisioned inside development
                       suite.
                     type: boolean
+                  notebookEnabled:
+                    description: If `true`, a Notebook will be provisioned inside development
+                      suite.
+                    type: boolean
+                  notebookTemplate:
+                    description: Configurational parameters of Notebook. Applied if
+                      `.spec.notebookEnabled` is set to `true`.
+                    properties:
+                      display:
+                        description: Notebook connects an X11 socket if it's set to
+                          `true` and a target Notebook resource is set in labels with
+                          key `robolaunch.io/target-vdi`. Applications that requires
+                          GUI can be executed such as VLC.
+                        type: boolean
+                      ingress:
+                        description: '[*alpha*] Notebook will create an Ingress resource
+                          if `true`.'
+                        type: boolean
+                      privileged:
+                        description: If `true`, containers of Notebook will be privileged
+                          containers. It can be used in physical instances where it's
+                          necessary to access I/O devices on the host machine. Not recommended
+                          to activate this field on cloud instances.
+                        type: boolean
+                      resources:
+                        description: Resource limitations of Notebook.
+                        properties:
+                          cpu:
+                            description: CPU resource limit.
+                            pattern: ^([0-9])+(m)$
+                            type: string
+                          gpuCore:
+                            description: GPU core number that will be allocated.
+                            type: integer
+                          gpuInstance:
+                            default: nvidia.com/gpu
+                            description: GPU instance that will be allocated. eg. nvidia.com/mig-1g.5gb.
+                              Defaults to "nvidia.com/gpu".
+                            type: string
+                          memory:
+                            description: Memory resource limit.
+                            pattern: ^([0-9])+(Mi|Gi)$
+                            type: string
+                        type: object
+                      serviceType:
+                        default: NodePort
+                        description: Service type of Notebook. `ClusterIP` and `NodePort`
+                          is supported.
+                        enum:
+                        - ClusterIP
+                        - NodePort
+                        type: string
+                    type: object
                   remoteIDEEnabled:
                     description: If `true`, a relay server for remote Cloud IDE will
                       be provisioned inside development suite.

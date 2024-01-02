@@ -1648,6 +1648,378 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.9.2
+  creationTimestamp: null
+  name: notebooks.robot.roboscale.io
+spec:
+  group: robot.roboscale.io
+  names:
+    kind: Notebook
+    listKind: NotebookList
+    plural: notebooks
+    singular: notebook
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          description: Notebook is the Schema for the notebooks API.
+          properties:
+            apiVersion:
+              description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+              type: string
+            kind:
+              description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+              type: string
+            metadata:
+              type: object
+            spec:
+              description: NotebookSpec defines the desired state of Notebook.
+              properties:
+                display:
+                  description: Notebook connects an X11 socket if it's set to `true` and a target Notebook resource is set in labels with key `robolaunch.io/target-vdi`. Applications that requires GUI can be executed such as VLC.
+                  type: boolean
+                ingress:
+                  description: '[*alpha*] Notebook will create an Ingress resource if `true`.'
+                  type: boolean
+                privileged:
+                  description: If `true`, containers of Notebook will be privileged containers. It can be used in physical instances where it's necessary to access I/O devices on the host machine. Not recommended to activate this field on cloud instances.
+                  type: boolean
+                resources:
+                  description: Resource limitations of Notebook.
+                  properties:
+                    cpu:
+                      description: CPU resource limit.
+                      pattern: ^([0-9])+(m)$
+                      type: string
+                    gpuCore:
+                      description: GPU core number that will be allocated.
+                      type: integer
+                    gpuInstance:
+                      default: nvidia.com/gpu
+                      description: GPU instance that will be allocated. eg. nvidia.com/mig-1g.5gb. Defaults to "nvidia.com/gpu".
+                      type: string
+                    memory:
+                      description: Memory resource limit.
+                      pattern: ^([0-9])+(Mi|Gi)$
+                      type: string
+                  type: object
+                serviceType:
+                  default: NodePort
+                  description: Service type of Notebook. `ClusterIP` and `NodePort` is supported.
+                  enum:
+                    - ClusterIP
+                    - NodePort
+                  type: string
+              type: object
+            status:
+              description: NotebookStatus defines the observed state of Notebook.
+              properties:
+                configMapStatus:
+                  description: Config map status. It's used to add background apps.
+                  properties:
+                    created:
+                      description: Shows if the owned resource is created.
+                      type: boolean
+                    phase:
+                      description: Phase of the owned resource.
+                      type: string
+                    reference:
+                      description: Reference to the owned resource.
+                      properties:
+                        apiVersion:
+                          description: API version of the referent.
+                          type: string
+                        fieldPath:
+                          description: 'If referring to a piece of an object instead of an entire object, this string should contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2]. For example, if the object reference is to a container within a pod, this would take on a value like: "spec.containers{name}" (where "name" refers to the name of the container that triggered the event) or if no container name is specified "spec.containers[2]" (container with index 2 in this pod). This syntax is chosen only to have some well-defined way of referencing a part of an object. TODO: this design is not final and this field is subject to change in the future.'
+                          type: string
+                        kind:
+                          description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                          type: string
+                        name:
+                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                          type: string
+                        namespace:
+                          description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                          type: string
+                        resourceVersion:
+                          description: 'Specific resourceVersion to which this reference is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                          type: string
+                        uid:
+                          description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                          type: string
+                      type: object
+                      x-kubernetes-map-type: atomic
+                  required:
+                    - created
+                  type: object
+                customPortIngressStatus:
+                  description: Status of Notebook ingress for custom ports service. Created only if the robot has an additional config with key `IDE_CUSTOM_PORT_RANGE` and `.spec.ingress` is `true`.
+                  properties:
+                    created:
+                      description: Shows if the owned resource is created.
+                      type: boolean
+                    phase:
+                      description: Phase of the owned resource.
+                      type: string
+                    reference:
+                      description: Reference to the owned resource.
+                      properties:
+                        apiVersion:
+                          description: API version of the referent.
+                          type: string
+                        fieldPath:
+                          description: 'If referring to a piece of an object instead of an entire object, this string should contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2]. For example, if the object reference is to a container within a pod, this would take on a value like: "spec.containers{name}" (where "name" refers to the name of the container that triggered the event) or if no container name is specified "spec.containers[2]" (container with index 2 in this pod). This syntax is chosen only to have some well-defined way of referencing a part of an object. TODO: this design is not final and this field is subject to change in the future.'
+                          type: string
+                        kind:
+                          description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                          type: string
+                        name:
+                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                          type: string
+                        namespace:
+                          description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                          type: string
+                        resourceVersion:
+                          description: 'Specific resourceVersion to which this reference is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                          type: string
+                        uid:
+                          description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                          type: string
+                      type: object
+                      x-kubernetes-map-type: atomic
+                  required:
+                    - created
+                  type: object
+                customPortServiceStatus:
+                  description: Status of Notebook service for custom ports. Created only if the robot has an additional config with key `IDE_CUSTOM_PORT_RANGE`.
+                  properties:
+                    resource:
+                      description: Generic status for any owned resource.
+                      properties:
+                        created:
+                          description: Shows if the owned resource is created.
+                          type: boolean
+                        phase:
+                          description: Phase of the owned resource.
+                          type: string
+                        reference:
+                          description: Reference to the owned resource.
+                          properties:
+                            apiVersion:
+                              description: API version of the referent.
+                              type: string
+                            fieldPath:
+                              description: 'If referring to a piece of an object instead of an entire object, this string should contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2]. For example, if the object reference is to a container within a pod, this would take on a value like: "spec.containers{name}" (where "name" refers to the name of the container that triggered the event) or if no container name is specified "spec.containers[2]" (container with index 2 in this pod). This syntax is chosen only to have some well-defined way of referencing a part of an object. TODO: this design is not final and this field is subject to change in the future.'
+                              type: string
+                            kind:
+                              description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                              type: string
+                            name:
+                              description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                              type: string
+                            namespace:
+                              description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                              type: string
+                            resourceVersion:
+                              description: 'Specific resourceVersion to which this reference is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                              type: string
+                            uid:
+                              description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                              type: string
+                          type: object
+                          x-kubernetes-map-type: atomic
+                      required:
+                        - created
+                      type: object
+                    urls:
+                      additionalProperties:
+                        type: string
+                      description: Connection URL.
+                      type: object
+                  type: object
+                ingressStatus:
+                  description: Status of Notebook Ingress.
+                  properties:
+                    created:
+                      description: Shows if the owned resource is created.
+                      type: boolean
+                    phase:
+                      description: Phase of the owned resource.
+                      type: string
+                    reference:
+                      description: Reference to the owned resource.
+                      properties:
+                        apiVersion:
+                          description: API version of the referent.
+                          type: string
+                        fieldPath:
+                          description: 'If referring to a piece of an object instead of an entire object, this string should contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2]. For example, if the object reference is to a container within a pod, this would take on a value like: "spec.containers{name}" (where "name" refers to the name of the container that triggered the event) or if no container name is specified "spec.containers[2]" (container with index 2 in this pod). This syntax is chosen only to have some well-defined way of referencing a part of an object. TODO: this design is not final and this field is subject to change in the future.'
+                          type: string
+                        kind:
+                          description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                          type: string
+                        name:
+                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                          type: string
+                        namespace:
+                          description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                          type: string
+                        resourceVersion:
+                          description: 'Specific resourceVersion to which this reference is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                          type: string
+                        uid:
+                          description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                          type: string
+                      type: object
+                      x-kubernetes-map-type: atomic
+                  required:
+                    - created
+                  type: object
+                phase:
+                  description: Phase of Notebook.
+                  type: string
+                podStatus:
+                  description: Status of Notebook pod.
+                  properties:
+                    ip:
+                      description: IP of the pod.
+                      type: string
+                    resource:
+                      description: Generic status for any owned resource.
+                      properties:
+                        created:
+                          description: Shows if the owned resource is created.
+                          type: boolean
+                        phase:
+                          description: Phase of the owned resource.
+                          type: string
+                        reference:
+                          description: Reference to the owned resource.
+                          properties:
+                            apiVersion:
+                              description: API version of the referent.
+                              type: string
+                            fieldPath:
+                              description: 'If referring to a piece of an object instead of an entire object, this string should contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2]. For example, if the object reference is to a container within a pod, this would take on a value like: "spec.containers{name}" (where "name" refers to the name of the container that triggered the event) or if no container name is specified "spec.containers[2]" (container with index 2 in this pod). This syntax is chosen only to have some well-defined way of referencing a part of an object. TODO: this design is not final and this field is subject to change in the future.'
+                              type: string
+                            kind:
+                              description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                              type: string
+                            name:
+                              description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                              type: string
+                            namespace:
+                              description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                              type: string
+                            resourceVersion:
+                              description: 'Specific resourceVersion to which this reference is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                              type: string
+                            uid:
+                              description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                              type: string
+                          type: object
+                          x-kubernetes-map-type: atomic
+                      required:
+                        - created
+                      type: object
+                  type: object
+                serviceExportStatus:
+                  description: Status of Notebook ServiceExport. Created only if the instance type is Physical Instance.
+                  properties:
+                    created:
+                      description: Shows if the owned resource is created.
+                      type: boolean
+                    phase:
+                      description: Phase of the owned resource.
+                      type: string
+                    reference:
+                      description: Reference to the owned resource.
+                      properties:
+                        apiVersion:
+                          description: API version of the referent.
+                          type: string
+                        fieldPath:
+                          description: 'If referring to a piece of an object instead of an entire object, this string should contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2]. For example, if the object reference is to a container within a pod, this would take on a value like: "spec.containers{name}" (where "name" refers to the name of the container that triggered the event) or if no container name is specified "spec.containers[2]" (container with index 2 in this pod). This syntax is chosen only to have some well-defined way of referencing a part of an object. TODO: this design is not final and this field is subject to change in the future.'
+                          type: string
+                        kind:
+                          description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                          type: string
+                        name:
+                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                          type: string
+                        namespace:
+                          description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                          type: string
+                        resourceVersion:
+                          description: 'Specific resourceVersion to which this reference is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                          type: string
+                        uid:
+                          description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                          type: string
+                      type: object
+                      x-kubernetes-map-type: atomic
+                  required:
+                    - created
+                  type: object
+                serviceStatus:
+                  description: Status of Notebook service.
+                  properties:
+                    resource:
+                      description: Generic status for any owned resource.
+                      properties:
+                        created:
+                          description: Shows if the owned resource is created.
+                          type: boolean
+                        phase:
+                          description: Phase of the owned resource.
+                          type: string
+                        reference:
+                          description: Reference to the owned resource.
+                          properties:
+                            apiVersion:
+                              description: API version of the referent.
+                              type: string
+                            fieldPath:
+                              description: 'If referring to a piece of an object instead of an entire object, this string should contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2]. For example, if the object reference is to a container within a pod, this would take on a value like: "spec.containers{name}" (where "name" refers to the name of the container that triggered the event) or if no container name is specified "spec.containers[2]" (container with index 2 in this pod). This syntax is chosen only to have some well-defined way of referencing a part of an object. TODO: this design is not final and this field is subject to change in the future.'
+                              type: string
+                            kind:
+                              description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                              type: string
+                            name:
+                              description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                              type: string
+                            namespace:
+                              description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                              type: string
+                            resourceVersion:
+                              description: 'Specific resourceVersion to which this reference is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                              type: string
+                            uid:
+                              description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                              type: string
+                          type: object
+                          x-kubernetes-map-type: atomic
+                      required:
+                        - created
+                      type: object
+                    urls:
+                      additionalProperties:
+                        type: string
+                      description: Connection URL.
+                      type: object
+                  type: object
+              type: object
+          type: object
+      served: true
+      storage: true
+      subresources:
+        status: {}
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.9.2
   name: relayservers.robot.roboscale.io
 spec:
   conversion:
@@ -2078,6 +2450,48 @@ spec:
                     ideEnabled:
                       description: If `true`, a Cloud IDE will be provisioned inside development suite.
                       type: boolean
+                    notebookEnabled:
+                      description: If `true`, a Notebook will be provisioned inside development suite.
+                      type: boolean
+                    notebookTemplate:
+                      description: Configurational parameters of Notebook. Applied if `.spec.notebookEnabled` is set to `true`.
+                      properties:
+                        display:
+                          description: Notebook connects an X11 socket if it's set to `true` and a target Notebook resource is set in labels with key `robolaunch.io/target-vdi`. Applications that requires GUI can be executed such as VLC.
+                          type: boolean
+                        ingress:
+                          description: '[*alpha*] Notebook will create an Ingress resource if `true`.'
+                          type: boolean
+                        privileged:
+                          description: If `true`, containers of Notebook will be privileged containers. It can be used in physical instances where it's necessary to access I/O devices on the host machine. Not recommended to activate this field on cloud instances.
+                          type: boolean
+                        resources:
+                          description: Resource limitations of Notebook.
+                          properties:
+                            cpu:
+                              description: CPU resource limit.
+                              pattern: ^([0-9])+(m)$
+                              type: string
+                            gpuCore:
+                              description: GPU core number that will be allocated.
+                              type: integer
+                            gpuInstance:
+                              default: nvidia.com/gpu
+                              description: GPU instance that will be allocated. eg. nvidia.com/mig-1g.5gb. Defaults to "nvidia.com/gpu".
+                              type: string
+                            memory:
+                              description: Memory resource limit.
+                              pattern: ^([0-9])+(Mi|Gi)$
+                              type: string
+                          type: object
+                        serviceType:
+                          default: NodePort
+                          description: Service type of Notebook. `ClusterIP` and `NodePort` is supported.
+                          enum:
+                            - ClusterIP
+                            - NodePort
+                          type: string
+                      type: object
                     remoteIDEEnabled:
                       description: If `true`, a relay server for remote Cloud IDE will be provisioned inside development suite.
                       type: boolean
@@ -2387,6 +2801,48 @@ spec:
                 ideEnabled:
                   description: If `true`, a Cloud IDE will be provisioned inside development suite.
                   type: boolean
+                notebookEnabled:
+                  description: If `true`, a Notebook will be provisioned inside development suite.
+                  type: boolean
+                notebookTemplate:
+                  description: Configurational parameters of Notebook. Applied if `.spec.notebookEnabled` is set to `true`.
+                  properties:
+                    display:
+                      description: Notebook connects an X11 socket if it's set to `true` and a target Notebook resource is set in labels with key `robolaunch.io/target-vdi`. Applications that requires GUI can be executed such as VLC.
+                      type: boolean
+                    ingress:
+                      description: '[*alpha*] Notebook will create an Ingress resource if `true`.'
+                      type: boolean
+                    privileged:
+                      description: If `true`, containers of Notebook will be privileged containers. It can be used in physical instances where it's necessary to access I/O devices on the host machine. Not recommended to activate this field on cloud instances.
+                      type: boolean
+                    resources:
+                      description: Resource limitations of Notebook.
+                      properties:
+                        cpu:
+                          description: CPU resource limit.
+                          pattern: ^([0-9])+(m)$
+                          type: string
+                        gpuCore:
+                          description: GPU core number that will be allocated.
+                          type: integer
+                        gpuInstance:
+                          default: nvidia.com/gpu
+                          description: GPU instance that will be allocated. eg. nvidia.com/mig-1g.5gb. Defaults to "nvidia.com/gpu".
+                          type: string
+                        memory:
+                          description: Memory resource limit.
+                          pattern: ^([0-9])+(Mi|Gi)$
+                          type: string
+                      type: object
+                    serviceType:
+                      default: NodePort
+                      description: Service type of Notebook. `ClusterIP` and `NodePort` is supported.
+                      enum:
+                        - ClusterIP
+                        - NodePort
+                      type: string
+                  type: object
                 remoteIDEEnabled:
                   description: If `true`, a relay server for remote Cloud IDE will be provisioned inside development suite.
                   type: boolean
@@ -2534,6 +2990,53 @@ spec:
                 active:
                   description: '[*alpha*] Indicates if RobotDevSuite is attached to a Robot and actively provisioned it''s resources.'
                   type: boolean
+                notebookStatus:
+                  description: Status of Notebook.
+                  properties:
+                    connections:
+                      additionalProperties:
+                        type: string
+                      description: Address of the robot service that can be reached from outside.
+                      type: object
+                    resource:
+                      description: Generic status for any owned resource.
+                      properties:
+                        created:
+                          description: Shows if the owned resource is created.
+                          type: boolean
+                        phase:
+                          description: Phase of the owned resource.
+                          type: string
+                        reference:
+                          description: Reference to the owned resource.
+                          properties:
+                            apiVersion:
+                              description: API version of the referent.
+                              type: string
+                            fieldPath:
+                              description: 'If referring to a piece of an object instead of an entire object, this string should contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2]. For example, if the object reference is to a container within a pod, this would take on a value like: "spec.containers{name}" (where "name" refers to the name of the container that triggered the event) or if no container name is specified "spec.containers[2]" (container with index 2 in this pod). This syntax is chosen only to have some well-defined way of referencing a part of an object. TODO: this design is not final and this field is subject to change in the future.'
+                              type: string
+                            kind:
+                              description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                              type: string
+                            name:
+                              description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                              type: string
+                            namespace:
+                              description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                              type: string
+                            resourceVersion:
+                              description: 'Specific resourceVersion to which this reference is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                              type: string
+                            uid:
+                              description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                              type: string
+                          type: object
+                          x-kubernetes-map-type: atomic
+                      required:
+                        - created
+                      type: object
+                  type: object
                 phase:
                   description: Phase of RobotDevSuite.
                   type: string
@@ -3309,6 +3812,48 @@ spec:
                     ideEnabled:
                       description: If `true`, a Cloud IDE will be provisioned inside development suite.
                       type: boolean
+                    notebookEnabled:
+                      description: If `true`, a Notebook will be provisioned inside development suite.
+                      type: boolean
+                    notebookTemplate:
+                      description: Configurational parameters of Notebook. Applied if `.spec.notebookEnabled` is set to `true`.
+                      properties:
+                        display:
+                          description: Notebook connects an X11 socket if it's set to `true` and a target Notebook resource is set in labels with key `robolaunch.io/target-vdi`. Applications that requires GUI can be executed such as VLC.
+                          type: boolean
+                        ingress:
+                          description: '[*alpha*] Notebook will create an Ingress resource if `true`.'
+                          type: boolean
+                        privileged:
+                          description: If `true`, containers of Notebook will be privileged containers. It can be used in physical instances where it's necessary to access I/O devices on the host machine. Not recommended to activate this field on cloud instances.
+                          type: boolean
+                        resources:
+                          description: Resource limitations of Notebook.
+                          properties:
+                            cpu:
+                              description: CPU resource limit.
+                              pattern: ^([0-9])+(m)$
+                              type: string
+                            gpuCore:
+                              description: GPU core number that will be allocated.
+                              type: integer
+                            gpuInstance:
+                              default: nvidia.com/gpu
+                              description: GPU instance that will be allocated. eg. nvidia.com/mig-1g.5gb. Defaults to "nvidia.com/gpu".
+                              type: string
+                            memory:
+                              description: Memory resource limit.
+                              pattern: ^([0-9])+(Mi|Gi)$
+                              type: string
+                          type: object
+                        serviceType:
+                          default: NodePort
+                          description: Service type of Notebook. `ClusterIP` and `NodePort` is supported.
+                          enum:
+                            - ClusterIP
+                            - NodePort
+                          type: string
+                      type: object
                     remoteIDEEnabled:
                       description: If `true`, a relay server for remote Cloud IDE will be provisioned inside development suite.
                       type: boolean
@@ -3823,6 +4368,53 @@ spec:
                           active:
                             description: '[*alpha*] Indicates if RobotDevSuite is attached to a Robot and actively provisioned it''s resources.'
                             type: boolean
+                          notebookStatus:
+                            description: Status of Notebook.
+                            properties:
+                              connections:
+                                additionalProperties:
+                                  type: string
+                                description: Address of the robot service that can be reached from outside.
+                                type: object
+                              resource:
+                                description: Generic status for any owned resource.
+                                properties:
+                                  created:
+                                    description: Shows if the owned resource is created.
+                                    type: boolean
+                                  phase:
+                                    description: Phase of the owned resource.
+                                    type: string
+                                  reference:
+                                    description: Reference to the owned resource.
+                                    properties:
+                                      apiVersion:
+                                        description: API version of the referent.
+                                        type: string
+                                      fieldPath:
+                                        description: 'If referring to a piece of an object instead of an entire object, this string should contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2]. For example, if the object reference is to a container within a pod, this would take on a value like: "spec.containers{name}" (where "name" refers to the name of the container that triggered the event) or if no container name is specified "spec.containers[2]" (container with index 2 in this pod). This syntax is chosen only to have some well-defined way of referencing a part of an object. TODO: this design is not final and this field is subject to change in the future.'
+                                        type: string
+                                      kind:
+                                        description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                                        type: string
+                                      name:
+                                        description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                                        type: string
+                                      namespace:
+                                        description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                                        type: string
+                                      resourceVersion:
+                                        description: 'Specific resourceVersion to which this reference is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                                        type: string
+                                      uid:
+                                        description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                                        type: string
+                                    type: object
+                                    x-kubernetes-map-type: atomic
+                                required:
+                                  - created
+                                type: object
+                            type: object
                           phase:
                             description: Phase of RobotDevSuite.
                             type: string
@@ -4581,6 +5173,53 @@ spec:
                         active:
                           description: '[*alpha*] Indicates if RobotDevSuite is attached to a Robot and actively provisioned it''s resources.'
                           type: boolean
+                        notebookStatus:
+                          description: Status of Notebook.
+                          properties:
+                            connections:
+                              additionalProperties:
+                                type: string
+                              description: Address of the robot service that can be reached from outside.
+                              type: object
+                            resource:
+                              description: Generic status for any owned resource.
+                              properties:
+                                created:
+                                  description: Shows if the owned resource is created.
+                                  type: boolean
+                                phase:
+                                  description: Phase of the owned resource.
+                                  type: string
+                                reference:
+                                  description: Reference to the owned resource.
+                                  properties:
+                                    apiVersion:
+                                      description: API version of the referent.
+                                      type: string
+                                    fieldPath:
+                                      description: 'If referring to a piece of an object instead of an entire object, this string should contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2]. For example, if the object reference is to a container within a pod, this would take on a value like: "spec.containers{name}" (where "name" refers to the name of the container that triggered the event) or if no container name is specified "spec.containers[2]" (container with index 2 in this pod). This syntax is chosen only to have some well-defined way of referencing a part of an object. TODO: this design is not final and this field is subject to change in the future.'
+                                      type: string
+                                    kind:
+                                      description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                                      type: string
+                                    name:
+                                      description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                                      type: string
+                                    namespace:
+                                      description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                                      type: string
+                                    resourceVersion:
+                                      description: 'Specific resourceVersion to which this reference is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                                      type: string
+                                    uid:
+                                      description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                                      type: string
+                                  type: object
+                                  x-kubernetes-map-type: atomic
+                              required:
+                                - created
+                              type: object
+                          type: object
                         phase:
                           description: Phase of RobotDevSuite.
                           type: string
@@ -6372,6 +7011,32 @@ rules:
   - apiGroups:
       - robot.roboscale.io
     resources:
+      - notebooks
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - robot.roboscale.io
+    resources:
+      - notebooks/finalizers
+    verbs:
+      - update
+  - apiGroups:
+      - robot.roboscale.io
+    resources:
+      - notebooks/status
+    verbs:
+      - get
+      - patch
+      - update
+  - apiGroups:
+      - robot.roboscale.io
+    resources:
       - relayservers
     verbs:
       - create
@@ -6768,7 +7433,7 @@ spec:
             - --leader-elect
           command:
             - /manager
-          image: robolaunchio/robot-controller-manager:v0.2.6-alpha.14.7
+          image: robolaunchio/robot-controller-manager:v0.2.6-alpha.14.8
           livenessProbe:
             httpGet:
               path: /healthz
@@ -6868,6 +7533,26 @@ metadata:
     app.kubernetes.io/part-of: robot-operator
   name: robot-mutating-webhook-configuration
 webhooks:
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: robot-webhook-service
+        namespace: robot-system
+        path: /mutate-robot-roboscale-io-v1alpha1-notebook
+    failurePolicy: Fail
+    name: mnotebook.kb.io
+    rules:
+      - apiGroups:
+          - robot.roboscale.io
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - notebooks
+    sideEffects: None
   - admissionReviewVersions:
       - v1
     clientConfig:
@@ -7043,6 +7728,26 @@ metadata:
     app.kubernetes.io/part-of: robot-operator
   name: robot-validating-webhook-configuration
 webhooks:
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: robot-webhook-service
+        namespace: robot-system
+        path: /validate-robot-roboscale-io-v1alpha1-notebook
+    failurePolicy: Fail
+    name: vnotebook.kb.io
+    rules:
+      - apiGroups:
+          - robot.roboscale.io
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - notebooks
+    sideEffects: None
   - admissionReviewVersions:
       - v1
     clientConfig:
