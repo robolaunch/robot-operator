@@ -84,6 +84,43 @@ func (r *RobotDevSuiteReconciler) reconcileDeleteRobotIDE(ctx context.Context, i
 	return nil
 }
 
+func (r *RobotDevSuiteReconciler) reconcileDeleteNotebook(ctx context.Context, instance *robotv1alpha1.RobotDevSuite) error {
+
+	notebookQuery := &robotv1alpha1.Notebook{}
+	err := r.Get(ctx, *instance.GetNotebookMetadata(), notebookQuery)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			instance.Status.NotebookStatus = robotv1alpha1.OwnedRobotServiceStatus{}
+		} else {
+			return err
+		}
+	} else {
+
+		propagationPolicy := v1.DeletePropagationForeground
+		err := r.Delete(ctx, notebookQuery, &client.DeleteOptions{
+			PropagationPolicy: &propagationPolicy,
+		})
+		if err != nil {
+			return err
+		}
+
+		// watch until it's deleted
+		deleted := false
+		for !deleted {
+			notebookQuery := &robotv1alpha1.Notebook{}
+			err := r.Get(ctx, *instance.GetNotebookMetadata(), notebookQuery)
+			if err != nil && errors.IsNotFound(err) {
+				deleted = true
+			}
+			time.Sleep(time.Second * 1)
+		}
+
+		instance.Status.NotebookStatus = robotv1alpha1.OwnedRobotServiceStatus{}
+	}
+
+	return nil
+}
+
 func (r *RobotDevSuiteReconciler) reconcileDeleteRemoteIDERelayServer(ctx context.Context, instance *robotv1alpha1.RobotDevSuite) error {
 
 	remoteIDERelayServerQuery := &robotv1alpha1.RelayServer{}

@@ -91,6 +91,47 @@ func (r *RobotDevSuiteReconciler) reconcileCheckRobotIDE(ctx context.Context, in
 	return nil
 }
 
+func (r *RobotDevSuiteReconciler) reconcileCheckNotebook(ctx context.Context, instance *robotv1alpha1.RobotDevSuite) error {
+
+	notebookQuery := &robotv1alpha1.Notebook{}
+	err := r.Get(ctx, *instance.GetNotebookMetadata(), notebookQuery)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			instance.Status.NotebookStatus = robotv1alpha1.OwnedRobotServiceStatus{}
+		} else {
+			return err
+		}
+	} else {
+
+		if instance.Spec.NotebookEnabled {
+
+			if !reflect.DeepEqual(instance.Spec.NotebookTemplate, notebookQuery.Spec) {
+				notebookQuery.Spec = instance.Spec.NotebookTemplate
+				err = r.Update(ctx, notebookQuery)
+				if err != nil {
+					return err
+				}
+			}
+
+			instance.Status.NotebookStatus.Resource.Created = true
+			reference.SetReference(&instance.Status.NotebookStatus.Resource.Reference, notebookQuery.TypeMeta, notebookQuery.ObjectMeta)
+			instance.Status.NotebookStatus.Resource.Phase = string(notebookQuery.Status.Phase)
+			instance.Status.NotebookStatus.Connections = notebookQuery.Status.ServiceStatus.URLs
+
+		} else {
+
+			err := r.Delete(ctx, notebookQuery)
+			if err != nil {
+				return err
+			}
+
+		}
+
+	}
+
+	return nil
+}
+
 func (r *RobotDevSuiteReconciler) reconcileCheckRemoteIDERelayServer(ctx context.Context, instance *robotv1alpha1.RobotDevSuite) error {
 
 	remoteIDERelayServerQuery := &robotv1alpha1.RelayServer{}

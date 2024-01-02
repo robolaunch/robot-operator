@@ -12,6 +12,61 @@ import (
 )
 
 // ********************************
+// Notebook webhooks
+// ********************************
+
+// log is for logging in this package.
+var notebooklog = logf.Log.WithName("notebook-resource")
+
+func (r *Notebook) SetupWebhookWithManager(mgr ctrl.Manager) error {
+	return ctrl.NewWebhookManagedBy(mgr).
+		For(r).
+		Complete()
+}
+
+// TODO(user): EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
+
+//+kubebuilder:webhook:path=/mutate-robot-roboscale-io-v1alpha1-notebook,mutating=true,failurePolicy=fail,sideEffects=None,groups=robot.roboscale.io,resources=notebooks,verbs=create;update,versions=v1alpha1,name=mnotebook.kb.io,admissionReviewVersions=v1
+
+var _ webhook.Defaulter = &Notebook{}
+
+// Default implements webhook.Defaulter so a webhook will be registered for the type
+func (r *Notebook) Default() {
+	notebooklog.Info("default", "name", r.Name)
+
+	// TODO(user): fill in your defaulting logic.
+}
+
+// TODO(user): change verbs to "verbs=create;update;delete" if you want to enable deletion validation.
+//+kubebuilder:webhook:path=/validate-robot-roboscale-io-v1alpha1-notebook,mutating=false,failurePolicy=fail,sideEffects=None,groups=robot.roboscale.io,resources=notebooks,verbs=create;update,versions=v1alpha1,name=vnotebook.kb.io,admissionReviewVersions=v1
+
+var _ webhook.Validator = &Notebook{}
+
+// ValidateCreate implements webhook.Validator so a webhook will be registered for the type
+func (r *Notebook) ValidateCreate() error {
+	notebooklog.Info("validate create", "name", r.Name)
+
+	// TODO(user): fill in your validation logic upon object creation.
+	return nil
+}
+
+// ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
+func (r *Notebook) ValidateUpdate(old runtime.Object) error {
+	notebooklog.Info("validate update", "name", r.Name)
+
+	// TODO(user): fill in your validation logic upon object update.
+	return nil
+}
+
+// ValidateDelete implements webhook.Validator so a webhook will be registered for the type
+func (r *Notebook) ValidateDelete() error {
+	notebooklog.Info("validate delete", "name", r.Name)
+
+	// TODO(user): fill in your validation logic upon object deletion.
+	return nil
+}
+
+// ********************************
 // RobotIDE webhooks
 // ********************************
 

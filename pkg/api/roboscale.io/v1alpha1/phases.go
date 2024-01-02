@@ -95,6 +95,7 @@ const (
 	RobotDevSuitePhaseRobotNotFound                   RobotDevSuitePhase = "RobotNotFound"
 	RobotDevSuitePhaseCreatingRobotVDI                RobotDevSuitePhase = "CreatingRobotVDI"
 	RobotDevSuitePhaseCreatingRobotIDE                RobotDevSuitePhase = "CreatingRobotIDE"
+	RobotDevSuitePhaseCreatingNotebook                RobotDevSuitePhase = "CreatingNotebook"
 	RobotDevSuitePhaseCreatingRelayServerForRemoteIDE RobotDevSuitePhase = "CreatingRelayServerForRemoteIDE"
 	RobotDevSuitePhaseRunning                         RobotDevSuitePhase = "Running"
 	RobotDevSuitePhaseDeactivating                    RobotDevSuitePhase = "Deactivating"
@@ -124,4 +125,16 @@ const (
 	RobotVDIPhaseCreatingCustomPortService RobotVDIPhase = "CreatingCustomPortService"
 	RobotVDIPhaseCreatingCustomPortIngress RobotVDIPhase = "CreatingCustomPortIngress"
 	RobotVDIPhaseRunning                   RobotVDIPhase = "Running"
+)
+
+type NotebookPhase string
+
+const (
+	NotebookPhaseCreatingService           NotebookPhase = "CreatingService"
+	NotebookPhaseCreatingPod               NotebookPhase = "CreatingPod"
+	NotebookPhaseCreatingIngress           NotebookPhase = "CreatingIngress"
+	NotebookPhaseCreatingCustomPortService NotebookPhase = "CreatingCustomPortService"
+	NotebookPhaseCreatingCustomPortIngress NotebookPhase = "CreatingCustomPortIngress"
+	NotebookPhaseCreatingConfigMap         NotebookPhase = "CreatingConfigMap"
+	NotebookPhaseRunning                   NotebookPhase = "Running"
 )

@@ -39,6 +39,24 @@ func GetRobotIDE(robotDevSuite *robotv1alpha1.RobotDevSuite, robotIDENamespacedN
 	return &robotIDE
 }
 
+func GetNotebook(robotDevSuite *robotv1alpha1.RobotDevSuite, notebookNamespacedName *types.NamespacedName) *robotv1alpha1.Notebook {
+
+	notebook := robotv1alpha1.Notebook{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      notebookNamespacedName.Name,
+			Namespace: notebookNamespacedName.Namespace,
+			Labels:    robotDevSuite.Labels,
+		},
+		Spec: robotDevSuite.Spec.NotebookTemplate,
+	}
+
+	if robotDevSuite.Spec.VDIEnabled {
+		notebook.Labels[internal.TARGET_VDI_LABEL_KEY] = robotDevSuite.GetRobotVDIMetadata().Name
+	}
+
+	return &notebook
+}
+
 func GetRemoteIDERelayServer(robotDevSuite *robotv1alpha1.RobotDevSuite, relayServerNamespacedName *types.NamespacedName) *robotv1alpha1.RelayServer {
 
 	relayServer := robotv1alpha1.RelayServer{

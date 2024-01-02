@@ -25,6 +25,7 @@ func init() {
 	SchemeBuilder.Register(&RobotDevSuite{}, &RobotDevSuiteList{})
 	SchemeBuilder.Register(&RobotIDE{}, &RobotIDEList{})
 	SchemeBuilder.Register(&RobotVDI{}, &RobotVDIList{})
+	SchemeBuilder.Register(&Notebook{}, &NotebookList{})
 }
 
 //+genclient
@@ -113,6 +114,28 @@ type RobotVDIList struct {
 	Items           []RobotVDI `json:"items"`
 }
 
+//+genclient
+//+kubebuilder:object:root=true
+//+kubebuilder:subresource:status
+
+// Notebook is the Schema for the notebooks API.
+type Notebook struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   NotebookSpec   `json:"spec,omitempty"`
+	Status NotebookStatus `json:"status,omitempty"`
+}
+
+//+kubebuilder:object:root=true
+
+// NotebookList contains a list of Notebook.
+type NotebookList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []Notebook `json:"items"`
+}
+
 // ********************************
 // RobotDevSuite types
 // ********************************
@@ -127,6 +150,10 @@ type RobotDevSuiteSpec struct {
 	IDEEnabled bool `json:"ideEnabled,omitempty"`
 	// Configurational parameters of RobotIDE. Applied if `.spec.ideEnabled` is set to `true`.
 	RobotIDETemplate RobotIDESpec `json:"robotIDETemplate,omitempty"`
+	// If `true`, a Notebook will be provisioned inside development suite.
+	NotebookEnabled bool `json:"notebookEnabled,omitempty"`
+	// Configurational parameters of Notebook. Applied if `.spec.notebookEnabled` is set to `true`.
+	NotebookTemplate NotebookSpec `json:"notebookTemplate,omitempty"`
 	// If `true`, a relay server for remote Cloud IDE will be provisioned inside development suite.
 	RemoteIDEEnabled bool `json:"remoteIDEEnabled,omitempty"`
 	// Configurational parameters of remote IDE. Applied if `.spec.remoteIDEEnabled` is set to `true`.
@@ -141,6 +168,8 @@ type RobotDevSuiteStatus struct {
 	RobotVDIStatus OwnedRobotServiceStatus `json:"robotVDIStatus,omitempty"`
 	// Status of RobotIDE.
 	RobotIDEStatus OwnedRobotServiceStatus `json:"robotIDEStatus,omitempty"`
+	// Status of Notebook.
+	NotebookStatus OwnedRobotServiceStatus `json:"notebookStatus,omitempty"`
 	// Status of remote Cloud IDE RelayServer. Created only if the instance type is Physical Instance.
 	RemoteIDERelayServerStatus OwnedRobotServiceStatus `json:"remoteIDERelayServerStatus,omitempty"`
 	// [*alpha*] Indicates if RobotDevSuite is attached to a Robot and actively provisioned it's resources.
@@ -260,4 +289,48 @@ type RobotVDIStatus struct {
 	CustomPortServiceStatus OwnedServiceStatus `json:"customPortServiceStatus,omitempty"`
 	// Status of Cloud IDE ingress for custom ports service. Created only if the robot has an additional config with key `IDE_CUSTOM_PORT_RANGE` and `.spec.ingress` is `true`.
 	CustomPortIngressStatus OwnedResourceStatus `json:"customPortIngressStatus,omitempty"`
+}
+
+// ********************************
+// Notebook types
+// ********************************
+
+// NotebookSpec defines the desired state of Notebook.
+type NotebookSpec struct {
+	// Resource limitations of Notebook.
+	Resources Resources `json:"resources,omitempty"`
+	// Service type of Notebook. `ClusterIP` and `NodePort` is supported.
+	// +kubebuilder:validation:Enum=ClusterIP;NodePort
+	// +kubebuilder:default="NodePort"
+	ServiceType corev1.ServiceType `json:"serviceType,omitempty"`
+	// If `true`, containers of Notebook will be privileged containers.
+	// It can be used in physical instances where it's necessary to access
+	// I/O devices on the host machine.
+	// Not recommended to activate this field on cloud instances.
+	Privileged bool `json:"privileged,omitempty"`
+	// Notebook connects an X11 socket if it's set to `true` and a target Notebook resource is set in labels with key `robolaunch.io/target-vdi`.
+	// Applications that requires GUI can be executed such as VLC.
+	Display bool `json:"display,omitempty"`
+	// [*alpha*] Notebook will create an Ingress resource if `true`.
+	Ingress bool `json:"ingress,omitempty"`
+}
+
+// NotebookStatus defines the observed state of Notebook.
+type NotebookStatus struct {
+	// Phase of Notebook.
+	Phase NotebookPhase `json:"phase,omitempty"`
+	// Status of Notebook pod.
+	PodStatus OwnedPodStatus `json:"podStatus,omitempty"`
+	// Status of Notebook service.
+	ServiceStatus OwnedServiceStatus `json:"serviceStatus,omitempty"`
+	// Status of Notebook Ingress.
+	IngressStatus OwnedResourceStatus `json:"ingressStatus,omitempty"`
+	// Status of Notebook ServiceExport. Created only if the instance type is Physical Instance.
+	ServiceExportStatus OwnedResourceStatus `json:"serviceExportStatus,omitempty"`
+	// Status of Notebook service for custom ports. Created only if the robot has an additional config with key `IDE_CUSTOM_PORT_RANGE`.
+	CustomPortServiceStatus OwnedServiceStatus `json:"customPortServiceStatus,omitempty"`
+	// Status of Notebook ingress for custom ports service. Created only if the robot has an additional config with key `IDE_CUSTOM_PORT_RANGE` and `.spec.ingress` is `true`.
+	CustomPortIngressStatus OwnedResourceStatus `json:"customPortIngressStatus,omitempty"`
+	// Config map status. It's used to add background apps.
+	ConfigMapStatus OwnedResourceStatus `json:"configMapStatus,omitempty"`
 }
