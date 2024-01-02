@@ -1,6 +1,12 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+### Fix
+- **service:** update connection keys
+
+
+<a name="v0.2.6-alpha.14.8"></a>
+## [v0.2.6-alpha.14.8] - 2024-01-02
 ### Feat
 - **notebook:** integrate jupyter notebook
 
@@ -383,7 +389,8 @@
 - Merge pull request [#24](https://github.com/robolaunch/robot-operator/issues/24) from robolaunch/23-allow-multiple-launches
 
 
-[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.14.7...HEAD
+[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.14.8...HEAD
+[v0.2.6-alpha.14.8]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.14.7...v0.2.6-alpha.14.8
 [v0.2.6-alpha.14.7]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.14.6...v0.2.6-alpha.14.7
 [v0.2.6-alpha.14.6]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.14.5...v0.2.6-alpha.14.6
 [v0.2.6-alpha.14.5]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.14.4...v0.2.6-alpha.14.5
