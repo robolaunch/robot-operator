@@ -69,6 +69,36 @@ func (r *RobotDevSuiteReconciler) reconcileHandleRobotIDE(ctx context.Context, i
 	return nil
 }
 
+func (r *RobotDevSuiteReconciler) reconcileHandleNotebook(ctx context.Context, instance *robotv1alpha1.RobotDevSuite) error {
+
+	if instance.Spec.NotebookEnabled {
+		if !instance.Status.NotebookStatus.Resource.Created {
+			instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseCreatingNotebook
+			err := r.reconcileCreateNotebook(ctx, instance)
+			if err != nil {
+				return err
+			}
+			instance.Status.NotebookStatus.Resource.Created = true
+
+			return &robotErr.CreatingResourceError{
+				ResourceKind:      "Notebook",
+				ResourceName:      instance.GetNotebookMetadata().Name,
+				ResourceNamespace: instance.GetNotebookMetadata().Namespace,
+			}
+		}
+
+		if instance.Status.NotebookStatus.Resource.Phase != string(robotv1alpha1.NotebookPhaseRunning) {
+			return &robotErr.WaitingForResourceError{
+				ResourceKind:      "Notebook",
+				ResourceName:      instance.GetNotebookMetadata().Name,
+				ResourceNamespace: instance.GetNotebookMetadata().Namespace,
+			}
+		}
+	}
+
+	return nil
+}
+
 func (r *RobotDevSuiteReconciler) reconcileHandleRemoteIDE(ctx context.Context, instance *robotv1alpha1.RobotDevSuite) error {
 
 	if instance.Spec.RemoteIDEEnabled && label.GetInstanceType(instance) == label.InstanceTypeCloudInstance {

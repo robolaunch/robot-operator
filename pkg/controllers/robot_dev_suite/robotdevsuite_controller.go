@@ -52,6 +52,7 @@ type RobotDevSuiteReconciler struct {
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=robotdevsuites/finalizers,verbs=update
 
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=robotides,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=robot.roboscale.io,resources=notebooks,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=robotvdis,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=relayservers,verbs=get;list;watch;create;update;patch;delete
 
@@ -132,6 +133,11 @@ func (r *RobotDevSuiteReconciler) reconcileCheckStatus(ctx context.Context, inst
 			return robotErr.CheckCreatingOrWaitingError(result, err)
 		}
 
+		err = r.reconcileHandleNotebook(ctx, instance)
+		if err != nil {
+			return robotErr.CheckCreatingOrWaitingError(result, err)
+		}
+
 		err = r.reconcileHandleRemoteIDE(ctx, instance)
 		if err != nil {
 			return robotErr.CheckCreatingOrWaitingError(result, err)
@@ -144,6 +150,11 @@ func (r *RobotDevSuiteReconciler) reconcileCheckStatus(ctx context.Context, inst
 		instance.Status.Phase = robotv1alpha1.RobotDevSuitePhaseDeactivating
 
 		err := r.reconcileDeleteRobotIDE(ctx, instance)
+		if err != nil {
+			return err
+		}
+
+		err = r.reconcileDeleteNotebook(ctx, instance)
 		if err != nil {
 			return err
 		}
@@ -177,6 +188,11 @@ func (r *RobotDevSuiteReconciler) reconcileCheckResources(ctx context.Context, i
 		return err
 	}
 
+	err = r.reconcileCheckNotebook(ctx, instance)
+	if err != nil {
+		return err
+	}
+
 	err = r.reconcileCheckRemoteIDERelayServer(ctx, instance)
 	if err != nil {
 		return err
@@ -191,6 +207,7 @@ func (r *RobotDevSuiteReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		For(&robotv1alpha1.RobotDevSuite{}).
 		Owns(&robotv1alpha1.RobotVDI{}).
 		Owns(&robotv1alpha1.RobotIDE{}).
+		Owns(&robotv1alpha1.Notebook{}).
 		Owns(&robotv1alpha1.RelayServer{}).
 		Watches(
 			&source.Kind{Type: &robotv1alpha1.Robot{}},

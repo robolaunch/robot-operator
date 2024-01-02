@@ -24,6 +24,13 @@ func (robotDevSuite *RobotDevSuite) GetRobotIDEMetadata() *types.NamespacedName 
 	}
 }
 
+func (robotDevSuite *RobotDevSuite) GetNotebookMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Namespace: robotDevSuite.Namespace,
+		Name:      robotDevSuite.Name + internal.NOTEBOOK_POSTFIX,
+	}
+}
+
 func (robotDevSuite *RobotDevSuite) GetRemoteIDERelayServerMetadata() *types.NamespacedName {
 	return &types.NamespacedName{
 		Namespace: robotDevSuite.Namespace,

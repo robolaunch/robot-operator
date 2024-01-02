@@ -95,6 +95,7 @@ const (
 	RobotDevSuitePhaseRobotNotFound                   RobotDevSuitePhase = "RobotNotFound"
 	RobotDevSuitePhaseCreatingRobotVDI                RobotDevSuitePhase = "CreatingRobotVDI"
 	RobotDevSuitePhaseCreatingRobotIDE                RobotDevSuitePhase = "CreatingRobotIDE"
+	RobotDevSuitePhaseCreatingNotebook                RobotDevSuitePhase = "CreatingNotebook"
 	RobotDevSuitePhaseCreatingRelayServerForRemoteIDE RobotDevSuitePhase = "CreatingRelayServerForRemoteIDE"
 	RobotDevSuitePhaseRunning                         RobotDevSuitePhase = "Running"
 	RobotDevSuitePhaseDeactivating                    RobotDevSuitePhase = "Deactivating"

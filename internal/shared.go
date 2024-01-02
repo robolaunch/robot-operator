@@ -111,6 +111,7 @@ const (
 const (
 	ROBOT_VDI_POSTFIX               = "-vdi"
 	ROBOT_IDE_POSTFIX               = "-ide"
+	NOTEBOOK_POSTFIX                = "-notebook"
 	REMOTE_IDE_RELAY_SERVER_POSTFIX = "-relay"
 )
 
