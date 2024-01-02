@@ -9,6 +9,7 @@ processor:
     - "RobotDevSuite"
     - "MetricsExporter"
     - "RobotVDI"
+    - "Notebook"
     - "RobotIDE"
     - "DiscoveryServer"
     - "ROSBridge"

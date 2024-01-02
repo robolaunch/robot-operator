@@ -13,6 +13,7 @@ Package v1alpha1 contains API Schema definitions for the robot v1alpha1 API grou
 - [RobotDevSuite](#robotdevsuite)
 - [MetricsExporter](#metricsexporter)
 - [RobotVDI](#robotvdi)
+- [Notebook](#notebook)
 - [RobotIDE](#robotide)
 - [DiscoveryServer](#discoveryserver)
 - [ROSBridge](#rosbridge)
@@ -270,6 +271,8 @@ _Appears in:_
 | `robotVDITemplate` _[RobotVDISpec](#robotvdispec)_ | Configurational parameters of RobotVDI. Applied if `.spec.vdiEnabled` is set to `true`. |
 | `ideEnabled` _boolean_ | If `true`, a Cloud IDE will be provisioned inside development suite. |
 | `robotIDETemplate` _[RobotIDESpec](#robotidespec)_ | Configurational parameters of RobotIDE. Applied if `.spec.ideEnabled` is set to `true`. |
+| `notebookEnabled` _boolean_ | If `true`, a Notebook will be provisioned inside development suite. |
+| `notebookTemplate` _[NotebookSpec](#notebookspec)_ | Configurational parameters of Notebook. Applied if `.spec.notebookEnabled` is set to `true`. |
 | `remoteIDEEnabled` _boolean_ | If `true`, a relay server for remote Cloud IDE will be provisioned inside development suite. |
 | `remoteIDERelayServerTemplate` _[RelayServerSpec](#relayserverspec)_ | Configurational parameters of remote IDE. Applied if `.spec.remoteIDEEnabled` is set to `true`. |
 
@@ -290,6 +293,7 @@ _Appears in:_
 | `phase` _[RobotDevSuitePhase](#robotdevsuitephase)_ | Phase of RobotDevSuite. |
 | `robotVDIStatus` _[OwnedRobotServiceStatus](#ownedrobotservicestatus)_ | Status of RobotVDI. |
 | `robotIDEStatus` _[OwnedRobotServiceStatus](#ownedrobotservicestatus)_ | Status of RobotIDE. |
+| `notebookStatus` _[OwnedRobotServiceStatus](#ownedrobotservicestatus)_ | Status of Notebook. |
 | `remoteIDERelayServerStatus` _[OwnedRobotServiceStatus](#ownedrobotservicestatus)_ | Status of remote Cloud IDE RelayServer. Created only if the instance type is Physical Instance. |
 | `active` _boolean_ | [*alpha*] Indicates if RobotDevSuite is attached to a Robot and actively provisioned it's resources. |
 
@@ -404,6 +408,63 @@ _Appears in:_
 | `pvcStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ | Status of Cloud VDI persistent volume claim. This PVC dynamically provisions a volume that is a shared between RobotVDI workloads and other workloads that requests display. |
 | `customPortServiceStatus` _[OwnedServiceStatus](#ownedservicestatus)_ | Status of Cloud IDE service for custom ports. Created only if the robot has an additional config with key `IDE_CUSTOM_PORT_RANGE`. |
 | `customPortIngressStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ | Status of Cloud IDE ingress for custom ports service. Created only if the robot has an additional config with key `IDE_CUSTOM_PORT_RANGE` and `.spec.ingress` is `true`. |
+
+
+#### Notebook
+
+
+
+Notebook is the Schema for the notebooks API.
+
+
+
+| Field | Description |
+| --- | --- |
+| `apiVersion` _string_ | `robot.roboscale.io/v1alpha1`
+| `kind` _string_ | `Notebook`
+| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |
+| `spec` _[NotebookSpec](#notebookspec)_ |  |
+| `status` _[NotebookStatus](#notebookstatus)_ |  |
+
+
+#### NotebookSpec
+
+
+
+NotebookSpec defines the desired state of Notebook.
+
+_Appears in:_
+- [Notebook](#notebook)
+- [RobotDevSuiteSpec](#robotdevsuitespec)
+
+| Field | Description |
+| --- | --- |
+| `resources` _[Resources](#resources)_ | Resource limitations of Notebook. |
+| `serviceType` _[ServiceType](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#servicetype-v1-core)_ | Service type of Notebook. `ClusterIP` and `NodePort` is supported. |
+| `privileged` _boolean_ | If `true`, containers of Notebook will be privileged containers. It can be used in physical instances where it's necessary to access I/O devices on the host machine. Not recommended to activate this field on cloud instances. |
+| `display` _boolean_ | Notebook connects an X11 socket if it's set to `true` and a target Notebook resource is set in labels with key `robolaunch.io/target-vdi`. Applications that requires GUI can be executed such as VLC. |
+| `ingress` _boolean_ | [*alpha*] Notebook will create an Ingress resource if `true`. |
+
+
+#### NotebookStatus
+
+
+
+NotebookStatus defines the observed state of Notebook.
+
+_Appears in:_
+- [Notebook](#notebook)
+
+| Field | Description |
+| --- | --- |
+| `phase` _[NotebookPhase](#notebookphase)_ | Phase of Notebook. |
+| `podStatus` _[OwnedPodStatus](#ownedpodstatus)_ | Status of Notebook pod. |
+| `serviceStatus` _[OwnedServiceStatus](#ownedservicestatus)_ | Status of Notebook service. |
+| `ingressStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ | Status of Notebook Ingress. |
+| `serviceExportStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ | Status of Notebook ServiceExport. Created only if the instance type is Physical Instance. |
+| `customPortServiceStatus` _[OwnedServiceStatus](#ownedservicestatus)_ | Status of Notebook service for custom ports. Created only if the robot has an additional config with key `IDE_CUSTOM_PORT_RANGE`. |
+| `customPortIngressStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ | Status of Notebook ingress for custom ports service. Created only if the robot has an additional config with key `IDE_CUSTOM_PORT_RANGE` and `.spec.ingress` is `true`. |
+| `configMapStatus` _[OwnedResourceStatus](#ownedresourcestatus)_ | Config map status. It's used to add background apps. |
 
 
 #### RobotIDE
@@ -1093,6 +1154,17 @@ _Appears in:_
 | `interfaces` _string array_ | Network interfaces which are desired to being watched. |
 
 
+#### NotebookPhase
+
+_Underlying type:_ `string`
+
+
+
+_Appears in:_
+- [NotebookStatus](#notebookstatus)
+
+
+
 #### OwnedPodStatus
 
 
@@ -1102,6 +1174,7 @@ _Appears in:_
 _Appears in:_
 - [DiscoveryServerStatus](#discoveryserverstatus)
 - [LaunchPodStatus](#launchpodstatus)
+- [NotebookStatus](#notebookstatus)
 - [RobotIDEStatus](#robotidestatus)
 - [RobotVDIStatus](#robotvdistatus)
 
@@ -1122,6 +1195,7 @@ _Appears in:_
 - [DiscoveryServerInstanceStatus](#discoveryserverinstancestatus)
 - [DiscoveryServerStatus](#discoveryserverstatus)
 - [MetricsExporterStatus](#metricsexporterstatus)
+- [NotebookStatus](#notebookstatus)
 - [OwnedPodStatus](#ownedpodstatus)
 - [OwnedRobotServiceStatus](#ownedrobotservicestatus)
 - [OwnedServiceStatus](#ownedservicestatus)
@@ -1166,6 +1240,7 @@ _Appears in:_
 
 
 _Appears in:_
+- [NotebookStatus](#notebookstatus)
 - [ROSBridgeStatus](#rosbridgestatus)
 - [RelayServerStatus](#relayserverstatus)
 - [RobotIDEStatus](#robotidestatus)
@@ -1259,6 +1334,7 @@ VDI resource limits.
 
 _Appears in:_
 - [LaunchContainerConfig](#launchcontainerconfig)
+- [NotebookSpec](#notebookspec)
 - [RobotIDESpec](#robotidespec)
 - [RobotVDISpec](#robotvdispec)
 
