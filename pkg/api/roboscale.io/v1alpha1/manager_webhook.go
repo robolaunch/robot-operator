@@ -101,6 +101,7 @@ func (r *WorkspaceManager) checkTargetRobotLabel() error {
 	return nil
 }
 
+/*
 func (r *WorkspaceManager) setRepositoryInfo() error {
 
 	for k1, ws := range r.Spec.Workspaces {
@@ -113,7 +114,7 @@ func (r *WorkspaceManager) setRepositoryInfo() error {
 			repo.Owner = userOrOrg
 			repo.Repo = repoName
 
-			lastCommitHash, err := getLastCommitHash(repo)
+			lastCommitHash, _ := getLastCommitHash(repo)
 			repo.Hash = lastCommitHash
 
 			ws.Repositories[k2] = repo
@@ -122,8 +123,9 @@ func (r *WorkspaceManager) setRepositoryInfo() error {
 	}
 
 	return nil
-
 }
+
+*/
 
 func (r *WorkspaceManager) setWorkspacesPath() {
 	if reflect.DeepEqual(r.Spec.WorkspacesPath, "") {
