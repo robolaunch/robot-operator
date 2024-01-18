@@ -2,6 +2,12 @@
 ## [Unreleased]
 
 ### Fix
+- **notebook:** :bug: allow notebook connections over ingress
+
+
+<a name="v0.2.6-alpha.14.9"></a>
+## [v0.2.6-alpha.14.9] - 2024-01-02
+### Fix
 - **service:** update connection keys
 
 
@@ -389,7 +395,8 @@
 - Merge pull request [#24](https://github.com/robolaunch/robot-operator/issues/24) from robolaunch/23-allow-multiple-launches
 
 
-[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.14.8...HEAD
+[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.14.9...HEAD
+[v0.2.6-alpha.14.9]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.14.8...v0.2.6-alpha.14.9
 [v0.2.6-alpha.14.8]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.14.7...v0.2.6-alpha.14.8
 [v0.2.6-alpha.14.7]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.14.6...v0.2.6-alpha.14.7
 [v0.2.6-alpha.14.6]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.14.5...v0.2.6-alpha.14.6
