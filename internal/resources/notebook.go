@@ -49,6 +49,7 @@ func GetNotebookPod(notebook *robotv1alpha1.Notebook, podNamespacedName *types.N
 		Command: internal.Bash(cmdBuilder.String()),
 		Env: []corev1.EnvVar{
 			internal.Env("NOTEBOOK_PORT", strconv.Itoa(NOTEBOOK_PORT)),
+			internal.Env("NOTEBOOK_BASE_URL", robotv1alpha1.GetRobotServicePath(robot, "/notebook")),
 			internal.Env("FILE_BROWSER_PORT", strconv.Itoa(internal.FILE_BROWSER_PORT)),
 			internal.Env("FILE_BROWSER_SERVICE", "notebook"),
 			internal.Env("FILE_BROWSER_BASE_URL", robotv1alpha1.GetRobotServicePath(robot, "/file-browser/notebook")),
