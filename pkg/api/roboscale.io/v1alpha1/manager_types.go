@@ -170,17 +170,17 @@ type WorkspaceManagerStatus struct {
 // BuildManager types
 // ********************************
 
-type BuildManagerScopeType string
+type ScopeType string
 
 const (
-	BuildManagerScopeTypeWorkspace BuildManagerScopeType = "Workspace"
-	BuildManagerScopeTypePath      BuildManagerScopeType = "Path"
+	ScopeTypeWorkspace ScopeType = "Workspace"
+	ScopeTypePath      ScopeType = "Path"
 )
 
-type BuildManagerScope struct {
-	// Type of the BuildManager scope.
+type Scope struct {
+	// Type of the scope.
 	// Allowed scopes are `Workspace` and `Path`.
-	ScopeType BuildManagerScopeType `json:"scopeType"`
+	ScopeType ScopeType `json:"scopeType"`
 	// Name of the workspace.
 	// Should be selected among the existing workspaces in WorkspaceManager's manifests.
 	// It's being applied if the scope type is `Workspace`.
@@ -194,7 +194,7 @@ type BuildManagerScope struct {
 // for each step.
 type Step struct {
 	// Selects the scope for BuildManager step.
-	Scope BuildManagerScope `json:"scope"`
+	Scope Scope `json:"scope"`
 	// Cluster selector.
 	// If the current instance name is on the list, BuildManager creates building jobs.
 	Instances []string `json:"instances,omitempty"`
@@ -239,19 +239,19 @@ type LaunchEntrypointConfig struct {
 	Type LaunchType `json:"type,omitempty"`
 	// Package name. (eg. `robolaunch_cloudy_navigation`)
 	// +kubebuilder:validation:Required
-	Package string `json:"package"`
+	Package string `json:"package,omitempty"`
 	// Launchfile. (eg. `nav_launch.py`)
 	// Required and used if the launch type is `Launch`.
-	Launchfile string `json:"launchfile"`
+	Launchfile string `json:"launchfile,omitempty"`
 	// Executable file name. (eg. `webcam_pub.py`)
 	// Required and used if the launch type is `Run`.
-	Executable string `json:"executable"`
+	Executable string `json:"executable,omitempty"`
 	// If `true`, workspaces are not sourced by default.
 	// Used if the launch type is `Custom`.
-	DisableSourcingWorkspace bool `json:"disableSourcingWs"`
+	DisableSourcingWorkspace bool `json:"disableSourcingWs,omitempty"`
 	// Custom command to launch packages or start nodes.
 	// Required if the launch type is `Custom`.
-	Command string `json:"cmd"`
+	Command string `json:"cmd,omitempty"`
 	// Launch parameters.
 	Parameters map[string]string `json:"parameters,omitempty"`
 }
@@ -278,13 +278,12 @@ const (
 
 // Launch description of a repository.
 type Launch struct {
+	// Selects the scope for launch.
+	// +kubebuilder:validation:Required
+	Scope Scope `json:"scope"`
 	// Cluster selector.
 	// If the current instance name is on the list, LaunchManager creates launch pods.
 	Instances []string `json:"instances,omitempty"`
-	// Name of the workspace.
-	// Should be selected among the existing workspaces in WorkspaceManager's manifests.
-	// +kubebuilder:validation:Required
-	Workspace string `json:"workspace"`
 	// ROS 2 namespacing. May not be suitable for all launchfiles.
 	// If used, all the node names and topic names should be defined relative, not absolute.
 	// (eg. `cmd_vel` instead of /cmd_vel``)

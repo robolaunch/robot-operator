@@ -189,8 +189,8 @@ spec:
                             applied if the scope type is `Path`.
                           type: string
                         scopeType:
-                          description: Type of the BuildManager scope. Allowed scopes
-                            are `Workspace` and `Path`.
+                          description: Type of the scope. Allowed scopes are `Workspace`
+                            and `Path`.
                           type: string
                         workspace:
                           description: Name of the workspace. Should be selected among
@@ -470,8 +470,8 @@ spec:
                                 applied if the scope type is `Path`.
                               type: string
                             scopeType:
-                              description: Type of the BuildManager scope. Allowed
-                                scopes are `Workspace` and `Path`.
+                              description: Type of the scope. Allowed scopes are `Workspace`
+                                and `Path`.
                               type: string
                             workspace:
                               description: Name of the workspace. Should be selected

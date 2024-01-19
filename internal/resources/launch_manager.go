@@ -45,13 +45,16 @@ func GetLaunchPod(launchManager *robotv1alpha1.LaunchManager, podNamespacedName 
 
 	cfg.InjectImagePullPolicy(&launchPod)
 	cfg.SchedulePod(&launchPod, launchManager)
-	cfg.InjectGenericEnvironmentVariables(&launchPod, robot)    // Environment variables
-	cfg.InjectLinuxUserAndGroup(&launchPod, robot)              // Linux user and group configuration
-	cfg.InjectRMWImplementationConfiguration(&launchPod, robot) // RMW implementation configuration
-	cfg.InjectROSDomainID(&launchPod, robot.Spec.RobotConfig.DomainID)
-	cfg.InjectDiscoveryServerConnection(&launchPod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo) // Discovery server configuration
+	cfg.InjectGenericEnvironmentVariables(&launchPod, robot) // Environment variables
+	cfg.InjectLinuxUserAndGroup(&launchPod, robot)           // Linux user and group configuration
 	cfg.InjectRuntimeClass(&launchPod, robot, node)
 	cfg.InjectVolumeConfiguration(&launchPod, robot)
+
+	if robot.Spec.Type == robotv1alpha1.TypeRobot {
+		cfg.InjectRMWImplementationConfiguration(&launchPod, robot) // RMW implementation configuration
+		cfg.InjectROSDomainID(&launchPod, robot.Spec.RobotConfig.DomainID)
+		cfg.InjectDiscoveryServerConnection(&launchPod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo) // Discovery server configuration
+	}
 
 	if InstanceNeedDisplay(*launchManager, robot) && label.GetTargetRobotVDI(launchManager) != "" {
 		// TODO: Add control for validating robot VDI
@@ -94,8 +97,10 @@ func getContainer(launch robotv1alpha1.Launch, launchName string, robot robotv1a
 		},
 	}
 
-	cfg.InjectWorkspaceEnvironmentVariable(&container, robot, launch.Workspace)
 	cfg.InjectVolumeMountConfiguration(&container, robot, "")
+	if launch.Scope.ScopeType == robotv1alpha1.ScopeTypeWorkspace {
+		cfg.InjectWorkspaceEnvironmentVariable(&container, robot, launch.Scope.Workspace)
+	}
 
 	return container
 }
@@ -105,15 +110,20 @@ func buildContainerEntrypoint(launch robotv1alpha1.Launch, robot robotv1alpha1.R
 	sleepTimeInt := 3
 	sleepTime := strconv.Itoa(sleepTimeInt)
 
-	workspace, _ := robot.GetWorkspaceByName(launch.Workspace)
-
 	var cmdBuilder strings.Builder
 	cmdBuilder.WriteString(configure.GetGrantPermissionCmd(robot))
 	cmdBuilder.WriteString("echo \"Starting node in " + sleepTime + " seconds...\" && ")
 	cmdBuilder.WriteString("sleep " + sleepTime + " && ")
-	if !disableSourcingWs {
-		cmdBuilder.WriteString("source " + filepath.Join("/opt", "ros", string(workspace.Distro), "setup.bash") + " && ")
-		cmdBuilder.WriteString("source " + filepath.Join("$WORKSPACES_PATH", launch.Workspace, getWsSubDir(workspace.Distro), "setup.bash") + " && ")
+
+	if launch.Scope.ScopeType == robotv1alpha1.ScopeTypeWorkspace {
+		workspace, _ := robot.GetWorkspaceByName(launch.Scope.Workspace)
+		cmdBuilder.WriteString("cd $WORKSPACES_PATH/" + launch.Scope.Workspace + " && ")
+		if !disableSourcingWs {
+			cmdBuilder.WriteString("source " + filepath.Join("/opt", "ros", string(workspace.Distro), "setup.bash") + " && ")
+			cmdBuilder.WriteString("source " + filepath.Join("$WORKSPACES_PATH", launch.Scope.Workspace, getWsSubDir(workspace.Distro), "setup.bash") + " && ")
+		}
+	} else if launch.Scope.ScopeType == robotv1alpha1.ScopeTypePath {
+		cmdBuilder.WriteString("cd " + launch.Scope.Path + " && ")
 	}
 
 	switch launch.Entrypoint.Type {

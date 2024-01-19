@@ -49,9 +49,9 @@ func GetBuildJob(buildManager *robotv1alpha1.BuildManager, robot *robotv1alpha1.
 	cmdBuilder.WriteString(configure.GetGrantPermissionCmd(*robot))
 
 	changeDirCmd := ""
-	if step.Scope.ScopeType == robotv1alpha1.BuildManagerScopeTypeWorkspace {
+	if step.Scope.ScopeType == robotv1alpha1.ScopeTypeWorkspace {
 		changeDirCmd = "cd $WORKSPACES_PATH/" + step.Scope.Workspace
-	} else if step.Scope.ScopeType == robotv1alpha1.BuildManagerScopeTypePath {
+	} else if step.Scope.ScopeType == robotv1alpha1.ScopeTypePath {
 		changeDirCmd = "cd " + step.Scope.Path
 	}
 
@@ -114,7 +114,7 @@ func GetBuildJob(buildManager *robotv1alpha1.BuildManager, robot *robotv1alpha1.
 	jobCfg.SchedulePod(&job, robot)
 	jobCfg.InjectVolumeConfiguration(&job, *robot)
 
-	if step.Scope.ScopeType == robotv1alpha1.BuildManagerScopeTypeWorkspace {
+	if step.Scope.ScopeType == robotv1alpha1.ScopeTypeWorkspace {
 		jobCfg.InjectWorkspaceEnvironmentVariable(&job, *robot, step.Scope.Workspace)
 	}
 
