@@ -196,6 +196,11 @@ func (r *BuildManager) ValidateCreate() error {
 		return err
 	}
 
+	err = r.checkScopes()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -204,6 +209,11 @@ func (r *BuildManager) ValidateUpdate(old runtime.Object) error {
 	buildmanagerlog.Info("validate update", "name", r.Name)
 
 	err := r.checkTargetRobotLabel()
+	if err != nil {
+		return err
+	}
+
+	err = r.checkScopes()
 	if err != nil {
 		return err
 	}
@@ -222,6 +232,35 @@ func (r *BuildManager) checkTargetRobotLabel() error {
 
 	if _, ok := labels[internal.TARGET_ROBOT_LABEL_KEY]; !ok {
 		return errors.New("target robot label should be added with key " + internal.TARGET_ROBOT_LABEL_KEY)
+	}
+
+	return nil
+}
+
+func (r *BuildManager) checkScopes() error {
+
+	for _, step := range r.Spec.Steps {
+		err := checkScopeOfStep(step)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func checkScopeOfStep(step Step) error {
+
+	if step.Scope.ScopeType == BuildManagerScopeTypeWorkspace {
+		if step.Scope.Workspace == "" {
+			return errors.New("workspace scope is not set for the step " + step.Name)
+		}
+	}
+
+	if step.Scope.ScopeType == BuildManagerScopeTypePath {
+		if step.Scope.Path == "" {
+			return errors.New("path scope is not set for the step " + step.Name)
+		}
 	}
 
 	return nil
