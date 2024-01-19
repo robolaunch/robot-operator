@@ -170,17 +170,17 @@ type WorkspaceManagerStatus struct {
 // BuildManager types
 // ********************************
 
-type BuildManagerScopeType string
+type ScopeType string
 
 const (
-	BuildManagerScopeTypeWorkspace BuildManagerScopeType = "Workspace"
-	BuildManagerScopeTypePath      BuildManagerScopeType = "Path"
+	ScopeTypeWorkspace ScopeType = "Workspace"
+	ScopeTypePath      ScopeType = "Path"
 )
 
-type BuildManagerScope struct {
+type Scope struct {
 	// Type of the BuildManager scope.
 	// Allowed scopes are `Workspace` and `Path`.
-	ScopeType BuildManagerScopeType `json:"scopeType"`
+	ScopeType ScopeType `json:"scopeType"`
 	// Name of the workspace.
 	// Should be selected among the existing workspaces in WorkspaceManager's manifests.
 	// It's being applied if the scope type is `Workspace`.
@@ -194,7 +194,7 @@ type BuildManagerScope struct {
 // for each step.
 type Step struct {
 	// Selects the scope for BuildManager step.
-	Scope BuildManagerScope `json:"scope"`
+	Scope Scope `json:"scope"`
 	// Cluster selector.
 	// If the current instance name is on the list, BuildManager creates building jobs.
 	Instances []string `json:"instances,omitempty"`
