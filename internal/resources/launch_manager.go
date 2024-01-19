@@ -94,8 +94,10 @@ func getContainer(launch robotv1alpha1.Launch, launchName string, robot robotv1a
 		},
 	}
 
-	cfg.InjectWorkspaceEnvironmentVariable(&container, robot, launch.Workspace)
 	cfg.InjectVolumeMountConfiguration(&container, robot, "")
+	if launch.Scope.ScopeType == robotv1alpha1.ScopeTypeWorkspace {
+		cfg.InjectWorkspaceEnvironmentVariable(&container, robot, launch.Scope.Workspace)
+	}
 
 	return container
 }
@@ -105,15 +107,17 @@ func buildContainerEntrypoint(launch robotv1alpha1.Launch, robot robotv1alpha1.R
 	sleepTimeInt := 3
 	sleepTime := strconv.Itoa(sleepTimeInt)
 
-	workspace, _ := robot.GetWorkspaceByName(launch.Workspace)
-
 	var cmdBuilder strings.Builder
 	cmdBuilder.WriteString(configure.GetGrantPermissionCmd(robot))
 	cmdBuilder.WriteString("echo \"Starting node in " + sleepTime + " seconds...\" && ")
 	cmdBuilder.WriteString("sleep " + sleepTime + " && ")
-	if !disableSourcingWs {
-		cmdBuilder.WriteString("source " + filepath.Join("/opt", "ros", string(workspace.Distro), "setup.bash") + " && ")
-		cmdBuilder.WriteString("source " + filepath.Join("$WORKSPACES_PATH", launch.Workspace, getWsSubDir(workspace.Distro), "setup.bash") + " && ")
+
+	if launch.Scope.ScopeType == robotv1alpha1.ScopeTypeWorkspace {
+		workspace, _ := robot.GetWorkspaceByName(launch.Scope.Workspace)
+		if !disableSourcingWs {
+			cmdBuilder.WriteString("source " + filepath.Join("/opt", "ros", string(workspace.Distro), "setup.bash") + " && ")
+			cmdBuilder.WriteString("source " + filepath.Join("$WORKSPACES_PATH", launch.Scope.Workspace, getWsSubDir(workspace.Distro), "setup.bash") + " && ")
+		}
 	}
 
 	switch launch.Entrypoint.Type {

@@ -178,7 +178,7 @@ const (
 )
 
 type Scope struct {
-	// Type of the BuildManager scope.
+	// Type of the scope.
 	// Allowed scopes are `Workspace` and `Path`.
 	ScopeType ScopeType `json:"scopeType"`
 	// Name of the workspace.
@@ -278,13 +278,12 @@ const (
 
 // Launch description of a repository.
 type Launch struct {
+	// Selects the scope for launch.
+	// +kubebuilder:validation:Required
+	Scope Scope `json:"scope"`
 	// Cluster selector.
 	// If the current instance name is on the list, LaunchManager creates launch pods.
 	Instances []string `json:"instances,omitempty"`
-	// Name of the workspace.
-	// Should be selected among the existing workspaces in WorkspaceManager's manifests.
-	// +kubebuilder:validation:Required
-	Workspace string `json:"workspace"`
 	// ROS 2 namespacing. May not be suitable for all launchfiles.
 	// If used, all the node names and topic names should be defined relative, not absolute.
 	// (eg. `cmd_vel` instead of /cmd_vel``)
