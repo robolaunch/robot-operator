@@ -45,13 +45,16 @@ func GetLaunchPod(launchManager *robotv1alpha1.LaunchManager, podNamespacedName 
 
 	cfg.InjectImagePullPolicy(&launchPod)
 	cfg.SchedulePod(&launchPod, launchManager)
-	cfg.InjectGenericEnvironmentVariables(&launchPod, robot)    // Environment variables
-	cfg.InjectLinuxUserAndGroup(&launchPod, robot)              // Linux user and group configuration
-	cfg.InjectRMWImplementationConfiguration(&launchPod, robot) // RMW implementation configuration
-	cfg.InjectROSDomainID(&launchPod, robot.Spec.RobotConfig.DomainID)
-	cfg.InjectDiscoveryServerConnection(&launchPod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo) // Discovery server configuration
+	cfg.InjectGenericEnvironmentVariables(&launchPod, robot) // Environment variables
+	cfg.InjectLinuxUserAndGroup(&launchPod, robot)           // Linux user and group configuration
 	cfg.InjectRuntimeClass(&launchPod, robot, node)
 	cfg.InjectVolumeConfiguration(&launchPod, robot)
+
+	if robot.Spec.Type == robotv1alpha1.TypeRobot {
+		cfg.InjectRMWImplementationConfiguration(&launchPod, robot) // RMW implementation configuration
+		cfg.InjectROSDomainID(&launchPod, robot.Spec.RobotConfig.DomainID)
+		cfg.InjectDiscoveryServerConnection(&launchPod, robot.Status.DiscoveryServerStatus.Status.ConnectionInfo) // Discovery server configuration
+	}
 
 	if InstanceNeedDisplay(*launchManager, robot) && label.GetTargetRobotVDI(launchManager) != "" {
 		// TODO: Add control for validating robot VDI
