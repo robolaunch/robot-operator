@@ -170,17 +170,36 @@ type WorkspaceManagerStatus struct {
 // BuildManager types
 // ********************************
 
+type BuildManagerScopeType string
+
+const (
+	BuildManagerScopeTypeWorkspace BuildManagerScopeType = "Workspace"
+	BuildManagerScopeTypePath      BuildManagerScopeType = "Path"
+)
+
+type BuildManagerScope struct {
+	// Type of the BuildManager scope.
+	// Allowed scopes are `Workspace` and `Path`.
+	ScopeType BuildManagerScopeType `json:"scopeType"`
+	// Name of the workspace.
+	// Should be selected among the existing workspaces in WorkspaceManager's manifests.
+	// It's being applied if the scope type is `Workspace`.
+	Workspace string `json:"workspace"`
+	// Absolute path of the directory.
+	// It's being applied if the scope type is `Path`.
+	Path string `json:"path"`
+}
+
 // Step is a command or script to execute when building a robot. Either `command` or `script` should be specified
 // for each step.
 type Step struct {
+	// Selects the scope for BuildManager step.
+	Scope BuildManagerScope `json:"scope"`
 	// Cluster selector.
 	// If the current instance name is on the list, BuildManager creates building jobs.
 	Instances []string `json:"instances,omitempty"`
 	// Name of the step.
 	Name string `json:"name"`
-	// Name of the workspace.
-	// Should be selected among the existing workspaces in WorkspaceManager's manifests.
-	Workspace string `json:"workspace"`
 	// Bash command to run.
 	// Assume that your command will be `/bin/bash -c <COMMAND>`.
 	// Use logical operators (eg. `&&`) and pipes if the multiple dependent commands will be executed.
