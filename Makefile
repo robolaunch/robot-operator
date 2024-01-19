@@ -223,3 +223,6 @@ gh-helm: manifests kustomize helmify
 
 changelog: git-chglog
 	$(GIT_CHGLOG) --config ${GIT_CHGLOG_CONFIG_PATH} -o CHANGELOG.md
+
+reference:
+	sed -i -e "s/\(<small>\).*\(<\/small>\)/<small>${RELEASE}<\/small>/g" docs/_coverpage.md
