@@ -253,13 +253,13 @@ func checkScopeOfStep(step Step) error {
 
 	if step.Scope.ScopeType == BuildManagerScopeTypeWorkspace {
 		if step.Scope.Workspace == "" {
-			return errors.New("workspace scope is not set for the step " + step.Name)
+			return errors.New("workspace scope is not set for the step '" + step.Name + "'")
 		}
 	}
 
 	if step.Scope.ScopeType == BuildManagerScopeTypePath {
 		if step.Scope.Path == "" {
-			return errors.New("path scope is not set for the step " + step.Name)
+			return errors.New("path scope is not set for the step '" + step.Name + "'")
 		}
 	}
 
