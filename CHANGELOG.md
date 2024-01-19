@@ -1,6 +1,12 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+### Feat
+- **build:** integrate buildmanager for environments
+
+
+<a name="v0.2.6-alpha.15"></a>
+## [v0.2.6-alpha.15] - 2024-01-18
 ### Fix
 - **notebook:** :bug: allow notebook connections over ingress
 
@@ -395,7 +401,8 @@
 - Merge pull request [#24](https://github.com/robolaunch/robot-operator/issues/24) from robolaunch/23-allow-multiple-launches
 
 
-[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.14.9...HEAD
+[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.15...HEAD
+[v0.2.6-alpha.15]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.14.9...v0.2.6-alpha.15
 [v0.2.6-alpha.14.9]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.14.8...v0.2.6-alpha.14.9
 [v0.2.6-alpha.14.8]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.14.7...v0.2.6-alpha.14.8
 [v0.2.6-alpha.14.7]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.14.6...v0.2.6-alpha.14.7

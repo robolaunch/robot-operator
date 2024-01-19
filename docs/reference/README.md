@@ -817,6 +817,33 @@ _Appears in:_
 
 
 
+#### BuildManagerScope
+
+
+
+
+
+_Appears in:_
+- [Step](#step)
+
+| Field | Description |
+| --- | --- |
+| `scopeType` _[BuildManagerScopeType](#buildmanagerscopetype)_ | Type of the BuildManager scope. Allowed scopes are `Workspace` and `Path`. |
+| `workspace` _string_ | Name of the workspace. Should be selected among the existing workspaces in WorkspaceManager's manifests. It's being applied if the scope type is `Workspace`. |
+| `path` _string_ | Absolute path of the directory. It's being applied if the scope type is `Path`. |
+
+
+#### BuildManagerScopeType
+
+_Underlying type:_ `string`
+
+
+
+_Appears in:_
+- [BuildManagerScope](#buildmanagerscope)
+
+
+
 #### ConnectionInfo
 
 
@@ -1439,9 +1466,9 @@ _Appears in:_
 
 | Field | Description |
 | --- | --- |
+| `scope` _[BuildManagerScope](#buildmanagerscope)_ | Selects the scope for BuildManager step. |
 | `instances` _string array_ | Cluster selector. If the current instance name is on the list, BuildManager creates building jobs. |
 | `name` _string_ | Name of the step. |
-| `workspace` _string_ | Name of the workspace. Should be selected among the existing workspaces in WorkspaceManager's manifests. |
 | `command` _string_ | Bash command to run. Assume that your command will be `/bin/bash -c <COMMAND>`. Use logical operators (eg. `&&`) and pipes if the multiple dependent commands will be executed. |
 | `script` _string_ | Bash script to run. |
 | `env` _[EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#envvar-v1-core) array_ | Environment variables for step. |

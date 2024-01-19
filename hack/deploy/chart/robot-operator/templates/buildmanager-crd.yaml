@@ -189,16 +189,31 @@ spec:
                     name:
                       description: Name of the step.
                       type: string
+                    scope:
+                      description: Selects the scope for BuildManager step.
+                      properties:
+                        path:
+                          description: Absolute path of the directory. It's being applied
+                            if the scope type is `Path`.
+                          type: string
+                        scopeType:
+                          description: Type of the BuildManager scope. Allowed scopes
+                            are `Workspace` and `Path`.
+                          type: string
+                        workspace:
+                          description: Name of the workspace. Should be selected among
+                            the existing workspaces in WorkspaceManager's manifests.
+                            It's being applied if the scope type is `Workspace`.
+                          type: string
+                      required:
+                      - scopeType
+                      type: object
                     script:
                       description: Bash script to run.
                       type: string
-                    workspace:
-                      description: Name of the workspace. Should be selected among the
-                        existing workspaces in WorkspaceManager's manifests.
-                      type: string
                   required:
                   - name
-                  - workspace
+                  - scope
                   type: object
                 type: array
             type: object
@@ -453,16 +468,31 @@ spec:
                         name:
                           description: Name of the step.
                           type: string
+                        scope:
+                          description: Selects the scope for BuildManager step.
+                          properties:
+                            path:
+                              description: Absolute path of the directory. It's being
+                                applied if the scope type is `Path`.
+                              type: string
+                            scopeType:
+                              description: Type of the BuildManager scope. Allowed scopes
+                                are `Workspace` and `Path`.
+                              type: string
+                            workspace:
+                              description: Name of the workspace. Should be selected
+                                among the existing workspaces in WorkspaceManager's
+                                manifests. It's being applied if the scope type is `Workspace`.
+                              type: string
+                          required:
+                          - scopeType
+                          type: object
                         script:
                           description: Bash script to run.
                           type: string
-                        workspace:
-                          description: Name of the workspace. Should be selected among
-                            the existing workspaces in WorkspaceManager's manifests.
-                          type: string
                       required:
                       - name
-                      - workspace
+                      - scope
                       type: object
                   type: object
                 type: array
