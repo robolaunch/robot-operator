@@ -117,10 +117,13 @@ func buildContainerEntrypoint(launch robotv1alpha1.Launch, robot robotv1alpha1.R
 
 	if launch.Scope.ScopeType == robotv1alpha1.ScopeTypeWorkspace {
 		workspace, _ := robot.GetWorkspaceByName(launch.Scope.Workspace)
+		cmdBuilder.WriteString("cd $WORKSPACES_PATH/" + launch.Scope.Workspace + " && ")
 		if !disableSourcingWs {
 			cmdBuilder.WriteString("source " + filepath.Join("/opt", "ros", string(workspace.Distro), "setup.bash") + " && ")
 			cmdBuilder.WriteString("source " + filepath.Join("$WORKSPACES_PATH", launch.Scope.Workspace, getWsSubDir(workspace.Distro), "setup.bash") + " && ")
 		}
+	} else if launch.Scope.ScopeType == robotv1alpha1.ScopeTypePath {
+		cmdBuilder.WriteString("cd " + launch.Scope.Path + " && ")
 	}
 
 	switch launch.Entrypoint.Type {
