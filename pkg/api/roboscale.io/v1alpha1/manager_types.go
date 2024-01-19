@@ -239,19 +239,19 @@ type LaunchEntrypointConfig struct {
 	Type LaunchType `json:"type,omitempty"`
 	// Package name. (eg. `robolaunch_cloudy_navigation`)
 	// +kubebuilder:validation:Required
-	Package string `json:"package"`
+	Package string `json:"package,omitempty"`
 	// Launchfile. (eg. `nav_launch.py`)
 	// Required and used if the launch type is `Launch`.
-	Launchfile string `json:"launchfile"`
+	Launchfile string `json:"launchfile,omitempty"`
 	// Executable file name. (eg. `webcam_pub.py`)
 	// Required and used if the launch type is `Run`.
-	Executable string `json:"executable"`
+	Executable string `json:"executable,omitempty"`
 	// If `true`, workspaces are not sourced by default.
 	// Used if the launch type is `Custom`.
-	DisableSourcingWorkspace bool `json:"disableSourcingWs"`
+	DisableSourcingWorkspace bool `json:"disableSourcingWs,omitempty"`
 	// Custom command to launch packages or start nodes.
 	// Required if the launch type is `Custom`.
-	Command string `json:"cmd"`
+	Command string `json:"cmd,omitempty"`
 	// Launch parameters.
 	Parameters map[string]string `json:"parameters,omitempty"`
 }
