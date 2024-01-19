@@ -184,10 +184,10 @@ type BuildManagerScope struct {
 	// Name of the workspace.
 	// Should be selected among the existing workspaces in WorkspaceManager's manifests.
 	// It's being applied if the scope type is `Workspace`.
-	Workspace string `json:"workspace"`
+	Workspace string `json:"workspace,omitempty"`
 	// Absolute path of the directory.
 	// It's being applied if the scope type is `Path`.
-	Path string `json:"path"`
+	Path string `json:"path,omitempty"`
 }
 
 // Step is a command or script to execute when building a robot. Either `command` or `script` should be specified
