@@ -184,6 +184,11 @@ func (r *RobotReconciler) reconcileCheckStatusForEnvironment(ctx context.Context
 		return robotErr.CheckCreatingOrWaitingError(result, err)
 	}
 
+	err = r.reconcileHandleManagers(ctx, instance)
+	if err != nil {
+		return robotErr.CheckCreatingOrWaitingError(result, err)
+	}
+
 	return nil
 }
 

@@ -48,11 +48,18 @@ func GetBuildJob(buildManager *robotv1alpha1.BuildManager, robot *robotv1alpha1.
 
 	cmdBuilder.WriteString(configure.GetGrantPermissionCmd(*robot))
 
+	changeDirCmd := ""
+	if step.Scope.ScopeType == robotv1alpha1.BuildManagerScopeTypeWorkspace {
+		changeDirCmd = "cd $WORKSPACES_PATH/" + step.Scope.Workspace
+	} else if step.Scope.ScopeType == robotv1alpha1.BuildManagerScopeTypePath {
+		changeDirCmd = "cd " + step.Scope.Path
+	}
+
 	if step.Command != "" {
-		cmdBuilder.WriteString("cd $WORKSPACES_PATH/" + step.Workspace + " && ")
+		cmdBuilder.WriteString(changeDirCmd + " && ")
 		cmdBuilder.WriteString(step.Command)
 	} else {
-		cmdBuilder.WriteString("cd $WORKSPACES_PATH/" + step.Workspace + " && ")
+		cmdBuilder.WriteString(changeDirCmd + " && ")
 		for _, env := range step.Env {
 			cmdBuilder.WriteString(env.Name + "=" + env.Value + " ")
 		}
@@ -101,12 +108,15 @@ func GetBuildJob(buildManager *robotv1alpha1.BuildManager, robot *robotv1alpha1.
 	}
 
 	jobCfg.InjectGenericEnvironmentVariables(&job, *robot)
-	jobCfg.InjectWorkspaceEnvironmentVariable(&job, *robot, step.Workspace)
 	jobCfg.InjectImagePullPolicy(&job)
 	jobCfg.InjectLinuxUserAndGroup(&job, *robot)
 	jobCfg.InjectRMWImplementationConfiguration(&job, *robot)
 	jobCfg.SchedulePod(&job, robot)
 	jobCfg.InjectVolumeConfiguration(&job, *robot)
+
+	if step.Scope.ScopeType == robotv1alpha1.BuildManagerScopeTypeWorkspace {
+		jobCfg.InjectWorkspaceEnvironmentVariable(&job, *robot, step.Scope.Workspace)
+	}
 
 	return &job
 }
