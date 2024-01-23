@@ -3,6 +3,7 @@ package ros_bridge
 import (
 	"context"
 
+	"github.com/robolaunch/robot-operator/internal/node"
 	"github.com/robolaunch/robot-operator/internal/resources"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -37,7 +38,17 @@ func (r *ROSBridgeReconciler) createPod(ctx context.Context, instance *robotv1al
 		return err
 	}
 
-	pod := resources.GetBridgePod(instance, instance.GetBridgePodMetadata(), *robot)
+	nodeInstance, err := r.reconcileCheckNode(ctx, robot)
+	if err != nil {
+		return err
+	}
+
+	image, err := node.GetImageForBridge(ctx, r.Client, *nodeInstance, *robot)
+	if err != nil {
+		return err
+	}
+
+	pod := resources.GetBridgePod(instance, instance.GetBridgePodMetadata(), *robot, image)
 
 	err = ctrl.SetControllerReference(instance, pod, r.Scheme)
 	if err != nil {
