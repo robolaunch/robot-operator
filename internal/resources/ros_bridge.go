@@ -29,7 +29,7 @@ func getROSBridgeSelector(rosbridge robotv1alpha1.ROSBridge) map[string]string {
 	}
 }
 
-func GetBridgePod(rosbridge *robotv1alpha1.ROSBridge, podNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot) *corev1.Pod {
+func GetBridgePod(rosbridge *robotv1alpha1.ROSBridge, podNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot, image string) *corev1.Pod {
 
 	cfg := configure.PodConfigInjector{}
 
@@ -51,7 +51,7 @@ func GetBridgePod(rosbridge *robotv1alpha1.ROSBridge, podNamespacedName *types.N
 	}
 
 	if rosbridge.Spec.ROS2.Enabled {
-		bridgePod.Spec.Containers = append(bridgePod.Spec.Containers, getROS2BridgeContainer(rosbridge))
+		bridgePod.Spec.Containers = append(bridgePod.Spec.Containers, getROS2BridgeContainer(rosbridge, image))
 	}
 
 	cfg.InjectImagePullPolicy(&bridgePod)
@@ -222,13 +222,13 @@ func getROSBridgeContainer(rosbridge *robotv1alpha1.ROSBridge) corev1.Container 
 	return rosBridgeContainer
 }
 
-func getROS2BridgeContainer(rosbridge *robotv1alpha1.ROSBridge) corev1.Container {
+func getROS2BridgeContainer(rosbridge *robotv1alpha1.ROSBridge, image string) corev1.Container {
 
 	ros2distro := rosbridge.Spec.ROS2.Distro
 
 	ros2BridgeContainer := corev1.Container{
 		Name:    ROS2_BRIDGE_PORT_NAME,
-		Image:   "robolaunchio/foxy-noetic-bridge:v0.0.3",
+		Image:   image,
 		Command: internal.Bash("source /opt/ros/" + string(ros2distro) + "/setup.bash && ros2 launch rosbridge_server rosbridge_websocket_launch.xml address:=0.0.0.0 port:=9091 use_compression:=true ssl:=true"),
 		Ports: []corev1.ContainerPort{
 			{
@@ -238,8 +238,6 @@ func getROS2BridgeContainer(rosbridge *robotv1alpha1.ROSBridge) corev1.Container
 			},
 		},
 	}
-
-	// TODO: inject discovery server configuration
 
 	return ros2BridgeContainer
 }
