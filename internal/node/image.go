@@ -119,6 +119,32 @@ func GetImageForRobot(ctx context.Context, r client.Client, node corev1.Node, ro
 	return imageBuilder.String(), nil
 }
 
+func GetImageForBridge(ctx context.Context, r client.Client, node corev1.Node, robot robotv1alpha1.Robot) (string, error) {
+	var imageBuilder strings.Builder
+	var tagBuilder strings.Builder
+
+	platformVersion := GetPlatformVersion(node)
+	imageProps, err := getImagePropsForRobot(ctx, r, platformVersion, getDistroStr(robot.Spec.RobotConfig.Distributions))
+	if err != nil {
+		return "", err
+	}
+
+	registry, hasRegistry := robot.Labels[internal.ROBOT_IMAGE_REGISTRY_LABEL_KEY]
+	if !hasRegistry {
+		return "", errors.New("registry is not found in label with key " + internal.ROBOT_IMAGE_REGISTRY_LABEL_KEY)
+	}
+
+	organization := "robolaunchio"
+	repository := "devspace-robotics"
+	tagBuilder.WriteString(imageProps.Application.Name + "-")
+	tagBuilder.WriteString(imageProps.Application.Version)
+	tagBuilder.WriteString("-bridge-" + imageProps.DevSpaceImage.Version)
+	imageBuilder.WriteString(filepath.Join(registry, organization, repository) + ":")
+	imageBuilder.WriteString(tagBuilder.String())
+
+	return imageBuilder.String(), nil
+}
+
 func GetImageForEnvironment(ctx context.Context, r client.Client, node corev1.Node, robot robotv1alpha1.Robot) (string, error) {
 	var imageBuilder strings.Builder
 	var tagBuilder strings.Builder
