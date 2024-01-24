@@ -137,6 +137,7 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 	}
 
 	containerCfg.InjectVolumeMountConfiguration(&vdiContainer, robot, "")
+	containerCfg.InjectGPUUsageEnvironmentVariable(&vdiContainer)
 	// add custom ports defined by user
 	if ports, ok := robot.Spec.AdditionalConfigs[internal.VDI_CUSTOM_PORT_RANGE_KEY]; ok {
 		containerCfg.InjectCustomPortConfiguration(&vdiContainer, ports)

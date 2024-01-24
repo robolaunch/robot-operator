@@ -76,6 +76,7 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 	}
 
 	containerCfg.InjectVolumeMountConfiguration(&ideContainer, robot, "")
+	containerCfg.InjectGPUUsageEnvironmentVariable(&ideContainer)
 	// add custom ports defined by user
 	if ports, ok := robot.Spec.AdditionalConfigs[internal.IDE_CUSTOM_PORT_RANGE_KEY]; ok {
 		containerCfg.InjectCustomPortConfiguration(&ideContainer, ports)

@@ -77,6 +77,7 @@ func GetNotebookPod(notebook *robotv1alpha1.Notebook, podNamespacedName *types.N
 	}
 
 	containerCfg.InjectVolumeMountConfiguration(&nbContainer, robot, "")
+	containerCfg.InjectGPUUsageEnvironmentVariable(&nbContainer)
 	// add custom ports defined by user
 	if ports, ok := robot.Spec.AdditionalConfigs[internal.NOTEBOOK_CUSTOM_PORT_RANGE_KEY]; ok {
 		containerCfg.InjectCustomPortConfiguration(&nbContainer, ports)
