@@ -149,3 +149,16 @@ func (cfg *PodConfigInjector) InjectWorkspaceEnvironmentVariable(pod *corev1.Pod
 
 	return pod
 }
+
+func (cfg *ContainerConfigInjector) InjectGPUUsageEnvironmentVariable(container *corev1.Container) *corev1.Container {
+	if val, ok := container.Resources.Limits["nvidia.com/gpu"]; ok {
+		if val.IsZero() {
+			container.Env = append(container.Env, internal.Env("USE_GPU", "false"))
+		} else {
+			container.Env = append(container.Env, internal.Env("USE_GPU", "true"))
+		}
+	} else {
+		container.Env = append(container.Env, internal.Env("USE_GPU", "false"))
+	}
+	return container
+}
