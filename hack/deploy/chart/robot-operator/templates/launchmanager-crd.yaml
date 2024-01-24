@@ -244,12 +244,6 @@ spec:
                           - Run
                           - Custom
                           type: string
-                      required:
-                      - cmd
-                      - disableSourcingWs
-                      - executable
-                      - launchfile
-                      - package
                       type: object
                     instances:
                       description: Cluster selector. If the current instance name is
@@ -262,12 +256,27 @@ spec:
                         If used, all the node names and topic names should be defined
                         relative, not absolute. (eg. `cmd_vel` instead of /cmd_vel``)
                       type: boolean
-                    workspace:
-                      description: Name of the workspace. Should be selected among the
-                        existing workspaces in WorkspaceManager's manifests.
-                      type: string
+                    scope:
+                      description: Selects the scope for launch.
+                      properties:
+                        path:
+                          description: Absolute path of the directory. It's being applied
+                            if the scope type is `Path`.
+                          type: string
+                        scopeType:
+                          description: Type of the scope. Allowed scopes are `Workspace`
+                            and `Path`.
+                          type: string
+                        workspace:
+                          description: Name of the workspace. Should be selected among
+                            the existing workspaces in WorkspaceManager's manifests.
+                            It's being applied if the scope type is `Workspace`.
+                          type: string
+                      required:
+                      - scopeType
+                      type: object
                   required:
-                  - workspace
+                  - scope
                   type: object
                 description: Launch descriptions. Every object defined here generates
                   a launching command in the specified workspace.
