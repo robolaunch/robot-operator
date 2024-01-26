@@ -39,6 +39,7 @@ func (r *Robot) Default() {
 	_ = r.setRepositoryInfo()
 	r.setWorkspacesPath()
 	r.setDiscoveryServerDomainID()
+	r.setGPUCoreForEnvironments()
 }
 
 //+kubebuilder:webhook:path=/validate-robot-roboscale-io-v1alpha1-robot,mutating=false,failurePolicy=fail,sideEffects=None,groups=robot.roboscale.io,resources=robots,verbs=create;update,versions=v1alpha1,name=vrobot.kb.io,admissionReviewVersions=v1
@@ -333,6 +334,18 @@ func (r *Robot) setWorkspacesPath() {
 func (r *Robot) setDiscoveryServerDomainID() {
 	if reflect.DeepEqual(r.Spec.Type, TypeRobot) {
 		r.Spec.RobotConfig.DiscoveryServerTemplate.DomainID = r.Spec.RobotConfig.DomainID
+	}
+}
+
+func (r *Robot) setGPUCoreForEnvironments() {
+	if !r.Spec.RobotDevSuiteTemplate.NotebookEnabled {
+		r.Spec.RobotDevSuiteTemplate.NotebookTemplate.Resources.GPUCore = 0
+	}
+	if !r.Spec.RobotDevSuiteTemplate.VDIEnabled {
+		r.Spec.RobotDevSuiteTemplate.RobotIDETemplate.Resources.GPUCore = 0
+	}
+	if !r.Spec.RobotDevSuiteTemplate.IDEEnabled {
+		r.Spec.RobotDevSuiteTemplate.RobotIDETemplate.Resources.GPUCore = 0
 	}
 }
 
