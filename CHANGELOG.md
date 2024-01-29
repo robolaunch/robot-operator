@@ -1,6 +1,9 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+
+<a name="v0.2.6-alpha.18"></a>
+## [v0.2.6-alpha.18] - 2024-01-26
 ### Fix
 - **gpu:** set gpu core count to 0 if the service is not enabled
 
@@ -413,7 +416,8 @@
 - Merge pull request [#24](https://github.com/robolaunch/robot-operator/issues/24) from robolaunch/23-allow-multiple-launches
 
 
-[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.17...HEAD
+[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.18...HEAD
+[v0.2.6-alpha.18]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.17...v0.2.6-alpha.18
 [v0.2.6-alpha.17]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.16...v0.2.6-alpha.17
 [v0.2.6-alpha.16]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.15...v0.2.6-alpha.16
 [v0.2.6-alpha.15]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.14.9...v0.2.6-alpha.15
