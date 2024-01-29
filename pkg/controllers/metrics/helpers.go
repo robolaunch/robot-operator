@@ -169,6 +169,15 @@ func (r *MetricsExporterReconciler) reconcileCheckGPUConsumingPods(ctx context.C
 				usages[ideSpec.Resources.GPUInstance] = int64(ideSpec.Resources.GPUCore)
 			}
 		}
+
+		if robot.Spec.RobotDevSuiteTemplate.NotebookEnabled {
+			notebookSpec := robot.Spec.RobotDevSuiteTemplate.NotebookTemplate
+			if val, ok := usages[notebookSpec.Resources.GPUInstance]; ok {
+				usages[notebookSpec.Resources.GPUInstance] = val + int64(notebookSpec.Resources.GPUCore)
+			} else {
+				usages[notebookSpec.Resources.GPUInstance] = int64(notebookSpec.Resources.GPUCore)
+			}
+		}
 	}
 
 	for resourceType, vCore := range usages {
