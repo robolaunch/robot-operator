@@ -188,6 +188,8 @@ const (
 	INGRESS_VDI_NGINX_PROXY_BUFFERS_NUMBER_VAL = "4"
 	INGRESS_NGINX_REWRITE_TARGET_KEY           = "nginx.ingress.kubernetes.io/rewrite-target"
 	INGRESS_NGINX_REWRITE_TARGET_VAL           = "/$2"
+	INGRESS_NGINX_PROXY_BODY_SIZE_KEY          = "nginx.ingress.kubernetes.io/proxy-body-size"
+	INGRESS_NGINX_PROXY_BODY_SIZE_VAL          = "900m"
 
 	INGRESS_IDE_CONFIGURATION_SNIPPET_VAL = "" +
 		"auth_request_set $name_upstream_1 $upstream_cookie_name_1;" +
