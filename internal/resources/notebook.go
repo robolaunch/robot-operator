@@ -311,6 +311,7 @@ func GetNotebookCustomIngress(notebook *robotv1alpha1.Notebook, ingressNamespace
 		internal.INGRESS_NGINX_PROXY_BUFFER_SIZE_KEY: internal.INGRESS_NGINX_PROXY_BUFFER_SIZE_VAL,
 		internal.INGRESS_NGINX_REWRITE_TARGET_KEY:    internal.INGRESS_NGINX_REWRITE_TARGET_VAL,
 		internal.INGRESS_PROXY_READ_TIMEOUT_KEY:      internal.INGRESS_PROXY_READ_TIMEOUT_VAL,
+		internal.INGRESS_NGINX_PROXY_BODY_SIZE_KEY:   internal.INGRESS_NGINX_PROXY_BODY_SIZE_VAL,
 	}
 
 	pathTypePrefix := networkingv1.PathTypePrefix
