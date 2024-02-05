@@ -44,15 +44,13 @@ func GetBridgePod(rosbridge *robotv1alpha1.ROSBridge, podNamespacedName *types.N
 		},
 	}
 
-	if rosbridge.Spec.ROS.Enabled {
-		bridgePod.Spec.Containers = append(bridgePod.Spec.Containers, getRoscoreContainer(rosbridge))
-		bridgePod.Spec.Containers = append(bridgePod.Spec.Containers, getInterDistroBridgeContainer(rosbridge))
-		bridgePod.Spec.Containers = append(bridgePod.Spec.Containers, getROSBridgeContainer(rosbridge))
-	}
+	// if rosbridge.Spec.ROS.Enabled {
+	// 	bridgePod.Spec.Containers = append(bridgePod.Spec.Containers, getRoscoreContainer(rosbridge))
+	// 	bridgePod.Spec.Containers = append(bridgePod.Spec.Containers, getInterDistroBridgeContainer(rosbridge))
+	// 	bridgePod.Spec.Containers = append(bridgePod.Spec.Containers, getROSBridgeContainer(rosbridge))
+	// }
 
-	if rosbridge.Spec.ROS2.Enabled {
-		bridgePod.Spec.Containers = append(bridgePod.Spec.Containers, getROS2BridgeContainer(rosbridge, image))
-	}
+	bridgePod.Spec.Containers = append(bridgePod.Spec.Containers, getROS2BridgeContainer(rosbridge, image))
 
 	cfg.InjectImagePullPolicy(&bridgePod)
 	cfg.SchedulePod(&bridgePod, rosbridge)
@@ -165,66 +163,66 @@ func GetBridgeIngress(rosBridge *robotv1alpha1.ROSBridge, ingressNamespacedName 
 	return ingress
 }
 
-func getRoscoreContainer(rosbridge *robotv1alpha1.ROSBridge) corev1.Container {
+// func getRoscoreContainer(rosbridge *robotv1alpha1.ROSBridge) corev1.Container {
 
-	rosdistro := rosbridge.Spec.ROS.Distro
+// 	rosdistro := rosbridge.Spec.ROS.Distro
 
-	roscoreContainer := corev1.Container{
-		Name:    "roscore",
-		Image:   "robolaunchio/foxy-noetic-bridge:v0.0.3",
-		Command: internal.Bash("source /opt/ros/" + string(rosdistro) + "/setup.bash && roscore"),
-		Env: []corev1.EnvVar{
-			internal.Env("ROS_MASTER_URI", "http://127.0.0.1:11311"),
-			internal.Env("ROS_HOSTNAME", "127.0.0.1"),
-		},
-	}
+// 	roscoreContainer := corev1.Container{
+// 		Name:    "roscore",
+// 		Image:   "robolaunchio/foxy-noetic-bridge:v0.0.3",
+// 		Command: internal.Bash("source /opt/ros/" + string(rosdistro) + "/setup.bash && roscore"),
+// 		Env: []corev1.EnvVar{
+// 			internal.Env("ROS_MASTER_URI", "http://127.0.0.1:11311"),
+// 			internal.Env("ROS_HOSTNAME", "127.0.0.1"),
+// 		},
+// 	}
 
-	return roscoreContainer
-}
+// 	return roscoreContainer
+// }
 
-func getInterDistroBridgeContainer(rosbridge *robotv1alpha1.ROSBridge) corev1.Container {
+// func getInterDistroBridgeContainer(rosbridge *robotv1alpha1.ROSBridge) corev1.Container {
 
-	rosdistro := rosbridge.Spec.ROS.Distro
-	ros2distro := rosbridge.Spec.ROS2.Distro
+// 	rosdistro := rosbridge.Spec.ROS.Distro
+// 	ros2distro := rosbridge.Spec.ROS2.Distro
 
-	interDistroBridgeContainer := corev1.Container{
-		Name:    "interdistro-bridge",
-		Image:   "robolaunchio/foxy-noetic-bridge:v0.0.3",
-		Command: internal.Bash("sleep 3 && source /opt/ros/" + string(rosdistro) + "/setup.bash && source /opt/ros/" + string(ros2distro) + "/setup.bash && ros2 run ros1_bridge dynamic_bridge"),
-	}
+// 	interDistroBridgeContainer := corev1.Container{
+// 		Name:    "interdistro-bridge",
+// 		Image:   "robolaunchio/foxy-noetic-bridge:v0.0.3",
+// 		Command: internal.Bash("sleep 3 && source /opt/ros/" + string(rosdistro) + "/setup.bash && source /opt/ros/" + string(ros2distro) + "/setup.bash && ros2 run ros1_bridge dynamic_bridge"),
+// 	}
 
-	// TODO: inject discovery server configuration
+// 	// TODO: inject discovery server configuration
 
-	return interDistroBridgeContainer
-}
+// 	return interDistroBridgeContainer
+// }
 
-func getROSBridgeContainer(rosbridge *robotv1alpha1.ROSBridge) corev1.Container {
+// func getROSBridgeContainer(rosbridge *robotv1alpha1.ROSBridge) corev1.Container {
 
-	rosdistro := rosbridge.Spec.ROS.Distro
+// 	rosdistro := rosbridge.Spec.ROS.Distro
 
-	rosBridgeContainer := corev1.Container{
-		Name:    ROS_BRIDGE_PORT_NAME,
-		Image:   "robolaunchio/foxy-noetic-bridge:v0.0.3",
-		Command: internal.Bash("sleep 3 && source /opt/ros/" + string(rosdistro) + "/setup.bash && roslaunch rosbridge_server rosbridge_websocket.launch websocket_external_port:=31044"),
-		Env: []corev1.EnvVar{
-			internal.Env("ROS_MASTER_URI", "http://127.0.0.1:11311"),
-			internal.Env("ROS_HOSTNAME", "127.0.0.1"),
-		},
-		Ports: []corev1.ContainerPort{
-			{
-				ContainerPort: ROS_BRIDGE_PORT,
-				Name:          ROS_BRIDGE_PORT_NAME,
-				Protocol:      corev1.ProtocolTCP,
-			},
-		},
-	}
+// 	rosBridgeContainer := corev1.Container{
+// 		Name:    ROS_BRIDGE_PORT_NAME,
+// 		Image:   "robolaunchio/foxy-noetic-bridge:v0.0.3",
+// 		Command: internal.Bash("sleep 3 && source /opt/ros/" + string(rosdistro) + "/setup.bash && roslaunch rosbridge_server rosbridge_websocket.launch websocket_external_port:=31044"),
+// 		Env: []corev1.EnvVar{
+// 			internal.Env("ROS_MASTER_URI", "http://127.0.0.1:11311"),
+// 			internal.Env("ROS_HOSTNAME", "127.0.0.1"),
+// 		},
+// 		Ports: []corev1.ContainerPort{
+// 			{
+// 				ContainerPort: ROS_BRIDGE_PORT,
+// 				Name:          ROS_BRIDGE_PORT_NAME,
+// 				Protocol:      corev1.ProtocolTCP,
+// 			},
+// 		},
+// 	}
 
-	return rosBridgeContainer
-}
+// 	return rosBridgeContainer
+// }
 
 func getROS2BridgeContainer(rosbridge *robotv1alpha1.ROSBridge, image string) corev1.Container {
 
-	ros2distro := rosbridge.Spec.ROS2.Distro
+	ros2distro := rosbridge.Spec.Distro
 
 	ros2BridgeContainer := corev1.Container{
 		Name:    ROS2_BRIDGE_PORT_NAME,

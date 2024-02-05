@@ -101,7 +101,7 @@ func (r *RobotReconciler) reconcileCheckROSBridge(ctx context.Context, instance 
 	} else if err != nil {
 		return err
 	} else {
-		if instance.Spec.RobotConfig.ROSBridgeTemplate.ROS2.Enabled {
+		if instance.Spec.RobotConfig.BridgeEnabled {
 			if !reflect.DeepEqual(instance.Spec.RobotConfig.ROSBridgeTemplate, rosBridgeQuery.Spec) {
 				rosBridgeQuery.Spec = instance.Spec.RobotConfig.ROSBridgeTemplate
 				err = r.Update(ctx, rosBridgeQuery)
