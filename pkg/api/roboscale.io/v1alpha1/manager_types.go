@@ -180,6 +180,7 @@ const (
 type Scope struct {
 	// Type of the scope.
 	// Allowed scopes are `Workspace` and `Path`.
+	// +kubebuilder:validation:Enum=Workspace;Path
 	ScopeType ScopeType `json:"scopeType"`
 	// Name of the workspace.
 	// Should be selected among the existing workspaces in WorkspaceManager's manifests.
