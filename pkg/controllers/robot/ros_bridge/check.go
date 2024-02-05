@@ -62,30 +62,6 @@ func (r *ROSBridgeReconciler) reconcileCheckPod(ctx context.Context, instance *r
 			return err
 		}
 
-		rosBridgeFound := false
-		ros2BridgeFound := false
-		rightImage := true
-		for _, container := range bridgePodQuery.Spec.Containers {
-			if container.Name == resources.ROS_BRIDGE_PORT_NAME {
-				rosBridgeFound = true
-			}
-			if container.Name == resources.ROS2_BRIDGE_PORT_NAME {
-				ros2BridgeFound = true
-			}
-		}
-
-		if (instance.Spec.ROS.Enabled && !rosBridgeFound) ||
-			(instance.Spec.ROS2.Enabled && !ros2BridgeFound) ||
-			!rightImage {
-			err = r.Delete(ctx, bridgePodQuery)
-			if err != nil {
-				return err
-			}
-
-			instance.Status.PodStatus.Phase = ""
-			return nil
-		}
-
 		instance.Status.PodStatus.Created = true
 		reference.SetReference(&instance.Status.PodStatus.Reference, bridgePodQuery.TypeMeta, bridgePodQuery.ObjectMeta)
 		instance.Status.PodStatus.Phase = string(bridgePodQuery.Status.Phase)
