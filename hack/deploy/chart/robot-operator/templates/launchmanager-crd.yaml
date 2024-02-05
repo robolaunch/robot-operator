@@ -266,6 +266,9 @@ spec:
                         scopeType:
                           description: Type of the scope. Allowed scopes are `Workspace`
                             and `Path`.
+                          enum:
+                          - Workspace
+                          - Path
                           type: string
                         workspace:
                           description: Name of the workspace. Should be selected among

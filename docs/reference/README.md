@@ -610,8 +610,7 @@ _Appears in:_
 
 | Field | Description |
 | --- | --- |
-| `ros` _[BridgeDistro](#bridgedistro)_ | Configurational parameters for ROS bridge. |
-| `ros2` _[BridgeDistro](#bridgedistro)_ | Configurational parameters for ROS 2 bridge. |
+| `distro` _[ROSDistro](#rosdistro)_ | Configurational parameters for ROS 2 bridge. |
 | `serviceType` _[ServiceType](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#servicetype-v1-core)_ | Service type of ROSBridge. `ClusterIP` and `NodePort` is supported. |
 | `ingress` _boolean_ | [*alpha*] ROSBridge will create an Ingress resource if `true`. |
 
@@ -791,21 +790,6 @@ _Appears in:_
 | `status` _[LaunchManagerStatus](#launchmanagerstatus)_ | Status of attached LaunchManager. |
 
 
-#### BridgeDistro
-
-
-
-
-
-_Appears in:_
-- [ROSBridgeSpec](#rosbridgespec)
-
-| Field | Description |
-| --- | --- |
-| `enabled` _boolean_ | If `true`, resources and workloads are created by ROSBridge. |
-| `distro` _[ROSDistro](#rosdistro)_ | ROS distribution for bridge. |
-
-
 #### BuildManagerPhase
 
 _Underlying type:_ `string`
@@ -814,33 +798,6 @@ _Underlying type:_ `string`
 
 _Appears in:_
 - [BuildManagerStatus](#buildmanagerstatus)
-
-
-
-#### BuildManagerScope
-
-
-
-
-
-_Appears in:_
-- [Step](#step)
-
-| Field | Description |
-| --- | --- |
-| `scopeType` _[BuildManagerScopeType](#buildmanagerscopetype)_ | Type of the BuildManager scope. Allowed scopes are `Workspace` and `Path`. |
-| `workspace` _string_ | Name of the workspace. Should be selected among the existing workspaces in WorkspaceManager's manifests. It's being applied if the scope type is `Workspace`. |
-| `path` _string_ | Absolute path of the directory. It's being applied if the scope type is `Path`. |
-
-
-#### BuildManagerScopeType
-
-_Underlying type:_ `string`
-
-
-
-_Appears in:_
-- [BuildManagerScope](#buildmanagerscope)
 
 
 
@@ -1028,8 +985,8 @@ _Appears in:_
 
 | Field | Description |
 | --- | --- |
+| `scope` _[Scope](#scope)_ | Selects the scope for launch. |
 | `instances` _string array_ | Cluster selector. If the current instance name is on the list, LaunchManager creates launch pods. |
-| `workspace` _string_ | Name of the workspace. Should be selected among the existing workspaces in WorkspaceManager's manifests. |
 | `namespacing` _boolean_ | ROS 2 namespacing. May not be suitable for all launchfiles. If used, all the node names and topic names should be defined relative, not absolute. (eg. `cmd_vel` instead of /cmd_vel``) |
 | `entrypoint` _[LaunchEntrypointConfig](#launchentrypointconfig)_ | Entrypoint configuration of launch. |
 | `container` _[LaunchContainerConfig](#launchcontainerconfig)_ | General container configuration parameters. |
@@ -1328,7 +1285,7 @@ _Underlying type:_ `string`
 ROS 2 distribution selection. Currently supported distributions are Humble, Foxy, Galactic.
 
 _Appears in:_
-- [BridgeDistro](#bridgedistro)
+- [ROSBridgeSpec](#rosbridgespec)
 - [RobotConfig](#robotconfig)
 - [Workspace](#workspace)
 
@@ -1388,6 +1345,7 @@ _Appears in:_
 | `rmwImplementation` _[RMWImplementation](#rmwimplementation)_ | RMW implementation selection. Robot operator currently supports only FastRTPS. See https://docs.ros.org/en/foxy/How-To-Guides/Working-with-multiple-RMW-implementations.html. |
 | `domainID` _integer_ | ROS domain ID for robot. See https://docs.ros.org/en/foxy/Concepts/About-Domain-ID.html. |
 | `discoveryServerTemplate` _[DiscoveryServerSpec](#discoveryserverspec)_ | Discovery server configurational parameters. |
+| `bridgeEnabled` _boolean_ | If enabled, ROSBridge object will be created. |
 | `rosBridgeTemplate` _[ROSBridgeSpec](#rosbridgespec)_ | ROS bridge configurational parameters. |
 
 
@@ -1454,6 +1412,34 @@ _Appears in:_
 | `host` _string_ | [*alpha*] Root DNS name.. |
 
 
+#### Scope
+
+
+
+
+
+_Appears in:_
+- [Launch](#launch)
+- [Step](#step)
+
+| Field | Description |
+| --- | --- |
+| `scopeType` _[ScopeType](#scopetype)_ | Type of the scope. Allowed scopes are `Workspace` and `Path`. |
+| `workspace` _string_ | Name of the workspace. Should be selected among the existing workspaces in WorkspaceManager's manifests. It's being applied if the scope type is `Workspace`. |
+| `path` _string_ | Absolute path of the directory. It's being applied if the scope type is `Path`. |
+
+
+#### ScopeType
+
+_Underlying type:_ `string`
+
+
+
+_Appears in:_
+- [Scope](#scope)
+
+
+
 #### Step
 
 
@@ -1466,7 +1452,7 @@ _Appears in:_
 
 | Field | Description |
 | --- | --- |
-| `scope` _[BuildManagerScope](#buildmanagerscope)_ | Selects the scope for BuildManager step. |
+| `scope` _[Scope](#scope)_ | Selects the scope for BuildManager step. |
 | `instances` _string array_ | Cluster selector. If the current instance name is on the list, BuildManager creates building jobs. |
 | `name` _string_ | Name of the step. |
 | `command` _string_ | Bash command to run. Assume that your command will be `/bin/bash -c <COMMAND>`. Use logical operators (eg. `&&`) and pipes if the multiple dependent commands will be executed. |

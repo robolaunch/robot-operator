@@ -41,38 +41,17 @@ spec:
           spec:
             description: Specification of the desired behavior of the ROSBridge.
             properties:
+              distro:
+                description: Configurational parameters for ROS 2 bridge.
+                enum:
+                - foxy
+                - galactic
+                - humble
+                type: string
               ingress:
                 description: '[*alpha*] ROSBridge will create an Ingress resource if
                   `true`.'
                 type: boolean
-              ros:
-                description: Configurational parameters for ROS bridge.
-                properties:
-                  distro:
-                    description: ROS distribution for bridge.
-                    enum:
-                    - foxy
-                    - galactic
-                    - humble
-                    type: string
-                  enabled:
-                    description: If `true`, resources and workloads are created by ROSBridge.
-                    type: boolean
-                type: object
-              ros2:
-                description: Configurational parameters for ROS 2 bridge.
-                properties:
-                  distro:
-                    description: ROS distribution for bridge.
-                    enum:
-                    - foxy
-                    - galactic
-                    - humble
-                    type: string
-                  enabled:
-                    description: If `true`, resources and workloads are created by ROSBridge.
-                    type: boolean
-                type: object
               serviceType:
                 description: Service type of ROSBridge. `ClusterIP` and `NodePort` is
                   supported.
