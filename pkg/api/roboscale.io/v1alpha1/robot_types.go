@@ -239,6 +239,8 @@ type RobotConfig struct {
 	DomainID int `json:"domainID"`
 	// Discovery server configurational parameters.
 	DiscoveryServerTemplate DiscoveryServerSpec `json:"discoveryServerTemplate,omitempty"`
+	// If enabled, ROSBridge object will be created.
+	BridgeEnabled bool `json:"bridgeEnabled,omitempty"`
 	// ROS bridge configurational parameters.
 	ROSBridgeTemplate ROSBridgeSpec `json:"rosBridgeTemplate,omitempty"`
 }
@@ -472,19 +474,10 @@ type DiscoveryServerStatus struct {
 // ROSBridge types
 // ********************************
 
-type BridgeDistro struct {
-	// If `true`, resources and workloads are created by ROSBridge.
-	Enabled bool `json:"enabled,omitempty"`
-	// ROS distribution for bridge.
-	Distro ROSDistro `json:"distro,omitempty"`
-}
-
 // ROSBridgeSpec defines the desired state of ROSBridge.
 type ROSBridgeSpec struct {
-	// Configurational parameters for ROS bridge.
-	ROS BridgeDistro `json:"ros,omitempty"`
 	// Configurational parameters for ROS 2 bridge.
-	ROS2 BridgeDistro `json:"ros2,omitempty"`
+	Distro ROSDistro `json:"distro,omitempty"`
 	// Service type of ROSBridge. `ClusterIP` and `NodePort` is supported.
 	// +kubebuilder:validation:Enum=ClusterIP;NodePort
 	ServiceType corev1.ServiceType `json:"serviceType,omitempty"`
