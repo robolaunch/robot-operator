@@ -1,0 +1,42 @@
+name: release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        type: string
+        default: "v0.1.0-alpha.1"
+        required: true
+        description: 'Robot Operator Version'
+      isPrerelease:
+        type: boolean
+        default: true
+        required: true
+        description: 'Is this a prerelease of Robot Operator?'
+jobs:
+  release:
+    runs-on: ubuntu-latest  
+    steps:
+    - uses: actions/checkout@v3
+      with:                                                                                           
+        fetch-depth: 0
+    - name: List Tags
+      run: git tag
+    - name: Login to DockerHub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+    - name: Make Release
+      run: hack/release.sh ${{ github.event.inputs.version }}
+    - uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: "build(manifests): update manifests and chart for ${{  github.ref_name }}"
+        tagging_message: ${{ github.event.inputs.version }}
+    - uses: ncipollo/release-action@v1
+      with:
+        tag: ${{ github.event.inputs.version }}
+        name: ${{ github.event.inputs.version }}
+        prerelease: "${{ github.event.inputs.isPrerelease }}"
+        body: |
+          Robot Operator - ${{ github.event.inputs.version }}
