@@ -31,7 +31,7 @@ jobs:
       run: hack/release.sh ${{ github.event.inputs.version }}
     - uses: stefanzweifel/git-auto-commit-action@v4
       with:
-        commit_message: "build(manifests): update manifests and chart for ${{  github.ref_name }}"
+        commit_message: "build(manifests): update manifests and chart for ${{ github.event.inputs.version }}"
         tagging_message: ${{ github.event.inputs.version }}
     - uses: ncipollo/release-action@v1
       with:
