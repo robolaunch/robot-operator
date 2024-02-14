@@ -75,7 +75,7 @@ type StepStatus struct {
 
 func GetRobotServiceDNSWithNodePort(robot Robot, prefix, port string) string {
 	tenancy := label.GetTenancy(&robot)
-	connectionStr := tenancy.CloudInstance + "." + robot.Spec.RootDNSConfig.Host + ":" + port
+	connectionStr := tenancy.Team + "." + robot.Spec.RootDNSConfig.Host + ":" + port
 
 	if prefix != "" {
 		connectionStr = prefix + connectionStr
@@ -86,7 +86,7 @@ func GetRobotServiceDNSWithNodePort(robot Robot, prefix, port string) string {
 
 func GetRobotServiceDNS(robot Robot, prefix, postfix string) string {
 	tenancy := label.GetTenancy(&robot)
-	connectionStr := tenancy.CloudInstance + "." + robot.Spec.RootDNSConfig.Host + GetRobotServicePath(robot, postfix)
+	connectionStr := tenancy.Team + "." + robot.Spec.RootDNSConfig.Host + GetRobotServicePath(robot, postfix)
 
 	if prefix != "" {
 		connectionStr = prefix + connectionStr
@@ -97,7 +97,7 @@ func GetRobotServiceDNS(robot Robot, prefix, postfix string) string {
 
 func GetRelayServerServiceDNS(rs RelayServer, prefix, postfix string) string {
 	tenancy := label.GetTenancy(&rs)
-	connectionStr := tenancy.CloudInstance + "." + rs.Spec.RootDNSConfig.Host + GetRelayServerServicePath(rs, postfix)
+	connectionStr := tenancy.Team + "." + rs.Spec.RootDNSConfig.Host + GetRelayServerServicePath(rs, postfix)
 
 	if prefix != "" {
 		connectionStr = prefix + connectionStr
@@ -108,8 +108,7 @@ func GetRelayServerServiceDNS(rs RelayServer, prefix, postfix string) string {
 
 func GetRobotServicePath(robot Robot, postfix string) string {
 	tenancy := label.GetTenancy(&robot)
-	connectionStr := "/" + tenancy.Team +
-		"/" + tenancy.Region +
+	connectionStr := "/" + tenancy.Region +
 		"/" + tenancy.CloudInstanceAlias +
 		"/" + robot.Namespace +
 		"/" + robot.Name
@@ -123,8 +122,7 @@ func GetRobotServicePath(robot Robot, postfix string) string {
 
 func GetRelayServerServicePath(rs RelayServer, postfix string) string {
 	tenancy := label.GetTenancy(&rs)
-	connectionStr := "/" + tenancy.Team +
-		"/" + tenancy.Region +
+	connectionStr := "/" + tenancy.Region +
 		"/" + tenancy.CloudInstance +
 		"/" + rs.Namespace +
 		"/" + rs.Name
