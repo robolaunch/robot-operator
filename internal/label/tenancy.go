@@ -70,13 +70,13 @@ func GetTenancyMap(obj metav1.Object) map[string]string {
 	labels := obj.GetLabels()
 	tenancyMap := make(map[string]string)
 
-	if organization, ok := labels[internal.ORGANIZATION_LABEL_KEY]; ok {
-		tenancyMap[internal.ORGANIZATION_LABEL_KEY] = organization
-	}
+	// if organization, ok := labels[internal.ORGANIZATION_LABEL_KEY]; ok {
+	// 	tenancyMap[internal.ORGANIZATION_LABEL_KEY] = organization
+	// }
 
-	if team, ok := labels[internal.TEAM_LABEL_KEY]; ok {
-		tenancyMap[internal.TEAM_LABEL_KEY] = team
-	}
+	// if team, ok := labels[internal.TEAM_LABEL_KEY]; ok {
+	// 	tenancyMap[internal.TEAM_LABEL_KEY] = team
+	// }
 
 	if region, ok := labels[internal.REGION_LABEL_KEY]; ok {
 		tenancyMap[internal.REGION_LABEL_KEY] = region
@@ -100,13 +100,13 @@ func GetTenancyMap(obj metav1.Object) map[string]string {
 func GetTenancyMapFromTenancy(tenancy Tenancy) map[string]string {
 	tenancyMap := make(map[string]string)
 
-	if tenancy.Organization != "" {
-		tenancyMap[internal.ORGANIZATION_LABEL_KEY] = tenancy.Organization
-	}
+	// if tenancy.Organization != "" {
+	// 	tenancyMap[internal.ORGANIZATION_LABEL_KEY] = tenancy.Organization
+	// }
 
-	if tenancy.Team != "" {
-		tenancyMap[internal.TEAM_LABEL_KEY] = tenancy.Team
-	}
+	// if tenancy.Team != "" {
+	// 	tenancyMap[internal.TEAM_LABEL_KEY] = tenancy.Team
+	// }
 
 	if tenancy.Region != "" {
 		tenancyMap[internal.REGION_LABEL_KEY] = tenancy.Region
