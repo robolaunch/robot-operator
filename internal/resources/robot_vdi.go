@@ -271,8 +271,8 @@ func GetRobotVDIIngress(robotVDI *robotv1alpha1.RobotVDI, ingressNamespacedName 
 	secretName := robot.Spec.TLSSecretReference.Name
 
 	annotations := map[string]string{
-		internal.INGRESS_AUTH_URL_KEY:                   fmt.Sprintf(internal.INGRESS_AUTH_URL_VAL, tenancy.CloudInstance, rootDNSConfig.Host),
-		internal.INGRESS_AUTH_SIGNIN_KEY:                fmt.Sprintf(internal.INGRESS_AUTH_SIGNIN_VAL, tenancy.CloudInstance, rootDNSConfig.Host),
+		internal.INGRESS_AUTH_URL_KEY:                   fmt.Sprintf(internal.INGRESS_AUTH_URL_VAL, tenancy.Team, rootDNSConfig.Host),
+		internal.INGRESS_AUTH_SIGNIN_KEY:                fmt.Sprintf(internal.INGRESS_AUTH_SIGNIN_VAL, tenancy.Team, rootDNSConfig.Host),
 		internal.INGRESS_AUTH_RESPONSE_HEADERS_KEY:      internal.INGRESS_AUTH_RESPONSE_HEADERS_VAL,
 		internal.INGRESS_CONFIGURATION_SNIPPET_KEY:      internal.INGRESS_VDI_CONFIGURATION_SNIPPET_VAL,
 		internal.INGRESS_CERT_MANAGER_KEY:               internal.INGRESS_CERT_MANAGER_VAL,
@@ -290,14 +290,14 @@ func GetRobotVDIIngress(robotVDI *robotv1alpha1.RobotVDI, ingressNamespacedName 
 		TLS: []networkingv1.IngressTLS{
 			{
 				Hosts: []string{
-					tenancy.CloudInstance + "." + rootDNSConfig.Host,
+					tenancy.Team + "." + rootDNSConfig.Host,
 				},
 				SecretName: secretName,
 			},
 		},
 		Rules: []networkingv1.IngressRule{
 			{
-				Host: tenancy.CloudInstance + "." + rootDNSConfig.Host,
+				Host: tenancy.Team + "." + rootDNSConfig.Host,
 				IngressRuleValue: networkingv1.IngressRuleValue{
 					HTTP: &networkingv1.HTTPIngressRuleValue{
 						Paths: []networkingv1.HTTPIngressPath{
@@ -394,8 +394,8 @@ func GetRobotVDICustomIngress(robotVDI *robotv1alpha1.RobotVDI, ingressNamespace
 	secretName := robot.Spec.TLSSecretReference.Name
 
 	annotations := map[string]string{
-		internal.INGRESS_AUTH_URL_KEY:                fmt.Sprintf(internal.INGRESS_AUTH_URL_VAL, tenancy.CloudInstance, rootDNSConfig.Host),
-		internal.INGRESS_AUTH_SIGNIN_KEY:             fmt.Sprintf(internal.INGRESS_AUTH_SIGNIN_VAL, tenancy.CloudInstance, rootDNSConfig.Host),
+		internal.INGRESS_AUTH_URL_KEY:                fmt.Sprintf(internal.INGRESS_AUTH_URL_VAL, tenancy.Team, rootDNSConfig.Host),
+		internal.INGRESS_AUTH_SIGNIN_KEY:             fmt.Sprintf(internal.INGRESS_AUTH_SIGNIN_VAL, tenancy.Team, rootDNSConfig.Host),
 		internal.INGRESS_AUTH_RESPONSE_HEADERS_KEY:   internal.INGRESS_AUTH_RESPONSE_HEADERS_VAL,
 		internal.INGRESS_CONFIGURATION_SNIPPET_KEY:   internal.INGRESS_IDE_CONFIGURATION_SNIPPET_VAL,
 		internal.INGRESS_CERT_MANAGER_KEY:            internal.INGRESS_CERT_MANAGER_VAL,
@@ -436,14 +436,14 @@ func GetRobotVDICustomIngress(robotVDI *robotv1alpha1.RobotVDI, ingressNamespace
 		TLS: []networkingv1.IngressTLS{
 			{
 				Hosts: []string{
-					tenancy.CloudInstance + "." + rootDNSConfig.Host,
+					tenancy.Team + "." + rootDNSConfig.Host,
 				},
 				SecretName: secretName,
 			},
 		},
 		Rules: []networkingv1.IngressRule{
 			{
-				Host: tenancy.CloudInstance + "." + rootDNSConfig.Host,
+				Host: tenancy.Team + "." + rootDNSConfig.Host,
 				IngressRuleValue: networkingv1.IngressRuleValue{
 					HTTP: &networkingv1.HTTPIngressRuleValue{
 						Paths: ingressPaths,
