@@ -2,6 +2,9 @@
 ## [Unreleased]
 
 
+<a name="0.2.7-alpha.3"></a>
+## [0.2.7-alpha.3] - 2024-02-15
+
 <a name="v0.2.7-alpha.2"></a>
 ## [v0.2.7-alpha.2] - 2024-02-15
 
@@ -434,7 +437,8 @@
 - Merge pull request [#24](https://github.com/robolaunch/robot-operator/issues/24) from robolaunch/23-allow-multiple-launches
 
 
-[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.2...HEAD
+[Unreleased]: https://github.com/robolaunch/robot-operator/compare/0.2.7-alpha.3...HEAD
+[0.2.7-alpha.3]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.2...0.2.7-alpha.3
 [v0.2.7-alpha.2]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.1-test.4...v0.2.7-alpha.2
 [v0.2.7-alpha.1-test.4]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.1-test.3...v0.2.7-alpha.1-test.4
 [v0.2.7-alpha.1-test.3]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.1-test.2...v0.2.7-alpha.1-test.3
