@@ -5,7 +5,7 @@ on:
     inputs:
       version:
         type: string
-        default: "v0.1.0-alpha.1"
+        default: "0.1.0-alpha.1"
         required: true
         description: 'Robot Operator Version'
       isPrerelease:
