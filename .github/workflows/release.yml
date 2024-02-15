@@ -31,12 +31,12 @@ jobs:
       run: hack/release.sh ${{ github.event.inputs.version }}
     - uses: stefanzweifel/git-auto-commit-action@v4
       with:
-        commit_message: "build(manifests): update manifests and chart for ${{ github.event.inputs.version }}"
-        tagging_message: ${{ github.event.inputs.version }}
+        commit_message: "build(manifests): update manifests and chart for v${{ github.event.inputs.version }}"
+        tagging_message: v${{ github.event.inputs.version }}
     - uses: ncipollo/release-action@v1
       with:
-        tag: ${{ github.event.inputs.version }}
-        name: ${{ github.event.inputs.version }}
+        tag: v${{ github.event.inputs.version }}
+        name: v${{ github.event.inputs.version }}
         prerelease: "${{ github.event.inputs.isPrerelease }}"
         body: |
-          Robot Operator - ${{ github.event.inputs.version }}
+          Robot Operator - v${{ github.event.inputs.version }}
