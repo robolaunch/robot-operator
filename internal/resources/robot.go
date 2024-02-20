@@ -158,7 +158,7 @@ func GetLoaderJobForRobot(robot *robotv1alpha1.Robot, jobNamespacedName *types.N
 
 	preparerContainer := corev1.Container{
 		Name:    "preparer",
-		Image:   "ubuntu:focal",
+		Image:   robot.Status.Image,
 		Command: internal.Bash(preparerCmdBuilder.String()),
 	}
 
@@ -279,7 +279,7 @@ func GetLoaderJobForEnvironment(robot *robotv1alpha1.Robot, jobNamespacedName *t
 
 	preparerContainer := corev1.Container{
 		Name:    "preparer",
-		Image:   "ubuntu:focal",
+		Image:   robot.Status.Image,
 		Command: internal.Bash(preparerCmdBuilder.String()),
 	}
 

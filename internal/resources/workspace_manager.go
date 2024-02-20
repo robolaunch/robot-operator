@@ -35,7 +35,7 @@ func GetClonerJob(workspaceManager *robotv1alpha1.WorkspaceManager, jobNamespace
 
 	clonerContainer := corev1.Container{
 		Name:    "cloner",
-		Image:   "ubuntu:focal",
+		Image:   robot.Status.Image,
 		Command: internal.Bash(clonerCmdBuilder.String()),
 	}
 
@@ -84,7 +84,7 @@ func GetCleanupJob(workspaceManager *robotv1alpha1.WorkspaceManager, jobNamespac
 
 	cleanupContainer := corev1.Container{
 		Name:    "cleanup",
-		Image:   "ubuntu:focal",
+		Image:   robot.Status.Image,
 		Command: internal.Bash(cmdBuilder.String()),
 	}
 
