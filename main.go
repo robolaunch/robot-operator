@@ -121,22 +121,14 @@ func main() {
 	}
 
 	// Start controllers and webhooks
+	// v1alpha1
 	startRobotCRDsAndWebhooks(mgr, dynamicClient, *clientset)
 	startManagerCRDsAndWebhooks(mgr, dynamicClient)
 	startDevCRDsAndWebhooks(mgr, dynamicClient)
 	startObserverCRDsAndWebhooks(mgr, dynamicClient)
+	// v1alpha2
+	startProductionCRDsAndWebhooks(mgr, dynamicClient)
 
-	if err = (&ros2Workload.ROS2WorkloadReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "ROS2Workload")
-		os.Exit(1)
-	}
-	if err = (&robotv1alpha2.ROS2Workload{}).SetupWebhookWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create webhook", "webhook", "ROS2Workload")
-		os.Exit(1)
-	}
 	//+kubebuilder:scaffold:builder
 
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
@@ -331,6 +323,22 @@ func startObserverCRDsAndWebhooks(mgr manager.Manager, dynamicClient dynamic.Int
 	}
 	if err := (&robotv1alpha1.RobotDevSuite{}).SetupWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "RobotDevSuite")
+		os.Exit(1)
+	}
+}
+
+// This function starts Production CRDs' controllers and webhooks. Here are the CRDs:
+// - ROS2Workload (ros2workloads.robot.roboscale.io/v1alpha2)
+func startProductionCRDsAndWebhooks(mgr manager.Manager, dynamicClient dynamic.Interface) {
+	if err := (&ros2Workload.ROS2WorkloadReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "ROS2Workload")
+		os.Exit(1)
+	}
+	if err := (&robotv1alpha2.ROS2Workload{}).SetupWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create webhook", "webhook", "ROS2Workload")
 		os.Exit(1)
 	}
 }

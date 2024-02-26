@@ -32,8 +32,6 @@ func (r *ROS2Workload) SetupWebhookWithManager(mgr ctrl.Manager) error {
 		Complete()
 }
 
-// TODO(user): EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-
 //+kubebuilder:webhook:path=/mutate-robot-roboscale-io-v1alpha2-ros2workload,mutating=true,failurePolicy=fail,sideEffects=None,groups=robot.roboscale.io,resources=ros2workloads,verbs=create;update,versions=v1alpha2,name=mros2workload.kb.io,admissionReviewVersions=v1
 
 var _ webhook.Defaulter = &ROS2Workload{}
@@ -41,8 +39,6 @@ var _ webhook.Defaulter = &ROS2Workload{}
 // Default implements webhook.Defaulter so a webhook will be registered for the type
 func (r *ROS2Workload) Default() {
 	ros2workloadlog.Info("default", "name", r.Name)
-
-	// TODO(user): fill in your defaulting logic.
 }
 
 // TODO(user): change verbs to "verbs=create;update;delete" if you want to enable deletion validation.
@@ -53,23 +49,17 @@ var _ webhook.Validator = &ROS2Workload{}
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
 func (r *ROS2Workload) ValidateCreate() error {
 	ros2workloadlog.Info("validate create", "name", r.Name)
-
-	// TODO(user): fill in your validation logic upon object creation.
 	return nil
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
 func (r *ROS2Workload) ValidateUpdate(old runtime.Object) error {
 	ros2workloadlog.Info("validate update", "name", r.Name)
-
-	// TODO(user): fill in your validation logic upon object update.
 	return nil
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
 func (r *ROS2Workload) ValidateDelete() error {
 	ros2workloadlog.Info("validate delete", "name", r.Name)
-
-	// TODO(user): fill in your validation logic upon object deletion.
 	return nil
 }

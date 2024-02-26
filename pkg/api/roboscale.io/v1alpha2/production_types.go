@@ -20,24 +20,11 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
-
-// ROS2WorkloadSpec defines the desired state of ROS2Workload
-type ROS2WorkloadSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
-
-	// Foo is an example field of ROS2Workload. Edit ros2workload_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+func init() {
+	SchemeBuilder.Register(&ROS2Workload{}, &ROS2WorkloadList{})
 }
 
-// ROS2WorkloadStatus defines the observed state of ROS2Workload
-type ROS2WorkloadStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
-}
-
+//+genclient
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 
@@ -59,6 +46,14 @@ type ROS2WorkloadList struct {
 	Items           []ROS2Workload `json:"items"`
 }
 
-func init() {
-	SchemeBuilder.Register(&ROS2Workload{}, &ROS2WorkloadList{})
+// ********************************
+// ROS2Workload types
+// ********************************
+
+// ROS2WorkloadSpec defines the desired state of ROS2Workload
+type ROS2WorkloadSpec struct {
+}
+
+// ROS2WorkloadStatus defines the observed state of ROS2Workload
+type ROS2WorkloadStatus struct {
 }
