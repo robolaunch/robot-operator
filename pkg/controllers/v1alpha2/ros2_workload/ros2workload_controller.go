@@ -19,6 +19,7 @@ package ros2_workload
 import (
 	"context"
 
+	robotErr "github.com/robolaunch/robot-operator/internal/error"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -26,6 +27,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	"github.com/go-logr/logr"
+	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	robotv1alpha2 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha2"
 )
 
@@ -39,11 +41,12 @@ type ROS2WorkloadReconciler struct {
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=ros2workloads/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=ros2workloads/finalizers,verbs=update
 
+//+kubebuilder:rbac:groups=robot.roboscale.io,resources=discoveryservers,verbs=get;list;watch;create;update;patch;delete
+
 var logger logr.Logger
 
 func (r *ROS2WorkloadReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	logger = log.FromContext(ctx)
-	logger.Info("Starting reconciler...")
 
 	var result ctrl.Result = ctrl.Result{}
 
@@ -89,10 +92,22 @@ func (r *ROS2WorkloadReconciler) Reconcile(ctx context.Context, req ctrl.Request
 }
 
 func (r *ROS2WorkloadReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha2.ROS2Workload, result *ctrl.Result) error {
+
+	err := r.reconcileHandleDiscoveryServer(ctx, instance)
+	if err != nil {
+		return robotErr.CheckCreatingOrWaitingError(result, err)
+	}
+
 	return nil
 }
 
 func (r *ROS2WorkloadReconciler) reconcileCheckResources(ctx context.Context, instance *robotv1alpha2.ROS2Workload) error {
+
+	err := r.reconcileCheckDiscoveryServer(ctx, instance)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -100,5 +115,6 @@ func (r *ROS2WorkloadReconciler) reconcileCheckResources(ctx context.Context, in
 func (r *ROS2WorkloadReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&robotv1alpha2.ROS2Workload{}).
+		Owns(&robotv1alpha1.DiscoveryServer{}).
 		Complete(r)
 }
