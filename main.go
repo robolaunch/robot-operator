@@ -37,18 +37,20 @@ import (
 	mcsv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/external/apis/mcsv1alpha1/v1alpha1"
 
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
-	buildManager "github.com/robolaunch/robot-operator/pkg/controllers/build_manager"
-	launchManager "github.com/robolaunch/robot-operator/pkg/controllers/launch_manager"
-	"github.com/robolaunch/robot-operator/pkg/controllers/metrics"
-	robot "github.com/robolaunch/robot-operator/pkg/controllers/robot"
-	discoveryServer "github.com/robolaunch/robot-operator/pkg/controllers/robot/discovery_server"
-	relayServer "github.com/robolaunch/robot-operator/pkg/controllers/robot/relay_server"
-	rosBridge "github.com/robolaunch/robot-operator/pkg/controllers/robot/ros_bridge"
-	robotDevSuite "github.com/robolaunch/robot-operator/pkg/controllers/robot_dev_suite"
-	"github.com/robolaunch/robot-operator/pkg/controllers/robot_dev_suite/notebook"
-	robotIDE "github.com/robolaunch/robot-operator/pkg/controllers/robot_dev_suite/robot_ide"
-	robotVDI "github.com/robolaunch/robot-operator/pkg/controllers/robot_dev_suite/robot_vdi"
-	workspaceManager "github.com/robolaunch/robot-operator/pkg/controllers/workspace_manager"
+	robotv1alpha2 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha2"
+	buildManager "github.com/robolaunch/robot-operator/pkg/controllers/v1alpha1/build_manager"
+	launchManager "github.com/robolaunch/robot-operator/pkg/controllers/v1alpha1/launch_manager"
+	"github.com/robolaunch/robot-operator/pkg/controllers/v1alpha1/metrics"
+	robot "github.com/robolaunch/robot-operator/pkg/controllers/v1alpha1/robot"
+	discoveryServer "github.com/robolaunch/robot-operator/pkg/controllers/v1alpha1/robot/discovery_server"
+	relayServer "github.com/robolaunch/robot-operator/pkg/controllers/v1alpha1/robot/relay_server"
+	rosBridge "github.com/robolaunch/robot-operator/pkg/controllers/v1alpha1/robot/ros_bridge"
+	robotDevSuite "github.com/robolaunch/robot-operator/pkg/controllers/v1alpha1/robot_dev_suite"
+	"github.com/robolaunch/robot-operator/pkg/controllers/v1alpha1/robot_dev_suite/notebook"
+	robotIDE "github.com/robolaunch/robot-operator/pkg/controllers/v1alpha1/robot_dev_suite/robot_ide"
+	robotVDI "github.com/robolaunch/robot-operator/pkg/controllers/v1alpha1/robot_dev_suite/robot_vdi"
+	workspaceManager "github.com/robolaunch/robot-operator/pkg/controllers/v1alpha1/workspace_manager"
+	ros2Workload "github.com/robolaunch/robot-operator/pkg/controllers/v1alpha2/ros2_workload"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -63,6 +65,7 @@ func init() {
 	utilruntime.Must(robotv1alpha1.AddToScheme(scheme))
 
 	utilruntime.Must(mcsv1alpha1.AddToScheme(scheme))
+	utilruntime.Must(robotv1alpha2.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
 }
 
@@ -118,10 +121,13 @@ func main() {
 	}
 
 	// Start controllers and webhooks
+	// v1alpha1
 	startRobotCRDsAndWebhooks(mgr, dynamicClient, *clientset)
 	startManagerCRDsAndWebhooks(mgr, dynamicClient)
 	startDevCRDsAndWebhooks(mgr, dynamicClient)
 	startObserverCRDsAndWebhooks(mgr, dynamicClient)
+	// v1alpha2
+	startProductionCRDsAndWebhooks(mgr, dynamicClient)
 
 	//+kubebuilder:scaffold:builder
 
@@ -317,6 +323,22 @@ func startObserverCRDsAndWebhooks(mgr manager.Manager, dynamicClient dynamic.Int
 	}
 	if err := (&robotv1alpha1.RobotDevSuite{}).SetupWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "RobotDevSuite")
+		os.Exit(1)
+	}
+}
+
+// This function starts Production CRDs' controllers and webhooks. Here are the CRDs:
+// - ROS2Workload (ros2workloads.robot.roboscale.io/v1alpha2)
+func startProductionCRDsAndWebhooks(mgr manager.Manager, dynamicClient dynamic.Interface) {
+	if err := (&ros2Workload.ROS2WorkloadReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "ROS2Workload")
+		os.Exit(1)
+	}
+	if err := (&robotv1alpha2.ROS2Workload{}).SetupWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create webhook", "webhook", "ROS2Workload")
 		os.Exit(1)
 	}
 }
