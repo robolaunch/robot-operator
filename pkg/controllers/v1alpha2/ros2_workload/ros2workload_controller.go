@@ -47,7 +47,6 @@ var logger logr.Logger
 
 func (r *ROS2WorkloadReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	logger = log.FromContext(ctx)
-	logger.Info("Starting reconciler...")
 
 	var result ctrl.Result = ctrl.Result{}
 
