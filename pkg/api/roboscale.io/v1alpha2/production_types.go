@@ -18,6 +18,8 @@ package v1alpha2
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 )
 
 func init() {
@@ -50,10 +52,16 @@ type ROS2WorkloadList struct {
 // ROS2Workload types
 // ********************************
 
-// ROS2WorkloadSpec defines the desired state of ROS2Workload
+// ROS2WorkloadSpec defines the desired state of ROS2Workload.
 type ROS2WorkloadSpec struct {
+	// Discovery server configurational parameters.
+	DiscoveryServerTemplate robotv1alpha1.DiscoveryServerSpec `json:"discoveryServerTemplate,omitempty"`
 }
 
-// ROS2WorkloadStatus defines the observed state of ROS2Workload
+// ROS2WorkloadStatus defines the observed state of ROS2Workload.
 type ROS2WorkloadStatus struct {
+	// Phase of ROS2Workload. It sums the general status of ROS 2 workload(s).
+	Phase ROS2WorkloadPhase `json:"phase,omitempty"`
+	// Discovery server instance status.
+	DiscoveryServerStatus robotv1alpha1.DiscoveryServerInstanceStatus `json:"discoveryServerStatus,omitempty"`
 }
