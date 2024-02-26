@@ -37,6 +37,7 @@ import (
 	mcsv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/external/apis/mcsv1alpha1/v1alpha1"
 
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
+	robotv1alpha2 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha2"
 	buildManager "github.com/robolaunch/robot-operator/pkg/controllers/build_manager"
 	launchManager "github.com/robolaunch/robot-operator/pkg/controllers/launch_manager"
 	"github.com/robolaunch/robot-operator/pkg/controllers/metrics"
@@ -48,6 +49,7 @@ import (
 	"github.com/robolaunch/robot-operator/pkg/controllers/robot_dev_suite/notebook"
 	robotIDE "github.com/robolaunch/robot-operator/pkg/controllers/robot_dev_suite/robot_ide"
 	robotVDI "github.com/robolaunch/robot-operator/pkg/controllers/robot_dev_suite/robot_vdi"
+	ros2Workload "github.com/robolaunch/robot-operator/pkg/controllers/v1alpha2/ros2_workload"
 	workspaceManager "github.com/robolaunch/robot-operator/pkg/controllers/workspace_manager"
 	//+kubebuilder:scaffold:imports
 )
@@ -63,6 +65,7 @@ func init() {
 	utilruntime.Must(robotv1alpha1.AddToScheme(scheme))
 
 	utilruntime.Must(mcsv1alpha1.AddToScheme(scheme))
+	utilruntime.Must(robotv1alpha2.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
 }
 
@@ -123,6 +126,17 @@ func main() {
 	startDevCRDsAndWebhooks(mgr, dynamicClient)
 	startObserverCRDsAndWebhooks(mgr, dynamicClient)
 
+	if err = (&ros2Workload.ROS2WorkloadReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "ROS2Workload")
+		os.Exit(1)
+	}
+	if err = (&robotv1alpha2.ROS2Workload{}).SetupWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create webhook", "webhook", "ROS2Workload")
+		os.Exit(1)
+	}
 	//+kubebuilder:scaffold:builder
 
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
