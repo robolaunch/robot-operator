@@ -23,6 +23,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 )
 
+// ********************************
+// ROS2Workload webhooks
+// ********************************
+
 // log is for logging in this package.
 var ros2workloadlog = logf.Log.WithName("ros2workload-resource")
 
