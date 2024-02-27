@@ -17,6 +17,8 @@ limitations under the License.
 package v1alpha2
 
 import (
+	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -52,8 +54,28 @@ type ROS2BridgeList struct {
 
 // ROS2BridgeSpec defines the desired state of ROS2Bridge.
 type ROS2BridgeSpec struct {
+	// Configurational parameters for ROS 2 bridge.
+	// +kubebuilder:validation:Required
+	Distro robotv1alpha1.ROSDistro `json:"distro"`
+	// Object reference to DiscoveryServer.
+	DiscoveryServerReference corev1.ObjectReference `json:"discoveryServerRef,omitempty"`
+	// Service type of ROS2Bridge. `ClusterIP` and `NodePort` is supported.
+	// +kubebuilder:validation:Enum=ClusterIP;NodePort
+	ServiceType corev1.ServiceType `json:"serviceType,omitempty"`
+	// ROS2Bridge will create an Ingress resource if `true`.
+	Ingress bool `json:"ingress,omitempty"`
 }
 
 // ROS2BridgeStatus defines the observed state of ROS2Bridge.
 type ROS2BridgeStatus struct {
+	// Phase of ROS2Bridge.
+	Phase ROS2BridgePhase `json:"phase,omitempty"`
+	// Object reference to DiscoveryServer.
+	DiscoveryServerReference corev1.ObjectReference `json:"discoveryServerRef,omitempty"`
+	// Status of ROS2Bridge pod.
+	PodStatus robotv1alpha1.OwnedResourceStatus `json:"podStatus,omitempty"`
+	// Status of ROS2Bridge service.
+	ServiceStatus robotv1alpha1.OwnedServiceStatus `json:"serviceStatus,omitempty"`
+	// Status of ROS2Bridge Ingress.
+	IngressStatus robotv1alpha1.OwnedResourceStatus `json:"ingressStatus,omitempty"`
 }
