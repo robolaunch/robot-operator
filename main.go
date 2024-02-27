@@ -129,6 +129,7 @@ func main() {
 	startObserverCRDsAndWebhooks(mgr, dynamicClient)
 	// v1alpha2
 	startProductionCRDsAndWebhooks(mgr, dynamicClient)
+	startToolkitCRDsAndWebhooks(mgr, dynamicClient)
 
 	//+kubebuilder:scaffold:builder
 
