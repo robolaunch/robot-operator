@@ -64,6 +64,8 @@ type ROS2BridgeSpec struct {
 	ServiceType corev1.ServiceType `json:"serviceType,omitempty"`
 	// ROS2Bridge will create an Ingress resource if `true`.
 	Ingress bool `json:"ingress,omitempty"`
+	// Name of the TLS secret.
+	TLSSecretName string `json:"tlsSecretName,omitempty"`
 }
 
 // ROS2BridgeStatus defines the observed state of ROS2Bridge.
