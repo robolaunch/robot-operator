@@ -2,6 +2,7 @@ package ros2_bridge
 
 import (
 	"context"
+	"reflect"
 	"strconv"
 
 	"github.com/robolaunch/robot-operator/internal/handle"
@@ -24,6 +25,17 @@ func (r *ROS2BridgeReconciler) reconcileCheckService(ctx context.Context, instan
 	} else if err != nil {
 		return err
 	} else {
+
+		isServiceOk := reflect.DeepEqual(instance.Spec.ServiceType, bridgeServiceQuery.Spec.Type)
+
+		if !isServiceOk {
+			err := r.Delete(ctx, bridgeServiceQuery)
+			if err != nil {
+				return err
+			}
+			instance.Status.ServiceStatus = robotv1alpha1.OwnedServiceStatus{}
+			return nil
+		}
 
 		instance.Status.ServiceStatus.Resource.Created = true
 		reference.SetReference(&instance.Status.ServiceStatus.Resource.Reference, bridgeServiceQuery.TypeMeta, bridgeServiceQuery.ObjectMeta)
@@ -82,6 +94,24 @@ func (r *ROS2BridgeReconciler) reconcileCheckIngress(ctx context.Context, instan
 		} else {
 			instance.Status.IngressStatus.Created = true
 			reference.SetReference(&instance.Status.IngressStatus.Reference, ingressQuery.TypeMeta, ingressQuery.ObjectMeta)
+		}
+	} else {
+		ingressQuery := &networkingv1.Ingress{}
+		err := r.Get(ctx, *instance.GetROS2BridgeIngressMetadata(), ingressQuery)
+		if err != nil {
+			if errors.IsNotFound(err) {
+				instance.Status.IngressStatus = robotv1alpha1.OwnedResourceStatus{}
+			} else {
+				return err
+			}
+		} else {
+
+			err := r.Delete(ctx, ingressQuery)
+			if err != nil {
+				return err
+			}
+
+			instance.Status.IngressStatus = robotv1alpha1.OwnedResourceStatus{}
 		}
 	}
 

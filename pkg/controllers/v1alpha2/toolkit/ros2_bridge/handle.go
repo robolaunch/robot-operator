@@ -2,11 +2,44 @@ package ros2_bridge
 
 import (
 	"context"
+	"reflect"
 
 	robotErr "github.com/robolaunch/robot-operator/internal/error"
+	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	robotv1alpha2 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha2"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 )
+
+func (r *ROS2BridgeReconciler) reconcileHandleConnectionInfo(ctx context.Context, instance *robotv1alpha2.ROS2Bridge) error {
+
+	ds, err := r.reconcileGetDiscoveryServer(ctx, instance)
+	if err != nil && errors.IsNotFound(err) {
+		instance.Status.ConnectionInfo = robotv1alpha1.ConnectionInfo{}
+	} else if err != nil {
+		return err
+	} else {
+
+		isPodOk := reflect.DeepEqual(instance.Status.ConnectionInfo, ds.Status.ConnectionInfo)
+
+		if !isPodOk && instance.Status.PodStatus.Created {
+			bridgePod := &corev1.Pod{}
+			err := r.Get(ctx, *instance.GetROS2BridgePodMetadata(), bridgePod)
+			if err != nil {
+				return err
+			}
+
+			err = r.Delete(ctx, bridgePod)
+			if err != nil {
+				return err
+			}
+		}
+
+		instance.Status.ConnectionInfo = ds.Status.ConnectionInfo
+	}
+
+	return nil
+}
 
 func (r *ROS2BridgeReconciler) reconcileHandleService(ctx context.Context, instance *robotv1alpha2.ROS2Bridge) error {
 

@@ -72,8 +72,8 @@ type ROS2BridgeSpec struct {
 type ROS2BridgeStatus struct {
 	// Phase of ROS2Bridge.
 	Phase ROS2BridgePhase `json:"phase,omitempty"`
-	// Object reference to DiscoveryServer.
-	DiscoveryServerReference corev1.ObjectReference `json:"discoveryServerRef,omitempty"`
+	// Connection info obtained from DiscoveryServer.
+	ConnectionInfo robotv1alpha1.ConnectionInfo `json:"connectionInfo,omitempty"`
 	// Status of ROS2Bridge pod.
 	PodStatus robotv1alpha1.OwnedResourceStatus `json:"podStatus,omitempty"`
 	// Status of ROS2Bridge service.

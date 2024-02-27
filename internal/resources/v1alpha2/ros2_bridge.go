@@ -62,8 +62,8 @@ func GetROS2BridgePod(ros2bridge *robotv1alpha2.ROS2Bridge, podNamespacedName *t
 	cfg.InjectImagePullPolicy(&bridgePod)
 	cfg.SchedulePod(&bridgePod, ros2bridge)
 
-	if reflect.DeepEqual(ros2bridge.Status.DiscoveryServerReference, corev1.ObjectReference{}) {
-		cfg.InjectDiscoveryServerConnection(&bridgePod, discoveryServer.Status.ConnectionInfo)
+	if !reflect.DeepEqual(ros2bridge.Status.ConnectionInfo, robotv1alpha1.ConnectionInfo{}) {
+		cfg.InjectDiscoveryServerConnection(&bridgePod, ros2bridge.Status.ConnectionInfo)
 		cfg.InjectROSDomainID(&bridgePod, discoveryServer.Spec.DomainID)
 		// cfg.InjectRMWImplementationConfiguration(&bridgePod, robot)
 	}
