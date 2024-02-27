@@ -3,6 +3,7 @@ package ros2_bridge
 import (
 	"context"
 
+	"github.com/robolaunch/robot-operator/internal/node"
 	v1alpha2_resources "github.com/robolaunch/robot-operator/internal/resources/v1alpha2"
 	robotv1alpha2 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha2"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -32,9 +33,24 @@ func (r *ROS2BridgeReconciler) createService(ctx context.Context, instance *robo
 
 func (r *ROS2BridgeReconciler) createPod(ctx context.Context, instance *robotv1alpha2.ROS2Bridge, podNamespacedName *types.NamespacedName) error {
 
-	pod := v1alpha2_resources.GetROS2BridgePod(instance, instance.GetROS2BridgePodMetadata())
+	activeNode, err := r.reconcileGetNode(ctx, instance)
+	if err != nil {
+		return err
+	}
 
-	err := ctrl.SetControllerReference(instance, pod, r.Scheme)
+	image, err := node.GetBridgeImage(ctx, r.Client, *activeNode, *instance)
+	if err != nil {
+		return err
+	}
+
+	discoveryServer, err := r.reconcileGetDiscoveryServer(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	pod := v1alpha2_resources.GetROS2BridgePod(instance, instance.GetROS2BridgePodMetadata(), image, *discoveryServer)
+
+	err = ctrl.SetControllerReference(instance, pod, r.Scheme)
 	if err != nil {
 		return err
 	}
