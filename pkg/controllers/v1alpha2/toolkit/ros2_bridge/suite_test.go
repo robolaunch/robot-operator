@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package controllers
+package ros2_bridge
 
 import (
 	"path/filepath"
