@@ -164,3 +164,14 @@ func GetServicePath(obj metav1.Object, postfix string) string {
 
 	return connectionStr
 }
+
+func GetServiceDNSWithNodePort(obj metav1.Object, prefix, port string) string {
+	tenancy := label.GetTenancy(obj)
+	connectionStr := tenancy.Team + "." + tenancy.Domain + ":" + port
+
+	if prefix != "" {
+		connectionStr = prefix + connectionStr
+	}
+
+	return connectionStr
+}
