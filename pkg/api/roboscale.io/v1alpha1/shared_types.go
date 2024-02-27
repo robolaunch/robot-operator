@@ -3,6 +3,7 @@ package v1alpha1
 import (
 	"github.com/robolaunch/robot-operator/internal/label"
 	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // Generic status for any owned resource.
@@ -73,6 +74,7 @@ type StepStatus struct {
 	Step Step `json:"step,omitempty"`
 }
 
+// DEPRECATE
 func GetRobotServiceDNSWithNodePort(robot Robot, prefix, port string) string {
 	tenancy := label.GetTenancy(&robot)
 	connectionStr := tenancy.Team + "." + robot.Spec.RootDNSConfig.Host + ":" + port
@@ -84,6 +86,7 @@ func GetRobotServiceDNSWithNodePort(robot Robot, prefix, port string) string {
 	return connectionStr
 }
 
+// DEPRECATE
 func GetRobotServiceDNS(robot Robot, prefix, postfix string) string {
 	tenancy := label.GetTenancy(&robot)
 	connectionStr := tenancy.Team + "." + robot.Spec.RootDNSConfig.Host + GetRobotServicePath(robot, postfix)
@@ -95,6 +98,7 @@ func GetRobotServiceDNS(robot Robot, prefix, postfix string) string {
 	return connectionStr
 }
 
+// DEPRECATE
 func GetRelayServerServiceDNS(rs RelayServer, prefix, postfix string) string {
 	tenancy := label.GetTenancy(&rs)
 	connectionStr := tenancy.Team + "." + rs.Spec.RootDNSConfig.Host + GetRelayServerServicePath(rs, postfix)
@@ -106,6 +110,7 @@ func GetRelayServerServiceDNS(rs RelayServer, prefix, postfix string) string {
 	return connectionStr
 }
 
+// DEPRECATE
 func GetRobotServicePath(robot Robot, postfix string) string {
 	tenancy := label.GetTenancy(&robot)
 	connectionStr := "/" + tenancy.Region +
@@ -120,12 +125,38 @@ func GetRobotServicePath(robot Robot, postfix string) string {
 	return connectionStr
 }
 
+// DEPRECATE
 func GetRelayServerServicePath(rs RelayServer, postfix string) string {
 	tenancy := label.GetTenancy(&rs)
 	connectionStr := "/" + tenancy.Region +
 		"/" + tenancy.CloudInstance +
 		"/" + rs.Namespace +
 		"/" + rs.Name
+
+	if postfix != "" {
+		connectionStr = connectionStr + postfix
+	}
+
+	return connectionStr
+}
+
+func GetServiceDNS(obj metav1.Object, prefix, postfix string) string {
+	tenancy := label.GetTenancy(obj)
+	connectionStr := tenancy.Team + "." + tenancy.Domain + GetServicePath(obj, postfix)
+
+	if prefix != "" {
+		connectionStr = prefix + connectionStr
+	}
+
+	return connectionStr
+}
+
+func GetServicePath(obj metav1.Object, postfix string) string {
+	tenancy := label.GetTenancy(obj)
+	connectionStr := "/" + tenancy.Region +
+		"/" + tenancy.CloudInstanceAlias +
+		"/" + obj.GetNamespace() +
+		"/" + obj.GetName()
 
 	if postfix != "" {
 		connectionStr = connectionStr + postfix

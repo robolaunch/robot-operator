@@ -15,6 +15,7 @@ const (
 	CLOUD_INSTANCE_LABEL_KEY       = "robolaunch.io/cloud-instance"
 	CLOUD_INSTANCE_ALIAS_LABEL_KEY = "robolaunch.io/cloud-instance-alias"
 	PHYSICAL_INSTANCE_LABEL_KEY    = "robolaunch.io/physical-instance"
+	DOMAIN_LABEL_KEY               = "robolaunch.io/domain"
 )
 
 // Timezone labels
