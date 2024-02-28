@@ -30,7 +30,7 @@ func (r *ROS2WorkloadReconciler) reconcileHandleDiscoveryServer(ctx context.Cont
 
 func (r *ROS2WorkloadReconciler) reconcileHandleROS2Bridge(ctx context.Context, instance *robotv1alpha2.ROS2Workload) error {
 
-	if !instance.Status.ROS2BridgeStatus.Resource.Created {
+	if instance.Status.DiscoveryServerStatus.Status.ConfigMapStatus.Created && !instance.Status.ROS2BridgeStatus.Resource.Created {
 		instance.Status.Phase = robotv1alpha2.ROS2WorkloadPhaseCreatingROS2Bridge
 		err := r.createROS2Bridge(ctx, instance, instance.GetROS2BridgeMetadata())
 		if err != nil {

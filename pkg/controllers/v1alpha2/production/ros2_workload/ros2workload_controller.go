@@ -89,12 +89,22 @@ func (r *ROS2WorkloadReconciler) reconcileCheckStatus(ctx context.Context, insta
 		return robotErr.CheckCreatingOrWaitingError(result, err)
 	}
 
+	err = r.reconcileHandleROS2Bridge(ctx, instance)
+	if err != nil {
+		return robotErr.CheckCreatingOrWaitingError(result, err)
+	}
+
 	return nil
 }
 
 func (r *ROS2WorkloadReconciler) reconcileCheckResources(ctx context.Context, instance *robotv1alpha2.ROS2Workload) error {
 
 	err := r.reconcileCheckDiscoveryServer(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	err = r.reconcileCheckROS2Bridge(ctx, instance)
 	if err != nil {
 		return err
 	}
