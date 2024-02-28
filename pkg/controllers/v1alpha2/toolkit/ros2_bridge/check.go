@@ -7,7 +7,7 @@ import (
 
 	"github.com/robolaunch/robot-operator/internal/handle"
 	"github.com/robolaunch/robot-operator/internal/reference"
-	"github.com/robolaunch/robot-operator/internal/resources"
+	resources "github.com/robolaunch/robot-operator/internal/resources/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1"
 	"k8s.io/apimachinery/pkg/api/errors"

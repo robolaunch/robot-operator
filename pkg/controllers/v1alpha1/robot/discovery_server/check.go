@@ -7,7 +7,7 @@ import (
 	robotErr "github.com/robolaunch/robot-operator/internal/error"
 	"github.com/robolaunch/robot-operator/internal/handle"
 	"github.com/robolaunch/robot-operator/internal/reference"
-	"github.com/robolaunch/robot-operator/internal/resources"
+	resources "github.com/robolaunch/robot-operator/internal/resources/v1alpha1"
 	mcsv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/external/apis/mcsv1alpha1/v1alpha1"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	corev1 "k8s.io/api/core/v1"

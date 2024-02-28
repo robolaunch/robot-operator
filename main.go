@@ -50,7 +50,7 @@ import (
 	robotIDE "github.com/robolaunch/robot-operator/pkg/controllers/v1alpha1/robot_dev_suite/robot_ide"
 	robotVDI "github.com/robolaunch/robot-operator/pkg/controllers/v1alpha1/robot_dev_suite/robot_vdi"
 	workspaceManager "github.com/robolaunch/robot-operator/pkg/controllers/v1alpha1/workspace_manager"
-	ros2Workload "github.com/robolaunch/robot-operator/pkg/controllers/v1alpha2/ros2_workload"
+	ros2Workload "github.com/robolaunch/robot-operator/pkg/controllers/v1alpha2/production/ros2_workload"
 	ros2Bridge "github.com/robolaunch/robot-operator/pkg/controllers/v1alpha2/toolkit/ros2_bridge"
 	//+kubebuilder:scaffold:imports
 )
