@@ -24,11 +24,16 @@ import (
 	networkingv1 "k8s.io/api/networking/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/log"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	"github.com/go-logr/logr"
+	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	robotv1alpha2 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha2"
 )
 
@@ -86,7 +91,12 @@ func (r *ROS2BridgeReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 
 func (r *ROS2BridgeReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha2.ROS2Bridge, result *ctrl.Result) error {
 
-	err := r.reconcileHandleService(ctx, instance)
+	err := r.reconcileHandleConnectionInfo(ctx, instance)
+	if err != nil {
+		return robotErr.CheckCreatingOrWaitingError(result, err)
+	}
+
+	err = r.reconcileHandleService(ctx, instance)
 	if err != nil {
 		return robotErr.CheckCreatingOrWaitingError(result, err)
 	}
@@ -133,5 +143,34 @@ func (r *ROS2BridgeReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Owns(&corev1.Pod{}).
 		Owns(&corev1.Service{}).
 		Owns(&networkingv1.Ingress{}).
+		Watches(
+			&source.Kind{Type: &robotv1alpha1.DiscoveryServer{}},
+			handler.EnqueueRequestsFromMapFunc(r.watchDiscoveryServer),
+		).
 		Complete(r)
+}
+
+func (r *ROS2BridgeReconciler) watchDiscoveryServer(o client.Object) []reconcile.Request {
+
+	obj := o.(*robotv1alpha1.DiscoveryServer)
+
+	ros2bridgeList := &robotv1alpha2.ROS2BridgeList{}
+	err := r.List(context.TODO(), ros2bridgeList)
+	if err != nil {
+		return []reconcile.Request{}
+	}
+
+	requests := []reconcile.Request{}
+	for _, r2b := range ros2bridgeList.Items {
+		if r2b.Spec.DiscoveryServerReference.Name == obj.Name && r2b.Spec.DiscoveryServerReference.Namespace == obj.Namespace {
+			requests = append(requests, reconcile.Request{
+				NamespacedName: types.NamespacedName{
+					Namespace: r2b.Namespace,
+					Name:      r2b.Name,
+				},
+			})
+		}
+	}
+
+	return requests
 }

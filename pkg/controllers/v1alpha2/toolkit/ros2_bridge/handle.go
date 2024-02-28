@@ -13,29 +13,31 @@ import (
 
 func (r *ROS2BridgeReconciler) reconcileHandleConnectionInfo(ctx context.Context, instance *robotv1alpha2.ROS2Bridge) error {
 
-	ds, err := r.reconcileGetDiscoveryServer(ctx, instance)
-	if err != nil && errors.IsNotFound(err) {
-		instance.Status.ConnectionInfo = robotv1alpha1.ConnectionInfo{}
-	} else if err != nil {
-		return err
-	} else {
+	if !reflect.DeepEqual(instance.Spec.DiscoveryServerReference, corev1.ObjectReference{}) {
+		ds, err := r.reconcileGetDiscoveryServer(ctx, instance)
+		if err != nil && errors.IsNotFound(err) {
+			instance.Status.ConnectionInfo = robotv1alpha1.ConnectionInfo{}
+		} else if err != nil {
+			return err
+		} else {
 
-		isPodOk := reflect.DeepEqual(instance.Status.ConnectionInfo, ds.Status.ConnectionInfo)
+			isPodOk := reflect.DeepEqual(instance.Status.ConnectionInfo, ds.Status.ConnectionInfo)
 
-		if !isPodOk && instance.Status.PodStatus.Created {
-			bridgePod := &corev1.Pod{}
-			err := r.Get(ctx, *instance.GetROS2BridgePodMetadata(), bridgePod)
-			if err != nil {
-				return err
+			if !isPodOk && instance.Status.PodStatus.Created {
+				bridgePod := &corev1.Pod{}
+				err := r.Get(ctx, *instance.GetROS2BridgePodMetadata(), bridgePod)
+				if err != nil {
+					return err
+				}
+
+				err = r.Delete(ctx, bridgePod)
+				if err != nil {
+					return err
+				}
 			}
 
-			err = r.Delete(ctx, bridgePod)
-			if err != nil {
-				return err
-			}
+			instance.Status.ConnectionInfo = ds.Status.ConnectionInfo
 		}
-
-		instance.Status.ConnectionInfo = ds.Status.ConnectionInfo
 	}
 
 	return nil
