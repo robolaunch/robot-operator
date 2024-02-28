@@ -83,6 +83,7 @@ spec:
                 description: ROS2Bridge will create an Ingress resource if `true`.
                 type: boolean
               serviceType:
+                default: ClusterIP
                 description: Service type of ROS2Bridge. `ClusterIP` and `NodePort`
                   is supported.
                 enum:
