@@ -61,8 +61,10 @@ type ROS2BridgeSpec struct {
 	DiscoveryServerReference corev1.ObjectReference `json:"discoveryServerRef,omitempty"`
 	// Service type of ROS2Bridge. `ClusterIP` and `NodePort` is supported.
 	// +kubebuilder:validation:Enum=ClusterIP;NodePort
+	// +kubebuilder:default=ClusterIP
 	ServiceType corev1.ServiceType `json:"serviceType,omitempty"`
 	// ROS2Bridge will create an Ingress resource if `true`.
+	// +kubebuilder:default=true
 	Ingress bool `json:"ingress,omitempty"`
 	// Name of the TLS secret.
 	TLSSecretName string `json:"tlsSecretName,omitempty"`

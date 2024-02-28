@@ -17,6 +17,9 @@ limitations under the License.
 package v1alpha2
 
 import (
+	"errors"
+	"reflect"
+
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
@@ -58,6 +61,12 @@ func (r *ROS2Bridge) ValidateCreate() error {
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
 func (r *ROS2Bridge) ValidateUpdate(old runtime.Object) error {
 	ros2bridgelog.Info("validate update", "name", r.Name)
+
+	oldObj := old.(*ROS2Bridge)
+	if !reflect.DeepEqual(oldObj.Spec.Distro, r.Spec.Distro) {
+		return errors.New("distro cannot be changed")
+	}
+
 	return nil
 }
 
