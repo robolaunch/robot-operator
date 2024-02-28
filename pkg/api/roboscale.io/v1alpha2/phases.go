@@ -4,6 +4,7 @@ type ROS2WorkloadPhase string
 
 const (
 	ROS2WorkloadPhaseCreatingDiscoveryServer ROS2WorkloadPhase = "CreatingDiscoveryServer"
+	ROS2WorkloadPhaseCreatingROS2Bridge      ROS2WorkloadPhase = "CreatingROS2Bridge"
 	ROS2WorkloadPhaseReady                   ROS2WorkloadPhase = "Ready"
 )
 
