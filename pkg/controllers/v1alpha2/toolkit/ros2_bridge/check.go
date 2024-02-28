@@ -92,6 +92,18 @@ func (r *ROS2BridgeReconciler) reconcileCheckIngress(ctx context.Context, instan
 				return err
 			}
 		} else {
+
+			if len(ingressQuery.Spec.TLS) > 0 {
+				ingressTLS := ingressQuery.Spec.TLS[0]
+				ingressTLS.SecretName = instance.Spec.TLSSecretName
+				ingressQuery.Spec.TLS[0] = ingressTLS
+
+				err := r.Update(ctx, ingressQuery)
+				if err != nil {
+					return err
+				}
+			}
+
 			instance.Status.IngressStatus.Created = true
 			reference.SetReference(&instance.Status.IngressStatus.Reference, ingressQuery.TypeMeta, ingressQuery.ObjectMeta)
 		}
