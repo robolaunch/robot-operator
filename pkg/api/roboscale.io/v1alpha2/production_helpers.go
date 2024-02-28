@@ -15,3 +15,10 @@ func (ros2Workload *ROS2Workload) GetDiscoveryServerMetadata() *types.Namespaced
 		Namespace: ros2Workload.Namespace,
 	}
 }
+
+func (ros2Workload *ROS2Workload) GetROS2BridgeMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Name:      ros2Workload.Name + internal.ROS_2_BRIDGE_POSTFIX,
+		Namespace: ros2Workload.Namespace,
+	}
+}

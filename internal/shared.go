@@ -59,6 +59,7 @@ const (
 	DISCOVERY_SERVER_POSTFIX  = "-discovery"
 	JOB_LOADER_POSTFIX        = "-loader"
 	ROS_BRIDGE_POSTFIX        = "-bridge"
+	ROS_2_BRIDGE_POSTFIX      = "-bridge"
 	ROBOT_DEV_SUITE_POSTFIX   = "-dev"
 	WORKSPACE_MANAGER_POSTFIX = "-ws"
 )
