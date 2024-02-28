@@ -42,6 +42,7 @@ type ROS2WorkloadReconciler struct {
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=ros2workloads/finalizers,verbs=update
 
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=discoveryservers,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=robot.roboscale.io,resources=ros2bridges,verbs=get;list;watch;create;update;patch;delete
 
 var logger logr.Logger
 
@@ -57,16 +58,6 @@ func (r *ROS2WorkloadReconciler) Reconcile(ctx context.Context, req ctrl.Request
 		}
 		return ctrl.Result{}, err
 	}
-
-	// ***reconciler logic***
-	// get instance
-	// check node
-	// check persistent directories
-	// check host directories
-	// check status
-	// update status
-	// check resource
-	// update status
 
 	err = r.reconcileCheckStatus(ctx, instance, &result)
 	if err != nil {
@@ -116,5 +107,6 @@ func (r *ROS2WorkloadReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&robotv1alpha2.ROS2Workload{}).
 		Owns(&robotv1alpha1.DiscoveryServer{}).
+		Owns(&robotv1alpha2.ROS2Bridge{}).
 		Complete(r)
 }
