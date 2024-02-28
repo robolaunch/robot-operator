@@ -56,6 +56,8 @@ type ROS2WorkloadList struct {
 type ROS2WorkloadSpec struct {
 	// Discovery server configurational parameters.
 	DiscoveryServerTemplate robotv1alpha1.DiscoveryServerSpec `json:"discoveryServerTemplate,omitempty"`
+	// ROS 2 Bridge configurational parameters.
+	ROS2BridgeTemplate ROS2BridgeSpec `json:"ros2BridgeTemplate,omitempty"`
 }
 
 // ROS2WorkloadStatus defines the observed state of ROS2Workload.
@@ -64,4 +66,6 @@ type ROS2WorkloadStatus struct {
 	Phase ROS2WorkloadPhase `json:"phase,omitempty"`
 	// Discovery server instance status.
 	DiscoveryServerStatus robotv1alpha1.DiscoveryServerInstanceStatus `json:"discoveryServerStatus,omitempty"`
+	// ROS 2 Bridge instance status.
+	ROS2BridgeStatus ROS2BridgeInstanceStatus `json:"ros2BridgeStatus,omitempty"`
 }
