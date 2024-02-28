@@ -31,9 +31,9 @@ func GetROS2Bridge(ros2Workload *robotv1alpha2.ROS2Workload, r2bNamespacedName *
 			Namespace: r2bNamespacedName.Namespace,
 			Labels:    ros2Workload.Labels,
 		},
-		Spec: ros2Workload.Spec.DiscoveryServerTemplate,
+		Spec: ros2Workload.Spec.ROS2BridgeTemplate,
 	}
 
-	return &discoveryServer
+	return &ros2Bridge
 
 }
