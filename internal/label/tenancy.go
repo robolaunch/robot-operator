@@ -12,6 +12,7 @@ type Tenancy struct {
 	CloudInstance      string
 	CloudInstanceAlias string
 	PhysicalInstance   string
+	Domain             string
 }
 
 type Timezone struct {
@@ -45,6 +46,10 @@ func GetTenancy(obj metav1.Object) *Tenancy {
 
 	if physicalInstance, ok := labels[internal.PHYSICAL_INSTANCE_LABEL_KEY]; ok {
 		tenancy.PhysicalInstance = physicalInstance
+	}
+
+	if domain, ok := labels[internal.DOMAIN_LABEL_KEY]; ok {
+		tenancy.Domain = domain
 	}
 
 	return tenancy

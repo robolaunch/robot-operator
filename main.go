@@ -50,7 +50,8 @@ import (
 	robotIDE "github.com/robolaunch/robot-operator/pkg/controllers/v1alpha1/robot_dev_suite/robot_ide"
 	robotVDI "github.com/robolaunch/robot-operator/pkg/controllers/v1alpha1/robot_dev_suite/robot_vdi"
 	workspaceManager "github.com/robolaunch/robot-operator/pkg/controllers/v1alpha1/workspace_manager"
-	ros2Workload "github.com/robolaunch/robot-operator/pkg/controllers/v1alpha2/ros2_workload"
+	ros2Workload "github.com/robolaunch/robot-operator/pkg/controllers/v1alpha2/production/ros2_workload"
+	ros2Bridge "github.com/robolaunch/robot-operator/pkg/controllers/v1alpha2/toolkit/ros2_bridge"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -128,6 +129,7 @@ func main() {
 	startObserverCRDsAndWebhooks(mgr, dynamicClient)
 	// v1alpha2
 	startProductionCRDsAndWebhooks(mgr, dynamicClient)
+	startToolkitCRDsAndWebhooks(mgr, dynamicClient)
 
 	//+kubebuilder:scaffold:builder
 
@@ -339,6 +341,22 @@ func startProductionCRDsAndWebhooks(mgr manager.Manager, dynamicClient dynamic.I
 	}
 	if err := (&robotv1alpha2.ROS2Workload{}).SetupWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "ROS2Workload")
+		os.Exit(1)
+	}
+}
+
+// This function starts Toolkit CRDs' controllers and webhooks. Here are the CRDs:
+// - ROS2Bridge (ros2bridges.robot.roboscale.io/v1alpha2)
+func startToolkitCRDsAndWebhooks(mgr manager.Manager, dynamicClient dynamic.Interface) {
+	if err := (&ros2Bridge.ROS2BridgeReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "ROS2Bridge")
+		os.Exit(1)
+	}
+	if err := (&robotv1alpha2.ROS2Bridge{}).SetupWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create webhook", "webhook", "ROS2Bridge")
 		os.Exit(1)
 	}
 }

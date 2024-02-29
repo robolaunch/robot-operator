@@ -30,3 +30,23 @@ func (r *ROS2WorkloadReconciler) createDiscoveryServer(ctx context.Context, inst
 	logger.Info("STATUS: Discovery server " + discoveryServer.Name + " is created.")
 	return nil
 }
+
+func (r *ROS2WorkloadReconciler) createROS2Bridge(ctx context.Context, instance *robotv1alpha2.ROS2Workload, r2bNamespacedName *types.NamespacedName) error {
+
+	ros2Bridge := v1alpha2_resources.GetROS2Bridge(instance, r2bNamespacedName)
+
+	err := ctrl.SetControllerReference(instance, ros2Bridge, r.Scheme)
+	if err != nil {
+		return err
+	}
+
+	err = r.Create(ctx, ros2Bridge)
+	if err != nil && errors.IsAlreadyExists(err) {
+		return nil
+	} else if err != nil {
+		return err
+	}
+
+	logger.Info("STATUS: ROS 2 Bridge " + ros2Bridge.Name + " is created.")
+	return nil
+}

@@ -22,3 +22,18 @@ func GetDiscoveryServer(ros2Workload *robotv1alpha2.ROS2Workload, dsNamespacedNa
 	return &discoveryServer
 
 }
+
+func GetROS2Bridge(ros2Workload *robotv1alpha2.ROS2Workload, r2bNamespacedName *types.NamespacedName) *robotv1alpha2.ROS2Bridge {
+
+	ros2Bridge := robotv1alpha2.ROS2Bridge{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      r2bNamespacedName.Name,
+			Namespace: r2bNamespacedName.Namespace,
+			Labels:    ros2Workload.Labels,
+		},
+		Spec: ros2Workload.Spec.ROS2BridgeTemplate,
+	}
+
+	return &ros2Bridge
+
+}

@@ -10,6 +10,7 @@ import (
 	cosmodrome "github.com/robolaunch/cosmodrome/pkg/api"
 	"github.com/robolaunch/robot-operator/internal"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
+	robotv1alpha2 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha2"
 	corev1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -119,6 +120,7 @@ func GetImageForRobot(ctx context.Context, r client.Client, node corev1.Node, ro
 	return imageBuilder.String(), nil
 }
 
+// DEPRECATE
 func GetImageForBridge(ctx context.Context, r client.Client, node corev1.Node, robot robotv1alpha1.Robot) (string, error) {
 	var imageBuilder strings.Builder
 	var tagBuilder strings.Builder
@@ -130,6 +132,32 @@ func GetImageForBridge(ctx context.Context, r client.Client, node corev1.Node, r
 	}
 
 	registry, hasRegistry := robot.Labels[internal.ROBOT_IMAGE_REGISTRY_LABEL_KEY]
+	if !hasRegistry {
+		return "", errors.New("registry is not found in label with key " + internal.ROBOT_IMAGE_REGISTRY_LABEL_KEY)
+	}
+
+	organization := "robolaunchio"
+	repository := "devspace-robotics"
+	tagBuilder.WriteString(imageProps.Application.Name + "-")
+	tagBuilder.WriteString(imageProps.Application.Version)
+	tagBuilder.WriteString("-bridge-" + imageProps.DevSpaceImage.Version)
+	imageBuilder.WriteString(filepath.Join(registry, organization, repository) + ":")
+	imageBuilder.WriteString(tagBuilder.String())
+
+	return imageBuilder.String(), nil
+}
+
+func GetBridgeImage(ctx context.Context, r client.Client, node corev1.Node, ros2Bridge robotv1alpha2.ROS2Bridge) (string, error) {
+	var imageBuilder strings.Builder
+	var tagBuilder strings.Builder
+
+	platformVersion := GetPlatformVersion(node)
+	imageProps, err := getImagePropsForRobot(ctx, r, platformVersion, getDistroStr([]robotv1alpha1.ROSDistro{ros2Bridge.Spec.Distro}))
+	if err != nil {
+		return "", err
+	}
+
+	registry, hasRegistry := ros2Bridge.Labels[internal.ROBOT_IMAGE_REGISTRY_LABEL_KEY]
 	if !hasRegistry {
 		return "", errors.New("registry is not found in label with key " + internal.ROBOT_IMAGE_REGISTRY_LABEL_KEY)
 	}

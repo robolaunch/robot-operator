@@ -412,6 +412,32 @@ rules:
 - apiGroups:
   - robot.roboscale.io
   resources:
+  - ros2bridges
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - ros2bridges/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - ros2bridges/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - robot.roboscale.io
+  resources:
   - ros2workloads
   verbs:
   - create
