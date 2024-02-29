@@ -53,7 +53,7 @@ func (r *ROS2Workload) Default() {
 
 var _ webhook.Validator = &ROS2Workload{}
 
-func (r *ROS2Workload) validateDiscoveryServerTemplate() error {
+func (r *ROS2Workload) validateCreateDiscoveryServerTemplate() error {
 
 	discoveryServerTemplate := &robotv1alpha1.DiscoveryServer{
 		ObjectMeta: metav1.ObjectMeta{
@@ -67,7 +67,7 @@ func (r *ROS2Workload) validateDiscoveryServerTemplate() error {
 	return discoveryServerTemplate.ValidateCreate()
 }
 
-func (r *ROS2Workload) validateROS2BridgeTemplate() error {
+func (r *ROS2Workload) validateCreateROS2BridgeTemplate() error {
 
 	ros2BridgeTemplate := &ROS2Bridge{
 		ObjectMeta: metav1.ObjectMeta{
@@ -81,16 +81,68 @@ func (r *ROS2Workload) validateROS2BridgeTemplate() error {
 	return ros2BridgeTemplate.ValidateCreate()
 }
 
+func (r *ROS2Workload) validateUpdateDiscoveryServerTemplate(old runtime.Object) error {
+
+	oldObj := old.(*ROS2Workload)
+
+	oldDiscoveryServerTemplate := &robotv1alpha1.DiscoveryServer{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      r.GetDiscoveryServerMetadata().Name,
+			Namespace: r.GetDiscoveryServerMetadata().Namespace,
+		},
+		Spec: oldObj.Spec.DiscoveryServerTemplate,
+	}
+
+	discoveryServerTemplate := &robotv1alpha1.DiscoveryServer{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      r.GetDiscoveryServerMetadata().Name,
+			Namespace: r.GetDiscoveryServerMetadata().Namespace,
+		},
+		Spec: r.Spec.DiscoveryServerTemplate,
+	}
+
+	oldDiscoveryServerTemplate.Default()
+	discoveryServerTemplate.Default()
+
+	return discoveryServerTemplate.ValidateUpdate(old)
+}
+
+func (r *ROS2Workload) validateUpdateROS2BridgeTemplate(old runtime.Object) error {
+
+	oldObj := old.(*ROS2Workload)
+
+	oldROS2BridgeTemplate := &ROS2Bridge{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      r.GetROS2BridgeMetadata().Name,
+			Namespace: r.GetROS2BridgeMetadata().Namespace,
+		},
+		Spec: oldObj.Spec.ROS2BridgeTemplate,
+	}
+
+	ros2BridgeTemplate := &ROS2Bridge{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      r.GetROS2BridgeMetadata().Name,
+			Namespace: r.GetROS2BridgeMetadata().Namespace,
+		},
+		Spec: r.Spec.ROS2BridgeTemplate,
+	}
+
+	oldROS2BridgeTemplate.Default()
+	ros2BridgeTemplate.Default()
+
+	return ros2BridgeTemplate.ValidateUpdate(oldROS2BridgeTemplate)
+}
+
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
 func (r *ROS2Workload) ValidateCreate() error {
 	ros2workloadlog.Info("validate create", "name", r.Name)
 
-	err := r.validateDiscoveryServerTemplate()
+	err := r.validateCreateDiscoveryServerTemplate()
 	if err != nil {
 		return err
 	}
 
-	err = r.validateROS2BridgeTemplate()
+	err = r.validateCreateROS2BridgeTemplate()
 	if err != nil {
 		return err
 	}
@@ -102,12 +154,12 @@ func (r *ROS2Workload) ValidateCreate() error {
 func (r *ROS2Workload) ValidateUpdate(old runtime.Object) error {
 	ros2workloadlog.Info("validate update", "name", r.Name)
 
-	err := r.validateDiscoveryServerTemplate()
+	err := r.validateUpdateDiscoveryServerTemplate(old)
 	if err != nil {
 		return err
 	}
 
-	err = r.validateROS2BridgeTemplate()
+	err = r.validateUpdateROS2BridgeTemplate(old)
 	if err != nil {
 		return err
 	}

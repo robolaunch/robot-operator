@@ -55,8 +55,10 @@ type ROS2WorkloadList struct {
 // ROS2WorkloadSpec defines the desired state of ROS2Workload.
 type ROS2WorkloadSpec struct {
 	// Discovery server configurational parameters.
-	DiscoveryServerTemplate robotv1alpha1.DiscoveryServerSpec `json:"discoveryServerTemplate,omitempty"`
+	// +kubebuilder:validation:Required
+	DiscoveryServerTemplate robotv1alpha1.DiscoveryServerSpec `json:"discoveryServerTemplate"`
 	// ROS 2 Bridge configurational parameters.
+	// +kubebuilder:validation:Required
 	ROS2BridgeTemplate ROS2BridgeSpec `json:"ros2BridgeTemplate,omitempty"`
 }
 
