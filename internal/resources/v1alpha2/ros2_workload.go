@@ -1,6 +1,7 @@
 package v1alpha2_resources
 
 import (
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
@@ -35,5 +36,20 @@ func GetROS2Bridge(ros2Workload *robotv1alpha2.ROS2Workload, r2bNamespacedName *
 	}
 
 	return &ros2Bridge
+
+}
+
+func GetPersistentVolumeClaim(ros2Workload *robotv1alpha2.ROS2Workload, pvcNamespacedName *types.NamespacedName, key int) *corev1.PersistentVolumeClaim {
+
+	pvc := corev1.PersistentVolumeClaim{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      pvcNamespacedName.Name,
+			Namespace: pvcNamespacedName.Namespace,
+			Labels:    ros2Workload.Labels,
+		},
+		Spec: ros2Workload.Spec.VolumeClaimTemplates[key].Spec,
+	}
+
+	return &pvc
 
 }

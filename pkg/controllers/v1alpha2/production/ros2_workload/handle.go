@@ -12,7 +12,7 @@ func (r *ROS2WorkloadReconciler) reconcileHandleDiscoveryServer(ctx context.Cont
 
 	if !instance.Status.DiscoveryServerStatus.Resource.Created {
 		instance.Status.Phase = robotv1alpha2.ROS2WorkloadPhaseCreatingDiscoveryServer
-		err := r.createDiscoveryServer(ctx, instance, instance.GetDiscoveryServerMetadata())
+		err := r.createDiscoveryServer(ctx, instance)
 		if err != nil {
 			return err
 		}
@@ -32,7 +32,7 @@ func (r *ROS2WorkloadReconciler) reconcileHandleROS2Bridge(ctx context.Context, 
 
 	if instance.Status.DiscoveryServerStatus.Status.ConfigMapStatus.Created && !instance.Status.ROS2BridgeStatus.Resource.Created {
 		instance.Status.Phase = robotv1alpha2.ROS2WorkloadPhaseCreatingROS2Bridge
-		err := r.createROS2Bridge(ctx, instance, instance.GetROS2BridgeMetadata())
+		err := r.createROS2Bridge(ctx, instance)
 		if err != nil {
 			return err
 		}
@@ -42,6 +42,29 @@ func (r *ROS2WorkloadReconciler) reconcileHandleROS2Bridge(ctx context.Context, 
 			ResourceKind:      "ROS2Bridge",
 			ResourceName:      instance.GetROS2BridgeMetadata().Name,
 			ResourceNamespace: instance.GetROS2BridgeMetadata().Namespace,
+		}
+	}
+
+	return nil
+}
+
+func (r *ROS2WorkloadReconciler) reconcileHandlePVCs(ctx context.Context, instance *robotv1alpha2.ROS2Workload) error {
+
+	for key, pvcStatus := range instance.Status.PVCStatuses {
+		if !pvcStatus.Resource.Created {
+
+			instance.Status.Phase = robotv1alpha2.ROS2WorkloadPhaseCreatingPVCs
+			err := r.createPersistentVolumeClaim(ctx, instance, key)
+			if err != nil {
+				return err
+			}
+			pvcStatus.Resource.Created = true
+
+			return &robotErr.CreatingResourceError{
+				ResourceKind:      "PersistentVolumeClaim",
+				ResourceName:      instance.GetPersistentVolumeClaimMetadata(key).Name,
+				ResourceNamespace: instance.GetPersistentVolumeClaimMetadata(key).Namespace,
+			}
 		}
 	}
 

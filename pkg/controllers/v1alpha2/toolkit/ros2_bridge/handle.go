@@ -47,7 +47,7 @@ func (r *ROS2BridgeReconciler) reconcileHandleService(ctx context.Context, insta
 
 	if !instance.Status.ServiceStatus.Resource.Created {
 		instance.Status.Phase = robotv1alpha2.ROS2BridgePhaseCreatingService
-		err := r.createService(ctx, instance, instance.GetROS2BridgeServiceMetadata())
+		err := r.createService(ctx, instance)
 		if err != nil {
 			return err
 		}
@@ -67,7 +67,7 @@ func (r *ROS2BridgeReconciler) reconcileHandlePod(ctx context.Context, instance 
 
 	if !instance.Status.PodStatus.Created {
 		instance.Status.Phase = robotv1alpha2.ROS2BridgePhaseCreatingPod
-		err := r.createPod(ctx, instance, instance.GetROS2BridgePodMetadata())
+		err := r.createPod(ctx, instance)
 		if err != nil {
 			return err
 		}
@@ -96,7 +96,7 @@ func (r *ROS2BridgeReconciler) reconcileHandleIngress(ctx context.Context, insta
 	if instance.Spec.Ingress {
 		if !instance.Status.IngressStatus.Created {
 			instance.Status.Phase = robotv1alpha2.ROS2BridgePhaseCreatingIngress
-			err := r.createIngress(ctx, instance, instance.GetROS2BridgeIngressMetadata())
+			err := r.createIngress(ctx, instance)
 			if err != nil {
 				return err
 			}

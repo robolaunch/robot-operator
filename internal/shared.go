@@ -48,7 +48,7 @@ const (
 	ROBOT_DEV_SUITE_OWNED = "robolaunch.io/dev-suite-owned"
 )
 
-// Robot owned resources' postfixes
+// Robot owned resources' postfixes (v1alpha1)
 const (
 	PVC_VAR_POSTFIX           = "-pvc-var"
 	PVC_ETC_POSTFIX           = "-pvc-etc"
@@ -59,9 +59,14 @@ const (
 	DISCOVERY_SERVER_POSTFIX  = "-discovery"
 	JOB_LOADER_POSTFIX        = "-loader"
 	ROS_BRIDGE_POSTFIX        = "-bridge"
-	ROS_2_BRIDGE_POSTFIX      = "-bridge"
 	ROBOT_DEV_SUITE_POSTFIX   = "-dev"
 	WORKSPACE_MANAGER_POSTFIX = "-ws"
+)
+
+// Robot owned resources' postfixes (v1alpha2)
+const (
+	ROS_2_BRIDGE_POSTFIX = "-bridge"
+	PVC_POSTFIX          = "-pvc"
 )
 
 // WorkspaceManager owned resources' postfixes

@@ -7,11 +7,10 @@ import (
 	v1alpha2_resources "github.com/robolaunch/robot-operator/internal/resources/v1alpha2"
 	robotv1alpha2 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha2"
 	"k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
-func (r *ROS2BridgeReconciler) createService(ctx context.Context, instance *robotv1alpha2.ROS2Bridge, svcNamespacedName *types.NamespacedName) error {
+func (r *ROS2BridgeReconciler) createService(ctx context.Context, instance *robotv1alpha2.ROS2Bridge) error {
 
 	svc := v1alpha2_resources.GetROS2BridgeService(instance, instance.GetROS2BridgeServiceMetadata())
 
@@ -31,7 +30,7 @@ func (r *ROS2BridgeReconciler) createService(ctx context.Context, instance *robo
 	return nil
 }
 
-func (r *ROS2BridgeReconciler) createPod(ctx context.Context, instance *robotv1alpha2.ROS2Bridge, podNamespacedName *types.NamespacedName) error {
+func (r *ROS2BridgeReconciler) createPod(ctx context.Context, instance *robotv1alpha2.ROS2Bridge) error {
 
 	activeNode, err := r.reconcileGetNode(ctx, instance)
 	if err != nil {
@@ -66,7 +65,7 @@ func (r *ROS2BridgeReconciler) createPod(ctx context.Context, instance *robotv1a
 	return nil
 }
 
-func (r *ROS2BridgeReconciler) createIngress(ctx context.Context, instance *robotv1alpha2.ROS2Bridge, ingressNamespacedName *types.NamespacedName) error {
+func (r *ROS2BridgeReconciler) createIngress(ctx context.Context, instance *robotv1alpha2.ROS2Bridge) error {
 
 	ingress := v1alpha2_resources.GetROS2BridgeIngress(instance, instance.GetROS2BridgeIngressMetadata())
 
