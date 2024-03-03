@@ -53,6 +53,13 @@ type ROS2WorkloadList struct {
 // ROS2Workload types
 // ********************************
 
+type LaunchContainer struct {
+	// Replica number of the stateful set.
+	Replicas *int32 `json:"replicas"`
+	// Single container configuration for stateful set.
+	Container corev1.Container `json:"container,omitempty"`
+}
+
 // ROS2WorkloadSpec defines the desired state of ROS2Workload.
 type ROS2WorkloadSpec struct {
 	// Discovery server configurational parameters.
@@ -66,7 +73,7 @@ type ROS2WorkloadSpec struct {
 	// that can be mounted to the ROS 2 workload.
 	VolumeClaimTemplates []corev1.PersistentVolumeClaimTemplate `json:"volumeClaimTemplates,omitempty"`
 	// Configurational parameters for containers that will be encapsulated within the ROS 2 workload StatefulSet.
-	Containers []corev1.Container `json:"containers,omitempty"`
+	Containers []LaunchContainer `json:"containers,omitempty"`
 }
 
 // ROS2WorkloadStatus defines the observed state of ROS2Workload.

@@ -1,6 +1,7 @@
 package v1alpha2_resources
 
 import (
+	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -51,5 +52,33 @@ func GetPersistentVolumeClaim(ros2Workload *robotv1alpha2.ROS2Workload, pvcNames
 	}
 
 	return &pvc
+
+}
+
+func GetStatefulSet(ros2Workload *robotv1alpha2.ROS2Workload, ssNamespacedName *types.NamespacedName, key int) *appsv1.StatefulSet {
+
+	container := ros2Workload.Spec.Containers[key]
+	ssAliasLabels := ros2Workload.Labels
+	ssAliasLabels["robolaunch.io/alias"] = container.Container.Name
+
+	statefulSet := appsv1.StatefulSet{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      ssNamespacedName.Name,
+			Namespace: ssNamespacedName.Namespace,
+			Labels:    ssAliasLabels,
+		},
+		Spec: appsv1.StatefulSetSpec{
+			Replicas: ros2Workload.Spec.Containers[key].Replicas,
+			Template: corev1.PodTemplateSpec{
+				Spec: corev1.PodSpec{
+					Containers: []corev1.Container{
+						container.Container,
+					},
+				},
+			},
+		},
+	}
+
+	return &statefulSet
 
 }
