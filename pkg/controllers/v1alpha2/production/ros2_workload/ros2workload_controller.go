@@ -20,6 +20,7 @@ import (
 	"context"
 
 	robotErr "github.com/robolaunch/robot-operator/internal/error"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -43,6 +44,7 @@ type ROS2WorkloadReconciler struct {
 
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=discoveryservers,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=ros2bridges,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=core,resources=persistentvolumeclaims,verbs=get;list;watch;create;update;patch;delete
 
 var logger logr.Logger
 
@@ -118,5 +120,6 @@ func (r *ROS2WorkloadReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		For(&robotv1alpha2.ROS2Workload{}).
 		Owns(&robotv1alpha1.DiscoveryServer{}).
 		Owns(&robotv1alpha2.ROS2Bridge{}).
+		Owns(&corev1.PersistentVolumeClaim{}).
 		Complete(r)
 }
