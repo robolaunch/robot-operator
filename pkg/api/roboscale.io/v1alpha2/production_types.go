@@ -17,7 +17,7 @@ limitations under the License.
 package v1alpha2
 
 import (
-	v1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
@@ -64,7 +64,7 @@ type ROS2WorkloadSpec struct {
 	// Volume templates for ROS 2 workload.
 	// For each volume template, operator will create a PersistentVolumeClaim
 	// that can be mounted to the ROS 2 workload.
-	VolumeClaimTemplates []v1.PersistentVolumeClaimTemplate `json:"volumeClaimTemplates,omitempty"`
+	VolumeClaimTemplates []corev1.PersistentVolumeClaimTemplate `json:"volumeClaimTemplates,omitempty"`
 }
 
 // ROS2WorkloadStatus defines the observed state of ROS2Workload.
