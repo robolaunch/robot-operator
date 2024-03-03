@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha2
 
 import (
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
@@ -60,6 +61,10 @@ type ROS2WorkloadSpec struct {
 	// ROS 2 Bridge configurational parameters.
 	// +kubebuilder:validation:Required
 	ROS2BridgeTemplate ROS2BridgeSpec `json:"ros2BridgeTemplate,omitempty"`
+	// Volume templates for ROS 2 workload.
+	// For each volume template, operator will create a PersistentVolumeClaim
+	// that can be mounted to the ROS 2 workload.
+	VolumeClaimTemplates []v1.PersistentVolumeClaimTemplate `json:"volumeClaimTemplates,omitempty"`
 }
 
 // ROS2WorkloadStatus defines the observed state of ROS2Workload.
@@ -70,4 +75,6 @@ type ROS2WorkloadStatus struct {
 	DiscoveryServerStatus robotv1alpha1.DiscoveryServerInstanceStatus `json:"discoveryServerStatus,omitempty"`
 	// ROS 2 Bridge instance status.
 	ROS2BridgeStatus ROS2BridgeInstanceStatus `json:"ros2BridgeStatus,omitempty"`
+	// Statuses of owned PersistentVolumeClaims.
+	PVCStatuses []OwnedPVCStatus `json:"pvcStatuses,omitempty"`
 }
