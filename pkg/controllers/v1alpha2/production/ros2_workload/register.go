@@ -1,13 +1,11 @@
 package ros2_workload
 
 import (
-	"context"
-
 	robotv1alpha2 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha2"
 	corev1 "k8s.io/api/core/v1"
 )
 
-func (r *ROS2WorkloadReconciler) registerPVCs(ctx context.Context, instance *robotv1alpha2.ROS2Workload) error {
+func (r *ROS2WorkloadReconciler) registerPVCs(instance *robotv1alpha2.ROS2Workload) {
 
 	pvcStatuses := []robotv1alpha2.OwnedPVCStatus{}
 
@@ -25,6 +23,4 @@ func (r *ROS2WorkloadReconciler) registerPVCs(ctx context.Context, instance *rob
 		}
 		instance.Status.PVCStatuses = pvcStatuses
 	}
-
-	return nil
 }
