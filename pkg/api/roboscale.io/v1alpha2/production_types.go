@@ -65,6 +65,8 @@ type ROS2WorkloadSpec struct {
 	// For each volume template, operator will create a PersistentVolumeClaim
 	// that can be mounted to the ROS 2 workload.
 	VolumeClaimTemplates []corev1.PersistentVolumeClaimTemplate `json:"volumeClaimTemplates,omitempty"`
+	// Configurational parameters for containers that will be encapsulated within the ROS 2 workload StatefulSet.
+	Containers []corev1.Container `json:"containers,omitempty"`
 }
 
 // ROS2WorkloadStatus defines the observed state of ROS2Workload.
@@ -77,4 +79,6 @@ type ROS2WorkloadStatus struct {
 	ROS2BridgeStatus ROS2BridgeInstanceStatus `json:"ros2BridgeStatus,omitempty"`
 	// Statuses of owned PersistentVolumeClaims.
 	PVCStatuses []OwnedPVCStatus `json:"pvcStatuses,omitempty"`
+	// Status of owned StatefulSet and containers.
+	StatefulSetStatuses []OwnedStatefulSetStatus `json:"statefulSetStatuses,omitempty"`
 }
