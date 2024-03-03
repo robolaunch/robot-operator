@@ -23,9 +23,8 @@ func (r *ROS2WorkloadReconciler) registerPVCs(ctx context.Context, instance *rob
 			}
 			pvcStatuses = append(pvcStatuses, pvcStatus)
 		}
+		instance.Status.PVCStatuses = pvcStatuses
 	}
-
-	instance.Status.PVCStatuses = pvcStatuses
 
 	return nil
 }
