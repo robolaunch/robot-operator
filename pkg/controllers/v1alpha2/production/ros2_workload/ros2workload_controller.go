@@ -61,6 +61,16 @@ func (r *ROS2WorkloadReconciler) Reconcile(ctx context.Context, req ctrl.Request
 		return ctrl.Result{}, err
 	}
 
+	err = r.reconcileRegisterResources(ctx, instance)
+	if err != nil {
+		return result, err
+	}
+
+	err = r.reconcileUpdateInstanceStatus(ctx, instance)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
 	err = r.reconcileCheckStatus(ctx, instance, &result)
 	if err != nil {
 		return result, err
@@ -82,6 +92,16 @@ func (r *ROS2WorkloadReconciler) Reconcile(ctx context.Context, req ctrl.Request
 	}
 
 	return result, nil
+}
+
+func (r *ROS2WorkloadReconciler) reconcileRegisterResources(ctx context.Context, instance *robotv1alpha2.ROS2Workload) error {
+
+	err := r.registerPVCs(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (r *ROS2WorkloadReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha2.ROS2Workload, result *ctrl.Result) error {
