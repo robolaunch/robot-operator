@@ -31,3 +31,10 @@ func (ros2Workload *ROS2Workload) GetPersistentVolumeClaimMetadata(key int) *typ
 		Namespace: ros2Workload.Namespace,
 	}
 }
+
+func (ros2Workload *ROS2Workload) GetStatefulSetMetadata(key int) *types.NamespacedName {
+	return &types.NamespacedName{
+		Name:      ros2Workload.Name + internal.STATEFULSET_POSTFIX + "-" + strconv.Itoa(key),
+		Namespace: ros2Workload.Namespace,
+	}
+}

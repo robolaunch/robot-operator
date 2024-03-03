@@ -96,6 +96,7 @@ func (r *ROS2WorkloadReconciler) Reconcile(ctx context.Context, req ctrl.Request
 func (r *ROS2WorkloadReconciler) reconcileRegisterResources(instance *robotv1alpha2.ROS2Workload) error {
 
 	r.registerPVCs(instance)
+	r.registerStatefulSets(instance)
 
 	return nil
 }
