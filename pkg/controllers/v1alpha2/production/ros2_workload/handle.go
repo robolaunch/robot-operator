@@ -47,3 +47,26 @@ func (r *ROS2WorkloadReconciler) reconcileHandleROS2Bridge(ctx context.Context, 
 
 	return nil
 }
+
+func (r *ROS2WorkloadReconciler) reconcileHandlePVCs(ctx context.Context, instance *robotv1alpha2.ROS2Workload) error {
+
+	for key, pvcStatus := range instance.Status.PVCStatuses {
+		if !pvcStatus.Resource.Created {
+
+			instance.Status.Phase = robotv1alpha2.ROS2WorkloadPhaseCreatingPVCs
+			err := r.createPersistentVolumeClaim(ctx, instance, key)
+			if err != nil {
+				return err
+			}
+			pvcStatus.Resource.Created = true
+
+			return &robotErr.CreatingResourceError{
+				ResourceKind:      "PersistentVolumeClaim",
+				ResourceName:      instance.GetPersistentVolumeClaimMetadata(key).Name,
+				ResourceNamespace: instance.GetPersistentVolumeClaimMetadata(key).Namespace,
+			}
+		}
+	}
+
+	return nil
+}

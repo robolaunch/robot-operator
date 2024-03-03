@@ -49,3 +49,23 @@ func (r *ROS2WorkloadReconciler) createROS2Bridge(ctx context.Context, instance 
 	logger.Info("STATUS: ROS 2 Bridge " + ros2Bridge.Name + " is created.")
 	return nil
 }
+
+func (r *ROS2WorkloadReconciler) createPersistentVolumeClaim(ctx context.Context, instance *robotv1alpha2.ROS2Workload, key int) error {
+
+	pvc := v1alpha2_resources.GetPersistentVolumeClaim(instance, instance.GetPersistentVolumeClaimMetadata(key), key)
+
+	err := ctrl.SetControllerReference(instance, pvc, r.Scheme)
+	if err != nil {
+		return err
+	}
+
+	err = r.Create(ctx, pvc)
+	if err != nil && errors.IsAlreadyExists(err) {
+		return nil
+	} else if err != nil {
+		return err
+	}
+
+	logger.Info("STATUS: PVC " + instance.GetPersistentVolumeClaimMetadata(key).Name + " is created.")
+	return nil
+}
