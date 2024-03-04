@@ -108,6 +108,28 @@ func (r *ROS2WorkloadReconciler) reconcileCheckStatefulSets(ctx context.Context,
 			} else if err != nil {
 				return err
 			} else {
+				// check if there are any inconsistencies
+				launchContainer := instance.Spec.Containers[key]
+				actualContainer := ssQuery.Spec.Template.Spec.Containers[0]
+
+				if !reflect.DeepEqual(launchContainer.Replicas, ssQuery.Spec.Replicas) ||
+					!reflect.DeepEqual(launchContainer.Container.Name, actualContainer.Name) ||
+					!reflect.DeepEqual(launchContainer.Container.Image, actualContainer.Image) ||
+					!reflect.DeepEqual(launchContainer.Container.Command, actualContainer.Command) ||
+					!reflect.DeepEqual(launchContainer.Container.Resources, actualContainer.Resources) ||
+					!reflect.DeepEqual(launchContainer.Container.SecurityContext, actualContainer.SecurityContext) {
+
+					err := r.Delete(ctx, ssQuery)
+					if err != nil {
+						return err
+					}
+
+					ssStatus.Resource.Created = false
+					ssStatus.Status = appsv1.StatefulSetStatus{}
+					ssStatus.ContainerStatuses = []corev1.ContainerStatus{}
+					continue
+				}
+
 				// update statefulset status
 				ssStatus.Resource.Created = true
 				reference.SetReference(&ssStatus.Resource.Reference, ssQuery.TypeMeta, ssQuery.ObjectMeta)
@@ -125,7 +147,7 @@ func (r *ROS2WorkloadReconciler) reconcileCheckStatefulSets(ctx context.Context,
 					LabelSelector: podSelector,
 				})
 				if err != nil && errors.IsNotFound(err) {
-					return nil
+					ssStatus.ContainerStatuses = []corev1.ContainerStatus{}
 				} else if err != nil {
 					return err
 				} else {
