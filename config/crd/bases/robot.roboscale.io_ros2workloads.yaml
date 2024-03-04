@@ -33,7 +33,7 @@ spec:
           metadata:
             type: object
           spec:
-            description: ROS2WorkloadSpec defines the desired state of ROS2Workload.
+            description: Specification of the desired behavior of the ROS2Workload.
             properties:
               containers:
                 description: Configurational parameters for containers that will be
@@ -1690,7 +1690,7 @@ spec:
             - discoveryServerTemplate
             type: object
           status:
-            description: ROS2WorkloadStatus defines the observed state of ROS2Workload.
+            description: Most recently observed status of the ROS2Workload.
             properties:
               discoveryServerStatus:
                 description: Discovery server instance status.
