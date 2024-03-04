@@ -1,4 +1,5 @@
 - [Overview](./README.md)
 - [Installation](./installation/README.md)
 - [Concepts](./concepts/README.md)
-- [API Reference](./reference/README.md)
+- [API Reference (`v1alpha1`)](./reference_v1alpha1/README.md)
+- [API Reference (`v1alpha2`)](./reference_v1alpha2/README.md)

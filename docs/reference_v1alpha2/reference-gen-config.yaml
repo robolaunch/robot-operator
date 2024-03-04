@@ -1,0 +1,11 @@
+processor:
+  ignoreTypes:
+    - "List$"
+  sortKinds:
+    - "ROS2Workload"
+    - "ROS2Bridge"
+  ignoreFields:
+    - "TypeMeta$"
+
+render:
+  kubernetesVersion: 1.22
