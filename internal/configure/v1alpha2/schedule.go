@@ -6,9 +6,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func (cfg *PodConfigInjector) SchedulePod(pod *corev1.Pod, obj metav1.Object) *corev1.Pod {
-
-	pod.Spec.NodeSelector = label.GetTenancyMap(obj)
-
-	return pod
+func (cfg *PodSpecConfigInjector) SchedulePod(podSpec *corev1.PodSpec, obj metav1.Object) {
+	podSpec.NodeSelector = label.GetTenancyMap(obj)
 }

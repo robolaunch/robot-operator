@@ -5,16 +5,13 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
-func (cfg *PodConfigInjector) InjectRMWImplementationConfiguration(pod *corev1.Pod, rmwImplementation string) *corev1.Pod {
-
+func (cfg *PodSpecConfigInjector) InjectRMWImplementationConfiguration(podSpec *corev1.PodSpec, rmwImplementation string) {
 	environmentVariables := []corev1.EnvVar{
 		internal.Env("RMW_IMPLEMENTATION", rmwImplementation),
 	}
 
-	for k, container := range pod.Spec.Containers {
+	for k, container := range podSpec.Containers {
 		container.Env = append(container.Env, environmentVariables...)
-		pod.Spec.Containers[k] = container
+		podSpec.Containers[k] = container
 	}
-
-	return pod
 }

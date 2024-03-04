@@ -7,22 +7,9 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
-func (cfg *PodConfigInjector) InjectRuntimeClass(pod *corev1.Pod, robot v1alpha1.Robot, currentNode corev1.Node) *corev1.Pod {
-
+func (cfg *PodSpecConfigInjector) InjectRuntimeClass(podSpec *corev1.PodSpec, robot v1alpha1.Robot, currentNode corev1.Node) {
 	if label.GetInstanceType(&robot) == label.InstanceTypeCloudInstance && node.IsK3s(currentNode) {
 		nvidiaRuntimeClass := "nvidia"
-		pod.Spec.RuntimeClassName = &nvidiaRuntimeClass
+		podSpec.RuntimeClassName = &nvidiaRuntimeClass
 	}
-
-	return pod
-}
-
-func (cfg *PodConfigInjector) InjectRuntimeClassForMetricsExporter(pod *corev1.Pod, currentNode corev1.Node) *corev1.Pod {
-
-	if node.IsK3s(currentNode) {
-		nvidiaRuntimeClass := "nvidia"
-		pod.Spec.RuntimeClassName = &nvidiaRuntimeClass
-	}
-
-	return pod
 }

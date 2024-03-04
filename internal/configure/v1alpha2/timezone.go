@@ -5,14 +5,11 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
-func (cfg *PodConfigInjector) InjectTimezone(pod *corev1.Pod, node corev1.Node) *corev1.Pod {
-
-	cfg.placeTimezone(pod, node)
-
-	return pod
+func (cfg *PodSpecConfigInjector) InjectTimezone(podSpec *corev1.PodSpec, node corev1.Node) {
+	cfg.placeTimezone(podSpec, node)
 }
 
-func (cfg *PodConfigInjector) placeTimezone(pod *corev1.Pod, node corev1.Node) {
+func (cfg *PodSpecConfigInjector) placeTimezone(podSpec *corev1.PodSpec, node corev1.Node) {
 
 	timezone := label.GetTimezone(&node)
 	if timezone.Continent == "" || timezone.City == "" {
@@ -26,9 +23,9 @@ func (cfg *PodConfigInjector) placeTimezone(pod *corev1.Pod, node corev1.Node) {
 		},
 	}
 
-	for k, container := range pod.Spec.Containers {
+	for k, container := range podSpec.Containers {
 		container.Env = append(container.Env, environmentVariables...)
-		pod.Spec.Containers[k] = container
+		podSpec.Containers[k] = container
 	}
 
 }

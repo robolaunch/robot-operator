@@ -6,14 +6,11 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
-func (cfg *PodConfigInjector) InjectROSDomainID(pod *corev1.Pod, domainID int) *corev1.Pod {
-
-	cfg.placeROSDomainIDEnvironmentVariables(pod, domainID)
-
-	return pod
+func (cfg *PodSpecConfigInjector) InjectROSDomainID(podSpec *corev1.PodSpec, domainID int) {
+	cfg.placeROSDomainIDEnvironmentVariables(podSpec, domainID)
 }
 
-func (cfg *PodConfigInjector) placeROSDomainIDEnvironmentVariables(pod *corev1.Pod, domainID int) {
+func (cfg *PodSpecConfigInjector) placeROSDomainIDEnvironmentVariables(podSpec *corev1.PodSpec, domainID int) {
 
 	environmentVariables := []corev1.EnvVar{
 		{
@@ -22,9 +19,9 @@ func (cfg *PodConfigInjector) placeROSDomainIDEnvironmentVariables(pod *corev1.P
 		},
 	}
 
-	for k, container := range pod.Spec.Containers {
+	for k, container := range podSpec.Containers {
 		container.Env = append(container.Env, environmentVariables...)
-		pod.Spec.Containers[k] = container
+		podSpec.Containers[k] = container
 	}
 
 }
