@@ -6,6 +6,18 @@ metadata:
   {{- include "robot-operator.labels" . | nindent 4 }}
 rules:
 - apiGroups:
+  - apps
+  resources:
+  - statefulsets
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
   - batch
   resources:
   - jobs
@@ -405,6 +417,58 @@ rules:
   - robot.roboscale.io
   resources:
   - robotvdis/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - ros2bridges
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - ros2bridges/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - ros2bridges/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - ros2workloads
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - ros2workloads/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - ros2workloads/status
   verbs:
   - get
   - patch

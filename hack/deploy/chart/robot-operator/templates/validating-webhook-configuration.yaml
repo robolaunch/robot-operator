@@ -187,3 +187,43 @@ webhooks:
     resources:
     - discoveryservers
   sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: '{{ include "robot-operator.fullname" . }}-webhook-service'
+      namespace: '{{ .Release.Namespace }}'
+      path: /validate-robot-roboscale-io-v1alpha2-ros2workload
+  failurePolicy: Fail
+  name: vros2workload.kb.io
+  rules:
+  - apiGroups:
+    - robot.roboscale.io
+    apiVersions:
+    - v1alpha2
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - ros2workloads
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: '{{ include "robot-operator.fullname" . }}-webhook-service'
+      namespace: '{{ .Release.Namespace }}'
+      path: /validate-robot-roboscale-io-v1alpha2-ros2bridge
+  failurePolicy: Fail
+  name: vros2bridge.kb.io
+  rules:
+  - apiGroups:
+    - robot.roboscale.io
+    apiVersions:
+    - v1alpha2
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - ros2bridges
+  sideEffects: None
