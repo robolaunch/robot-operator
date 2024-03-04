@@ -6,6 +6,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
+	"github.com/robolaunch/robot-operator/internal"
 	configure "github.com/robolaunch/robot-operator/internal/configure/v1alpha2"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	robotv1alpha2 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha2"
@@ -87,7 +88,17 @@ func GetStatefulSet(ros2Workload *robotv1alpha2.ROS2Workload, ssNamespacedName *
 		},
 		Spec: appsv1.StatefulSetSpec{
 			Replicas: ros2Workload.Spec.Containers[key].Replicas,
+			Selector: &metav1.LabelSelector{
+				MatchLabels: map[string]string{
+					internal.ROS2_WORKLOAD_CONTAINER_SELECTOR_LABEL_KEY: container.Container.Name,
+				},
+			},
 			Template: corev1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{
+						internal.ROS2_WORKLOAD_CONTAINER_SELECTOR_LABEL_KEY: container.Container.Name,
+					},
+				},
 				Spec: podSpec,
 			},
 		},
