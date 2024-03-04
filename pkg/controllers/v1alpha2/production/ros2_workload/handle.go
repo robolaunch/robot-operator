@@ -80,7 +80,7 @@ func (r *ROS2WorkloadReconciler) reconcileHandleStatefulSets(ctx context.Context
 		volumesReady = volumesReady && pvcStatus.Resource.Created
 	}
 
-	if volumesReady {
+	if instance.Status.DiscoveryServerStatus.Status.ConfigMapStatus.Created && volumesReady {
 		for key, ssStatus := range instance.Status.StatefulSetStatuses {
 			if !ssStatus.Resource.Created {
 

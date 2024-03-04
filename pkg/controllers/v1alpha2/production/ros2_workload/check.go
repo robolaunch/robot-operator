@@ -95,25 +95,27 @@ func (r *ROS2WorkloadReconciler) reconcileCheckStatefulSets(ctx context.Context,
 		volumesReady = volumesReady && pvcStatus.Resource.Created
 	}
 
-	for key, ssStatus := range instance.Status.StatefulSetStatuses {
+	if instance.Status.DiscoveryServerStatus.Status.ConfigMapStatus.Created && volumesReady {
+		for key, ssStatus := range instance.Status.StatefulSetStatuses {
 
-		ssQuery := &appsv1.StatefulSet{}
-		err := r.Get(ctx, *instance.GetStatefulSetMetadata(key), ssQuery)
-		if err != nil && errors.IsNotFound(err) {
-			ssStatus.Resource.Created = false
-		} else if err != nil {
-			return err
-		} else {
+			ssQuery := &appsv1.StatefulSet{}
+			err := r.Get(ctx, *instance.GetStatefulSetMetadata(key), ssQuery)
+			if err != nil && errors.IsNotFound(err) {
+				ssStatus.Resource.Created = false
+			} else if err != nil {
+				return err
+			} else {
 
-			// TODO: check container status
+				// TODO: check container status
 
-			ssStatus.Resource.Created = true
-			reference.SetReference(&ssStatus.Resource.Reference, ssQuery.TypeMeta, ssQuery.ObjectMeta)
-			ssStatus.Status = ssQuery.Status
+				ssStatus.Resource.Created = true
+				reference.SetReference(&ssStatus.Resource.Reference, ssQuery.TypeMeta, ssQuery.ObjectMeta)
+				ssStatus.Status = ssQuery.Status
+			}
+
+			instance.Status.StatefulSetStatuses[key] = ssStatus
+
 		}
-
-		instance.Status.StatefulSetStatuses[key] = ssStatus
-
 	}
 
 	return nil
