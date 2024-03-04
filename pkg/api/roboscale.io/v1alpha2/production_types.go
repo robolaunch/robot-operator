@@ -35,8 +35,9 @@ func init() {
 type ROS2Workload struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
-
-	Spec   ROS2WorkloadSpec   `json:"spec,omitempty"`
+	// Specification of the desired behavior of the ROS2Workload.
+	Spec ROS2WorkloadSpec `json:"spec,omitempty"`
+	// Most recently observed status of the ROS2Workload.
 	Status ROS2WorkloadStatus `json:"status,omitempty"`
 }
 

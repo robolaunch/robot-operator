@@ -34,8 +34,9 @@ func init() {
 type ROS2Bridge struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
-
-	Spec   ROS2BridgeSpec   `json:"spec,omitempty"`
+	// Specification of the desired behavior of the ROS2Bridge.
+	Spec ROS2BridgeSpec `json:"spec,omitempty"`
+	// Most recently observed status of the ROS2Bridge.
 	Status ROS2BridgeStatus `json:"status,omitempty"`
 }
 
