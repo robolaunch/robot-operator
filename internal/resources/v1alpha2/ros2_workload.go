@@ -6,6 +6,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
+	configure "github.com/robolaunch/robot-operator/internal/configure/v1alpha2"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	robotv1alpha2 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha2"
 )
@@ -55,11 +56,28 @@ func GetPersistentVolumeClaim(ros2Workload *robotv1alpha2.ROS2Workload, pvcNames
 
 }
 
-func GetStatefulSet(ros2Workload *robotv1alpha2.ROS2Workload, ssNamespacedName *types.NamespacedName, key int) *appsv1.StatefulSet {
+func GetStatefulSet(ros2Workload *robotv1alpha2.ROS2Workload, ssNamespacedName *types.NamespacedName, key int, node corev1.Node) *appsv1.StatefulSet {
+
+	cfg := configure.PodSpecConfigInjector{}
 
 	container := ros2Workload.Spec.Containers[key]
 	ssAliasLabels := ros2Workload.Labels
 	ssAliasLabels["robolaunch.io/alias"] = container.Container.Name
+
+	podSpec := corev1.PodSpec{
+		Containers: []corev1.Container{
+			container.Container,
+		},
+	}
+
+	cfg.InjectDiscoveryServerConnection(&podSpec, ros2Workload.Status.DiscoveryServerStatus.Status.ConnectionInfo)
+	cfg.InjectROSDomainID(&podSpec, ros2Workload.Spec.DiscoveryServerTemplate.DomainID)
+	cfg.InjectRMWImplementationConfiguration(&podSpec, "rmw_fastrtps_cpp")
+	cfg.InjectImagePullPolicy(&podSpec)
+	cfg.SchedulePod(&podSpec, ros2Workload)
+	cfg.InjectTimezone(&podSpec, node)
+	cfg.InjectRuntimeClass(&podSpec, *ros2Workload, node)
+	cfg.InjectVolumeConfiguration(&podSpec, *ros2Workload)
 
 	statefulSet := appsv1.StatefulSet{
 		ObjectMeta: metav1.ObjectMeta{
@@ -70,11 +88,7 @@ func GetStatefulSet(ros2Workload *robotv1alpha2.ROS2Workload, ssNamespacedName *
 		Spec: appsv1.StatefulSetSpec{
 			Replicas: ros2Workload.Spec.Containers[key].Replicas,
 			Template: corev1.PodTemplateSpec{
-				Spec: corev1.PodSpec{
-					Containers: []corev1.Container{
-						container.Container,
-					},
-				},
+				Spec: podSpec,
 			},
 		},
 	}
