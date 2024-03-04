@@ -69,3 +69,29 @@ func (r *ROS2WorkloadReconciler) createPersistentVolumeClaim(ctx context.Context
 	logger.Info("STATUS: PVC " + instance.GetPersistentVolumeClaimMetadata(key).Name + " is created.")
 	return nil
 }
+
+// o zaman implement
+func (r *ROS2WorkloadReconciler) createStatefulSet(ctx context.Context, instance *robotv1alpha2.ROS2Workload, key int) error {
+
+	node, err := r.reconcileGetNode(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	statefulSet := v1alpha2_resources.GetStatefulSet(instance, instance.GetStatefulSetMetadata(key), key, *node)
+
+	err = ctrl.SetControllerReference(instance, statefulSet, r.Scheme)
+	if err != nil {
+		return err
+	}
+
+	err = r.Create(ctx, statefulSet)
+	if err != nil && errors.IsAlreadyExists(err) {
+		return nil
+	} else if err != nil {
+		return err
+	}
+
+	logger.Info("STATUS: StatefulSet " + instance.GetStatefulSetMetadata(key).Name + " is created.")
+	return nil
+}

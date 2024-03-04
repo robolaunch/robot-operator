@@ -58,12 +58,46 @@ func (r *ROS2WorkloadReconciler) reconcileHandlePVCs(ctx context.Context, instan
 			if err != nil {
 				return err
 			}
+
 			pvcStatus.Resource.Created = true
+			instance.Status.PVCStatuses[key] = pvcStatus
 
 			return &robotErr.CreatingResourceError{
 				ResourceKind:      "PersistentVolumeClaim",
 				ResourceName:      instance.GetPersistentVolumeClaimMetadata(key).Name,
 				ResourceNamespace: instance.GetPersistentVolumeClaimMetadata(key).Namespace,
+			}
+		}
+	}
+
+	return nil
+}
+
+func (r *ROS2WorkloadReconciler) reconcileHandleStatefulSets(ctx context.Context, instance *robotv1alpha2.ROS2Workload) error {
+
+	volumesReady := true
+	for _, pvcStatus := range instance.Status.PVCStatuses {
+		volumesReady = volumesReady && pvcStatus.Resource.Created
+	}
+
+	if volumesReady {
+		for key, ssStatus := range instance.Status.StatefulSetStatuses {
+			if !ssStatus.Resource.Created {
+
+				instance.Status.Phase = robotv1alpha2.ROS2WorkloadPhaseCreatingStatefulSets
+				err := r.createStatefulSet(ctx, instance, key)
+				if err != nil {
+					return err
+				}
+
+				ssStatus.Resource.Created = true
+				instance.Status.StatefulSetStatuses[key] = ssStatus
+
+				return &robotErr.CreatingResourceError{
+					ResourceKind:      "StatefulSet",
+					ResourceName:      instance.GetStatefulSetMetadata(key).Name,
+					ResourceNamespace: instance.GetStatefulSetMetadata(key).Namespace,
+				}
 			}
 		}
 	}

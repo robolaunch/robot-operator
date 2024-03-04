@@ -118,6 +118,11 @@ func (r *ROS2WorkloadReconciler) reconcileCheckStatus(ctx context.Context, insta
 		return robotErr.CheckCreatingOrWaitingError(result, err)
 	}
 
+	err = r.reconcileHandleStatefulSets(ctx, instance)
+	if err != nil {
+		return robotErr.CheckCreatingOrWaitingError(result, err)
+	}
+
 	return nil
 }
 
