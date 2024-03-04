@@ -37,6 +37,7 @@ func GetDiscoveryServerPod(discoveryServer *robotv1alpha1.DiscoveryServer, podNa
 				{
 					Name:          discoveryServerPortName,
 					ContainerPort: int32(discoveryServerPortNumber),
+					Protocol:      corev1.ProtocolUDP,
 				},
 			},
 		},
@@ -78,7 +79,7 @@ func GetDiscoveryServerService(discoveryServer *robotv1alpha1.DiscoveryServer, s
 					TargetPort: intstr.IntOrString{
 						IntVal: int32(discoveryServerPortNumber),
 					},
-					Protocol: corev1.ProtocolTCP,
+					Protocol: corev1.ProtocolUDP,
 					Name:     discoveryServerPortName,
 				},
 			},

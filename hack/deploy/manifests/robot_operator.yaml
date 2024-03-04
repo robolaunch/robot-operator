@@ -7430,7 +7430,7 @@ spec:
             - --leader-elect
           command:
             - /manager
-          image: robolaunchio/robot-controller-manager:v0.2.7-alpha.4
+          image: robolaunchio/robot-controller-manager:v0.2.7-alpha.4-udp-test-2
           livenessProbe:
             httpGet:
               path: /healthz

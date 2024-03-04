@@ -2,20 +2,11 @@
 ## [Unreleased]
 
 
-<a name="0.2.7-alpha.3"></a>
-## [0.2.7-alpha.3] - 2024-02-15
+<a name="v0.2.7-alpha.5"></a>
+## [v0.2.7-alpha.5] - 2024-03-04
 
-<a name="v0.2.7-alpha.2"></a>
-## [v0.2.7-alpha.2] - 2024-02-15
-
-<a name="v0.2.7-alpha.1-test.4"></a>
-## [v0.2.7-alpha.1-test.4] - 2024-02-12
-
-<a name="v0.2.7-alpha.1-test.3"></a>
-## [v0.2.7-alpha.1-test.3] - 2024-02-12
-
-<a name="v0.2.7-alpha.1-test.2"></a>
-## [v0.2.7-alpha.1-test.2] - 2024-02-12
+<a name="v0.2.7-alpha.4"></a>
+## [v0.2.7-alpha.4] - 2024-02-15
 
 <a name="v0.2.7-alpha.1"></a>
 ## [v0.2.7-alpha.1] - 2024-02-05
@@ -437,12 +428,9 @@
 - Merge pull request [#24](https://github.com/robolaunch/robot-operator/issues/24) from robolaunch/23-allow-multiple-launches
 
 
-[Unreleased]: https://github.com/robolaunch/robot-operator/compare/0.2.7-alpha.3...HEAD
-[0.2.7-alpha.3]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.2...0.2.7-alpha.3
-[v0.2.7-alpha.2]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.1-test.4...v0.2.7-alpha.2
-[v0.2.7-alpha.1-test.4]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.1-test.3...v0.2.7-alpha.1-test.4
-[v0.2.7-alpha.1-test.3]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.1-test.2...v0.2.7-alpha.1-test.3
-[v0.2.7-alpha.1-test.2]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.1...v0.2.7-alpha.1-test.2
+[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.5...HEAD
+[v0.2.7-alpha.5]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.4...v0.2.7-alpha.5
+[v0.2.7-alpha.4]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.1...v0.2.7-alpha.4
 [v0.2.7-alpha.1]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.19...v0.2.7-alpha.1
 [v0.2.6-alpha.19]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.18...v0.2.6-alpha.19
 [v0.2.6-alpha.18]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.17...v0.2.6-alpha.18
