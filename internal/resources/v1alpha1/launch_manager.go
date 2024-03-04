@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/robolaunch/robot-operator/internal"
-	"github.com/robolaunch/robot-operator/internal/configure"
+	configure "github.com/robolaunch/robot-operator/internal/configure/v1alpha1"
 	"github.com/robolaunch/robot-operator/internal/hybrid"
 	"github.com/robolaunch/robot-operator/internal/label"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"

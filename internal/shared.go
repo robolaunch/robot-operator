@@ -67,6 +67,7 @@ const (
 const (
 	ROS_2_BRIDGE_POSTFIX = "-bridge"
 	PVC_POSTFIX          = "-pvc"
+	STATEFULSET_POSTFIX  = ""
 )
 
 // WorkspaceManager owned resources' postfixes

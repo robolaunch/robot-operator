@@ -1,6 +1,7 @@
 package v1alpha2
 
 import (
+	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -28,4 +29,13 @@ type OwnedPVCStatus struct {
 	Resource OwnedResourceStatus `json:"resource,omitempty"`
 	// Status of the ROS2Bridge instance.
 	Status corev1.PersistentVolumeClaimStatus `json:"status,omitempty"`
+}
+
+type OwnedStatefulSetStatus struct {
+	// Generic status for any owned resource.
+	Resource OwnedResourceStatus `json:"resource,omitempty"`
+	// Status of the ROS2Bridge instance.
+	Status appsv1.StatefulSetStatus `json:"status,omitempty"`
+	// Container statuses.
+	ContainerStatuses []corev1.ContainerStatus `json:"containerStatuses,omitempty"`
 }
