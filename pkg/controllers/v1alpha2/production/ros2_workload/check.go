@@ -7,6 +7,7 @@ import (
 	"github.com/robolaunch/robot-operator/internal/reference"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	robotv1alpha2 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha2"
+	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 )
@@ -80,6 +81,38 @@ func (r *ROS2WorkloadReconciler) reconcileCheckPVCs(ctx context.Context, instanc
 		}
 
 		instance.Status.PVCStatuses[key] = pvcStatus
+
+	}
+
+	return nil
+}
+
+func (r *ROS2WorkloadReconciler) reconcileCheckStatefulSets(ctx context.Context, instance *robotv1alpha2.ROS2Workload) error {
+
+	volumesReady := true
+
+	for _, pvcStatus := range instance.Status.PVCStatuses {
+		volumesReady = volumesReady && pvcStatus.Resource.Created
+	}
+
+	for key, ssStatus := range instance.Status.StatefulSetStatuses {
+
+		ssQuery := &appsv1.StatefulSet{}
+		err := r.Get(ctx, *instance.GetStatefulSetMetadata(key), ssQuery)
+		if err != nil && errors.IsNotFound(err) {
+			ssStatus.Resource.Created = false
+		} else if err != nil {
+			return err
+		} else {
+
+			// TODO: check container status
+
+			ssStatus.Resource.Created = true
+			reference.SetReference(&ssStatus.Resource.Reference, ssQuery.TypeMeta, ssQuery.ObjectMeta)
+			ssStatus.Status = ssQuery.Status
+		}
+
+		instance.Status.StatefulSetStatuses[key] = ssStatus
 
 	}
 

@@ -143,6 +143,11 @@ func (r *ROS2WorkloadReconciler) reconcileCheckResources(ctx context.Context, in
 		return err
 	}
 
+	err = r.reconcileCheckStatefulSets(ctx, instance)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
