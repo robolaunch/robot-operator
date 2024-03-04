@@ -10,6 +10,9 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/selection"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 func (r *ROS2WorkloadReconciler) reconcileCheckDiscoveryServer(ctx context.Context, instance *robotv1alpha2.ROS2Workload) error {
@@ -105,12 +108,34 @@ func (r *ROS2WorkloadReconciler) reconcileCheckStatefulSets(ctx context.Context,
 			} else if err != nil {
 				return err
 			} else {
-
-				// TODO: check container status
-
+				// update statefulset status
 				ssStatus.Resource.Created = true
 				reference.SetReference(&ssStatus.Resource.Reference, ssQuery.TypeMeta, ssQuery.ObjectMeta)
 				ssStatus.Status = ssQuery.Status
+
+				// update container statuses
+				newReq, err := labels.NewRequirement("controller-revision-hash", selection.In, []string{ssQuery.Status.CurrentRevision})
+				if err != nil {
+					return err
+				}
+				podSelector := labels.NewSelector().Add([]labels.Requirement{*newReq}...)
+
+				podList := corev1.PodList{}
+				err = r.List(ctx, &podList, &client.ListOptions{
+					LabelSelector: podSelector,
+				})
+				if err != nil && errors.IsNotFound(err) {
+					return nil
+				} else if err != nil {
+					return err
+				} else {
+					containerStatuses := []corev1.ContainerStatus{}
+					for _, pod := range podList.Items {
+						containerStatuses = append(containerStatuses, pod.Status.ContainerStatuses...)
+					}
+					ssStatus.ContainerStatuses = containerStatuses
+				}
+
 			}
 
 			instance.Status.StatefulSetStatuses[key] = ssStatus
