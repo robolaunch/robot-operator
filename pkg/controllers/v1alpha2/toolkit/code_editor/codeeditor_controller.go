@@ -19,11 +19,13 @@ package code_editor
 import (
 	"context"
 
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
+	"github.com/go-logr/logr"
 	robotv1alpha2 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha2"
 )
 
@@ -37,9 +39,50 @@ type CodeEditorReconciler struct {
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=codeeditors/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=codeeditors/finalizers,verbs=update
 
+var logger logr.Logger
+
 func (r *CodeEditorReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
-	return ctrl.Result{}, nil
+	logger = log.FromContext(ctx)
+
+	var result ctrl.Result = ctrl.Result{}
+
+	instance, err := r.reconcileGetInstance(ctx, req.NamespacedName)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			return ctrl.Result{}, nil
+		}
+		return ctrl.Result{}, err
+	}
+
+	err = r.reconcileCheckStatus(ctx, instance, &result)
+	if err != nil {
+		return result, err
+	}
+
+	err = r.reconcileUpdateInstanceStatus(ctx, instance)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	err = r.reconcileCheckResources(ctx, instance)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	err = r.reconcileUpdateInstanceStatus(ctx, instance)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	return result, nil
+}
+
+func (r *CodeEditorReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha2.CodeEditor, result *ctrl.Result) error {
+	return nil
+}
+
+func (r *CodeEditorReconciler) reconcileCheckResources(ctx context.Context, instance *robotv1alpha2.CodeEditor) error {
+	return nil
 }
 
 // SetupWithManager sets up the controller with the Manager.
