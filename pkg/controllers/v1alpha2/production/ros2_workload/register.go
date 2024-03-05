@@ -29,8 +29,8 @@ func (r *ROS2WorkloadReconciler) registerStatefulSets(instance *robotv1alpha2.RO
 
 	ssStatuses := []robotv1alpha2.OwnedStatefulSetStatus{}
 
-	if len(instance.Spec.Containers) != len(instance.Status.StatefulSetStatuses) {
-		for key := range instance.Spec.Containers {
+	if len(instance.Spec.LaunchContainers) != len(instance.Status.StatefulSetStatuses) {
+		for key := range instance.Spec.LaunchContainers {
 			ssStatus := robotv1alpha2.OwnedStatefulSetStatus{
 				Resource: robotv1alpha2.OwnedResourceStatus{
 					Reference: corev1.ObjectReference{

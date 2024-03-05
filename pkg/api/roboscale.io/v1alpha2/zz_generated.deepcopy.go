@@ -286,8 +286,8 @@ func (in *ROS2WorkloadSpec) DeepCopyInto(out *ROS2WorkloadSpec) {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
 	}
-	if in.Containers != nil {
-		in, out := &in.Containers, &out.Containers
+	if in.LaunchContainers != nil {
+		in, out := &in.LaunchContainers, &out.LaunchContainers
 		*out = make([]LaunchContainer, len(*in))
 		for i := range *in {
 			(*in)[i].DeepCopyInto(&(*out)[i])

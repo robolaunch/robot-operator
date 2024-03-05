@@ -74,7 +74,7 @@ type ROS2WorkloadSpec struct {
 	// that can be mounted to the ROS 2 workload.
 	VolumeClaimTemplates []corev1.PersistentVolumeClaimTemplate `json:"volumeClaimTemplates,omitempty"`
 	// Configurational parameters for containers that will be encapsulated within the ROS 2 workload StatefulSet.
-	Containers []LaunchContainer `json:"containers,omitempty"`
+	LaunchContainers []LaunchContainer `json:"launchContainers,omitempty"`
 }
 
 // ROS2WorkloadStatus defines the observed state of ROS2Workload.
