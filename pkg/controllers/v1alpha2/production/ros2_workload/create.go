@@ -70,7 +70,6 @@ func (r *ROS2WorkloadReconciler) createPersistentVolumeClaim(ctx context.Context
 	return nil
 }
 
-// o zaman implement
 func (r *ROS2WorkloadReconciler) createStatefulSet(ctx context.Context, instance *robotv1alpha2.ROS2Workload, key int) error {
 
 	node, err := r.reconcileGetNode(ctx, instance)

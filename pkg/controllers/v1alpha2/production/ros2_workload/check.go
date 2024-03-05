@@ -26,8 +26,7 @@ func (r *ROS2WorkloadReconciler) reconcileCheckDiscoveryServer(ctx context.Conte
 	} else {
 
 		if !reflect.DeepEqual(instance.Spec.DiscoveryServerTemplate, discoveryServerQuery.Spec) {
-			discoveryServerQuery.Spec = instance.Spec.DiscoveryServerTemplate
-			err = r.Update(ctx, discoveryServerQuery)
+			err = r.updateDiscoveryServer(ctx, instance)
 			if err != nil {
 				return err
 			}
@@ -52,8 +51,7 @@ func (r *ROS2WorkloadReconciler) reconcileCheckROS2Bridge(ctx context.Context, i
 	} else {
 
 		if !reflect.DeepEqual(instance.Spec.ROS2BridgeTemplate, ros2BridgeQuery.Spec) {
-			ros2BridgeQuery.Spec = instance.Spec.ROS2BridgeTemplate
-			err = r.Update(ctx, ros2BridgeQuery)
+			err = r.updateROS2Bridge(ctx, instance)
 			if err != nil {
 				return err
 			}
@@ -112,14 +110,41 @@ func (r *ROS2WorkloadReconciler) reconcileCheckStatefulSets(ctx context.Context,
 				launchContainer := instance.Spec.Containers[key]
 				actualContainer := ssQuery.Spec.Template.Spec.Containers[0]
 
+				volumeMountsSynced := true
+				for _, vmDesired := range launchContainer.Container.VolumeMounts {
+					volumePresent := false
+					for _, vmActual := range actualContainer.VolumeMounts {
+						if reflect.DeepEqual(vmDesired, vmActual) {
+							volumePresent = true
+						}
+					}
+					volumeMountsSynced = volumeMountsSynced && volumePresent
+				}
+
+				// changes that needs resource updates
 				if !reflect.DeepEqual(launchContainer.Replicas, ssQuery.Spec.Replicas) ||
-					!reflect.DeepEqual(launchContainer.Container.Name, actualContainer.Name) ||
 					!reflect.DeepEqual(launchContainer.Container.Image, actualContainer.Image) ||
 					!reflect.DeepEqual(launchContainer.Container.Command, actualContainer.Command) ||
 					!reflect.DeepEqual(launchContainer.Container.Resources, actualContainer.Resources) ||
 					!reflect.DeepEqual(launchContainer.Container.SecurityContext, actualContainer.SecurityContext) {
 
-					err := r.Delete(ctx, ssQuery)
+					err = r.updateStatefulSet(ctx, instance, key)
+					if err != nil {
+						return err
+					}
+
+					ssStatus.Resource.Created = false
+					ssStatus.Status = appsv1.StatefulSetStatus{}
+					ssStatus.ContainerStatuses = []corev1.ContainerStatus{}
+					continue
+				}
+
+				// changes that needs resource recreation
+				if !reflect.DeepEqual(launchContainer.Container.Name, actualContainer.Name) ||
+					!reflect.DeepEqual(launchContainer.Container.SecurityContext, actualContainer.SecurityContext) ||
+					!volumeMountsSynced {
+
+					err = r.Delete(ctx, ssQuery)
 					if err != nil {
 						return err
 					}
