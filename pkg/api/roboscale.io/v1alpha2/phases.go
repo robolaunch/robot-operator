@@ -6,6 +6,7 @@ const (
 	ROS2WorkloadPhaseCreatingDiscoveryServer ROS2WorkloadPhase = "CreatingDiscoveryServer"
 	ROS2WorkloadPhaseCreatingROS2Bridge      ROS2WorkloadPhase = "CreatingROS2Bridge"
 	ROS2WorkloadPhaseCreatingPVCs            ROS2WorkloadPhase = "CreatingPVCs"
+	ROS2WorkloadPhaseCreatingStatefulSets    ROS2WorkloadPhase = "CreatingStatefulSets"
 	ROS2WorkloadPhaseReady                   ROS2WorkloadPhase = "Ready"
 )
 

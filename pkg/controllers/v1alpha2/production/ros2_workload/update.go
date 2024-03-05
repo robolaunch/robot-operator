@@ -10,7 +10,7 @@ import (
 	robotv1alpha2 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha2"
 )
 
-func (r *ROS2WorkloadReconciler) createDiscoveryServer(ctx context.Context, instance *robotv1alpha2.ROS2Workload) error {
+func (r *ROS2WorkloadReconciler) updateDiscoveryServer(ctx context.Context, instance *robotv1alpha2.ROS2Workload) error {
 
 	discoveryServer := v1alpha2_resources.GetDiscoveryServer(instance, instance.GetDiscoveryServerMetadata())
 
@@ -19,18 +19,18 @@ func (r *ROS2WorkloadReconciler) createDiscoveryServer(ctx context.Context, inst
 		return err
 	}
 
-	err = r.Create(ctx, discoveryServer)
+	err = r.Update(ctx, discoveryServer)
 	if err != nil && errors.IsAlreadyExists(err) {
 		return nil
 	} else if err != nil {
 		return err
 	}
 
-	logger.Info("STATUS: Discovery server " + discoveryServer.Name + " is created.")
+	logger.Info("STATUS: Discovery server " + discoveryServer.Name + " is updated.")
 	return nil
 }
 
-func (r *ROS2WorkloadReconciler) createROS2Bridge(ctx context.Context, instance *robotv1alpha2.ROS2Workload) error {
+func (r *ROS2WorkloadReconciler) updateROS2Bridge(ctx context.Context, instance *robotv1alpha2.ROS2Workload) error {
 
 	ros2Bridge := v1alpha2_resources.GetROS2Bridge(instance, instance.GetROS2BridgeMetadata())
 
@@ -39,38 +39,18 @@ func (r *ROS2WorkloadReconciler) createROS2Bridge(ctx context.Context, instance 
 		return err
 	}
 
-	err = r.Create(ctx, ros2Bridge)
+	err = r.Update(ctx, ros2Bridge)
 	if err != nil && errors.IsAlreadyExists(err) {
 		return nil
 	} else if err != nil {
 		return err
 	}
 
-	logger.Info("STATUS: ROS 2 Bridge " + ros2Bridge.Name + " is created.")
+	logger.Info("STATUS: ROS 2 Bridge " + ros2Bridge.Name + " is updated.")
 	return nil
 }
 
-func (r *ROS2WorkloadReconciler) createPersistentVolumeClaim(ctx context.Context, instance *robotv1alpha2.ROS2Workload, key int) error {
-
-	pvc := v1alpha2_resources.GetPersistentVolumeClaim(instance, instance.GetPersistentVolumeClaimMetadata(key), key)
-
-	err := ctrl.SetControllerReference(instance, pvc, r.Scheme)
-	if err != nil {
-		return err
-	}
-
-	err = r.Create(ctx, pvc)
-	if err != nil && errors.IsAlreadyExists(err) {
-		return nil
-	} else if err != nil {
-		return err
-	}
-
-	logger.Info("STATUS: PVC " + instance.GetPersistentVolumeClaimMetadata(key).Name + " is created.")
-	return nil
-}
-
-func (r *ROS2WorkloadReconciler) createStatefulSet(ctx context.Context, instance *robotv1alpha2.ROS2Workload, key int) error {
+func (r *ROS2WorkloadReconciler) updateStatefulSet(ctx context.Context, instance *robotv1alpha2.ROS2Workload, key int) error {
 
 	node, err := r.reconcileGetNode(ctx, instance)
 	if err != nil {
@@ -84,13 +64,13 @@ func (r *ROS2WorkloadReconciler) createStatefulSet(ctx context.Context, instance
 		return err
 	}
 
-	err = r.Create(ctx, statefulSet)
+	err = r.Update(ctx, statefulSet)
 	if err != nil && errors.IsAlreadyExists(err) {
 		return nil
 	} else if err != nil {
 		return err
 	}
 
-	logger.Info("STATUS: StatefulSet " + instance.GetStatefulSetMetadata(key).Name + " is created.")
+	logger.Info("STATUS: StatefulSet " + instance.GetStatefulSetMetadata(key).Name + " is updated.")
 	return nil
 }

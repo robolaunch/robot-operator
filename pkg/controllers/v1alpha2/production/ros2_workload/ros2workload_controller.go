@@ -118,6 +118,11 @@ func (r *ROS2WorkloadReconciler) reconcileCheckStatus(ctx context.Context, insta
 		return robotErr.CheckCreatingOrWaitingError(result, err)
 	}
 
+	err = r.reconcileHandleStatefulSets(ctx, instance)
+	if err != nil {
+		return robotErr.CheckCreatingOrWaitingError(result, err)
+	}
+
 	return nil
 }
 
@@ -134,6 +139,11 @@ func (r *ROS2WorkloadReconciler) reconcileCheckResources(ctx context.Context, in
 	}
 
 	err = r.reconcileCheckPVCs(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	err = r.reconcileCheckStatefulSets(ctx, instance)
 	if err != nil {
 		return err
 	}

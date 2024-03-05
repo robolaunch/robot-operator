@@ -18,6 +18,11 @@ const (
 	DOMAIN_LABEL_KEY               = "robolaunch.io/domain"
 )
 
+// Selector labels
+const (
+	ROS2_WORKLOAD_CONTAINER_SELECTOR_LABEL_KEY = "robolaunch.io/ros2-workload-container"
+)
+
 // Timezone labels
 const (
 	TZ_CONTINENT_LABEL_KEY = "robolaunch.io/tz-continent"
