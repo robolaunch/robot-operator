@@ -61,7 +61,7 @@ func GetStatefulSet(ros2Workload *robotv1alpha2.ROS2Workload, ssNamespacedName *
 
 	cfg := configure.PodSpecConfigInjector{}
 
-	container := ros2Workload.Spec.Containers[key]
+	container := ros2Workload.Spec.LaunchContainers[key]
 	ssAliasLabels := ros2Workload.Labels
 	ssAliasLabels["robolaunch.io/alias"] = container.Container.Name
 
@@ -87,7 +87,7 @@ func GetStatefulSet(ros2Workload *robotv1alpha2.ROS2Workload, ssNamespacedName *
 			Labels:    ssAliasLabels,
 		},
 		Spec: appsv1.StatefulSetSpec{
-			Replicas: ros2Workload.Spec.Containers[key].Replicas,
+			Replicas: ros2Workload.Spec.LaunchContainers[key].Replicas,
 			Selector: &metav1.LabelSelector{
 				MatchLabels: map[string]string{
 					internal.ROS2_WORKLOAD_CONTAINER_SELECTOR_LABEL_KEY: container.Container.Name,
