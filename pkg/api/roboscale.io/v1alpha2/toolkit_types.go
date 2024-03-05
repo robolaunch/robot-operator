@@ -24,6 +24,7 @@ import (
 
 func init() {
 	SchemeBuilder.Register(&ROS2Bridge{}, &ROS2BridgeList{})
+	SchemeBuilder.Register(&CodeEditor{}, &CodeEditorList{})
 }
 
 //+genclient
@@ -47,6 +48,29 @@ type ROS2BridgeList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []ROS2Bridge `json:"items"`
+}
+
+//+genclient
+//+kubebuilder:object:root=true
+//+kubebuilder:subresource:status
+
+// CodeEditor is the Schema for the codeeditors API
+type CodeEditor struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+	// Specification of the desired behavior of the CodeEditor.
+	Spec CodeEditorSpec `json:"spec,omitempty"`
+	// Most recently observed status of the CodeEditor.
+	Status CodeEditorStatus `json:"status,omitempty"`
+}
+
+//+kubebuilder:object:root=true
+
+// CodeEditorList contains a list of CodeEditor
+type CodeEditorList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []CodeEditor `json:"items"`
 }
 
 // ********************************
@@ -82,4 +106,16 @@ type ROS2BridgeStatus struct {
 	ServiceStatus robotv1alpha1.OwnedServiceStatus `json:"serviceStatus,omitempty"`
 	// Status of ROS2Bridge Ingress.
 	IngressStatus robotv1alpha1.OwnedResourceStatus `json:"ingressStatus,omitempty"`
+}
+
+// ********************************
+// CodeEditor types
+// ********************************
+
+// CodeEditorSpec defines the desired state of CodeEditor.
+type CodeEditorSpec struct {
+}
+
+// CodeEditorStatus defines the observed state of CodeEditor.
+type CodeEditorStatus struct {
 }

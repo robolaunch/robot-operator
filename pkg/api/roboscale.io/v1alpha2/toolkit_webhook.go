@@ -75,3 +75,47 @@ func (r *ROS2Bridge) ValidateDelete() error {
 	ros2bridgelog.Info("validate delete", "name", r.Name)
 	return nil
 }
+
+// ********************************
+// CodeEditor webhooks
+// ********************************
+
+// log is for logging in this package.
+var codeeditorlog = logf.Log.WithName("codeeditor-resource")
+
+func (r *CodeEditor) SetupWebhookWithManager(mgr ctrl.Manager) error {
+	return ctrl.NewWebhookManagedBy(mgr).
+		For(r).
+		Complete()
+}
+
+//+kubebuilder:webhook:path=/mutate-robot-roboscale-io-v1alpha2-codeeditor,mutating=true,failurePolicy=fail,sideEffects=None,groups=robot.roboscale.io,resources=codeeditors,verbs=create;update,versions=v1alpha2,name=mcodeeditor.kb.io,admissionReviewVersions=v1
+
+var _ webhook.Defaulter = &CodeEditor{}
+
+// Default implements webhook.Defaulter so a webhook will be registered for the type
+func (r *CodeEditor) Default() {
+	codeeditorlog.Info("default", "name", r.Name)
+}
+
+//+kubebuilder:webhook:path=/validate-robot-roboscale-io-v1alpha2-codeeditor,mutating=false,failurePolicy=fail,sideEffects=None,groups=robot.roboscale.io,resources=codeeditors,verbs=create;update,versions=v1alpha2,name=vcodeeditor.kb.io,admissionReviewVersions=v1
+
+var _ webhook.Validator = &CodeEditor{}
+
+// ValidateCreate implements webhook.Validator so a webhook will be registered for the type
+func (r *CodeEditor) ValidateCreate() error {
+	codeeditorlog.Info("validate create", "name", r.Name)
+	return nil
+}
+
+// ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
+func (r *CodeEditor) ValidateUpdate(old runtime.Object) error {
+	codeeditorlog.Info("validate update", "name", r.Name)
+	return nil
+}
+
+// ValidateDelete implements webhook.Validator so a webhook will be registered for the type
+func (r *CodeEditor) ValidateDelete() error {
+	codeeditorlog.Info("validate delete", "name", r.Name)
+	return nil
+}
