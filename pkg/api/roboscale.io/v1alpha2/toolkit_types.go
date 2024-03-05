@@ -114,8 +114,14 @@ type ROS2BridgeStatus struct {
 
 // CodeEditorSpec defines the desired state of CodeEditor.
 type CodeEditorSpec struct {
+	// Volume templates for ROS 2 workload.
+	// For each volume template, operator will create a PersistentVolumeClaim
+	// that can be mounted to the ROS 2 workload.
+	VolumeClaimTemplates []corev1.PersistentVolumeClaimTemplate `json:"volumeClaimTemplates,omitempty"`
 }
 
 // CodeEditorStatus defines the observed state of CodeEditor.
 type CodeEditorStatus struct {
+	// Statuses of owned PersistentVolumeClaims.
+	PVCStatuses []OwnedPVCStatus `json:"pvcStatuses,omitempty"`
 }
