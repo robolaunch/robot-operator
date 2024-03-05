@@ -107,7 +107,7 @@ func (r *ROS2WorkloadReconciler) reconcileCheckStatefulSets(ctx context.Context,
 				return err
 			} else {
 				// check if there are any inconsistencies
-				launchContainer := instance.Spec.Containers[key]
+				launchContainer := instance.Spec.LaunchContainers[key]
 				actualContainer := ssQuery.Spec.Template.Spec.Containers[0]
 
 				volumeMountsSynced := true
