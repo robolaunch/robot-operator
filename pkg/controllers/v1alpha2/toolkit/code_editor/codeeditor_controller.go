@@ -20,6 +20,7 @@ import (
 	"context"
 
 	robotErr "github.com/robolaunch/robot-operator/internal/error"
+	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -42,6 +43,7 @@ type CodeEditorReconciler struct {
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=codeeditors/finalizers,verbs=update
 
 //+kubebuilder:rbac:groups=core,resources=persistentvolumeclaims,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=apps,resources=persistentvolumeclaims,verbs=get;list;watch;create;update;patch;delete
 
 var logger logr.Logger
 
@@ -126,5 +128,6 @@ func (r *CodeEditorReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&robotv1alpha2.CodeEditor{}).
 		Owns(&corev1.PersistentVolumeClaim{}).
+		Owns(&appsv1.Deployment{}).
 		Complete(r)
 }
