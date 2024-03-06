@@ -132,6 +132,9 @@ type CodeEditorSpec struct {
 	Remote bool `json:"remote,omitempty"`
 	// Configurational parameters for code editor container.
 	Container CodeEditorContainer `json:"container,omitempty"`
+	// Port that code editor will use inside the container.
+	// +kubebuilder:default=9000
+	Port int32 `json:"port"`
 	// Volume templates for ROS 2 workload.
 	// For each volume template, operator will create a PersistentVolumeClaim
 	// that can be mounted to the ROS 2 workload.
