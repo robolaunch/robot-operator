@@ -1,0 +1,27 @@
+# permissions for end users to view codeeditors.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: codeeditor-viewer-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: robot-operator
+    app.kubernetes.io/part-of: robot-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: codeeditor-viewer-role
+rules:
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - codeeditors
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - codeeditors/status
+  verbs:
+  - get

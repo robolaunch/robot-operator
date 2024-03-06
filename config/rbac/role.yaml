@@ -190,6 +190,32 @@ rules:
 - apiGroups:
   - robot.roboscale.io
   resources:
+  - codeeditors
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - codeeditors/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - codeeditors/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - robot.roboscale.io
+  resources:
   - discoveryservers
   verbs:
   - create
