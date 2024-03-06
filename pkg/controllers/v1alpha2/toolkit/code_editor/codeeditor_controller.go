@@ -91,6 +91,7 @@ func (r *CodeEditorReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 func (r *CodeEditorReconciler) reconcileRegisterResources(instance *robotv1alpha2.CodeEditor) error {
 
 	r.registerPVCs(instance)
+	r.registerExternalVolumes(instance)
 
 	return nil
 }
@@ -108,6 +109,11 @@ func (r *CodeEditorReconciler) reconcileCheckStatus(ctx context.Context, instanc
 func (r *CodeEditorReconciler) reconcileCheckResources(ctx context.Context, instance *robotv1alpha2.CodeEditor) error {
 
 	err := r.reconcileCheckPVCs(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	err = r.reconcileCheckExternalVolumes(ctx, instance)
 	if err != nil {
 		return err
 	}

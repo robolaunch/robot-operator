@@ -24,3 +24,18 @@ func (r *CodeEditorReconciler) registerPVCs(instance *robotv1alpha2.CodeEditor) 
 		instance.Status.PVCStatuses = pvcStatuses
 	}
 }
+
+func (r *CodeEditorReconciler) registerExternalVolumes(instance *robotv1alpha2.CodeEditor) {
+
+	evStatuses := []robotv1alpha2.ExternalVolumeStatus{}
+
+	if len(instance.Spec.ExternalVolumes) != len(instance.Status.ExternalVolumeStatuses) {
+		for _, ev := range instance.Spec.ExternalVolumes {
+			evStatus := robotv1alpha2.ExternalVolumeStatus{
+				Name: ev.Name,
+			}
+			evStatuses = append(evStatuses, evStatus)
+		}
+		instance.Status.ExternalVolumeStatuses = evStatuses
+	}
+}
