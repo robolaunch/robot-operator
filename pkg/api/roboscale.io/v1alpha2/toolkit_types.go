@@ -119,8 +119,19 @@ type ExternalVolumeStatus struct {
 	Exists bool `json:"exists,omitempty"`
 }
 
+type CodeEditorContainer struct {
+	// Security context of the code editor container.
+	SecurityContext corev1.SecurityContext `json:"securityContext,omitempty"`
+	// Mounted volumes of the code editor container.
+	VolumeMounts []corev1.VolumeMount `json:"volumeMounts,omitempty"`
+}
+
 // CodeEditorSpec defines the desired state of CodeEditor.
 type CodeEditorSpec struct {
+	// If `true`, code editor will be consumed remotely.
+	Remote bool `json:"remote,omitempty"`
+	// Configurational parameters for code editor container.
+	Container CodeEditorContainer `json:"container,omitempty"`
 	// Volume templates for ROS 2 workload.
 	// For each volume template, operator will create a PersistentVolumeClaim
 	// that can be mounted to the ROS 2 workload.
@@ -137,4 +148,6 @@ type CodeEditorStatus struct {
 	PVCStatuses []OwnedPVCStatus `json:"pvcStatuses,omitempty"`
 	// Statuses of external volumes.
 	ExternalVolumeStatuses []ExternalVolumeStatus `json:"externalVolumeStatuses,omitempty"`
+	// Status of code editor deployment.
+	DeploymentStatus OwnedDeploymentStatus `json:"deploymentStatus,omitempty"`
 }
