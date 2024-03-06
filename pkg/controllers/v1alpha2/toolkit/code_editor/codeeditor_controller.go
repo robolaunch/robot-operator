@@ -43,7 +43,7 @@ type CodeEditorReconciler struct {
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=codeeditors/finalizers,verbs=update
 
 //+kubebuilder:rbac:groups=core,resources=persistentvolumeclaims,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=apps,resources=persistentvolumeclaims,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete
 
 var logger logr.Logger
 
@@ -121,6 +121,11 @@ func (r *CodeEditorReconciler) reconcileCheckResources(ctx context.Context, inst
 	}
 
 	err = r.reconcileCheckExternalVolumes(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	err = r.reconcileCheckDeployment(ctx, instance)
 	if err != nil {
 		return err
 	}

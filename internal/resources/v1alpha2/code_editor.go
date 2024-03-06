@@ -38,7 +38,7 @@ func GetCodeEditorDeployment(codeEditor *robotv1alpha2.CodeEditor, deploymentNam
 		Containers: []corev1.Container{
 			{
 				Name:    "code-editor",
-				Image:   "docker.io/robolaunchio/code-editor:4.22.0-arm64-0.2.6-alpha.19",
+				Image:   "docker.io/robolaunchio/code-editor:4.22.0-0.2.6-alpha.19",
 				Command: []string{"/bin/bash", "-c", "sleep infinity"},
 				Ports: []corev1.ContainerPort{
 					{
@@ -64,6 +64,10 @@ func GetCodeEditorDeployment(codeEditor *robotv1alpha2.CodeEditor, deploymentNam
 	cfg.InjectRuntimeClass(&podSpec, codeEditor, node)
 	cfg.InjectVolumeConfiguration(&podSpec, codeEditor.Status.PVCStatuses)
 	cfg.InjectExternalVolumeConfiguration(&podSpec, codeEditor.Status.ExternalVolumeStatuses)
+
+	if !codeEditor.Spec.Root {
+		cfg.InjectLinuxUserAndGroup(&podSpec)
+	}
 
 	deployment := appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{

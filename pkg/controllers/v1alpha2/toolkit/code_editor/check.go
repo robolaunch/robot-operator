@@ -5,6 +5,7 @@ import (
 
 	"github.com/robolaunch/robot-operator/internal/reference"
 	robotv1alpha2 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha2"
+	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
@@ -52,6 +53,25 @@ func (r *CodeEditorReconciler) reconcileCheckExternalVolumes(ctx context.Context
 
 		instance.Status.ExternalVolumeStatuses[key] = evStatus
 
+	}
+
+	return nil
+}
+
+func (r *CodeEditorReconciler) reconcileCheckDeployment(ctx context.Context, instance *robotv1alpha2.CodeEditor) error {
+
+	deploymentQuery := &appsv1.Deployment{}
+	err := r.Get(ctx, *instance.GetDeploymentMetadata(), deploymentQuery)
+	if err != nil && errors.IsNotFound(err) {
+		instance.Status.DeploymentStatus = robotv1alpha2.OwnedDeploymentStatus{}
+	} else if err != nil {
+		return err
+	} else {
+
+		// make deployment dynamic
+
+		instance.Status.DeploymentStatus.Resource.Created = true
+		reference.SetReference(&instance.Status.DeploymentStatus.Resource.Reference, deploymentQuery.TypeMeta, deploymentQuery.ObjectMeta)
 	}
 
 	return nil
