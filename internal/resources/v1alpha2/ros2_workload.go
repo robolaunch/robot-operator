@@ -77,8 +77,8 @@ func GetROS2WorkloadStatefulSet(ros2Workload *robotv1alpha2.ROS2Workload, ssName
 	cfg.InjectImagePullPolicy(&podSpec)
 	cfg.SchedulePod(&podSpec, ros2Workload)
 	cfg.InjectTimezone(&podSpec, node)
-	cfg.InjectRuntimeClass(&podSpec, *ros2Workload, node)
-	cfg.InjectVolumeConfiguration(&podSpec, *ros2Workload)
+	cfg.InjectRuntimeClass(&podSpec, ros2Workload, node)
+	cfg.InjectVolumeConfiguration(&podSpec, ros2Workload.Status.PVCStatuses)
 
 	statefulSet := appsv1.StatefulSet{
 		ObjectMeta: metav1.ObjectMeta{

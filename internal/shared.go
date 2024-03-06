@@ -21,6 +21,7 @@ const (
 // Selector labels
 const (
 	ROS2_WORKLOAD_CONTAINER_SELECTOR_LABEL_KEY = "robolaunch.io/ros2-workload-container"
+	CODE_EDITOR_CONTAINER_SELECTOR_LABEL_KEY   = "robolaunch.io/code-editor-container"
 )
 
 // Timezone labels
