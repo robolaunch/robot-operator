@@ -119,6 +119,9 @@ spec:
                           with Server's hostname. Used for getting Server's IP over
                           DNS.
                         type: string
+                      protocol:
+                        default: TCP
+                        type: string
                       reference:
                         description: Reference to the `Server` instance. It is used
                           if `.spec.type` is `Client`. Referenced object can be previously

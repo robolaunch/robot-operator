@@ -33,7 +33,7 @@ spec:
           metadata:
             type: object
           spec:
-            description: ROS2BridgeSpec defines the desired state of ROS2Bridge.
+            description: Specification of the desired behavior of the ROS2Bridge.
             properties:
               discoveryServerRef:
                 description: Object reference to DiscoveryServer.
@@ -97,7 +97,7 @@ spec:
             - distro
             type: object
           status:
-            description: ROS2BridgeStatus defines the observed state of ROS2Bridge.
+            description: Most recently observed status of the ROS2Bridge.
             properties:
               connectionInfo:
                 description: Connection info obtained from DiscoveryServer.
