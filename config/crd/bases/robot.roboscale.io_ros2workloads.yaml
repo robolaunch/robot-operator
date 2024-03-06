@@ -2622,7 +2622,7 @@ spec:
                       - created
                       type: object
                     status:
-                      description: Status of the ROS2Bridge instance.
+                      description: Status of the StatefulSet.
                       properties:
                         availableReplicas:
                           description: Total number of available pods (ready for at
