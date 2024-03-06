@@ -12,7 +12,7 @@ import (
 
 func (r *ROS2WorkloadReconciler) createDiscoveryServer(ctx context.Context, instance *robotv1alpha2.ROS2Workload) error {
 
-	discoveryServer := v1alpha2_resources.GetDiscoveryServer(instance, instance.GetDiscoveryServerMetadata())
+	discoveryServer := v1alpha2_resources.GetROS2WorkloadDiscoveryServer(instance, instance.GetDiscoveryServerMetadata())
 
 	err := ctrl.SetControllerReference(instance, discoveryServer, r.Scheme)
 	if err != nil {
@@ -32,7 +32,7 @@ func (r *ROS2WorkloadReconciler) createDiscoveryServer(ctx context.Context, inst
 
 func (r *ROS2WorkloadReconciler) createROS2Bridge(ctx context.Context, instance *robotv1alpha2.ROS2Workload) error {
 
-	ros2Bridge := v1alpha2_resources.GetROS2Bridge(instance, instance.GetROS2BridgeMetadata())
+	ros2Bridge := v1alpha2_resources.GetROS2WorkloadROS2Bridge(instance, instance.GetROS2BridgeMetadata())
 
 	err := ctrl.SetControllerReference(instance, ros2Bridge, r.Scheme)
 	if err != nil {
@@ -52,7 +52,7 @@ func (r *ROS2WorkloadReconciler) createROS2Bridge(ctx context.Context, instance 
 
 func (r *ROS2WorkloadReconciler) createPersistentVolumeClaim(ctx context.Context, instance *robotv1alpha2.ROS2Workload, key int) error {
 
-	pvc := v1alpha2_resources.GetPersistentVolumeClaim(instance, instance.GetPersistentVolumeClaimMetadata(key), key)
+	pvc := v1alpha2_resources.GetROS2WorkloadPersistentVolumeClaim(instance, instance.GetPersistentVolumeClaimMetadata(key), key)
 
 	err := ctrl.SetControllerReference(instance, pvc, r.Scheme)
 	if err != nil {
@@ -77,7 +77,7 @@ func (r *ROS2WorkloadReconciler) createStatefulSet(ctx context.Context, instance
 		return err
 	}
 
-	statefulSet := v1alpha2_resources.GetStatefulSet(instance, instance.GetStatefulSetMetadata(key), key, *node)
+	statefulSet := v1alpha2_resources.GetROS2WorkloadStatefulSet(instance, instance.GetStatefulSetMetadata(key), key, *node)
 
 	err = ctrl.SetControllerReference(instance, statefulSet, r.Scheme)
 	if err != nil {

@@ -12,7 +12,7 @@ import (
 	robotv1alpha2 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha2"
 )
 
-func GetDiscoveryServer(ros2Workload *robotv1alpha2.ROS2Workload, dsNamespacedName *types.NamespacedName) *robotv1alpha1.DiscoveryServer {
+func GetROS2WorkloadDiscoveryServer(ros2Workload *robotv1alpha2.ROS2Workload, dsNamespacedName *types.NamespacedName) *robotv1alpha1.DiscoveryServer {
 
 	discoveryServer := robotv1alpha1.DiscoveryServer{
 		ObjectMeta: metav1.ObjectMeta{
@@ -27,7 +27,7 @@ func GetDiscoveryServer(ros2Workload *robotv1alpha2.ROS2Workload, dsNamespacedNa
 
 }
 
-func GetROS2Bridge(ros2Workload *robotv1alpha2.ROS2Workload, r2bNamespacedName *types.NamespacedName) *robotv1alpha2.ROS2Bridge {
+func GetROS2WorkloadROS2Bridge(ros2Workload *robotv1alpha2.ROS2Workload, r2bNamespacedName *types.NamespacedName) *robotv1alpha2.ROS2Bridge {
 
 	ros2Bridge := robotv1alpha2.ROS2Bridge{
 		ObjectMeta: metav1.ObjectMeta{
@@ -42,7 +42,7 @@ func GetROS2Bridge(ros2Workload *robotv1alpha2.ROS2Workload, r2bNamespacedName *
 
 }
 
-func GetPersistentVolumeClaim(ros2Workload *robotv1alpha2.ROS2Workload, pvcNamespacedName *types.NamespacedName, key int) *corev1.PersistentVolumeClaim {
+func GetROS2WorkloadPersistentVolumeClaim(ros2Workload *robotv1alpha2.ROS2Workload, pvcNamespacedName *types.NamespacedName, key int) *corev1.PersistentVolumeClaim {
 
 	pvc := corev1.PersistentVolumeClaim{
 		ObjectMeta: metav1.ObjectMeta{
@@ -57,7 +57,7 @@ func GetPersistentVolumeClaim(ros2Workload *robotv1alpha2.ROS2Workload, pvcNames
 
 }
 
-func GetStatefulSet(ros2Workload *robotv1alpha2.ROS2Workload, ssNamespacedName *types.NamespacedName, key int, node corev1.Node) *appsv1.StatefulSet {
+func GetROS2WorkloadStatefulSet(ros2Workload *robotv1alpha2.ROS2Workload, ssNamespacedName *types.NamespacedName, key int, node corev1.Node) *appsv1.StatefulSet {
 
 	cfg := configure.PodSpecConfigInjector{}
 
