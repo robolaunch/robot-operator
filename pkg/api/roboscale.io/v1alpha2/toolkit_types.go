@@ -128,6 +128,8 @@ type CodeEditorContainer struct {
 
 // CodeEditorSpec defines the desired state of CodeEditor.
 type CodeEditorSpec struct {
+	// If `true`, code editor will be consumed as `root` user.
+	Root bool `json:"root,omitempty"`
 	// If `true`, code editor will be consumed remotely.
 	Remote bool `json:"remote,omitempty"`
 	// Configurational parameters for code editor container.
