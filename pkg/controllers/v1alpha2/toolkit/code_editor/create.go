@@ -28,3 +28,28 @@ func (r *CodeEditorReconciler) createPersistentVolumeClaim(ctx context.Context, 
 	logger.Info("STATUS: PVC " + instance.GetPersistentVolumeClaimMetadata(key).Name + " is created.")
 	return nil
 }
+
+func (r *CodeEditorReconciler) createDeployment(ctx context.Context, instance *robotv1alpha2.CodeEditor) error {
+
+	node, err := r.reconcileGetNode(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	deployment := v1alpha2_resources.GetCodeEditorDeployment(instance, instance.GetDeploymentMetadata(), *node)
+
+	err = ctrl.SetControllerReference(instance, deployment, r.Scheme)
+	if err != nil {
+		return err
+	}
+
+	err = r.Create(ctx, deployment)
+	if err != nil && errors.IsAlreadyExists(err) {
+		return nil
+	} else if err != nil {
+		return err
+	}
+
+	logger.Info("STATUS: Deployment " + instance.GetDeploymentMetadata().Name + " is created.")
+	return nil
+}

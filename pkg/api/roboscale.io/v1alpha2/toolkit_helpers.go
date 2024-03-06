@@ -42,3 +42,10 @@ func (codeEditor *CodeEditor) GetPersistentVolumeClaimMetadata(key int) *types.N
 		Namespace: codeEditor.Namespace,
 	}
 }
+
+func (codeEditor *CodeEditor) GetDeploymentMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Name:      codeEditor.Name + internal.DEPLOYMENT_POSTFIX,
+		Namespace: codeEditor.Namespace,
+	}
+}

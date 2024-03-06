@@ -105,6 +105,11 @@ func (r *CodeEditorReconciler) reconcileCheckStatus(ctx context.Context, instanc
 		return robotErr.CheckCreatingOrWaitingError(result, err)
 	}
 
+	err = r.reconcileHandleDeployment(ctx, instance)
+	if err != nil {
+		return robotErr.CheckCreatingOrWaitingError(result, err)
+	}
+
 	return nil
 }
 

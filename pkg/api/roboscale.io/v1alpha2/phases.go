@@ -24,6 +24,7 @@ const (
 type CodeEditorPhase string
 
 const (
-	CodeEditorPhaseCreatingPVCs CodeEditorPhase = "CreatingPVCs"
-	CodeEditorPhaseReady        CodeEditorPhase = "Ready"
+	CodeEditorPhaseCreatingPVCs       CodeEditorPhase = "CreatingPVCs"
+	CodeEditorPhaseCreatingDeployment CodeEditorPhase = "CreatingDeployment"
+	CodeEditorPhaseReady              CodeEditorPhase = "Ready"
 )
