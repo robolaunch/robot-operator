@@ -20,3 +20,10 @@ const (
 	ROS2BridgePhaseDeletingPod     ROS2BridgePhase = "DeletingPod"
 	ROS2BridgePhaseDeletingService ROS2BridgePhase = "DeletingService"
 )
+
+type CodeEditorPhase string
+
+const (
+	CodeEditorPhaseCreatingPVCs CodeEditorPhase = "CreatingPVCs"
+	CodeEditorPhaseReady        CodeEditorPhase = "Ready"
+)

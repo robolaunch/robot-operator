@@ -19,6 +19,8 @@ package code_editor
 import (
 	"context"
 
+	robotErr "github.com/robolaunch/robot-operator/internal/error"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -39,6 +41,8 @@ type CodeEditorReconciler struct {
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=codeeditors/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=codeeditors/finalizers,verbs=update
 
+//+kubebuilder:rbac:groups=core,resources=persistentvolumeclaims,verbs=get;list;watch;create;update;patch;delete
+
 var logger logr.Logger
 
 func (r *CodeEditorReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
@@ -51,6 +55,13 @@ func (r *CodeEditorReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		if errors.IsNotFound(err) {
 			return ctrl.Result{}, nil
 		}
+		return ctrl.Result{}, err
+	}
+
+	r.reconcileRegisterResources(instance)
+
+	err = r.reconcileUpdateInstanceStatus(ctx, instance)
+	if err != nil {
 		return ctrl.Result{}, err
 	}
 
@@ -77,11 +88,30 @@ func (r *CodeEditorReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	return result, nil
 }
 
+func (r *CodeEditorReconciler) reconcileRegisterResources(instance *robotv1alpha2.CodeEditor) error {
+
+	r.registerPVCs(instance)
+
+	return nil
+}
+
 func (r *CodeEditorReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha2.CodeEditor, result *ctrl.Result) error {
+
+	err := r.reconcileHandlePVCs(ctx, instance)
+	if err != nil {
+		return robotErr.CheckCreatingOrWaitingError(result, err)
+	}
+
 	return nil
 }
 
 func (r *CodeEditorReconciler) reconcileCheckResources(ctx context.Context, instance *robotv1alpha2.CodeEditor) error {
+
+	err := r.reconcileCheckPVCs(ctx, instance)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -89,5 +119,6 @@ func (r *CodeEditorReconciler) reconcileCheckResources(ctx context.Context, inst
 func (r *CodeEditorReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&robotv1alpha2.CodeEditor{}).
+		Owns(&corev1.PersistentVolumeClaim{}).
 		Complete(r)
 }

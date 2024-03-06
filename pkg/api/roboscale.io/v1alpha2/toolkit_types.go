@@ -122,6 +122,8 @@ type CodeEditorSpec struct {
 
 // CodeEditorStatus defines the observed state of CodeEditor.
 type CodeEditorStatus struct {
+	// Phase of CodeEditor. It sums the general status of code editor.
+	Phase CodeEditorPhase `json:"phase,omitempty"`
 	// Statuses of owned PersistentVolumeClaims.
 	PVCStatuses []OwnedPVCStatus `json:"pvcStatuses,omitempty"`
 }
