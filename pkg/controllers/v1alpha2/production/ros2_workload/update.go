@@ -12,7 +12,7 @@ import (
 
 func (r *ROS2WorkloadReconciler) updateDiscoveryServer(ctx context.Context, instance *robotv1alpha2.ROS2Workload) error {
 
-	discoveryServer := v1alpha2_resources.GetDiscoveryServer(instance, instance.GetDiscoveryServerMetadata())
+	discoveryServer := v1alpha2_resources.GetROS2WorkloadDiscoveryServer(instance, instance.GetDiscoveryServerMetadata())
 
 	err := ctrl.SetControllerReference(instance, discoveryServer, r.Scheme)
 	if err != nil {
@@ -32,7 +32,7 @@ func (r *ROS2WorkloadReconciler) updateDiscoveryServer(ctx context.Context, inst
 
 func (r *ROS2WorkloadReconciler) updateROS2Bridge(ctx context.Context, instance *robotv1alpha2.ROS2Workload) error {
 
-	ros2Bridge := v1alpha2_resources.GetROS2Bridge(instance, instance.GetROS2BridgeMetadata())
+	ros2Bridge := v1alpha2_resources.GetROS2WorkloadROS2Bridge(instance, instance.GetROS2BridgeMetadata())
 
 	err := ctrl.SetControllerReference(instance, ros2Bridge, r.Scheme)
 	if err != nil {
@@ -57,7 +57,7 @@ func (r *ROS2WorkloadReconciler) updateStatefulSet(ctx context.Context, instance
 		return err
 	}
 
-	statefulSet := v1alpha2_resources.GetStatefulSet(instance, instance.GetStatefulSetMetadata(key), key, *node)
+	statefulSet := v1alpha2_resources.GetROS2WorkloadStatefulSet(instance, instance.GetStatefulSetMetadata(key), key, *node)
 
 	err = ctrl.SetControllerReference(instance, statefulSet, r.Scheme)
 	if err != nil {

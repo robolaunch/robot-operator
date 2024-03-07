@@ -34,8 +34,17 @@ type OwnedPVCStatus struct {
 type OwnedStatefulSetStatus struct {
 	// Generic status for any owned resource.
 	Resource OwnedResourceStatus `json:"resource,omitempty"`
-	// Status of the ROS2Bridge instance.
+	// Status of the StatefulSet.
 	Status appsv1.StatefulSetStatus `json:"status,omitempty"`
+	// Container statuses.
+	ContainerStatuses []corev1.ContainerStatus `json:"containerStatuses,omitempty"`
+}
+
+type OwnedDeploymentStatus struct {
+	// Generic status for any owned resource.
+	Resource OwnedResourceStatus `json:"resource,omitempty"`
+	// Status of the Deployment.
+	Status appsv1.DeploymentStatus `json:"status,omitempty"`
 	// Container statuses.
 	ContainerStatuses []corev1.ContainerStatus `json:"containerStatuses,omitempty"`
 }

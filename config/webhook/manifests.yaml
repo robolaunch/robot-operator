@@ -225,6 +225,26 @@ webhooks:
     resources:
     - ros2bridges
   sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /mutate-robot-roboscale-io-v1alpha2-codeeditor
+  failurePolicy: Fail
+  name: mcodeeditor.kb.io
+  rules:
+  - apiGroups:
+    - robot.roboscale.io
+    apiVersions:
+    - v1alpha2
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - codeeditors
+  sideEffects: None
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
@@ -451,4 +471,24 @@ webhooks:
     - UPDATE
     resources:
     - ros2bridges
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /validate-robot-roboscale-io-v1alpha2-codeeditor
+  failurePolicy: Fail
+  name: vcodeeditor.kb.io
+  rules:
+  - apiGroups:
+    - robot.roboscale.io
+    apiVersions:
+    - v1alpha2
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - codeeditors
   sideEffects: None

@@ -182,4 +182,17 @@ resources:
     defaulting: true
     validation: true
     webhookVersion: v1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: roboscale.io
+  group: robot
+  kind: CodeEditor
+  path: github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha2
+  version: v1alpha2
+  webhooks:
+    defaulting: true
+    validation: true
+    webhookVersion: v1
 version: "3"

@@ -51,6 +51,7 @@ import (
 	robotVDI "github.com/robolaunch/robot-operator/pkg/controllers/v1alpha1/robot_dev_suite/robot_vdi"
 	workspaceManager "github.com/robolaunch/robot-operator/pkg/controllers/v1alpha1/workspace_manager"
 	ros2Workload "github.com/robolaunch/robot-operator/pkg/controllers/v1alpha2/production/ros2_workload"
+	codeEditor "github.com/robolaunch/robot-operator/pkg/controllers/v1alpha2/toolkit/code_editor"
 	ros2Bridge "github.com/robolaunch/robot-operator/pkg/controllers/v1alpha2/toolkit/ros2_bridge"
 	//+kubebuilder:scaffold:imports
 )
@@ -128,8 +129,8 @@ func main() {
 	startDevCRDsAndWebhooks(mgr, dynamicClient)
 	startObserverCRDsAndWebhooks(mgr, dynamicClient)
 	// v1alpha2
-	startProductionCRDsAndWebhooks(mgr, dynamicClient)
-	startToolkitCRDsAndWebhooks(mgr, dynamicClient)
+	startProductionCRDsAndWebhooks(mgr)
+	startToolkitCRDsAndWebhooks(mgr)
 
 	//+kubebuilder:scaffold:builder
 
@@ -331,7 +332,8 @@ func startObserverCRDsAndWebhooks(mgr manager.Manager, dynamicClient dynamic.Int
 
 // This function starts Production CRDs' controllers and webhooks. Here are the CRDs:
 // - ROS2Workload (ros2workloads.robot.roboscale.io/v1alpha2)
-func startProductionCRDsAndWebhooks(mgr manager.Manager, dynamicClient dynamic.Interface) {
+func startProductionCRDsAndWebhooks(mgr manager.Manager) {
+	// ROS2Workload controller & webhook
 	if err := (&ros2Workload.ROS2WorkloadReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
@@ -347,7 +349,8 @@ func startProductionCRDsAndWebhooks(mgr manager.Manager, dynamicClient dynamic.I
 
 // This function starts Toolkit CRDs' controllers and webhooks. Here are the CRDs:
 // - ROS2Bridge (ros2bridges.robot.roboscale.io/v1alpha2)
-func startToolkitCRDsAndWebhooks(mgr manager.Manager, dynamicClient dynamic.Interface) {
+func startToolkitCRDsAndWebhooks(mgr manager.Manager) {
+	// ROS2Bridge controller & webhook
 	if err := (&ros2Bridge.ROS2BridgeReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
@@ -357,6 +360,19 @@ func startToolkitCRDsAndWebhooks(mgr manager.Manager, dynamicClient dynamic.Inte
 	}
 	if err := (&robotv1alpha2.ROS2Bridge{}).SetupWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "ROS2Bridge")
+		os.Exit(1)
+	}
+
+	// ROS2Bridge controller & webhook
+	if err := (&codeEditor.CodeEditorReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "CodeEditor")
+		os.Exit(1)
+	}
+	if err := (&robotv1alpha2.CodeEditor{}).SetupWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create webhook", "webhook", "CodeEditor")
 		os.Exit(1)
 	}
 }

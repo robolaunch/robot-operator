@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package ros2_workload
+package code_editor
 
 import (
 	"context"
@@ -29,28 +29,25 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	"github.com/go-logr/logr"
-	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	robotv1alpha2 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha2"
 )
 
-// ROS2WorkloadReconciler reconciles a ROS2Workload object
-type ROS2WorkloadReconciler struct {
+// CodeEditorReconciler reconciles a CodeEditor object
+type CodeEditorReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
 }
 
-//+kubebuilder:rbac:groups=robot.roboscale.io,resources=ros2workloads,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=robot.roboscale.io,resources=ros2workloads/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=robot.roboscale.io,resources=ros2workloads/finalizers,verbs=update
+//+kubebuilder:rbac:groups=robot.roboscale.io,resources=codeeditors,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=robot.roboscale.io,resources=codeeditors/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=robot.roboscale.io,resources=codeeditors/finalizers,verbs=update
 
-//+kubebuilder:rbac:groups=robot.roboscale.io,resources=discoveryservers,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=robot.roboscale.io,resources=ros2bridges,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=core,resources=persistentvolumeclaims,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=apps,resources=statefulsets,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete
 
 var logger logr.Logger
 
-func (r *ROS2WorkloadReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
+func (r *CodeEditorReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	logger = log.FromContext(ctx)
 
 	var result ctrl.Result = ctrl.Result{}
@@ -63,10 +60,7 @@ func (r *ROS2WorkloadReconciler) Reconcile(ctx context.Context, req ctrl.Request
 		return ctrl.Result{}, err
 	}
 
-	err = r.reconcileRegisterResources(ctx, instance)
-	if err != nil {
-		return ctrl.Result{}, err
-	}
+	r.reconcileRegisterResources(instance)
 
 	err = r.reconcileUpdateInstanceStatus(ctx, instance)
 	if err != nil {
@@ -96,39 +90,22 @@ func (r *ROS2WorkloadReconciler) Reconcile(ctx context.Context, req ctrl.Request
 	return result, nil
 }
 
-func (r *ROS2WorkloadReconciler) reconcileRegisterResources(ctx context.Context, instance *robotv1alpha2.ROS2Workload) error {
+func (r *CodeEditorReconciler) reconcileRegisterResources(instance *robotv1alpha2.CodeEditor) error {
 
-	err := r.registerPVCs(ctx, instance)
-	if err != nil {
-		return err
-	}
-
-	err = r.registerStatefulSets(ctx, instance)
-	if err != nil {
-		return err
-	}
+	r.registerPVCs(instance)
+	r.registerExternalVolumes(instance)
 
 	return nil
 }
 
-func (r *ROS2WorkloadReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha2.ROS2Workload, result *ctrl.Result) error {
+func (r *CodeEditorReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha2.CodeEditor, result *ctrl.Result) error {
 
-	err := r.reconcileHandleDiscoveryServer(ctx, instance)
+	err := r.reconcileHandlePVCs(ctx, instance)
 	if err != nil {
 		return robotErr.CheckCreatingOrWaitingError(result, err)
 	}
 
-	err = r.reconcileHandleROS2Bridge(ctx, instance)
-	if err != nil {
-		return robotErr.CheckCreatingOrWaitingError(result, err)
-	}
-
-	err = r.reconcileHandlePVCs(ctx, instance)
-	if err != nil {
-		return robotErr.CheckCreatingOrWaitingError(result, err)
-	}
-
-	err = r.reconcileHandleStatefulSets(ctx, instance)
+	err = r.reconcileHandleDeployment(ctx, instance)
 	if err != nil {
 		return robotErr.CheckCreatingOrWaitingError(result, err)
 	}
@@ -136,24 +113,19 @@ func (r *ROS2WorkloadReconciler) reconcileCheckStatus(ctx context.Context, insta
 	return nil
 }
 
-func (r *ROS2WorkloadReconciler) reconcileCheckResources(ctx context.Context, instance *robotv1alpha2.ROS2Workload) error {
+func (r *CodeEditorReconciler) reconcileCheckResources(ctx context.Context, instance *robotv1alpha2.CodeEditor) error {
 
-	err := r.reconcileCheckDiscoveryServer(ctx, instance)
+	err := r.reconcileCheckPVCs(ctx, instance)
 	if err != nil {
 		return err
 	}
 
-	err = r.reconcileCheckROS2Bridge(ctx, instance)
+	err = r.reconcileCheckExternalVolumes(ctx, instance)
 	if err != nil {
 		return err
 	}
 
-	err = r.reconcileCheckPVCs(ctx, instance)
-	if err != nil {
-		return err
-	}
-
-	err = r.reconcileCheckStatefulSets(ctx, instance)
+	err = r.reconcileCheckDeployment(ctx, instance)
 	if err != nil {
 		return err
 	}
@@ -162,12 +134,10 @@ func (r *ROS2WorkloadReconciler) reconcileCheckResources(ctx context.Context, in
 }
 
 // SetupWithManager sets up the controller with the Manager.
-func (r *ROS2WorkloadReconciler) SetupWithManager(mgr ctrl.Manager) error {
+func (r *CodeEditorReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&robotv1alpha2.ROS2Workload{}).
-		Owns(&robotv1alpha1.DiscoveryServer{}).
-		Owns(&robotv1alpha2.ROS2Bridge{}).
+		For(&robotv1alpha2.CodeEditor{}).
 		Owns(&corev1.PersistentVolumeClaim{}).
-		Owns(&appsv1.StatefulSet{}).
+		Owns(&appsv1.Deployment{}).
 		Complete(r)
 }

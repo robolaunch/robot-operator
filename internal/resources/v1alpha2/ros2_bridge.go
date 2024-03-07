@@ -18,10 +18,8 @@ import (
 )
 
 const (
-	ROS_BRIDGE_PORT_NAME  = "bridge-server"
-	ROS_BRIDGE_PORT       = 9090
-	ROS2_BRIDGE_PORT_NAME = "bridge-server-2"
-	ROS2_BRIDGE_PORT      = 9091
+	ROS2_BRIDGE_PORT_NAME = "bridge-server"
+	ROS2_BRIDGE_PORT      = 9090
 )
 
 func getROSBridgeSelector(rosbridge robotv1alpha2.ROS2Bridge) map[string]string {
@@ -79,14 +77,6 @@ func GetROS2BridgeService(rosbridge *robotv1alpha2.ROS2Bridge, svcNamespacedName
 		},
 		Spec: corev1.ServiceSpec{
 			Ports: []corev1.ServicePort{
-				{
-					Name:     ROS_BRIDGE_PORT_NAME,
-					Port:     ROS_BRIDGE_PORT,
-					Protocol: corev1.ProtocolTCP,
-					TargetPort: intstr.IntOrString{
-						IntVal: ROS_BRIDGE_PORT,
-					},
-				},
 				{
 					Name:     ROS2_BRIDGE_PORT_NAME,
 					Port:     ROS2_BRIDGE_PORT,
