@@ -63,7 +63,10 @@ func (r *ROS2WorkloadReconciler) Reconcile(ctx context.Context, req ctrl.Request
 		return ctrl.Result{}, err
 	}
 
-	r.reconcileRegisterResources(instance)
+	err = r.reconcileRegisterResources(ctx, instance)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
 
 	err = r.reconcileUpdateInstanceStatus(ctx, instance)
 	if err != nil {
@@ -93,10 +96,17 @@ func (r *ROS2WorkloadReconciler) Reconcile(ctx context.Context, req ctrl.Request
 	return result, nil
 }
 
-func (r *ROS2WorkloadReconciler) reconcileRegisterResources(instance *robotv1alpha2.ROS2Workload) error {
+func (r *ROS2WorkloadReconciler) reconcileRegisterResources(ctx context.Context, instance *robotv1alpha2.ROS2Workload) error {
 
-	r.registerPVCs(instance)
-	r.registerStatefulSets(instance)
+	err := r.registerPVCs(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	err = r.registerStatefulSets(ctx, instance)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

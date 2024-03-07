@@ -96,7 +96,7 @@ func (r *ROS2WorkloadReconciler) reconcileCheckStatefulSets(ctx context.Context,
 		volumesReady = volumesReady && pvcStatus.Resource.Created
 	}
 
-	if instance.Status.DiscoveryServerStatus.Status.ConfigMapStatus.Created && volumesReady {
+	if instance.Status.DiscoveryServerStatus.Status.ConfigMapStatus.Created && volumesReady && len(instance.Spec.LaunchContainers) == len(instance.Status.StatefulSetStatuses) {
 		for key, ssStatus := range instance.Status.StatefulSetStatuses {
 
 			ssQuery := &appsv1.StatefulSet{}
@@ -109,6 +109,10 @@ func (r *ROS2WorkloadReconciler) reconcileCheckStatefulSets(ctx context.Context,
 				// check if there are any inconsistencies
 				launchContainer := instance.Spec.LaunchContainers[key]
 				actualContainer := ssQuery.Spec.Template.Spec.Containers[0]
+				actualContainerStatus := corev1.ContainerStatus{}
+				if len(ssStatus.ContainerStatuses) > 0 {
+					actualContainerStatus = ssStatus.ContainerStatuses[0]
+				}
 
 				volumeMountsSynced := true
 				for _, vmDesired := range launchContainer.Container.VolumeMounts {
@@ -121,21 +125,41 @@ func (r *ROS2WorkloadReconciler) reconcileCheckStatefulSets(ctx context.Context,
 					volumeMountsSynced = volumeMountsSynced && volumePresent
 				}
 
+				envSynced := true
+				for _, envDesired := range launchContainer.Container.Env {
+					envPresent := false
+					for _, envActual := range actualContainer.Env {
+						if reflect.DeepEqual(envDesired, envActual) {
+							envPresent = true
+						}
+					}
+					envSynced = envSynced && envPresent
+				}
+
 				// changes that needs resource updates
 				if !reflect.DeepEqual(launchContainer.Replicas, ssQuery.Spec.Replicas) ||
 					!reflect.DeepEqual(launchContainer.Container.Image, actualContainer.Image) ||
 					!reflect.DeepEqual(launchContainer.Container.Command, actualContainer.Command) ||
 					!reflect.DeepEqual(launchContainer.Container.Resources, actualContainer.Resources) ||
-					!reflect.DeepEqual(launchContainer.Container.SecurityContext, actualContainer.SecurityContext) {
+					!reflect.DeepEqual(launchContainer.Container.SecurityContext, actualContainer.SecurityContext) ||
+					!envSynced {
 
-					err = r.updateStatefulSet(ctx, instance, key)
-					if err != nil {
-						return err
+					if !actualContainerStatus.Ready {
+						err = r.Delete(ctx, ssQuery)
+						if err != nil {
+							return err
+						}
+
+						ssStatus.Resource.Created = false
+						ssStatus.Status = appsv1.StatefulSetStatus{}
+						ssStatus.ContainerStatuses = []corev1.ContainerStatus{}
+					} else {
+						err = r.updateStatefulSet(ctx, instance, key)
+						if err != nil {
+							return err
+						}
 					}
 
-					ssStatus.Resource.Created = false
-					ssStatus.Status = appsv1.StatefulSetStatus{}
-					ssStatus.ContainerStatuses = []corev1.ContainerStatus{}
 					continue
 				}
 
