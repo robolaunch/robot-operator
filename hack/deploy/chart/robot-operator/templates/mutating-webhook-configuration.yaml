@@ -227,3 +227,23 @@ webhooks:
     resources:
     - ros2bridges
   sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: '{{ include "robot-operator.fullname" . }}-webhook-service'
+      namespace: '{{ .Release.Namespace }}'
+      path: /mutate-robot-roboscale-io-v1alpha2-codeeditor
+  failurePolicy: Fail
+  name: mcodeeditor.kb.io
+  rules:
+  - apiGroups:
+    - robot.roboscale.io
+    apiVersions:
+    - v1alpha2
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - codeeditors
+  sideEffects: None
