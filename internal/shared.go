@@ -54,6 +54,13 @@ const (
 	ROBOT_DEV_SUITE_OWNED = "robolaunch.io/dev-suite-owned"
 )
 
+// Platform server
+const (
+	DEFAULT_PLATFORM_URL           = "https://raw.githubusercontent.com/robolaunch/platform/main/platforms/industry-cloud-platform/platform.yaml"
+	DEFAULT_ENVIRONMENTS_URL       = "https://raw.githubusercontent.com/robolaunch/platform/main/platforms/industry-cloud-platform/environments.yaml"
+	DEFAULT_TOOLS_ENVIRONMENTS_URL = "https://raw.githubusercontent.com/robolaunch/platform/main/platforms/internal/environments.yaml"
+)
+
 // Robot owned resources' postfixes (v1alpha1)
 const (
 	PVC_VAR_POSTFIX           = "-pvc-var"
