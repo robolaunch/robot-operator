@@ -163,4 +163,6 @@ type CodeEditorStatus struct {
 	ExternalVolumeStatuses []ExternalVolumeStatus `json:"externalVolumeStatuses,omitempty"`
 	// Status of code editor deployment.
 	DeploymentStatus OwnedDeploymentStatus `json:"deploymentStatus,omitempty"`
+	// Status of code editor service.
+	ServiceStatus OwnedServiceStatus `json:"serviceStatus,omitempty"`
 }

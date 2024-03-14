@@ -48,3 +48,10 @@ type OwnedDeploymentStatus struct {
 	// Container statuses.
 	ContainerStatuses []corev1.ContainerStatus `json:"containerStatuses,omitempty"`
 }
+
+type OwnedServiceStatus struct {
+	// Generic status for any owned resource.
+	Resource OwnedResourceStatus `json:"resource,omitempty"`
+	// Connection URL.
+	URLs map[string]string `json:"urls,omitempty"`
+}
