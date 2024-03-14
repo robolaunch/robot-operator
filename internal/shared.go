@@ -2,9 +2,10 @@ package internal
 
 import corev1 "k8s.io/api/core/v1"
 
-// Platform related labels
+// Platform meta labels
 const (
 	PLATFORM_VERSION_LABEL_KEY = "robolaunch.io/platform"
+	DOMAIN_LABEL_KEY           = "robolaunch.io/domain"
 )
 
 // Tenancy labels
@@ -15,7 +16,6 @@ const (
 	CLOUD_INSTANCE_LABEL_KEY       = "robolaunch.io/cloud-instance"
 	CLOUD_INSTANCE_ALIAS_LABEL_KEY = "robolaunch.io/cloud-instance-alias"
 	PHYSICAL_INSTANCE_LABEL_KEY    = "robolaunch.io/physical-instance"
-	DOMAIN_LABEL_KEY               = "robolaunch.io/domain"
 )
 
 // Selector labels

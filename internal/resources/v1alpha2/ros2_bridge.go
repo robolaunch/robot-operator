@@ -97,10 +97,11 @@ func GetROS2BridgeService(rosbridge *robotv1alpha2.ROS2Bridge, svcNamespacedName
 func GetROS2BridgeIngress(ros2Bridge *robotv1alpha2.ROS2Bridge, ingressNamespacedName *types.NamespacedName) *networkingv1.Ingress {
 
 	tenancy := label.GetTenancy(ros2Bridge)
+	platformMeta := label.GetPlatformMeta(ros2Bridge)
 
 	annotations := map[string]string{
-		internal.INGRESS_AUTH_URL_KEY:                fmt.Sprintf(internal.INGRESS_AUTH_URL_VAL, tenancy.Team, tenancy.Domain),
-		internal.INGRESS_AUTH_SIGNIN_KEY:             fmt.Sprintf(internal.INGRESS_AUTH_SIGNIN_VAL, tenancy.Team, tenancy.Domain),
+		internal.INGRESS_AUTH_URL_KEY:                fmt.Sprintf(internal.INGRESS_AUTH_URL_VAL, tenancy.Team, platformMeta.Domain),
+		internal.INGRESS_AUTH_SIGNIN_KEY:             fmt.Sprintf(internal.INGRESS_AUTH_SIGNIN_VAL, tenancy.Team, platformMeta.Domain),
 		internal.INGRESS_AUTH_RESPONSE_HEADERS_KEY:   internal.INGRESS_AUTH_RESPONSE_HEADERS_VAL,
 		internal.INGRESS_CONFIGURATION_SNIPPET_KEY:   internal.INGRESS_IDE_CONFIGURATION_SNIPPET_VAL,
 		internal.INGRESS_CERT_MANAGER_KEY:            internal.INGRESS_CERT_MANAGER_VAL,
@@ -116,14 +117,14 @@ func GetROS2BridgeIngress(ros2Bridge *robotv1alpha2.ROS2Bridge, ingressNamespace
 		TLS: []networkingv1.IngressTLS{
 			{
 				Hosts: []string{
-					tenancy.Team + "." + tenancy.Domain,
+					tenancy.Team + "." + platformMeta.Domain,
 				},
 				SecretName: ros2Bridge.Spec.TLSSecretName,
 			},
 		},
 		Rules: []networkingv1.IngressRule{
 			{
-				Host: tenancy.Team + "." + tenancy.Domain,
+				Host: tenancy.Team + "." + platformMeta.Domain,
 				IngressRuleValue: networkingv1.IngressRuleValue{
 					HTTP: &networkingv1.HTTPIngressRuleValue{
 						Paths: []networkingv1.HTTPIngressPath{

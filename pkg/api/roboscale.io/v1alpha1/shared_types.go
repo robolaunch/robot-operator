@@ -142,7 +142,8 @@ func GetRelayServerServicePath(rs RelayServer, postfix string) string {
 
 func GetServiceDNS(obj metav1.Object, prefix, postfix string) string {
 	tenancy := label.GetTenancy(obj)
-	connectionStr := tenancy.Team + "." + tenancy.Domain + GetServicePath(obj, postfix)
+	platformMeta := label.GetPlatformMeta(obj)
+	connectionStr := tenancy.Team + "." + platformMeta.Domain + GetServicePath(obj, postfix)
 
 	if prefix != "" {
 		connectionStr = prefix + connectionStr
@@ -167,7 +168,8 @@ func GetServicePath(obj metav1.Object, postfix string) string {
 
 func GetServiceDNSWithNodePort(obj metav1.Object, prefix, port string) string {
 	tenancy := label.GetTenancy(obj)
-	connectionStr := tenancy.Team + "." + tenancy.Domain + ":" + port
+	platformMeta := label.GetPlatformMeta(obj)
+	connectionStr := tenancy.Team + "." + platformMeta.Domain + ":" + port
 
 	if prefix != "" {
 		connectionStr = prefix + connectionStr

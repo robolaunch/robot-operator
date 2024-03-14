@@ -1,7 +1,6 @@
 package node
 
 import (
-	"github.com/robolaunch/robot-operator/internal"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -15,11 +14,4 @@ func IsK3s(node corev1.Node) bool {
 		return true
 	}
 	return false
-}
-
-func GetPlatformVersion(node corev1.Node) string {
-	if platformVersion, ok := node.Labels[internal.PLATFORM_VERSION_LABEL_KEY]; ok {
-		return platformVersion
-	}
-	return ""
 }

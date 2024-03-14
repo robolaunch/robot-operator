@@ -12,12 +12,6 @@ type Tenancy struct {
 	CloudInstance      string
 	CloudInstanceAlias string
 	PhysicalInstance   string
-	Domain             string
-}
-
-type Timezone struct {
-	Continent string
-	City      string
 }
 
 func GetTenancy(obj metav1.Object) *Tenancy {
@@ -48,27 +42,7 @@ func GetTenancy(obj metav1.Object) *Tenancy {
 		tenancy.PhysicalInstance = physicalInstance
 	}
 
-	if domain, ok := labels[internal.DOMAIN_LABEL_KEY]; ok {
-		tenancy.Domain = domain
-	}
-
 	return tenancy
-}
-
-func GetTimezone(obj metav1.Object) *Timezone {
-
-	timezone := &Timezone{}
-	labels := obj.GetLabels()
-
-	if continent, ok := labels[internal.TZ_CONTINENT_LABEL_KEY]; ok {
-		timezone.Continent = continent
-	}
-
-	if city, ok := labels[internal.TZ_CITY_LABEL_KEY]; ok {
-		timezone.City = city
-	}
-
-	return timezone
 }
 
 func GetTenancyMap(obj metav1.Object) map[string]string {
@@ -130,27 +104,4 @@ func GetTenancyMapFromTenancy(tenancy Tenancy) map[string]string {
 	}
 
 	return tenancyMap
-}
-
-type InstanceType string
-
-const (
-	InstanceTypeCloudInstance    InstanceType = "CloudInstance"
-	InstanceTypePhysicalInstance InstanceType = "PhysicalInstance"
-)
-
-func GetInstanceType(obj metav1.Object) InstanceType {
-	tenancy := GetTenancy(obj)
-	if tenancy.PhysicalInstance == "" {
-		return InstanceTypeCloudInstance
-	}
-	return InstanceTypePhysicalInstance
-}
-
-func GetClusterName(obj metav1.Object) string {
-	tenancy := GetTenancy(obj)
-	if tenancy.PhysicalInstance == "" {
-		return tenancy.CloudInstance
-	}
-	return tenancy.PhysicalInstance
 }
