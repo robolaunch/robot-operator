@@ -141,6 +141,10 @@ type CodeEditorSpec struct {
 	// Port that code editor will use inside the container.
 	// +kubebuilder:default=9000
 	Port int32 `json:"port"`
+	// Service type of CodeEditor. `ClusterIP` and `NodePort` is supported.
+	// +kubebuilder:validation:Enum=ClusterIP;NodePort
+	// +kubebuilder:default="ClusterIP"
+	ServiceType corev1.ServiceType `json:"serviceType,omitempty"`
 	// Volume templates for ROS 2 workload.
 	// For each volume template, operator will create a PersistentVolumeClaim
 	// that can be mounted to the ROS 2 workload.
