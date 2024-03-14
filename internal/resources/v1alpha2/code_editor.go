@@ -54,6 +54,11 @@ func GetCodeEditorDeployment(codeEditor *robotv1alpha2.CodeEditor, deploymentNam
 		return nil
 	}
 
+	labels := getCodeEditorSelector(*codeEditor)
+	for k, v := range codeEditor.Labels {
+		labels[k] = v
+	}
+
 	podSpec := corev1.PodSpec{
 		Containers: []corev1.Container{
 			{
@@ -104,7 +109,7 @@ func GetCodeEditorDeployment(codeEditor *robotv1alpha2.CodeEditor, deploymentNam
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      deploymentNamespacedName.Name,
 			Namespace: deploymentNamespacedName.Namespace,
-			Labels:    codeEditor.Labels,
+			Labels:    labels,
 		},
 		Spec: appsv1.DeploymentSpec{
 			Selector: &metav1.LabelSelector{
