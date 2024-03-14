@@ -39,7 +39,7 @@ func GetCodeEditorDeployment(codeEditor *robotv1alpha2.CodeEditor, deploymentNam
 
 	cfg := configure.PodSpecConfigInjector{}
 
-	image, err := platform.GetToolsImage(platformMeta.Version, CODE_EDITOR_APP_NAME, codeEditor.Spec.Version)
+	image, err := platform.GetToolsImage(codeEditor, platformMeta.Version, CODE_EDITOR_APP_NAME, codeEditor.Spec.Version)
 	if err != nil {
 		return nil
 	}

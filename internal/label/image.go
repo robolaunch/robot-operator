@@ -12,7 +12,7 @@ type ImageMeta struct {
 	Tag        string
 }
 
-func GetImageProperties(obj metav1.Object) *ImageMeta {
+func GetImageMeta(obj metav1.Object) *ImageMeta {
 
 	imageMeta := &ImageMeta{}
 	labels := obj.GetLabels()
