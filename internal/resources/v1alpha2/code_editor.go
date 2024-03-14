@@ -7,6 +7,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/util/intstr"
 
 	"github.com/robolaunch/robot-operator/internal"
 	configure "github.com/robolaunch/robot-operator/internal/configure/v1alpha2"
@@ -20,6 +21,12 @@ const (
 	CODE_EDITOR_APP_NAME  = "code-editor"
 	CODE_EDITOR_PORT_NAME = "code-server"
 )
+
+func getCodeEditorSelector(codeEditor robotv1alpha2.CodeEditor) map[string]string {
+	return map[string]string{
+		CODE_EDITOR_APP_NAME: codeEditor.GetName(),
+	}
+}
 
 func GetCodeEditorPersistentVolumeClaim(codeEditor *robotv1alpha2.CodeEditor, pvcNamespacedName *types.NamespacedName, key int) *corev1.PersistentVolumeClaim {
 
@@ -117,4 +124,46 @@ func GetCodeEditorDeployment(codeEditor *robotv1alpha2.CodeEditor, deploymentNam
 	}
 
 	return &deployment
+}
+
+func GetCodeEditorService(codeEditor *robotv1alpha2.CodeEditor, svcNamespacedName *types.NamespacedName) *corev1.Service {
+
+	cfg := configure.ServiceSpecConfigInjector{}
+
+	serviceSpec := corev1.ServiceSpec{
+		Type:     codeEditor.Spec.ServiceType,
+		Selector: getCodeEditorSelector(*codeEditor),
+		Ports: []corev1.ServicePort{
+			{
+				Name: CODE_EDITOR_PORT_NAME,
+				Port: codeEditor.Spec.Port,
+				TargetPort: intstr.IntOrString{
+					IntVal: codeEditor.Spec.Port,
+				},
+				Protocol: corev1.ProtocolTCP,
+			},
+			{
+				Name: internal.FILE_BROWSER_PORT_NAME,
+				Port: internal.FILE_BROWSER_PORT,
+				TargetPort: intstr.IntOrString{
+					IntVal: internal.FILE_BROWSER_PORT,
+				},
+				Protocol: corev1.ProtocolTCP,
+			},
+		},
+	}
+
+	service := corev1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      svcNamespacedName.Name,
+			Namespace: svcNamespacedName.Namespace,
+		},
+		Spec: serviceSpec,
+	}
+
+	if codeEditor.Spec.Remote {
+		cfg.InjectRemoteConfigurations(&serviceSpec)
+	}
+
+	return &service
 }
