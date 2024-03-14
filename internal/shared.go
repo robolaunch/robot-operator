@@ -82,6 +82,7 @@ const (
 	PVC_POSTFIX          = "-pvc"
 	STATEFULSET_POSTFIX  = ""
 	DEPLOYMENT_POSTFIX   = ""
+	SERVICE_POSTFIX      = ""
 )
 
 // WorkspaceManager owned resources' postfixes

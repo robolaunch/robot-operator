@@ -76,3 +76,22 @@ func (r *CodeEditorReconciler) reconcileCheckDeployment(ctx context.Context, ins
 
 	return nil
 }
+
+func (r *CodeEditorReconciler) reconcileCheckService(ctx context.Context, instance *robotv1alpha2.CodeEditor) error {
+
+	serviceQuery := &corev1.Service{}
+	err := r.Get(ctx, *instance.GetServiceMetadata(), serviceQuery)
+	if err != nil && errors.IsNotFound(err) {
+		instance.Status.ServiceStatus = robotv1alpha2.OwnedServiceStatus{}
+	} else if err != nil {
+		return err
+	} else {
+
+		// make service dynamic
+
+		instance.Status.ServiceStatus.Resource.Created = true
+		reference.SetReference(&instance.Status.ServiceStatus.Resource.Reference, serviceQuery.TypeMeta, serviceQuery.ObjectMeta)
+	}
+
+	return nil
+}

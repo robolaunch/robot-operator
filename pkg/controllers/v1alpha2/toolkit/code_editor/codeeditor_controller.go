@@ -44,6 +44,7 @@ type CodeEditorReconciler struct {
 
 //+kubebuilder:rbac:groups=core,resources=persistentvolumeclaims,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=core,resources=services,verbs=get;list;watch;create;update;patch;delete
 
 var logger logr.Logger
 
@@ -110,6 +111,11 @@ func (r *CodeEditorReconciler) reconcileCheckStatus(ctx context.Context, instanc
 		return robotErr.CheckCreatingOrWaitingError(result, err)
 	}
 
+	err = r.reconcileHandleService(ctx, instance)
+	if err != nil {
+		return robotErr.CheckCreatingOrWaitingError(result, err)
+	}
+
 	return nil
 }
 
@@ -130,6 +136,11 @@ func (r *CodeEditorReconciler) reconcileCheckResources(ctx context.Context, inst
 		return err
 	}
 
+	err = r.reconcileCheckService(ctx, instance)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -139,5 +150,6 @@ func (r *CodeEditorReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		For(&robotv1alpha2.CodeEditor{}).
 		Owns(&corev1.PersistentVolumeClaim{}).
 		Owns(&appsv1.Deployment{}).
+		Owns(&corev1.Service{}).
 		Complete(r)
 }

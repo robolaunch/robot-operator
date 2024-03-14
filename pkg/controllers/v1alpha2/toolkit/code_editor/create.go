@@ -53,3 +53,23 @@ func (r *CodeEditorReconciler) createDeployment(ctx context.Context, instance *r
 	logger.Info("STATUS: Deployment " + instance.GetDeploymentMetadata().Name + " is created.")
 	return nil
 }
+
+func (r *CodeEditorReconciler) createService(ctx context.Context, instance *robotv1alpha2.CodeEditor) error {
+
+	service := v1alpha2_resources.GetCodeEditorService(instance, instance.GetServiceMetadata())
+
+	err := ctrl.SetControllerReference(instance, service, r.Scheme)
+	if err != nil {
+		return err
+	}
+
+	err = r.Create(ctx, service)
+	if err != nil && errors.IsAlreadyExists(err) {
+		return nil
+	} else if err != nil {
+		return err
+	}
+
+	logger.Info("STATUS: Service " + instance.GetServiceMetadata().Name + " is created.")
+	return nil
+}

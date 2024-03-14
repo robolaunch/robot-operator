@@ -63,3 +63,25 @@ func (r *CodeEditorReconciler) reconcileHandleDeployment(ctx context.Context, in
 
 	return nil
 }
+
+func (r *CodeEditorReconciler) reconcileHandleService(ctx context.Context, instance *robotv1alpha2.CodeEditor) error {
+
+	if !instance.Status.ServiceStatus.Resource.Created {
+
+		instance.Status.Phase = robotv1alpha2.CodeEditorPhaseCreatingService
+		err := r.createService(ctx, instance)
+		if err != nil {
+			return err
+		}
+
+		instance.Status.ServiceStatus.Resource.Created = true
+
+		return &robotErr.CreatingResourceError{
+			ResourceKind:      "Service",
+			ResourceName:      instance.GetServiceMetadata().Name,
+			ResourceNamespace: instance.GetServiceMetadata().Namespace,
+		}
+	}
+
+	return nil
+}
