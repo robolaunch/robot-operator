@@ -57,10 +57,10 @@ type ReadyRobotProperties struct {
 func GetReadyRobotProperties(robot robotv1alpha1.Robot) ReadyRobotProperties {
 	labels := robot.GetLabels()
 
-	if registry, hasRegistry := labels[internal.ROBOT_IMAGE_REGISTRY_LABEL_KEY]; hasRegistry {
-		if user, hasUser := labels[internal.ROBOT_IMAGE_USER_LABEL_KEY]; hasUser {
-			if repository, hasRepository := labels[internal.ROBOT_IMAGE_REPOSITORY_LABEL_KEY]; hasRepository {
-				if tag, hasTag := labels[internal.ROBOT_IMAGE_TAG_LABEL_KEY]; hasTag {
+	if registry, hasRegistry := labels[internal.IMAGE_REGISTRY_LABEL_KEY]; hasRegistry {
+		if user, hasUser := labels[internal.IMAGE_USER_LABEL_KEY]; hasUser {
+			if repository, hasRepository := labels[internal.IMAGE_REPOSITORY_LABEL_KEY]; hasRepository {
+				if tag, hasTag := labels[internal.IMAGE_TAG_LABEL_KEY]; hasTag {
 					return ReadyRobotProperties{
 						Enabled: true,
 						Image:   registry + "/" + user + "/" + repository + ":" + tag,
@@ -103,9 +103,9 @@ func GetImageForRobot(ctx context.Context, r client.Client, node corev1.Node, ro
 			return "", err
 		}
 
-		registry, hasRegistry := robot.Labels[internal.ROBOT_IMAGE_REGISTRY_LABEL_KEY]
+		registry, hasRegistry := robot.Labels[internal.IMAGE_REGISTRY_LABEL_KEY]
 		if !hasRegistry {
-			return "", errors.New("registry is not found in label with key " + internal.ROBOT_IMAGE_REGISTRY_LABEL_KEY)
+			return "", errors.New("registry is not found in label with key " + internal.IMAGE_REGISTRY_LABEL_KEY)
 		}
 
 		organization := "robolaunchio"
@@ -134,9 +134,9 @@ func GetImageForBridge(ctx context.Context, r client.Client, node corev1.Node, r
 		return "", err
 	}
 
-	registry, hasRegistry := robot.Labels[internal.ROBOT_IMAGE_REGISTRY_LABEL_KEY]
+	registry, hasRegistry := robot.Labels[internal.IMAGE_REGISTRY_LABEL_KEY]
 	if !hasRegistry {
-		return "", errors.New("registry is not found in label with key " + internal.ROBOT_IMAGE_REGISTRY_LABEL_KEY)
+		return "", errors.New("registry is not found in label with key " + internal.IMAGE_REGISTRY_LABEL_KEY)
 	}
 
 	organization := "robolaunchio"
@@ -161,9 +161,9 @@ func GetBridgeImage(ctx context.Context, r client.Client, node corev1.Node, ros2
 		return "", err
 	}
 
-	registry, hasRegistry := ros2Bridge.Labels[internal.ROBOT_IMAGE_REGISTRY_LABEL_KEY]
+	registry, hasRegistry := ros2Bridge.Labels[internal.IMAGE_REGISTRY_LABEL_KEY]
 	if !hasRegistry {
-		return "", errors.New("registry is not found in label with key " + internal.ROBOT_IMAGE_REGISTRY_LABEL_KEY)
+		return "", errors.New("registry is not found in label with key " + internal.IMAGE_REGISTRY_LABEL_KEY)
 	}
 
 	organization := "robolaunchio"
@@ -196,9 +196,9 @@ func GetImageForEnvironment(ctx context.Context, r client.Client, node corev1.No
 			return "", err
 		}
 
-		registry, hasRegistry := robot.Labels[internal.ROBOT_IMAGE_REGISTRY_LABEL_KEY]
+		registry, hasRegistry := robot.Labels[internal.IMAGE_REGISTRY_LABEL_KEY]
 		if !hasRegistry {
-			return "", errors.New("registry is not found in label with key " + internal.ROBOT_IMAGE_REGISTRY_LABEL_KEY)
+			return "", errors.New("registry is not found in label with key " + internal.IMAGE_REGISTRY_LABEL_KEY)
 		}
 
 		organization := imageProps.Organization

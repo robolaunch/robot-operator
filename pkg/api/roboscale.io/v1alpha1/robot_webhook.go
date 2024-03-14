@@ -273,8 +273,8 @@ func (r *Robot) checkAdditionalConfigs() error {
 }
 
 func (r *Robot) setDefaultLabels() {
-	if _, ok := r.Labels[internal.ROBOT_IMAGE_REGISTRY_LABEL_KEY]; !ok {
-		r.Labels[internal.ROBOT_IMAGE_REGISTRY_LABEL_KEY] = "docker.io"
+	if _, ok := r.Labels[internal.IMAGE_REGISTRY_LABEL_KEY]; !ok {
+		r.Labels[internal.IMAGE_REGISTRY_LABEL_KEY] = "docker.io"
 	}
 }
 

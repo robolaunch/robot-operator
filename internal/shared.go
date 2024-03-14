@@ -30,12 +30,12 @@ const (
 	TZ_CITY_LABEL_KEY      = "robolaunch.io/tz-city"
 )
 
-// Ready robot label
+// Image labels
 const (
-	ROBOT_IMAGE_REGISTRY_LABEL_KEY   = "robolaunch.io/robot-image-registry"
-	ROBOT_IMAGE_USER_LABEL_KEY       = "robolaunch.io/robot-image-user"
-	ROBOT_IMAGE_REPOSITORY_LABEL_KEY = "robolaunch.io/robot-image-repository"
-	ROBOT_IMAGE_TAG_LABEL_KEY        = "robolaunch.io/robot-image-tag"
+	IMAGE_REGISTRY_LABEL_KEY   = "robolaunch.io/robot-image-registry"
+	IMAGE_USER_LABEL_KEY       = "robolaunch.io/robot-image-user"
+	IMAGE_REPOSITORY_LABEL_KEY = "robolaunch.io/robot-image-repository"
+	IMAGE_TAG_LABEL_KEY        = "robolaunch.io/robot-image-tag"
 )
 
 // Target resource labels

@@ -129,8 +129,8 @@ type CodeEditorContainer struct {
 // CodeEditorSpec defines the desired state of CodeEditor.
 type CodeEditorSpec struct {
 	// App version of the code editor.
-	// +kubebuilder:validation:Enum=4.22.0
-	// +kubebuilder:default=4.22.0
+	// +kubebuilder:validation:Enum="4.22.0"
+	// +kubebuilder:default="4.22.0"
 	Version string `json:"version"`
 	// If `true`, code editor will be consumed as `root` user.
 	Root bool `json:"root,omitempty"`
