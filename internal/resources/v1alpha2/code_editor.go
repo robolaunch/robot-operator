@@ -8,11 +8,14 @@ import (
 
 	"github.com/robolaunch/robot-operator/internal"
 	configure "github.com/robolaunch/robot-operator/internal/configure/v1alpha2"
+	"github.com/robolaunch/robot-operator/internal/label"
+	"github.com/robolaunch/robot-operator/internal/platform"
 	robotv1alpha2 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha2"
 )
 
 const (
 	CODE_EDITOR_PORT_NAME = "code-server"
+	CODE_EDITOR_APP_NAME  = "code-editor"
 )
 
 func GetCodeEditorPersistentVolumeClaim(codeEditor *robotv1alpha2.CodeEditor, pvcNamespacedName *types.NamespacedName, key int) *corev1.PersistentVolumeClaim {
@@ -32,13 +35,20 @@ func GetCodeEditorPersistentVolumeClaim(codeEditor *robotv1alpha2.CodeEditor, pv
 
 func GetCodeEditorDeployment(codeEditor *robotv1alpha2.CodeEditor, deploymentNamespacedName *types.NamespacedName, node corev1.Node) *appsv1.Deployment {
 
+	platformMeta := label.GetPlatformMeta(&node)
+
 	cfg := configure.PodSpecConfigInjector{}
+
+	image, err := platform.GetToolsImage(platformMeta.Version, CODE_EDITOR_APP_NAME, codeEditor.Spec.Version)
+	if err != nil {
+		return nil
+	}
 
 	podSpec := corev1.PodSpec{
 		Containers: []corev1.Container{
 			{
-				Name:    "code-editor",
-				Image:   "docker.io/robolaunchio/code-editor:4.22.0-0.2.6-alpha.19",
+				Name:    CODE_EDITOR_APP_NAME,
+				Image:   image,
 				Command: []string{"/bin/bash", "-c", "sleep infinity"},
 				Ports: []corev1.ContainerPort{
 					{
@@ -78,13 +88,13 @@ func GetCodeEditorDeployment(codeEditor *robotv1alpha2.CodeEditor, deploymentNam
 		Spec: appsv1.DeploymentSpec{
 			Selector: &metav1.LabelSelector{
 				MatchLabels: map[string]string{
-					internal.CODE_EDITOR_CONTAINER_SELECTOR_LABEL_KEY: "code-editor",
+					internal.CODE_EDITOR_CONTAINER_SELECTOR_LABEL_KEY: CODE_EDITOR_APP_NAME,
 				},
 			},
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: map[string]string{
-						internal.CODE_EDITOR_CONTAINER_SELECTOR_LABEL_KEY: "code-editor",
+						internal.CODE_EDITOR_CONTAINER_SELECTOR_LABEL_KEY: CODE_EDITOR_APP_NAME,
 					},
 				},
 				Spec: podSpec,
