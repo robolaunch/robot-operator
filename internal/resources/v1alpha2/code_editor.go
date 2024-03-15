@@ -1,7 +1,9 @@
 package v1alpha2_resources
 
 import (
+	"path/filepath"
 	"strconv"
+	"strings"
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -54,12 +56,15 @@ func GetCodeEditorDeployment(codeEditor *robotv1alpha2.CodeEditor, deploymentNam
 		return nil
 	}
 
+	var cmdBuilder strings.Builder
+	cmdBuilder.WriteString("supervisord -c " + filepath.Join("/etc", "robolaunch", "services", "code-server.conf"))
+
 	podSpec := corev1.PodSpec{
 		Containers: []corev1.Container{
 			{
 				Name:    CODE_EDITOR_APP_NAME,
 				Image:   image,
-				Command: []string{"/bin/bash", "-c", "sleep infinity"},
+				Command: internal.Bash(cmdBuilder.String()),
 				Env: []corev1.EnvVar{
 					internal.Env("CODE_SERVER_PORT", strconv.FormatInt(int64(codeEditor.Spec.Port), 10)),
 					internal.Env("FILE_BROWSER_PORT", strconv.Itoa(internal.FILE_BROWSER_PORT)),
