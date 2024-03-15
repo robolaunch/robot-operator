@@ -84,8 +84,11 @@ func (r *CodeEditorReconciler) reconcileCheckDeployment(ctx context.Context, ins
 		remoteConfigSynced := (instance.Spec.Remote && reflect.DeepEqual(deploymentQuery.Spec.Template.Spec.Hostname, instance.Name) && reflect.DeepEqual(deploymentQuery.Spec.Template.Spec.Subdomain, instance.Name)) ||
 			(!instance.Spec.Remote && reflect.DeepEqual(deploymentQuery.Spec.Template.Spec.Hostname, "") && reflect.DeepEqual(deploymentQuery.Spec.Template.Spec.Subdomain, ""))
 
+		volumeMountsSynced := reflect.DeepEqual(instance.Spec.Container.VolumeMounts, deploymentQuery.Spec.Template.Spec.Containers[0].VolumeMounts)
+
 		if !reflect.DeepEqual(desiredImage, actualImage) ||
-			!remoteConfigSynced {
+			!remoteConfigSynced ||
+			!volumeMountsSynced {
 			err := r.updateDeployment(ctx, instance)
 			if err != nil {
 				return err
