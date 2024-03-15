@@ -4,10 +4,10 @@ import (
 	"context"
 	"reflect"
 
+	"github.com/robolaunch/robot-operator/internal"
 	"github.com/robolaunch/robot-operator/internal/label"
 	"github.com/robolaunch/robot-operator/internal/platform"
 	"github.com/robolaunch/robot-operator/internal/reference"
-	v1alpha2_resources "github.com/robolaunch/robot-operator/internal/resources/v1alpha2"
 	robotv1alpha2 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha2"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -74,7 +74,7 @@ func (r *CodeEditorReconciler) reconcileCheckDeployment(ctx context.Context, ins
 
 		platformMeta := label.GetPlatformMeta(instance)
 
-		desiredImage, err := platform.GetToolsImage(instance, platformMeta.Version, v1alpha2_resources.CODE_EDITOR_APP_NAME, instance.Spec.Version)
+		desiredImage, err := platform.GetToolsImage(instance, platformMeta.Version, internal.CODE_EDITOR_APP_NAME, instance.Spec.Version)
 		if err != nil {
 			return err
 		}

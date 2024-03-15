@@ -19,11 +19,6 @@ import (
 	robotv1alpha2 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha2"
 )
 
-const (
-	CODE_EDITOR_APP_NAME  = "code-editor"
-	CODE_EDITOR_PORT_NAME = "code-server"
-)
-
 func getCodeEditorSelector(codeEditor robotv1alpha2.CodeEditor) map[string]string {
 	return map[string]string{
 		internal.CODE_EDITOR_CONTAINER_SELECTOR_LABEL_KEY: codeEditor.Name,
@@ -51,7 +46,7 @@ func GetCodeEditorDeployment(codeEditor *robotv1alpha2.CodeEditor, deploymentNam
 
 	cfg := configure.PodSpecConfigInjector{}
 
-	image, err := platform.GetToolsImage(codeEditor, platformMeta.Version, CODE_EDITOR_APP_NAME, codeEditor.Spec.Version)
+	image, err := platform.GetToolsImage(codeEditor, platformMeta.Version, internal.CODE_EDITOR_APP_NAME, codeEditor.Spec.Version)
 	if err != nil {
 		return nil
 	}
@@ -62,19 +57,19 @@ func GetCodeEditorDeployment(codeEditor *robotv1alpha2.CodeEditor, deploymentNam
 	podSpec := corev1.PodSpec{
 		Containers: []corev1.Container{
 			{
-				Name:    CODE_EDITOR_APP_NAME,
+				Name:    internal.CODE_EDITOR_APP_NAME,
 				Image:   image,
 				Command: internal.Bash(cmdBuilder.String()),
 				Env: []corev1.EnvVar{
 					internal.Env("CODE_SERVER_PORT", strconv.FormatInt(int64(codeEditor.Spec.Port), 10)),
 					internal.Env("FILE_BROWSER_PORT", strconv.Itoa(internal.FILE_BROWSER_PORT)),
-					internal.Env("FILE_BROWSER_SERVICE", CODE_EDITOR_PORT_NAME),
+					internal.Env("FILE_BROWSER_SERVICE", internal.CODE_EDITOR_PORT_NAME),
 					internal.Env("FILE_BROWSER_BASE_URL", v1alpha1.GetServicePath(codeEditor, "/file-browser/ide")),
 					internal.Env("TERM", "xterm-256color"),
 				},
 				Ports: []corev1.ContainerPort{
 					{
-						Name:          CODE_EDITOR_PORT_NAME,
+						Name:          internal.CODE_EDITOR_PORT_NAME,
 						ContainerPort: codeEditor.Spec.Port,
 						Protocol:      corev1.ProtocolTCP,
 					},
@@ -132,7 +127,7 @@ func GetCodeEditorService(codeEditor *robotv1alpha2.CodeEditor, svcNamespacedNam
 		Selector: getCodeEditorSelector(*codeEditor),
 		Ports: []corev1.ServicePort{
 			{
-				Name: CODE_EDITOR_PORT_NAME,
+				Name: internal.CODE_EDITOR_PORT_NAME,
 				Port: codeEditor.Spec.Port,
 				TargetPort: intstr.IntOrString{
 					IntVal: codeEditor.Spec.Port,

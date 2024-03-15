@@ -61,6 +61,13 @@ const (
 	DEFAULT_TOOLS_ENVIRONMENTS_URL = "https://raw.githubusercontent.com/robolaunch/platform/main/platforms/internal/environments.yaml"
 )
 
+// CodeEditor
+
+const (
+	CODE_EDITOR_APP_NAME  = "code-editor"
+	CODE_EDITOR_PORT_NAME = "code-server"
+)
+
 // Robot owned resources' postfixes (v1alpha1)
 const (
 	PVC_VAR_POSTFIX           = "-pvc-var"
