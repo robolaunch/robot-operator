@@ -1813,9 +1813,6 @@ spec:
               remote:
                 description: If `true`, code editor will be consumed remotely.
                 type: boolean
-              root:
-                description: If `true`, code editor will be consumed as `root` user.
-                type: boolean
               serviceType:
                 default: ClusterIP
                 description: Service type of CodeEditor. `ClusterIP` and `NodePort`
@@ -1827,8 +1824,6 @@ spec:
               version:
                 default: 4.22.0
                 description: App version of the code editor.
-                enum:
-                - 4.22.0
                 type: string
               volumeClaimTemplates:
                 description: Volume templates for ROS 2 workload. For each volume
