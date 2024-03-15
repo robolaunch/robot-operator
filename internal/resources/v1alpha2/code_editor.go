@@ -24,7 +24,7 @@ const (
 
 func getCodeEditorSelector(codeEditor robotv1alpha2.CodeEditor) map[string]string {
 	return map[string]string{
-		CODE_EDITOR_APP_NAME: codeEditor.GetName(),
+		internal.CODE_EDITOR_CONTAINER_SELECTOR_LABEL_KEY: codeEditor.Name,
 	}
 }
 
@@ -52,11 +52,6 @@ func GetCodeEditorDeployment(codeEditor *robotv1alpha2.CodeEditor, deploymentNam
 	image, err := platform.GetToolsImage(codeEditor, platformMeta.Version, CODE_EDITOR_APP_NAME, codeEditor.Spec.Version)
 	if err != nil {
 		return nil
-	}
-
-	labels := getCodeEditorSelector(*codeEditor)
-	for k, v := range codeEditor.Labels {
-		labels[k] = v
 	}
 
 	podSpec := corev1.PodSpec{
@@ -109,19 +104,15 @@ func GetCodeEditorDeployment(codeEditor *robotv1alpha2.CodeEditor, deploymentNam
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      deploymentNamespacedName.Name,
 			Namespace: deploymentNamespacedName.Namespace,
-			Labels:    labels,
+			Labels:    codeEditor.Labels,
 		},
 		Spec: appsv1.DeploymentSpec{
 			Selector: &metav1.LabelSelector{
-				MatchLabels: map[string]string{
-					internal.CODE_EDITOR_CONTAINER_SELECTOR_LABEL_KEY: CODE_EDITOR_APP_NAME,
-				},
+				MatchLabels: getCodeEditorSelector(*codeEditor),
 			},
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
-					Labels: map[string]string{
-						internal.CODE_EDITOR_CONTAINER_SELECTOR_LABEL_KEY: CODE_EDITOR_APP_NAME,
-					},
+					Labels: getCodeEditorSelector(*codeEditor),
 				},
 				Spec: podSpec,
 			},
