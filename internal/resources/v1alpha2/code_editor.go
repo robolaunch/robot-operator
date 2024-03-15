@@ -97,10 +97,6 @@ func GetCodeEditorDeployment(codeEditor *robotv1alpha2.CodeEditor, deploymentNam
 	cfg.InjectVolumeConfiguration(&podSpec, codeEditor.Status.PVCStatuses)
 	cfg.InjectExternalVolumeConfiguration(&podSpec, codeEditor.Status.ExternalVolumeStatuses)
 
-	if !codeEditor.Spec.Root {
-		cfg.InjectLinuxUserAndGroup(&podSpec)
-	}
-
 	if codeEditor.Spec.Remote {
 		cfg.InjectRemoteConfigurations(&podSpec, codeEditor)
 	}

@@ -2,8 +2,12 @@ package code_editor
 
 import (
 	"context"
+	"reflect"
 
+	"github.com/robolaunch/robot-operator/internal/label"
+	"github.com/robolaunch/robot-operator/internal/platform"
 	"github.com/robolaunch/robot-operator/internal/reference"
+	v1alpha2_resources "github.com/robolaunch/robot-operator/internal/resources/v1alpha2"
 	robotv1alpha2 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha2"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -68,7 +72,25 @@ func (r *CodeEditorReconciler) reconcileCheckDeployment(ctx context.Context, ins
 		return err
 	} else {
 
-		// make deployment dynamic
+		platformMeta := label.GetPlatformMeta(instance)
+
+		desiredImage, err := platform.GetToolsImage(instance, platformMeta.Version, v1alpha2_resources.CODE_EDITOR_APP_NAME, instance.Spec.Version)
+		if err != nil {
+			return err
+		}
+
+		actualImage := deploymentQuery.Spec.Template.Spec.Containers[0].Image
+
+		remoteConfigSynced := (instance.Spec.Remote && reflect.DeepEqual(deploymentQuery.Spec.Template.Spec.Hostname, instance.Name) && reflect.DeepEqual(deploymentQuery.Spec.Template.Spec.Subdomain, instance.Name)) ||
+			(!instance.Spec.Remote && reflect.DeepEqual(deploymentQuery.Spec.Template.Spec.Hostname, "") && reflect.DeepEqual(deploymentQuery.Spec.Template.Spec.Subdomain, ""))
+
+		if !reflect.DeepEqual(desiredImage, actualImage) ||
+			!remoteConfigSynced {
+			err := r.updateDeployment(ctx, instance)
+			if err != nil {
+				return err
+			}
+		}
 
 		instance.Status.DeploymentStatus.Resource.Created = true
 		reference.SetReference(&instance.Status.DeploymentStatus.Resource.Reference, deploymentQuery.TypeMeta, deploymentQuery.ObjectMeta)
