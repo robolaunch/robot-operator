@@ -61,11 +61,14 @@ func (r *CodeEditorReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		return ctrl.Result{}, err
 	}
 
-	r.reconcileRegisterResources(instance)
+	err = r.reconcileRegisterResources(ctx, instance)
+	if err != nil {
+		return result, err
+	}
 
 	err = r.reconcileUpdateInstanceStatus(ctx, instance)
 	if err != nil {
-		return ctrl.Result{}, err
+		return result, err
 	}
 
 	err = r.reconcileCheckStatus(ctx, instance, &result)
@@ -75,26 +78,33 @@ func (r *CodeEditorReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 
 	err = r.reconcileUpdateInstanceStatus(ctx, instance)
 	if err != nil {
-		return ctrl.Result{}, err
+		return result, err
 	}
 
 	err = r.reconcileCheckResources(ctx, instance)
 	if err != nil {
-		return ctrl.Result{}, err
+		return result, err
 	}
 
 	err = r.reconcileUpdateInstanceStatus(ctx, instance)
 	if err != nil {
-		return ctrl.Result{}, err
+		return result, err
 	}
 
 	return result, nil
 }
 
-func (r *CodeEditorReconciler) reconcileRegisterResources(instance *robotv1alpha2.CodeEditor) error {
+func (r *CodeEditorReconciler) reconcileRegisterResources(ctx context.Context, instance *robotv1alpha2.CodeEditor) error {
 
-	r.registerPVCs(instance)
-	r.registerExternalVolumes(instance)
+	err := r.registerPVCs(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	err = r.registerExternalVolumes(ctx, instance)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
