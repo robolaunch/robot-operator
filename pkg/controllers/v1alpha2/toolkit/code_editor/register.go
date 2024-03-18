@@ -40,6 +40,7 @@ func (r *CodeEditorReconciler) registerPVCs(ctx context.Context, instance *robot
 			pvcStatuses = append(pvcStatuses, pvcStatus)
 		}
 		instance.Status.PVCStatuses = pvcStatuses
+		instance.Status.WorkloadUpdateNeeded = true
 	}
 
 	return nil
@@ -57,6 +58,7 @@ func (r *CodeEditorReconciler) registerExternalVolumes(ctx context.Context, inst
 			evStatuses = append(evStatuses, evStatus)
 		}
 		instance.Status.ExternalVolumeStatuses = evStatuses
+		instance.Status.WorkloadUpdateNeeded = true
 	}
 
 	return nil

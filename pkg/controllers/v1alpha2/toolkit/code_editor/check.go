@@ -88,11 +88,13 @@ func (r *CodeEditorReconciler) reconcileCheckDeployment(ctx context.Context, ins
 
 		if !reflect.DeepEqual(desiredImage, actualImage) ||
 			!remoteConfigSynced ||
-			!volumeMountsSynced {
+			!volumeMountsSynced ||
+			instance.Status.WorkloadUpdateNeeded {
 			err := r.updateDeployment(ctx, instance)
 			if err != nil {
 				return err
 			}
+			instance.Status.WorkloadUpdateNeeded = false
 		}
 
 		instance.Status.DeploymentStatus.Resource.Created = true

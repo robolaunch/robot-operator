@@ -162,4 +162,6 @@ type CodeEditorStatus struct {
 	DeploymentStatus OwnedDeploymentStatus `json:"deploymentStatus,omitempty"`
 	// Status of code editor service.
 	ServiceStatus OwnedServiceStatus `json:"serviceStatus,omitempty"`
+	// Field to indicate if the workload should be restarted.
+	WorkloadUpdateNeeded bool `json:"workloadUpdateNeeded,omitempty"`
 }
