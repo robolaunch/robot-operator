@@ -86,9 +86,23 @@ func (r *CodeEditorReconciler) reconcileCheckDeployment(ctx context.Context, ins
 
 		volumeMountsSynced := reflect.DeepEqual(instance.Spec.Container.VolumeMounts, deploymentQuery.Spec.Template.Spec.Containers[0].VolumeMounts)
 
+		desiredPort := instance.Spec.Port
+		var actualPort int32
+		if len(deploymentQuery.Spec.Template.Spec.Containers) > 0 {
+			cont := deploymentQuery.Spec.Template.Spec.Containers[0]
+			for _, cPort := range cont.Ports {
+				if cPort.Name == internal.CODE_EDITOR_PORT_NAME {
+					actualPort = cPort.ContainerPort
+				}
+			}
+		}
+
+		portSynced := desiredPort == actualPort
+
 		if !reflect.DeepEqual(desiredImage, actualImage) ||
 			!remoteConfigSynced ||
 			!volumeMountsSynced ||
+			!portSynced ||
 			instance.Status.WorkloadUpdateNeeded {
 			err := r.updateDeployment(ctx, instance)
 			if err != nil {
@@ -114,7 +128,22 @@ func (r *CodeEditorReconciler) reconcileCheckService(ctx context.Context, instan
 		return err
 	} else {
 
-		// make service dynamic
+		desiredPort := instance.Spec.Port
+		var actualPort int32
+		for _, sPort := range serviceQuery.Spec.Ports {
+			if sPort.Name == internal.CODE_EDITOR_PORT_NAME {
+				actualPort = sPort.Port
+			}
+		}
+
+		portSynced := desiredPort == actualPort
+
+		if !portSynced {
+			err := r.updateService(ctx, instance)
+			if err != nil {
+				return err
+			}
+		}
 
 		instance.Status.ServiceStatus.Resource.Created = true
 		reference.SetReference(&instance.Status.ServiceStatus.Resource.Reference, serviceQuery.TypeMeta, serviceQuery.ObjectMeta)

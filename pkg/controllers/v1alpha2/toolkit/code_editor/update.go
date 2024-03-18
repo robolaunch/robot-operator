@@ -33,3 +33,23 @@ func (r *CodeEditorReconciler) updateDeployment(ctx context.Context, instance *r
 	logger.Info("STATUS: Deployment " + deployment.Name + " is updated.")
 	return nil
 }
+
+func (r *CodeEditorReconciler) updateService(ctx context.Context, instance *robotv1alpha2.CodeEditor) error {
+
+	service := v1alpha2_resources.GetCodeEditorService(instance, instance.GetServiceMetadata())
+
+	err := ctrl.SetControllerReference(instance, service, r.Scheme)
+	if err != nil {
+		return err
+	}
+
+	err = r.Update(ctx, service)
+	if err != nil && errors.IsAlreadyExists(err) {
+		return nil
+	} else if err != nil {
+		return err
+	}
+
+	logger.Info("STATUS: Service " + service.Name + " is updated.")
+	return nil
+}
