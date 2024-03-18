@@ -415,7 +415,8 @@ const (
 
 // DiscoveryServerSpec defines the desired state of DiscoveryServer.
 type DiscoveryServerSpec struct {
-	Protocol corev1.Protocol `json:"protocol,omitempty"`
+	// +kubebuilder:default=TCP
+	Protocol string `json:"protocol,omitempty"`
 	// ROS domain ID for robot. See https://docs.ros.org/en/foxy/Concepts/About-Domain-ID.html.
 	// +kubebuilder:validation:Minimum=0
 	// +kubebuilder:validation:Maximum=101
