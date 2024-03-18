@@ -2584,6 +2584,9 @@ spec:
                     description: Connection URL.
                     type: object
                 type: object
+              workloadUpdateNeeded:
+                description: Field to indicate if the workload should be restarted.
+                type: boolean
             type: object
         type: object
     served: true
