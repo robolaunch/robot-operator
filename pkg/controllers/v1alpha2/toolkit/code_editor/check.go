@@ -138,7 +138,10 @@ func (r *CodeEditorReconciler) reconcileCheckService(ctx context.Context, instan
 
 		portSynced := desiredPort == actualPort
 
-		if !portSynced {
+		serviceTypeSynced := instance.Spec.Remote || (!instance.Spec.Remote && reflect.DeepEqual(instance.Spec.ServiceType, serviceQuery.Spec.Type))
+
+		if !portSynced ||
+			!serviceTypeSynced {
 			err := r.updateService(ctx, instance)
 			if err != nil {
 				return err
