@@ -1,6 +1,9 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+### Fix
+- **protocol:** switch protocol field from v1.Protocol to string
+
 
 <a name="v0.2.7-alpha.6"></a>
 ## [v0.2.7-alpha.6] - 2024-03-06
@@ -10,12 +13,6 @@
 ### Fix
 - **typo:** fix field reference
 
-
-<a name="v0.2.7-alpha.4-udp-test-2"></a>
-## [v0.2.7-alpha.4-udp-test-2] - 2024-03-04
-
-<a name="v0.2.7-alpha.5"></a>
-## [v0.2.7-alpha.5] - 2024-03-04
 
 <a name="v0.2.7-alpha.4"></a>
 ## [v0.2.7-alpha.4] - 2024-02-15
@@ -441,9 +438,7 @@
 
 
 [Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.6...HEAD
-[v0.2.7-alpha.6]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.4-udp-test-2...v0.2.7-alpha.6
-[v0.2.7-alpha.4-udp-test-2]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.5...v0.2.7-alpha.4-udp-test-2
-[v0.2.7-alpha.5]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.4...v0.2.7-alpha.5
+[v0.2.7-alpha.6]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.4...v0.2.7-alpha.6
 [v0.2.7-alpha.4]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.1...v0.2.7-alpha.4
 [v0.2.7-alpha.1]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.19...v0.2.7-alpha.1
 [v0.2.6-alpha.19]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.18...v0.2.6-alpha.19
