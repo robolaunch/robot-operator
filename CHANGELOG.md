@@ -1,6 +1,9 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+
+<a name="v0.2.7-alpha.6.2"></a>
+## [v0.2.7-alpha.6.2] - 2024-03-18
 ### Fix
 - **protocol:** switch protocol field from v1.Protocol to string
 
@@ -437,7 +440,8 @@
 - Merge pull request [#24](https://github.com/robolaunch/robot-operator/issues/24) from robolaunch/23-allow-multiple-launches
 
 
-[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.6...HEAD
+[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.6.2...HEAD
+[v0.2.7-alpha.6.2]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.6...v0.2.7-alpha.6.2
 [v0.2.7-alpha.6]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.4...v0.2.7-alpha.6
 [v0.2.7-alpha.4]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.1...v0.2.7-alpha.4
 [v0.2.7-alpha.1]: https://github.com/robolaunch/robot-operator/compare/v0.2.6-alpha.19...v0.2.7-alpha.1

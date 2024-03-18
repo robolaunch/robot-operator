@@ -2156,7 +2156,9 @@ spec:
                   description: If instance type is `Server`, it can be an arbitrary value. If instance type is `Client`, it should be the same with Server's hostname. Used for getting Server's IP over DNS.
                   type: string
                 protocol:
-                  default: TCP
+                  enum:
+                    - TCP
+                    - UDP
                   type: string
                 reference:
                   description: Reference to the `Server` instance. It is used if `.spec.type` is `Client`. Referenced object can be previously provisioned in another cluster. In that case, cluster's name can be specified in `.spec.cluster` field.
@@ -4071,7 +4073,9 @@ spec:
                           description: If instance type is `Server`, it can be an arbitrary value. If instance type is `Client`, it should be the same with Server's hostname. Used for getting Server's IP over DNS.
                           type: string
                         protocol:
-                          default: TCP
+                          enum:
+                            - TCP
+                            - UDP
                           type: string
                         reference:
                           description: Reference to the `Server` instance. It is used if `.spec.type` is `Client`. Referenced object can be previously provisioned in another cluster. In that case, cluster's name can be specified in `.spec.cluster` field.
@@ -5418,7 +5422,9 @@ spec:
                           description: If instance type is `Server`, it can be an arbitrary value. If instance type is `Client`, it should be the same with Server's hostname. Used for getting Server's IP over DNS.
                           type: string
                         protocol:
-                          default: TCP
+                          enum:
+                            - TCP
+                            - UDP
                           type: string
                         reference:
                           description: Reference to the `Server` instance. It is used if `.spec.type` is `Client`. Referenced object can be previously provisioned in another cluster. In that case, cluster's name can be specified in `.spec.cluster` field.
@@ -8079,7 +8085,9 @@ spec:
                       description: If instance type is `Server`, it can be an arbitrary value. If instance type is `Client`, it should be the same with Server's hostname. Used for getting Server's IP over DNS.
                       type: string
                     protocol:
-                      default: TCP
+                      enum:
+                        - TCP
+                        - UDP
                       type: string
                     reference:
                       description: Reference to the `Server` instance. It is used if `.spec.type` is `Client`. Referenced object can be previously provisioned in another cluster. In that case, cluster's name can be specified in `.spec.cluster` field.
@@ -11315,7 +11323,7 @@ spec:
             - --leader-elect
           command:
             - /manager
-          image: robolaunchio/robot-controller-manager:v0.2.7-alpha.6.2
+          image: robolaunchio/robot-controller-manager:v0.2.7-alpha.6.3
           livenessProbe:
             httpGet:
               path: /healthz

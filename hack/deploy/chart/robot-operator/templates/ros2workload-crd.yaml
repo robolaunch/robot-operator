@@ -55,7 +55,9 @@ spec:
                       Server's hostname. Used for getting Server's IP over DNS.
                     type: string
                   protocol:
-                    default: TCP
+                    enum:
+                    - TCP
+                    - UDP
                     type: string
                   reference:
                     description: Reference to the `Server` instance. It is used if `.spec.type`
