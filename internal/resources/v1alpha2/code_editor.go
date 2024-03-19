@@ -66,7 +66,7 @@ func GetCodeEditorDeployment(codeEditor *robotv1alpha2.CodeEditor, deploymentNam
 					internal.Env("CODE_SERVER_PORT", strconv.FormatInt(int64(codeEditor.Spec.Port), 10)),
 					internal.Env("FILE_BROWSER_PORT", strconv.Itoa(internal.FILE_BROWSER_PORT)),
 					internal.Env("FILE_BROWSER_SERVICE", internal.CODE_EDITOR_PORT_NAME),
-					internal.Env("FILE_BROWSER_BASE_URL", robotv1alpha1.GetServicePath(codeEditor, "/file-browser/ide")),
+					internal.Env("FILE_BROWSER_BASE_URL", robotv1alpha1.GetServicePath(codeEditor, "/"+internal.FILE_BROWSER_PORT_NAME)),
 					internal.Env("TERM", "xterm-256color"),
 				},
 				Ports: []corev1.ContainerPort{
@@ -198,13 +198,25 @@ func GetCodeEditorIngress(codeEditor *robotv1alpha2.CodeEditor, ingressNamespace
 					HTTP: &networkingv1.HTTPIngressRuleValue{
 						Paths: []networkingv1.HTTPIngressPath{
 							{
-								Path:     robotv1alpha1.GetServicePath(codeEditor, "/ide") + "(/|$)(.*)",
+								Path:     robotv1alpha1.GetServicePath(codeEditor, "/"+internal.CODE_EDITOR_APP_NAME) + "(/|$)(.*)",
 								PathType: &pathTypePrefix,
 								Backend: networkingv1.IngressBackend{
 									Service: &networkingv1.IngressServiceBackend{
 										Name: codeEditor.GetServiceMetadata().Name,
 										Port: networkingv1.ServiceBackendPort{
 											Number: codeEditor.Spec.Port,
+										},
+									},
+								},
+							},
+							{
+								Path:     robotv1alpha1.GetServicePath(codeEditor, "/"+internal.FILE_BROWSER_PORT_NAME) + "(/|$)(.*)",
+								PathType: &pathTypePrefix,
+								Backend: networkingv1.IngressBackend{
+									Service: &networkingv1.IngressServiceBackend{
+										Name: codeEditor.GetServiceMetadata().Name,
+										Port: networkingv1.ServiceBackendPort{
+											Number: internal.FILE_BROWSER_PORT,
 										},
 									},
 								},
