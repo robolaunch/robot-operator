@@ -126,6 +126,11 @@ func (r *CodeEditorReconciler) reconcileCheckStatus(ctx context.Context, instanc
 		return robotErr.CheckCreatingOrWaitingError(result, err)
 	}
 
+	err = r.reconcileHandleIngress(ctx, instance)
+	if err != nil {
+		return robotErr.CheckCreatingOrWaitingError(result, err)
+	}
+
 	return nil
 }
 
@@ -147,6 +152,11 @@ func (r *CodeEditorReconciler) reconcileCheckResources(ctx context.Context, inst
 	}
 
 	err = r.reconcileCheckService(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	err = r.reconcileCheckIngress(ctx, instance)
 	if err != nil {
 		return err
 	}

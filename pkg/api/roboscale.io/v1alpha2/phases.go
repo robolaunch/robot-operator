@@ -27,5 +27,6 @@ const (
 	CodeEditorPhaseCreatingPVCs       CodeEditorPhase = "CreatingPVCs"
 	CodeEditorPhaseCreatingDeployment CodeEditorPhase = "CreatingDeployment"
 	CodeEditorPhaseCreatingService    CodeEditorPhase = "CreatingService"
+	CodeEditorPhaseCreatingIngress    CodeEditorPhase = "CreatingIngress"
 	CodeEditorPhaseReady              CodeEditorPhase = "Ready"
 )

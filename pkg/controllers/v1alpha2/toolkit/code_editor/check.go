@@ -11,6 +11,7 @@ import (
 	robotv1alpha2 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha2"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
+	networkingv1 "k8s.io/api/networking/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
 )
@@ -162,6 +163,25 @@ func (r *CodeEditorReconciler) reconcileCheckService(ctx context.Context, instan
 
 		instance.Status.ServiceStatus.Resource.Created = true
 		reference.SetReference(&instance.Status.ServiceStatus.Resource.Reference, serviceQuery.TypeMeta, serviceQuery.ObjectMeta)
+	}
+
+	return nil
+}
+
+func (r *CodeEditorReconciler) reconcileCheckIngress(ctx context.Context, instance *robotv1alpha2.CodeEditor) error {
+
+	ingressQuery := &networkingv1.Ingress{}
+	err := r.Get(ctx, *instance.GetIngressMetadata(), ingressQuery)
+	if err != nil && errors.IsNotFound(err) {
+		instance.Status.IngressStatus = robotv1alpha2.OwnedResourceStatus{}
+	} else if err != nil {
+		return err
+	} else {
+
+		// make resource dynamic
+
+		instance.Status.IngressStatus.Created = true
+		reference.SetReference(&instance.Status.IngressStatus.Reference, ingressQuery.TypeMeta, ingressQuery.ObjectMeta)
 	}
 
 	return nil

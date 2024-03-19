@@ -73,3 +73,23 @@ func (r *CodeEditorReconciler) createService(ctx context.Context, instance *robo
 	logger.Info("STATUS: Service " + instance.GetServiceMetadata().Name + " is created.")
 	return nil
 }
+
+func (r *CodeEditorReconciler) createIngress(ctx context.Context, instance *robotv1alpha2.CodeEditor) error {
+
+	ingress := v1alpha2_resources.GetCodeEditorIngress(instance, instance.GetIngressMetadata())
+
+	err := ctrl.SetControllerReference(instance, ingress, r.Scheme)
+	if err != nil {
+		return err
+	}
+
+	err = r.Create(ctx, ingress)
+	if err != nil && errors.IsAlreadyExists(err) {
+		return nil
+	} else if err != nil {
+		return err
+	}
+
+	logger.Info("STATUS: Ingress " + instance.GetIngressMetadata().Name + " is created.")
+	return nil
+}

@@ -85,3 +85,25 @@ func (r *CodeEditorReconciler) reconcileHandleService(ctx context.Context, insta
 
 	return nil
 }
+
+func (r *CodeEditorReconciler) reconcileHandleIngress(ctx context.Context, instance *robotv1alpha2.CodeEditor) error {
+
+	if instance.Spec.Ingress && !instance.Status.IngressStatus.Created {
+
+		instance.Status.Phase = robotv1alpha2.CodeEditorPhaseCreatingIngress
+		err := r.createIngress(ctx, instance)
+		if err != nil {
+			return err
+		}
+
+		instance.Status.IngressStatus.Created = true
+
+		return &robotErr.CreatingResourceError{
+			ResourceKind:      "Ingress",
+			ResourceName:      instance.GetIngressMetadata().Name,
+			ResourceNamespace: instance.GetIngressMetadata().Namespace,
+		}
+	}
+
+	return nil
+}
