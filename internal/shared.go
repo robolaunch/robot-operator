@@ -90,6 +90,7 @@ const (
 	STATEFULSET_POSTFIX  = ""
 	DEPLOYMENT_POSTFIX   = ""
 	SERVICE_POSTFIX      = ""
+	INGRESS_POSTFIX      = ""
 )
 
 // WorkspaceManager owned resources' postfixes

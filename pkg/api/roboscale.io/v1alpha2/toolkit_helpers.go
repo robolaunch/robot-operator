@@ -56,3 +56,10 @@ func (codeEditor *CodeEditor) GetServiceMetadata() *types.NamespacedName {
 		Namespace: codeEditor.Namespace,
 	}
 }
+
+func (codeEditor *CodeEditor) GetIngressMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Name:      codeEditor.Name + internal.INGRESS_POSTFIX,
+		Namespace: codeEditor.Namespace,
+	}
+}

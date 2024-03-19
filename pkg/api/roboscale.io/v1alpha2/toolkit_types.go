@@ -142,6 +142,8 @@ type CodeEditorSpec struct {
 	// +kubebuilder:validation:Enum=ClusterIP;NodePort
 	// +kubebuilder:default="ClusterIP"
 	ServiceType corev1.ServiceType `json:"serviceType,omitempty"`
+	// CodeEditor will create an Ingress resource if `true`.
+	Ingress bool `json:"ingress,omitempty"`
 	// Volume templates for ROS 2 workload.
 	// For each volume template, operator will create a PersistentVolumeClaim
 	// that can be mounted to the ROS 2 workload.
@@ -162,6 +164,8 @@ type CodeEditorStatus struct {
 	DeploymentStatus OwnedDeploymentStatus `json:"deploymentStatus,omitempty"`
 	// Status of code editor service.
 	ServiceStatus OwnedServiceStatus `json:"serviceStatus,omitempty"`
+	// Status of CodeEditor Ingress.
+	IngressStatus OwnedResourceStatus `json:"ingressStatus,omitempty"`
 	// Field to indicate if the workload should be restarted.
 	WorkloadUpdateNeeded bool `json:"workloadUpdateNeeded,omitempty"`
 }
