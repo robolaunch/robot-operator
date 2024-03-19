@@ -65,7 +65,7 @@ func GetCodeEditorDeployment(codeEditor *robotv1alpha2.CodeEditor, deploymentNam
 				Env: []corev1.EnvVar{
 					internal.Env("CODE_SERVER_PORT", strconv.FormatInt(int64(codeEditor.Spec.Port), 10)),
 					internal.Env("FILE_BROWSER_PORT", strconv.Itoa(internal.FILE_BROWSER_PORT)),
-					internal.Env("FILE_BROWSER_SERVICE", internal.CODE_EDITOR_PORT_NAME),
+					internal.Env("FILE_BROWSER_SERVICE", "code-server"),
 					internal.Env("FILE_BROWSER_BASE_URL", robotv1alpha1.GetServicePath(codeEditor, "/"+internal.FILE_BROWSER_PORT_NAME)),
 					internal.Env("TERM", "xterm-256color"),
 				},

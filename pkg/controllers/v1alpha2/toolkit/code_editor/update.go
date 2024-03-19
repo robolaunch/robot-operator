@@ -48,3 +48,21 @@ func (r *CodeEditorReconciler) updateService(ctx context.Context, instance *robo
 	logger.Info("STATUS: Service " + service.Name + " is updated.")
 	return nil
 }
+
+func (r *CodeEditorReconciler) updateIngress(ctx context.Context, instance *robotv1alpha2.CodeEditor) error {
+
+	ingress := v1alpha2_resources.GetCodeEditorIngress(instance, instance.GetIngressMetadata())
+
+	err := ctrl.SetControllerReference(instance, ingress, r.Scheme)
+	if err != nil {
+		return err
+	}
+
+	err = r.Update(ctx, ingress)
+	if err != nil {
+		return err
+	}
+
+	logger.Info("STATUS: Ingress " + ingress.Name + " is updated.")
+	return nil
+}

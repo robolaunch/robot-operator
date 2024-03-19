@@ -2,7 +2,9 @@ package code_editor
 
 import (
 	"context"
+	"errors"
 	"reflect"
+	"strconv"
 
 	"github.com/robolaunch/robot-operator/internal"
 	"github.com/robolaunch/robot-operator/internal/label"
@@ -12,7 +14,7 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1"
-	"k8s.io/apimachinery/pkg/api/errors"
+	k8sErr "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
 )
 
@@ -22,7 +24,7 @@ func (r *CodeEditorReconciler) reconcileCheckPVCs(ctx context.Context, instance 
 
 		pvcQuery := &corev1.PersistentVolumeClaim{}
 		err := r.Get(ctx, *instance.GetPersistentVolumeClaimMetadata(key), pvcQuery)
-		if err != nil && errors.IsNotFound(err) {
+		if err != nil && k8sErr.IsNotFound(err) {
 			pvcStatus.Resource.Created = false
 		} else if err != nil {
 			return err
@@ -48,7 +50,7 @@ func (r *CodeEditorReconciler) reconcileCheckExternalVolumes(ctx context.Context
 			Namespace: instance.Namespace,
 			Name:      evStatus.Name,
 		}, pvcQuery)
-		if err != nil && errors.IsNotFound(err) {
+		if err != nil && k8sErr.IsNotFound(err) {
 			evStatus.Exists = false
 		} else if err != nil {
 			return err
@@ -67,7 +69,7 @@ func (r *CodeEditorReconciler) reconcileCheckDeployment(ctx context.Context, ins
 
 	deploymentQuery := &appsv1.Deployment{}
 	err := r.Get(ctx, *instance.GetDeploymentMetadata(), deploymentQuery)
-	if err != nil && errors.IsNotFound(err) {
+	if err != nil && k8sErr.IsNotFound(err) {
 		instance.Status.DeploymentStatus = robotv1alpha2.OwnedDeploymentStatus{}
 	} else if err != nil {
 		return err
@@ -123,11 +125,14 @@ func (r *CodeEditorReconciler) reconcileCheckService(ctx context.Context, instan
 
 	serviceQuery := &corev1.Service{}
 	err := r.Get(ctx, *instance.GetServiceMetadata(), serviceQuery)
-	if err != nil && errors.IsNotFound(err) {
+	if err != nil && k8sErr.IsNotFound(err) {
 		instance.Status.ServiceStatus = robotv1alpha2.OwnedServiceStatus{}
 	} else if err != nil {
 		return err
 	} else {
+
+		remoteConfigSynced := (instance.Spec.Remote && reflect.DeepEqual(serviceQuery.Spec.ClusterIP, corev1.ClusterIPNone)) ||
+			(!instance.Spec.Remote && reflect.DeepEqual(serviceQuery.Spec.Type, instance.Spec.ServiceType) && !reflect.DeepEqual(serviceQuery.Spec.ClusterIP, corev1.ClusterIPNone))
 
 		desiredPort := instance.Spec.Port
 		var actualPort int32
@@ -136,9 +141,6 @@ func (r *CodeEditorReconciler) reconcileCheckService(ctx context.Context, instan
 				actualPort = sPort.Port
 			}
 		}
-
-		remoteConfigSynced := (instance.Spec.Remote && reflect.DeepEqual(serviceQuery.Spec.ClusterIP, corev1.ClusterIPNone)) ||
-			(!instance.Spec.Remote && reflect.DeepEqual(serviceQuery.Spec.Type, instance.Spec.ServiceType) && !reflect.DeepEqual(serviceQuery.Spec.ClusterIP, corev1.ClusterIPNone))
 
 		portSynced := reflect.DeepEqual(desiredPort, actualPort)
 
@@ -161,6 +163,55 @@ func (r *CodeEditorReconciler) reconcileCheckService(ctx context.Context, instan
 			}
 		}
 
+		// set url(s)
+
+		urls := make(map[string]string)
+
+		if instance.Spec.Remote {
+
+			// this part will be populated after implementing relay mechanism
+
+		} else {
+
+			if instance.Spec.Ingress {
+
+				urls = map[string]string{
+					internal.CODE_EDITOR_PORT_NAME:  robotv1alpha2.GetServiceDNS(instance, "https://", "/"+internal.CODE_EDITOR_APP_NAME),
+					internal.FILE_BROWSER_PORT_NAME: robotv1alpha2.GetServiceDNS(instance, "https://", "/"+internal.FILE_BROWSER_PORT_NAME),
+				}
+
+			} else {
+
+				if instance.Spec.ServiceType == corev1.ServiceTypeNodePort {
+
+					if len(serviceQuery.Spec.Ports) == 2 {
+
+						var ceNodePort int32
+						var fbNodePort int32
+						for _, sPort := range serviceQuery.Spec.Ports {
+							if sPort.Name == internal.CODE_EDITOR_PORT_NAME {
+								ceNodePort = sPort.NodePort
+							}
+							if sPort.Name == internal.FILE_BROWSER_PORT_NAME {
+								fbNodePort = sPort.NodePort
+							}
+						}
+
+						urls = map[string]string{
+							internal.CODE_EDITOR_PORT_NAME:  robotv1alpha2.GetServiceDNSWithNodePort(instance, "http://", strconv.Itoa(int(ceNodePort))),
+							internal.FILE_BROWSER_PORT_NAME: robotv1alpha2.GetServiceDNSWithNodePort(instance, "http://", strconv.Itoa(int(fbNodePort))),
+						}
+					} else {
+						return errors.New("wrong number of ports in service")
+					}
+
+				}
+
+			}
+
+		}
+
+		instance.Status.ServiceStatus.URLs = urls
 		instance.Status.ServiceStatus.Resource.Created = true
 		reference.SetReference(&instance.Status.ServiceStatus.Resource.Reference, serviceQuery.TypeMeta, serviceQuery.ObjectMeta)
 	}
@@ -172,13 +223,54 @@ func (r *CodeEditorReconciler) reconcileCheckIngress(ctx context.Context, instan
 
 	ingressQuery := &networkingv1.Ingress{}
 	err := r.Get(ctx, *instance.GetIngressMetadata(), ingressQuery)
-	if err != nil && errors.IsNotFound(err) {
+	if err != nil && k8sErr.IsNotFound(err) {
 		instance.Status.IngressStatus = robotv1alpha2.OwnedResourceStatus{}
 	} else if err != nil {
 		return err
 	} else {
 
-		// make resource dynamic
+		desiredPort := instance.Spec.Port
+		var actualPort int32
+		if len(ingressQuery.Spec.Rules) > 0 {
+			rule := ingressQuery.Spec.Rules[0]
+			if len(rule.HTTP.Paths) > 0 {
+				codeEditorPath := rule.HTTP.Paths[0]
+				actualPort = codeEditorPath.Backend.Service.Port.Number
+			} else {
+				return errors.New("wrong number of ingress paths")
+			}
+		} else {
+			return errors.New("wrong number of ingress rules")
+		}
+
+		portSynced := reflect.DeepEqual(desiredPort, actualPort)
+
+		actualSecretName := ""
+		if len(ingressQuery.Spec.TLS) > 0 {
+			tls := ingressQuery.Spec.TLS[0]
+			actualSecretName = tls.SecretName
+		} else {
+			return errors.New("ingress host is not found")
+		}
+
+		secretNameSynced := reflect.DeepEqual(instance.Spec.TLSSecretName, actualSecretName)
+
+		if !portSynced ||
+			!secretNameSynced {
+			err := r.updateIngress(ctx, instance)
+			if err != nil {
+				return err
+			}
+		}
+
+		if !instance.Spec.Ingress {
+			err := r.Delete(ctx, ingressQuery)
+			if err != nil {
+				return err
+			}
+
+			instance.Status.IngressStatus = robotv1alpha2.OwnedResourceStatus{}
+		}
 
 		instance.Status.IngressStatus.Created = true
 		reference.SetReference(&instance.Status.IngressStatus.Reference, ingressQuery.TypeMeta, ingressQuery.ObjectMeta)

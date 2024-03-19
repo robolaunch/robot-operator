@@ -65,7 +65,7 @@ const (
 
 const (
 	CODE_EDITOR_APP_NAME  = "code-editor"
-	CODE_EDITOR_PORT_NAME = "code-server"
+	CODE_EDITOR_PORT_NAME = "code-editor"
 )
 
 // Robot owned resources' postfixes (v1alpha1)
