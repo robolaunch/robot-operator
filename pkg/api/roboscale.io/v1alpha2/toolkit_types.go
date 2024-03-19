@@ -144,6 +144,8 @@ type CodeEditorSpec struct {
 	ServiceType corev1.ServiceType `json:"serviceType,omitempty"`
 	// CodeEditor will create an Ingress resource if `true`.
 	Ingress bool `json:"ingress,omitempty"`
+	// Name of the TLS secret for ingress resource.
+	TLSSecretName string `json:"tlsSecretName,omitempty"`
 	// Volume templates for ROS 2 workload.
 	// For each volume template, operator will create a PersistentVolumeClaim
 	// that can be mounted to the ROS 2 workload.
