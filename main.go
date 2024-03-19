@@ -365,8 +365,9 @@ func startToolkitCRDsAndWebhooks(mgr manager.Manager) {
 
 	// ROS2Bridge controller & webhook
 	if err := (&codeEditor.CodeEditorReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
+		Client:   mgr.GetClient(),
+		Scheme:   mgr.GetScheme(),
+		Recorder: mgr.GetEventRecorderFor("code-editor"),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "CodeEditor")
 		os.Exit(1)

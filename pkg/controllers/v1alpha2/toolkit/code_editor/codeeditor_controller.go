@@ -25,6 +25,7 @@ import (
 	networkingv1 "k8s.io/api/networking/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -36,7 +37,8 @@ import (
 // CodeEditorReconciler reconciles a CodeEditor object
 type CodeEditorReconciler struct {
 	client.Client
-	Scheme *runtime.Scheme
+	Scheme   *runtime.Scheme
+	Recorder record.EventRecorder
 }
 
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=codeeditors,verbs=get;list;watch;create;update;patch;delete
@@ -47,6 +49,7 @@ type CodeEditorReconciler struct {
 //+kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=core,resources=services,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=networking.k8s.io,resources=ingresses,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=core,resources=events,verbs=get;list;watch;create;update;patch;delete
 
 var logger logr.Logger
 
