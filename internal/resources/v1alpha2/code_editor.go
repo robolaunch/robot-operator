@@ -145,16 +145,16 @@ func GetCodeEditorService(codeEditor *robotv1alpha2.CodeEditor, svcNamespacedNam
 		},
 	}
 
+	if codeEditor.Spec.Remote {
+		cfg.InjectRemoteConfigurations(&serviceSpec)
+	}
+
 	service := corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      svcNamespacedName.Name,
 			Namespace: svcNamespacedName.Namespace,
 		},
 		Spec: serviceSpec,
-	}
-
-	if codeEditor.Spec.Remote {
-		cfg.InjectRemoteConfigurations(&serviceSpec)
 	}
 
 	return &service

@@ -97,7 +97,7 @@ func (r *CodeEditorReconciler) reconcileCheckDeployment(ctx context.Context, ins
 			}
 		}
 
-		portSynced := desiredPort == actualPort
+		portSynced := reflect.DeepEqual(desiredPort, actualPort)
 
 		if !reflect.DeepEqual(desiredImage, actualImage) ||
 			!remoteConfigSynced ||
@@ -136,9 +136,21 @@ func (r *CodeEditorReconciler) reconcileCheckService(ctx context.Context, instan
 			}
 		}
 
-		portSynced := desiredPort == actualPort
+		remoteConfigSynced := (instance.Spec.Remote && reflect.DeepEqual(serviceQuery.Spec.ClusterIP, corev1.ClusterIPNone)) ||
+			(!instance.Spec.Remote && reflect.DeepEqual(serviceQuery.Spec.Type, instance.Spec.ServiceType) && !reflect.DeepEqual(serviceQuery.Spec.ClusterIP, corev1.ClusterIPNone))
+
+		portSynced := reflect.DeepEqual(desiredPort, actualPort)
 
 		serviceTypeSynced := instance.Spec.Remote || (!instance.Spec.Remote && reflect.DeepEqual(instance.Spec.ServiceType, serviceQuery.Spec.Type))
+
+		if !remoteConfigSynced {
+			err := r.Delete(ctx, serviceQuery)
+			if err != nil {
+				return err
+			}
+			instance.Status.ServiceStatus = robotv1alpha2.OwnedServiceStatus{}
+			return nil
+		}
 
 		if !portSynced ||
 			!serviceTypeSynced {
