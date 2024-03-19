@@ -1,12 +1,14 @@
 package v1alpha2_resources
 
 import (
+	"fmt"
 	"path/filepath"
 	"strconv"
 	"strings"
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
+	networkingv1 "k8s.io/api/networking/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -15,7 +17,7 @@ import (
 	configure "github.com/robolaunch/robot-operator/internal/configure/v1alpha2"
 	"github.com/robolaunch/robot-operator/internal/label"
 	"github.com/robolaunch/robot-operator/internal/platform"
-	"github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
+	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	robotv1alpha2 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha2"
 )
 
@@ -64,7 +66,7 @@ func GetCodeEditorDeployment(codeEditor *robotv1alpha2.CodeEditor, deploymentNam
 					internal.Env("CODE_SERVER_PORT", strconv.FormatInt(int64(codeEditor.Spec.Port), 10)),
 					internal.Env("FILE_BROWSER_PORT", strconv.Itoa(internal.FILE_BROWSER_PORT)),
 					internal.Env("FILE_BROWSER_SERVICE", internal.CODE_EDITOR_PORT_NAME),
-					internal.Env("FILE_BROWSER_BASE_URL", v1alpha1.GetServicePath(codeEditor, "/file-browser/ide")),
+					internal.Env("FILE_BROWSER_BASE_URL", robotv1alpha1.GetServicePath(codeEditor, "/file-browser/ide")),
 					internal.Env("TERM", "xterm-256color"),
 				},
 				Ports: []corev1.ContainerPort{
@@ -153,9 +155,77 @@ func GetCodeEditorService(codeEditor *robotv1alpha2.CodeEditor, svcNamespacedNam
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      svcNamespacedName.Name,
 			Namespace: svcNamespacedName.Namespace,
+			Labels:    codeEditor.Labels,
 		},
 		Spec: serviceSpec,
 	}
 
 	return &service
+}
+
+func GetCodeEditorIngress(codeEditor *robotv1alpha2.CodeEditor, ingressNamespacedName *types.NamespacedName) *networkingv1.Ingress {
+
+	tenancy := label.GetTenancy(codeEditor)
+	platformMeta := label.GetPlatformMeta(codeEditor)
+
+	annotations := map[string]string{
+		internal.INGRESS_AUTH_URL_KEY:                fmt.Sprintf(internal.INGRESS_AUTH_URL_VAL, tenancy.Team, platformMeta.Domain),
+		internal.INGRESS_AUTH_SIGNIN_KEY:             fmt.Sprintf(internal.INGRESS_AUTH_SIGNIN_VAL, tenancy.Team, platformMeta.Domain),
+		internal.INGRESS_AUTH_RESPONSE_HEADERS_KEY:   internal.INGRESS_AUTH_RESPONSE_HEADERS_VAL,
+		internal.INGRESS_CONFIGURATION_SNIPPET_KEY:   internal.INGRESS_IDE_CONFIGURATION_SNIPPET_VAL,
+		internal.INGRESS_CERT_MANAGER_KEY:            internal.INGRESS_CERT_MANAGER_VAL,
+		internal.INGRESS_NGINX_PROXY_BUFFER_SIZE_KEY: internal.INGRESS_NGINX_PROXY_BUFFER_SIZE_VAL,
+		internal.INGRESS_NGINX_REWRITE_TARGET_KEY:    internal.INGRESS_NGINX_REWRITE_TARGET_VAL,
+		internal.INGRESS_PROXY_READ_TIMEOUT_KEY:      internal.INGRESS_PROXY_READ_TIMEOUT_VAL,
+	}
+
+	pathTypePrefix := networkingv1.PathTypePrefix
+	ingressClassNameNginx := "nginx"
+
+	ingressSpec := networkingv1.IngressSpec{
+		TLS: []networkingv1.IngressTLS{
+			{
+				Hosts: []string{
+					tenancy.Team + "." + platformMeta.Domain,
+				},
+				SecretName: codeEditor.Spec.TLSSecretName,
+			},
+		},
+		Rules: []networkingv1.IngressRule{
+			{
+				Host: tenancy.Team + "." + platformMeta.Domain,
+				IngressRuleValue: networkingv1.IngressRuleValue{
+					HTTP: &networkingv1.HTTPIngressRuleValue{
+						Paths: []networkingv1.HTTPIngressPath{
+							{
+								Path:     robotv1alpha1.GetServicePath(codeEditor, "/ide") + "(/|$)(.*)",
+								PathType: &pathTypePrefix,
+								Backend: networkingv1.IngressBackend{
+									Service: &networkingv1.IngressServiceBackend{
+										Name: codeEditor.GetServiceMetadata().Name,
+										Port: networkingv1.ServiceBackendPort{
+											Number: codeEditor.Spec.Port,
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		IngressClassName: &ingressClassNameNginx,
+	}
+
+	ingress := &networkingv1.Ingress{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:        ingressNamespacedName.Name,
+			Namespace:   ingressNamespacedName.Namespace,
+			Labels:      codeEditor.Labels,
+			Annotations: annotations,
+		},
+		Spec: ingressSpec,
+	}
+
+	return ingress
 }
