@@ -151,6 +151,7 @@ func (r *CodeEditorReconciler) reconcileCheckService(ctx context.Context, instan
 			if err != nil {
 				return err
 			}
+			r.Recorder.Event(instance, "Normal", "Deleted", "Service '"+instance.GetServiceMetadata().Name+"' is deleted to sync resources.")
 			instance.Status.ServiceStatus = robotv1alpha2.OwnedServiceStatus{}
 			return nil
 		}
@@ -165,7 +166,7 @@ func (r *CodeEditorReconciler) reconcileCheckService(ctx context.Context, instan
 
 		// set url(s)
 
-		urls := make(map[string]string)
+		urls := map[string]string{}
 
 		if instance.Spec.Remote {
 
@@ -209,6 +210,11 @@ func (r *CodeEditorReconciler) reconcileCheckService(ctx context.Context, instan
 
 			}
 
+		}
+
+		// TODO: Wait for pod to be in 'Running' state.
+		if codeEditorURL, ok := urls[internal.CODE_EDITOR_PORT_NAME]; ok && !reflect.DeepEqual(instance.Status.ServiceStatus.URLs, urls) {
+			r.Recorder.Event(instance, "Normal", "Ready", "CodeEditor is accessible over the URL '"+codeEditorURL+"'.")
 		}
 
 		instance.Status.ServiceStatus.URLs = urls
@@ -268,6 +274,7 @@ func (r *CodeEditorReconciler) reconcileCheckIngress(ctx context.Context, instan
 			if err != nil {
 				return err
 			}
+			r.Recorder.Event(instance, "Normal", "Deleted", "Ingress '"+instance.GetIngressMetadata().Name+"' is deleted to sync resources.")
 
 			instance.Status.IngressStatus = robotv1alpha2.OwnedResourceStatus{}
 		}

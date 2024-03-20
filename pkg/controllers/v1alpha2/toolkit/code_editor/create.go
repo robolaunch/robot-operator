@@ -25,6 +25,8 @@ func (r *CodeEditorReconciler) createPersistentVolumeClaim(ctx context.Context, 
 		return err
 	}
 
+	r.Recorder.Event(instance, "Normal", "Created", "PersistentVolumeClaim '"+instance.GetPersistentVolumeClaimMetadata(key).Name+"' is created.")
+
 	logger.Info("STATUS: PVC " + instance.GetPersistentVolumeClaimMetadata(key).Name + " is created.")
 	return nil
 }
@@ -50,6 +52,8 @@ func (r *CodeEditorReconciler) createDeployment(ctx context.Context, instance *r
 		return err
 	}
 
+	r.Recorder.Event(instance, "Normal", "Created", "Deployment '"+instance.GetDeploymentMetadata().Name+"' is created.")
+
 	logger.Info("STATUS: Deployment " + instance.GetDeploymentMetadata().Name + " is created.")
 	return nil
 }
@@ -70,6 +74,8 @@ func (r *CodeEditorReconciler) createService(ctx context.Context, instance *robo
 		return err
 	}
 
+	r.Recorder.Event(instance, "Normal", "Created", "Service '"+instance.GetDeploymentMetadata().Name+"' is created.")
+
 	logger.Info("STATUS: Service " + instance.GetServiceMetadata().Name + " is created.")
 	return nil
 }
@@ -89,6 +95,8 @@ func (r *CodeEditorReconciler) createIngress(ctx context.Context, instance *robo
 	} else if err != nil {
 		return err
 	}
+
+	r.Recorder.Event(instance, "Normal", "Created", "Ingress '"+instance.GetDeploymentMetadata().Name+"' is created.")
 
 	logger.Info("STATUS: Ingress " + instance.GetIngressMetadata().Name + " is created.")
 	return nil

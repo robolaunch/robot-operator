@@ -27,6 +27,8 @@ func (r *CodeEditorReconciler) updateDeployment(ctx context.Context, instance *r
 		return err
 	}
 
+	r.Recorder.Event(instance, "Normal", "Updated", "Deployment '"+instance.GetDeploymentMetadata().Name+"' is updated to sync resources.")
+
 	logger.Info("STATUS: Deployment " + deployment.Name + " is updated.")
 	return nil
 }
@@ -44,6 +46,8 @@ func (r *CodeEditorReconciler) updateService(ctx context.Context, instance *robo
 	if err != nil {
 		return err
 	}
+
+	r.Recorder.Event(instance, "Normal", "Updated", "Service '"+instance.GetServiceMetadata().Name+"' is updated to sync resources.")
 
 	logger.Info("STATUS: Service " + service.Name + " is updated.")
 	return nil
@@ -63,6 +67,8 @@ func (r *CodeEditorReconciler) updateIngress(ctx context.Context, instance *robo
 		return err
 	}
 
-	logger.Info("STATUS: Ingress " + ingress.Name + " is updated.")
+	r.Recorder.Event(instance, "Normal", "Updated", "Ingress '"+instance.GetIngressMetadata().Name+"' is updated to sync resources.")
+
+	logger.Info("STATUS: Ingress " + instance.GetIngressMetadata().Name + " is updated.")
 	return nil
 }
