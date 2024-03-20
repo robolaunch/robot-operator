@@ -1,0 +1,12 @@
+apiVersion: robot.roboscale.io/v1alpha2
+kind: EdgeProxy
+metadata:
+  labels:
+    app.kubernetes.io/name: edgeproxy
+    app.kubernetes.io/instance: edgeproxy-sample
+    app.kubernetes.io/part-of: robot-operator
+    app.kuberentes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: robot-operator
+  name: edgeproxy-sample
+spec:
+  # TODO(user): Add fields here
