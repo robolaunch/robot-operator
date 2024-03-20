@@ -166,6 +166,31 @@ func (r *CodeEditorReconciler) reconcileCheckResources(ctx context.Context, inst
 		return err
 	}
 
+	err = r.reconcileCalculatePhase(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *CodeEditorReconciler) reconcileCalculatePhase(ctx context.Context, instance *robotv1alpha2.CodeEditor) error {
+
+	containersReady := true
+	if len(instance.Status.DeploymentStatus.ContainerStatuses) > 0 {
+		for _, cStatus := range instance.Status.DeploymentStatus.ContainerStatuses {
+			containersReady = containersReady && cStatus.Ready
+		}
+	} else {
+		containersReady = false
+	}
+
+	if containersReady && instance.Status.ServiceStatus.Resource.Created && (instance.Spec.Ingress == instance.Status.IngressStatus.Created) {
+		instance.Status.Phase = robotv1alpha2.CodeEditorPhaseReady
+	} else {
+		instance.Status.Phase = robotv1alpha2.CodeEditorPhaseConfiguringResources
+	}
+
 	return nil
 }
 

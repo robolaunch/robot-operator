@@ -238,9 +238,10 @@ func (r *CodeEditorReconciler) reconcileCheckService(ctx context.Context, instan
 
 		}
 
-		// TODO: Wait for pod to be in 'Running' state.
-		if codeEditorURL, ok := urls[internal.CODE_EDITOR_PORT_NAME]; ok && !reflect.DeepEqual(instance.Status.ServiceStatus.URLs, urls) {
-			r.Recorder.Event(instance, "Normal", "Ready", "CodeEditor is accessible over the URL '"+codeEditorURL+"'.")
+		if codeEditorURL, ok := urls[internal.CODE_EDITOR_PORT_NAME]; ok {
+			if lastCodeEditorURL, ok := instance.Status.ServiceStatus.URLs[internal.CODE_EDITOR_PORT_NAME]; (ok && !reflect.DeepEqual(lastCodeEditorURL, codeEditorURL)) || !ok {
+				r.Recorder.Event(instance, "Normal", "Ready", "CodeEditor is accessible over the URL '"+codeEditorURL+"'.")
+			}
 		}
 
 		instance.Status.ServiceStatus.URLs = urls
