@@ -52,6 +52,7 @@ import (
 	workspaceManager "github.com/robolaunch/robot-operator/pkg/controllers/v1alpha1/workspace_manager"
 	ros2Workload "github.com/robolaunch/robot-operator/pkg/controllers/v1alpha2/production/ros2_workload"
 	codeEditor "github.com/robolaunch/robot-operator/pkg/controllers/v1alpha2/toolkit/code_editor"
+	edgeProxy "github.com/robolaunch/robot-operator/pkg/controllers/v1alpha2/toolkit/edge_proxy"
 	ros2Bridge "github.com/robolaunch/robot-operator/pkg/controllers/v1alpha2/toolkit/ros2_bridge"
 	//+kubebuilder:scaffold:imports
 )
@@ -363,7 +364,7 @@ func startToolkitCRDsAndWebhooks(mgr manager.Manager) {
 		os.Exit(1)
 	}
 
-	// ROS2Bridge controller & webhook
+	// CodeEditor controller & webhook
 	if err := (&codeEditor.CodeEditorReconciler{
 		Client:   mgr.GetClient(),
 		Scheme:   mgr.GetScheme(),
@@ -374,6 +375,19 @@ func startToolkitCRDsAndWebhooks(mgr manager.Manager) {
 	}
 	if err := (&robotv1alpha2.CodeEditor{}).SetupWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create webhook", "webhook", "CodeEditor")
+		os.Exit(1)
+	}
+
+	// EdgeProxy controller & webhook
+	if err := (&edgeProxy.EdgeProxyReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "EdgeProxy")
+		os.Exit(1)
+	}
+	if err := (&robotv1alpha2.EdgeProxy{}).SetupWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create webhook", "webhook", "EdgeProxy")
 		os.Exit(1)
 	}
 }
