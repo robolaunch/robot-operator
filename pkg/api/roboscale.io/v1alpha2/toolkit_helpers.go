@@ -49,3 +49,17 @@ func (codeEditor *CodeEditor) GetDeploymentMetadata() *types.NamespacedName {
 		Namespace: codeEditor.Namespace,
 	}
 }
+
+func (codeEditor *CodeEditor) GetServiceMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Name:      codeEditor.Name + internal.SERVICE_POSTFIX,
+		Namespace: codeEditor.Namespace,
+	}
+}
+
+func (codeEditor *CodeEditor) GetIngressMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Name:      codeEditor.Name + internal.INGRESS_POSTFIX,
+		Namespace: codeEditor.Namespace,
+	}
+}

@@ -9,6 +9,7 @@ import (
 
 	cosmodrome "github.com/robolaunch/cosmodrome/pkg/api"
 	"github.com/robolaunch/robot-operator/internal"
+	"github.com/robolaunch/robot-operator/internal/label"
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	robotv1alpha2 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha2"
 	corev1 "k8s.io/api/core/v1"
@@ -56,10 +57,10 @@ type ReadyRobotProperties struct {
 func GetReadyRobotProperties(robot robotv1alpha1.Robot) ReadyRobotProperties {
 	labels := robot.GetLabels()
 
-	if registry, hasRegistry := labels[internal.ROBOT_IMAGE_REGISTRY_LABEL_KEY]; hasRegistry {
-		if user, hasUser := labels[internal.ROBOT_IMAGE_USER_LABEL_KEY]; hasUser {
-			if repository, hasRepository := labels[internal.ROBOT_IMAGE_REPOSITORY_LABEL_KEY]; hasRepository {
-				if tag, hasTag := labels[internal.ROBOT_IMAGE_TAG_LABEL_KEY]; hasTag {
+	if registry, hasRegistry := labels[internal.IMAGE_REGISTRY_LABEL_KEY]; hasRegistry {
+		if user, hasUser := labels[internal.IMAGE_USER_LABEL_KEY]; hasUser {
+			if repository, hasRepository := labels[internal.IMAGE_REPOSITORY_LABEL_KEY]; hasRepository {
+				if tag, hasTag := labels[internal.IMAGE_TAG_LABEL_KEY]; hasTag {
 					return ReadyRobotProperties{
 						Enabled: true,
 						Image:   registry + "/" + user + "/" + repository + ":" + tag,
@@ -95,15 +96,16 @@ func GetImageForRobot(ctx context.Context, r client.Client, node corev1.Node, ro
 
 	} else {
 
-		platformVersion := GetPlatformVersion(node)
-		imageProps, err := getImagePropsForRobot(ctx, r, platformVersion, getDistroStr(robot.Spec.RobotConfig.Distributions))
+		platformMeta := label.GetPlatformMeta(&node)
+
+		imageProps, err := getImagePropsForRobot(ctx, r, platformMeta.Version, getDistroStr(robot.Spec.RobotConfig.Distributions))
 		if err != nil {
 			return "", err
 		}
 
-		registry, hasRegistry := robot.Labels[internal.ROBOT_IMAGE_REGISTRY_LABEL_KEY]
+		registry, hasRegistry := robot.Labels[internal.IMAGE_REGISTRY_LABEL_KEY]
 		if !hasRegistry {
-			return "", errors.New("registry is not found in label with key " + internal.ROBOT_IMAGE_REGISTRY_LABEL_KEY)
+			return "", errors.New("registry is not found in label with key " + internal.IMAGE_REGISTRY_LABEL_KEY)
 		}
 
 		organization := "robolaunchio"
@@ -125,15 +127,16 @@ func GetImageForBridge(ctx context.Context, r client.Client, node corev1.Node, r
 	var imageBuilder strings.Builder
 	var tagBuilder strings.Builder
 
-	platformVersion := GetPlatformVersion(node)
-	imageProps, err := getImagePropsForRobot(ctx, r, platformVersion, getDistroStr(robot.Spec.RobotConfig.Distributions))
+	platformMeta := label.GetPlatformMeta(&node)
+
+	imageProps, err := getImagePropsForRobot(ctx, r, platformMeta.Version, getDistroStr(robot.Spec.RobotConfig.Distributions))
 	if err != nil {
 		return "", err
 	}
 
-	registry, hasRegistry := robot.Labels[internal.ROBOT_IMAGE_REGISTRY_LABEL_KEY]
+	registry, hasRegistry := robot.Labels[internal.IMAGE_REGISTRY_LABEL_KEY]
 	if !hasRegistry {
-		return "", errors.New("registry is not found in label with key " + internal.ROBOT_IMAGE_REGISTRY_LABEL_KEY)
+		return "", errors.New("registry is not found in label with key " + internal.IMAGE_REGISTRY_LABEL_KEY)
 	}
 
 	organization := "robolaunchio"
@@ -151,15 +154,16 @@ func GetBridgeImage(ctx context.Context, r client.Client, node corev1.Node, ros2
 	var imageBuilder strings.Builder
 	var tagBuilder strings.Builder
 
-	platformVersion := GetPlatformVersion(node)
-	imageProps, err := getImagePropsForRobot(ctx, r, platformVersion, getDistroStr([]robotv1alpha1.ROSDistro{ros2Bridge.Spec.Distro}))
+	platformMeta := label.GetPlatformMeta(&node)
+
+	imageProps, err := getImagePropsForRobot(ctx, r, platformMeta.Version, getDistroStr([]robotv1alpha1.ROSDistro{ros2Bridge.Spec.Distro}))
 	if err != nil {
 		return "", err
 	}
 
-	registry, hasRegistry := ros2Bridge.Labels[internal.ROBOT_IMAGE_REGISTRY_LABEL_KEY]
+	registry, hasRegistry := ros2Bridge.Labels[internal.IMAGE_REGISTRY_LABEL_KEY]
 	if !hasRegistry {
-		return "", errors.New("registry is not found in label with key " + internal.ROBOT_IMAGE_REGISTRY_LABEL_KEY)
+		return "", errors.New("registry is not found in label with key " + internal.IMAGE_REGISTRY_LABEL_KEY)
 	}
 
 	organization := "robolaunchio"
@@ -185,15 +189,16 @@ func GetImageForEnvironment(ctx context.Context, r client.Client, node corev1.No
 
 	} else {
 
-		platformVersion := GetPlatformVersion(node)
-		imageProps, err := getImagePropsForEnvironment(ctx, r, platformVersion)
+		platformMeta := label.GetPlatformMeta(&node)
+
+		imageProps, err := getImagePropsForEnvironment(ctx, r, platformMeta.Version)
 		if err != nil {
 			return "", err
 		}
 
-		registry, hasRegistry := robot.Labels[internal.ROBOT_IMAGE_REGISTRY_LABEL_KEY]
+		registry, hasRegistry := robot.Labels[internal.IMAGE_REGISTRY_LABEL_KEY]
 		if !hasRegistry {
-			return "", errors.New("registry is not found in label with key " + internal.ROBOT_IMAGE_REGISTRY_LABEL_KEY)
+			return "", errors.New("registry is not found in label with key " + internal.IMAGE_REGISTRY_LABEL_KEY)
 		}
 
 		organization := imageProps.Organization

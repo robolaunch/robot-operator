@@ -39,6 +39,7 @@ func (r *Robot) Default() {
 	_ = r.setRepositoryInfo()
 	r.setWorkspacesPath()
 	r.setDiscoveryServerDomainID()
+	r.setDiscoveryServerProtocol()
 }
 
 //+kubebuilder:webhook:path=/validate-robot-roboscale-io-v1alpha1-robot,mutating=false,failurePolicy=fail,sideEffects=None,groups=robot.roboscale.io,resources=robots,verbs=create;update,versions=v1alpha1,name=vrobot.kb.io,admissionReviewVersions=v1
@@ -273,8 +274,8 @@ func (r *Robot) checkAdditionalConfigs() error {
 }
 
 func (r *Robot) setDefaultLabels() {
-	if _, ok := r.Labels[internal.ROBOT_IMAGE_REGISTRY_LABEL_KEY]; !ok {
-		r.Labels[internal.ROBOT_IMAGE_REGISTRY_LABEL_KEY] = "docker.io"
+	if _, ok := r.Labels[internal.IMAGE_REGISTRY_LABEL_KEY]; !ok {
+		r.Labels[internal.IMAGE_REGISTRY_LABEL_KEY] = "docker.io"
 	}
 }
 
@@ -333,6 +334,12 @@ func (r *Robot) setWorkspacesPath() {
 func (r *Robot) setDiscoveryServerDomainID() {
 	if reflect.DeepEqual(r.Spec.Type, TypeRobot) {
 		r.Spec.RobotConfig.DiscoveryServerTemplate.DomainID = r.Spec.RobotConfig.DomainID
+	}
+}
+
+func (r *Robot) setDiscoveryServerProtocol() {
+	if reflect.DeepEqual(r.Spec.Type, TypeRobot) {
+		r.Spec.RobotConfig.DiscoveryServerTemplate.Protocol = "UDP"
 	}
 }
 

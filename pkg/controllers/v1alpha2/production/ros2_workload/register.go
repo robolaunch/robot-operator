@@ -13,6 +13,22 @@ func (r *ROS2WorkloadReconciler) registerPVCs(ctx context.Context, instance *rob
 	pvcStatuses := []robotv1alpha2.OwnedPVCStatus{}
 
 	if len(instance.Spec.VolumeClaimTemplates) != len(instance.Status.PVCStatuses) {
+
+		if len(instance.Status.PVCStatuses) > len(instance.Spec.VolumeClaimTemplates) {
+			for key := len(instance.Spec.VolumeClaimTemplates); key < len(instance.Status.PVCStatuses); key++ {
+				pvc := corev1.PersistentVolumeClaim{}
+				err := r.Get(ctx, *instance.GetPersistentVolumeClaimMetadata(key), &pvc)
+				if err != nil {
+					return err
+				}
+
+				err = r.Delete(ctx, &pvc)
+				if err != nil {
+					return err
+				}
+			}
+		}
+
 		for key := range instance.Spec.VolumeClaimTemplates {
 			pvcStatus := robotv1alpha2.OwnedPVCStatus{
 				Resource: robotv1alpha2.OwnedResourceStatus{

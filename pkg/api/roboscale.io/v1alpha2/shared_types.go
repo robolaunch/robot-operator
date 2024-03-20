@@ -1,8 +1,10 @@
 package v1alpha2
 
 import (
+	"github.com/robolaunch/robot-operator/internal/label"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // Generic status for any owned resource.
@@ -47,4 +49,49 @@ type OwnedDeploymentStatus struct {
 	Status appsv1.DeploymentStatus `json:"status,omitempty"`
 	// Container statuses.
 	ContainerStatuses []corev1.ContainerStatus `json:"containerStatuses,omitempty"`
+}
+
+type OwnedServiceStatus struct {
+	// Generic status for any owned resource.
+	Resource OwnedResourceStatus `json:"resource,omitempty"`
+	// Connection URL.
+	URLs map[string]string `json:"urls,omitempty"`
+}
+
+func GetServiceDNS(obj metav1.Object, prefix, postfix string) string {
+	tenancy := label.GetTenancy(obj)
+	platformMeta := label.GetPlatformMeta(obj)
+	connectionStr := tenancy.Team + "." + platformMeta.Domain + GetServicePath(obj, postfix)
+
+	if prefix != "" {
+		connectionStr = prefix + connectionStr
+	}
+
+	return connectionStr
+}
+
+func GetServiceDNSWithNodePort(obj metav1.Object, prefix, port string) string {
+	tenancy := label.GetTenancy(obj)
+	platformMeta := label.GetPlatformMeta(obj)
+	connectionStr := tenancy.Team + "." + platformMeta.Domain + ":" + port
+
+	if prefix != "" {
+		connectionStr = prefix + connectionStr
+	}
+
+	return connectionStr
+}
+
+func GetServicePath(obj metav1.Object, postfix string) string {
+	tenancy := label.GetTenancy(obj)
+	connectionStr := "/" + tenancy.Region +
+		"/" + tenancy.CloudInstanceAlias +
+		"/" + obj.GetNamespace() +
+		"/" + obj.GetName()
+
+	if postfix != "" {
+		connectionStr = connectionStr + postfix
+	}
+
+	return connectionStr
 }

@@ -13,7 +13,6 @@ func (r *CodeEditorReconciler) reconcileHandlePVCs(ctx context.Context, instance
 	for key, pvcStatus := range instance.Status.PVCStatuses {
 		if !pvcStatus.Resource.Created {
 
-			instance.Status.Phase = robotv1alpha2.CodeEditorPhaseCreatingPVCs
 			err := r.createPersistentVolumeClaim(ctx, instance, key)
 			if err != nil {
 				return err
@@ -46,7 +45,6 @@ func (r *CodeEditorReconciler) reconcileHandleDeployment(ctx context.Context, in
 
 	if volumesReady && !instance.Status.DeploymentStatus.Resource.Created {
 
-		instance.Status.Phase = robotv1alpha2.CodeEditorPhaseCreatingDeployment
 		err := r.createDeployment(ctx, instance)
 		if err != nil {
 			return err
@@ -58,6 +56,48 @@ func (r *CodeEditorReconciler) reconcileHandleDeployment(ctx context.Context, in
 			ResourceKind:      "Deployment",
 			ResourceName:      instance.GetDeploymentMetadata().Name,
 			ResourceNamespace: instance.GetDeploymentMetadata().Namespace,
+		}
+	}
+
+	return nil
+}
+
+func (r *CodeEditorReconciler) reconcileHandleService(ctx context.Context, instance *robotv1alpha2.CodeEditor) error {
+
+	if !instance.Status.ServiceStatus.Resource.Created {
+
+		err := r.createService(ctx, instance)
+		if err != nil {
+			return err
+		}
+
+		instance.Status.ServiceStatus.Resource.Created = true
+
+		return &robotErr.CreatingResourceError{
+			ResourceKind:      "Service",
+			ResourceName:      instance.GetServiceMetadata().Name,
+			ResourceNamespace: instance.GetServiceMetadata().Namespace,
+		}
+	}
+
+	return nil
+}
+
+func (r *CodeEditorReconciler) reconcileHandleIngress(ctx context.Context, instance *robotv1alpha2.CodeEditor) error {
+
+	if instance.Spec.Ingress && !instance.Status.IngressStatus.Created {
+
+		err := r.createIngress(ctx, instance)
+		if err != nil {
+			return err
+		}
+
+		instance.Status.IngressStatus.Created = true
+
+		return &robotErr.CreatingResourceError{
+			ResourceKind:      "Ingress",
+			ResourceName:      instance.GetIngressMetadata().Name,
+			ResourceNamespace: instance.GetIngressMetadata().Namespace,
 		}
 	}
 

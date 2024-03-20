@@ -128,8 +128,9 @@ type CodeEditorContainer struct {
 
 // CodeEditorSpec defines the desired state of CodeEditor.
 type CodeEditorSpec struct {
-	// If `true`, code editor will be consumed as `root` user.
-	Root bool `json:"root,omitempty"`
+	// App version of the code editor.
+	// +kubebuilder:default="4.22.0"
+	Version string `json:"version"`
 	// If `true`, code editor will be consumed remotely.
 	Remote bool `json:"remote,omitempty"`
 	// Configurational parameters for code editor container.
@@ -137,6 +138,14 @@ type CodeEditorSpec struct {
 	// Port that code editor will use inside the container.
 	// +kubebuilder:default=9000
 	Port int32 `json:"port"`
+	// Service type of CodeEditor. `ClusterIP` and `NodePort` is supported.
+	// +kubebuilder:validation:Enum=ClusterIP;NodePort
+	// +kubebuilder:default="ClusterIP"
+	ServiceType corev1.ServiceType `json:"serviceType,omitempty"`
+	// CodeEditor will create an Ingress resource if `true`.
+	Ingress bool `json:"ingress,omitempty"`
+	// Name of the TLS secret for ingress resource.
+	TLSSecretName string `json:"tlsSecretName,omitempty"`
 	// Volume templates for ROS 2 workload.
 	// For each volume template, operator will create a PersistentVolumeClaim
 	// that can be mounted to the ROS 2 workload.
@@ -155,4 +164,10 @@ type CodeEditorStatus struct {
 	ExternalVolumeStatuses []ExternalVolumeStatus `json:"externalVolumeStatuses,omitempty"`
 	// Status of code editor deployment.
 	DeploymentStatus OwnedDeploymentStatus `json:"deploymentStatus,omitempty"`
+	// Status of code editor service.
+	ServiceStatus OwnedServiceStatus `json:"serviceStatus,omitempty"`
+	// Status of CodeEditor Ingress.
+	IngressStatus OwnedResourceStatus `json:"ingressStatus,omitempty"`
+	// Field to indicate if the workload should be restarted.
+	WorkloadUpdateNeeded bool `json:"workloadUpdateNeeded,omitempty"`
 }

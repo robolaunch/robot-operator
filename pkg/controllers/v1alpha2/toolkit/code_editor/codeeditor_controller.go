@@ -19,11 +19,14 @@ package code_editor
 import (
 	"context"
 
+	"github.com/robolaunch/robot-operator/internal"
 	robotErr "github.com/robolaunch/robot-operator/internal/error"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
+	networkingv1 "k8s.io/api/networking/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -35,7 +38,8 @@ import (
 // CodeEditorReconciler reconciles a CodeEditor object
 type CodeEditorReconciler struct {
 	client.Client
-	Scheme *runtime.Scheme
+	Scheme   *runtime.Scheme
+	Recorder record.EventRecorder
 }
 
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=codeeditors,verbs=get;list;watch;create;update;patch;delete
@@ -44,6 +48,9 @@ type CodeEditorReconciler struct {
 
 //+kubebuilder:rbac:groups=core,resources=persistentvolumeclaims,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=core,resources=services,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=networking.k8s.io,resources=ingresses,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=core,resources=events,verbs=get;list;watch;create;update;patch;delete
 
 var logger logr.Logger
 
@@ -60,11 +67,14 @@ func (r *CodeEditorReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		return ctrl.Result{}, err
 	}
 
-	r.reconcileRegisterResources(instance)
+	err = r.reconcileRegisterResources(ctx, instance)
+	if err != nil {
+		return result, err
+	}
 
 	err = r.reconcileUpdateInstanceStatus(ctx, instance)
 	if err != nil {
-		return ctrl.Result{}, err
+		return result, err
 	}
 
 	err = r.reconcileCheckStatus(ctx, instance, &result)
@@ -74,26 +84,33 @@ func (r *CodeEditorReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 
 	err = r.reconcileUpdateInstanceStatus(ctx, instance)
 	if err != nil {
-		return ctrl.Result{}, err
+		return result, err
 	}
 
 	err = r.reconcileCheckResources(ctx, instance)
 	if err != nil {
-		return ctrl.Result{}, err
+		return result, err
 	}
 
 	err = r.reconcileUpdateInstanceStatus(ctx, instance)
 	if err != nil {
-		return ctrl.Result{}, err
+		return result, err
 	}
 
 	return result, nil
 }
 
-func (r *CodeEditorReconciler) reconcileRegisterResources(instance *robotv1alpha2.CodeEditor) error {
+func (r *CodeEditorReconciler) reconcileRegisterResources(ctx context.Context, instance *robotv1alpha2.CodeEditor) error {
 
-	r.registerPVCs(instance)
-	r.registerExternalVolumes(instance)
+	err := r.registerPVCs(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	err = r.registerExternalVolumes(ctx, instance)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -106,6 +123,16 @@ func (r *CodeEditorReconciler) reconcileCheckStatus(ctx context.Context, instanc
 	}
 
 	err = r.reconcileHandleDeployment(ctx, instance)
+	if err != nil {
+		return robotErr.CheckCreatingOrWaitingError(result, err)
+	}
+
+	err = r.reconcileHandleService(ctx, instance)
+	if err != nil {
+		return robotErr.CheckCreatingOrWaitingError(result, err)
+	}
+
+	err = r.reconcileHandleIngress(ctx, instance)
 	if err != nil {
 		return robotErr.CheckCreatingOrWaitingError(result, err)
 	}
@@ -130,6 +157,44 @@ func (r *CodeEditorReconciler) reconcileCheckResources(ctx context.Context, inst
 		return err
 	}
 
+	err = r.reconcileCheckService(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	err = r.reconcileCheckIngress(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	err = r.reconcileCalculatePhase(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *CodeEditorReconciler) reconcileCalculatePhase(ctx context.Context, instance *robotv1alpha2.CodeEditor) error {
+
+	containersReady := true
+	if len(instance.Status.DeploymentStatus.ContainerStatuses) > 0 {
+		for _, cStatus := range instance.Status.DeploymentStatus.ContainerStatuses {
+			containersReady = containersReady && cStatus.Ready
+		}
+	} else {
+		containersReady = false
+	}
+
+	if containersReady && instance.Status.ServiceStatus.Resource.Created && (instance.Spec.Ingress == instance.Status.IngressStatus.Created) {
+		if codeEditorURL, ok := instance.Status.ServiceStatus.URLs[internal.CODE_EDITOR_PORT_NAME]; ok && instance.Status.Phase != robotv1alpha2.CodeEditorPhaseReady {
+			r.Recorder.Event(instance, "Normal", "Ready", "CodeEditor is accessible over the URL '"+codeEditorURL+"'.")
+		}
+		instance.Status.Phase = robotv1alpha2.CodeEditorPhaseReady
+	} else {
+		instance.Status.Phase = robotv1alpha2.CodeEditorPhaseConfiguringResources
+	}
+
 	return nil
 }
 
@@ -139,5 +204,7 @@ func (r *CodeEditorReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		For(&robotv1alpha2.CodeEditor{}).
 		Owns(&corev1.PersistentVolumeClaim{}).
 		Owns(&appsv1.Deployment{}).
+		Owns(&corev1.Service{}).
+		Owns(&networkingv1.Ingress{}).
 		Complete(r)
 }

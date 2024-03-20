@@ -4,7 +4,6 @@ import (
 	"context"
 
 	v1alpha2_resources "github.com/robolaunch/robot-operator/internal/resources/v1alpha2"
-	"k8s.io/apimachinery/pkg/api/errors"
 	ctrl "sigs.k8s.io/controller-runtime"
 
 	robotv1alpha2 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha2"
@@ -20,9 +19,7 @@ func (r *ROS2WorkloadReconciler) updateDiscoveryServer(ctx context.Context, inst
 	}
 
 	err = r.Update(ctx, discoveryServer)
-	if err != nil && errors.IsAlreadyExists(err) {
-		return nil
-	} else if err != nil {
+	if err != nil {
 		return err
 	}
 
@@ -40,9 +37,7 @@ func (r *ROS2WorkloadReconciler) updateROS2Bridge(ctx context.Context, instance 
 	}
 
 	err = r.Update(ctx, ros2Bridge)
-	if err != nil && errors.IsAlreadyExists(err) {
-		return nil
-	} else if err != nil {
+	if err != nil {
 		return err
 	}
 
@@ -65,9 +60,7 @@ func (r *ROS2WorkloadReconciler) updateStatefulSet(ctx context.Context, instance
 	}
 
 	err = r.Update(ctx, statefulSet)
-	if err != nil && errors.IsAlreadyExists(err) {
-		return nil
-	} else if err != nil {
+	if err != nil {
 		return err
 	}
 

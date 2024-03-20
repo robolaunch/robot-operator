@@ -2,9 +2,10 @@ package internal
 
 import corev1 "k8s.io/api/core/v1"
 
-// Platform related labels
+// Platform meta labels
 const (
 	PLATFORM_VERSION_LABEL_KEY = "robolaunch.io/platform"
+	DOMAIN_LABEL_KEY           = "robolaunch.io/domain"
 )
 
 // Tenancy labels
@@ -15,7 +16,6 @@ const (
 	CLOUD_INSTANCE_LABEL_KEY       = "robolaunch.io/cloud-instance"
 	CLOUD_INSTANCE_ALIAS_LABEL_KEY = "robolaunch.io/cloud-instance-alias"
 	PHYSICAL_INSTANCE_LABEL_KEY    = "robolaunch.io/physical-instance"
-	DOMAIN_LABEL_KEY               = "robolaunch.io/domain"
 )
 
 // Selector labels
@@ -30,12 +30,12 @@ const (
 	TZ_CITY_LABEL_KEY      = "robolaunch.io/tz-city"
 )
 
-// Ready robot label
+// Image labels
 const (
-	ROBOT_IMAGE_REGISTRY_LABEL_KEY   = "robolaunch.io/robot-image-registry"
-	ROBOT_IMAGE_USER_LABEL_KEY       = "robolaunch.io/robot-image-user"
-	ROBOT_IMAGE_REPOSITORY_LABEL_KEY = "robolaunch.io/robot-image-repository"
-	ROBOT_IMAGE_TAG_LABEL_KEY        = "robolaunch.io/robot-image-tag"
+	IMAGE_REGISTRY_LABEL_KEY   = "robolaunch.io/robot-image-registry"
+	IMAGE_USER_LABEL_KEY       = "robolaunch.io/robot-image-user"
+	IMAGE_REPOSITORY_LABEL_KEY = "robolaunch.io/robot-image-repository"
+	IMAGE_TAG_LABEL_KEY        = "robolaunch.io/robot-image-tag"
 )
 
 // Target resource labels
@@ -52,6 +52,20 @@ const (
 // Special escape labels
 const (
 	ROBOT_DEV_SUITE_OWNED = "robolaunch.io/dev-suite-owned"
+)
+
+// Platform server
+const (
+	DEFAULT_PLATFORM_URL           = "https://raw.githubusercontent.com/robolaunch/platform/main/platforms/industry-cloud-platform/platform.yaml"
+	DEFAULT_ENVIRONMENTS_URL       = "https://raw.githubusercontent.com/robolaunch/platform/main/platforms/industry-cloud-platform/environments.yaml"
+	DEFAULT_TOOLS_ENVIRONMENTS_URL = "https://raw.githubusercontent.com/robolaunch/platform/main/platforms/internal/environments.yaml"
+)
+
+// CodeEditor
+
+const (
+	CODE_EDITOR_APP_NAME  = "code-editor"
+	CODE_EDITOR_PORT_NAME = "code-editor"
 )
 
 // Robot owned resources' postfixes (v1alpha1)
@@ -75,6 +89,8 @@ const (
 	PVC_POSTFIX          = "-pvc"
 	STATEFULSET_POSTFIX  = ""
 	DEPLOYMENT_POSTFIX   = ""
+	SERVICE_POSTFIX      = ""
+	INGRESS_POSTFIX      = ""
 )
 
 // WorkspaceManager owned resources' postfixes
