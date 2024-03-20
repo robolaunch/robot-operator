@@ -145,3 +145,47 @@ func (r *CodeEditor) validateVersion() error {
 
 	return nil
 }
+
+// ********************************
+// EdgeProxy webhooks
+// ********************************
+
+// log is for logging in this package.
+var edgeproxylog = logf.Log.WithName("edgeproxy-resource")
+
+func (r *EdgeProxy) SetupWebhookWithManager(mgr ctrl.Manager) error {
+	return ctrl.NewWebhookManagedBy(mgr).
+		For(r).
+		Complete()
+}
+
+//+kubebuilder:webhook:path=/mutate-robot-roboscale-io-v1alpha2-edgeproxy,mutating=true,failurePolicy=fail,sideEffects=None,groups=robot.roboscale.io,resources=edgeproxies,verbs=create;update,versions=v1alpha2,name=medgeproxy.kb.io,admissionReviewVersions=v1
+
+var _ webhook.Defaulter = &EdgeProxy{}
+
+// Default implements webhook.Defaulter so a webhook will be registered for the type
+func (r *EdgeProxy) Default() {
+	edgeproxylog.Info("default", "name", r.Name)
+}
+
+//+kubebuilder:webhook:path=/validate-robot-roboscale-io-v1alpha2-edgeproxy,mutating=false,failurePolicy=fail,sideEffects=None,groups=robot.roboscale.io,resources=edgeproxies,verbs=create;update,versions=v1alpha2,name=vedgeproxy.kb.io,admissionReviewVersions=v1
+
+var _ webhook.Validator = &EdgeProxy{}
+
+// ValidateCreate implements webhook.Validator so a webhook will be registered for the type
+func (r *EdgeProxy) ValidateCreate() error {
+	edgeproxylog.Info("validate create", "name", r.Name)
+	return nil
+}
+
+// ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
+func (r *EdgeProxy) ValidateUpdate(old runtime.Object) error {
+	edgeproxylog.Info("validate update", "name", r.Name)
+	return nil
+}
+
+// ValidateDelete implements webhook.Validator so a webhook will be registered for the type
+func (r *EdgeProxy) ValidateDelete() error {
+	edgeproxylog.Info("validate delete", "name", r.Name)
+	return nil
+}
