@@ -13,7 +13,6 @@ func (r *CodeEditorReconciler) reconcileHandlePVCs(ctx context.Context, instance
 	for key, pvcStatus := range instance.Status.PVCStatuses {
 		if !pvcStatus.Resource.Created {
 
-			instance.Status.Phase = robotv1alpha2.CodeEditorPhaseCreatingPVCs
 			err := r.createPersistentVolumeClaim(ctx, instance, key)
 			if err != nil {
 				return err
@@ -46,7 +45,6 @@ func (r *CodeEditorReconciler) reconcileHandleDeployment(ctx context.Context, in
 
 	if volumesReady && !instance.Status.DeploymentStatus.Resource.Created {
 
-		instance.Status.Phase = robotv1alpha2.CodeEditorPhaseCreatingDeployment
 		err := r.createDeployment(ctx, instance)
 		if err != nil {
 			return err
@@ -68,7 +66,6 @@ func (r *CodeEditorReconciler) reconcileHandleService(ctx context.Context, insta
 
 	if !instance.Status.ServiceStatus.Resource.Created {
 
-		instance.Status.Phase = robotv1alpha2.CodeEditorPhaseCreatingService
 		err := r.createService(ctx, instance)
 		if err != nil {
 			return err
@@ -90,7 +87,6 @@ func (r *CodeEditorReconciler) reconcileHandleIngress(ctx context.Context, insta
 
 	if instance.Spec.Ingress && !instance.Status.IngressStatus.Created {
 
-		instance.Status.Phase = robotv1alpha2.CodeEditorPhaseCreatingIngress
 		err := r.createIngress(ctx, instance)
 		if err != nil {
 			return err

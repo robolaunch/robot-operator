@@ -15,7 +15,10 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1"
 	k8sErr "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/selection"
 	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 func (r *CodeEditorReconciler) reconcileCheckPVCs(ctx context.Context, instance *robotv1alpha2.CodeEditor) error {
@@ -112,6 +115,29 @@ func (r *CodeEditorReconciler) reconcileCheckDeployment(ctx context.Context, ins
 				return err
 			}
 			instance.Status.WorkloadUpdateNeeded = false
+		}
+
+		// update container statuses
+		newReq, err := labels.NewRequirement(internal.CODE_EDITOR_CONTAINER_SELECTOR_LABEL_KEY, selection.In, []string{instance.Name})
+		if err != nil {
+			return err
+		}
+		podSelector := labels.NewSelector().Add([]labels.Requirement{*newReq}...)
+
+		podList := corev1.PodList{}
+		err = r.List(ctx, &podList, &client.ListOptions{
+			LabelSelector: podSelector,
+		})
+		if err != nil && k8sErr.IsNotFound(err) {
+			instance.Status.DeploymentStatus.ContainerStatuses = []corev1.ContainerStatus{}
+		} else if err != nil {
+			return err
+		} else {
+			containerStatuses := []corev1.ContainerStatus{}
+			for _, pod := range podList.Items {
+				containerStatuses = append(containerStatuses, pod.Status.ContainerStatuses...)
+			}
+			instance.Status.DeploymentStatus.ContainerStatuses = containerStatuses
 		}
 
 		instance.Status.DeploymentStatus.Resource.Created = true
