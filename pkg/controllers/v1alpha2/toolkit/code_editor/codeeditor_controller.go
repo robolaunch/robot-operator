@@ -19,6 +19,7 @@ package code_editor
 import (
 	"context"
 
+	"github.com/robolaunch/robot-operator/internal"
 	robotErr "github.com/robolaunch/robot-operator/internal/error"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -186,6 +187,9 @@ func (r *CodeEditorReconciler) reconcileCalculatePhase(ctx context.Context, inst
 	}
 
 	if containersReady && instance.Status.ServiceStatus.Resource.Created && (instance.Spec.Ingress == instance.Status.IngressStatus.Created) {
+		if codeEditorURL, ok := instance.Status.ServiceStatus.URLs[internal.CODE_EDITOR_PORT_NAME]; ok && instance.Status.Phase != robotv1alpha2.CodeEditorPhaseReady {
+			r.Recorder.Event(instance, "Normal", "Ready", "CodeEditor is accessible over the URL '"+codeEditorURL+"'.")
+		}
 		instance.Status.Phase = robotv1alpha2.CodeEditorPhaseReady
 	} else {
 		instance.Status.Phase = robotv1alpha2.CodeEditorPhaseConfiguringResources

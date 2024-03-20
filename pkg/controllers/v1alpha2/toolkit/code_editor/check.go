@@ -87,6 +87,8 @@ func (r *CodeEditorReconciler) reconcileCheckDeployment(ctx context.Context, ins
 
 		actualImage := deploymentQuery.Spec.Template.Spec.Containers[0].Image
 
+		imageSynced := reflect.DeepEqual(desiredImage, actualImage)
+
 		remoteConfigSynced := (instance.Spec.Remote && reflect.DeepEqual(deploymentQuery.Spec.Template.Spec.Hostname, instance.Name) && reflect.DeepEqual(deploymentQuery.Spec.Template.Spec.Subdomain, instance.Name)) ||
 			(!instance.Spec.Remote && reflect.DeepEqual(deploymentQuery.Spec.Template.Spec.Hostname, "") && reflect.DeepEqual(deploymentQuery.Spec.Template.Spec.Subdomain, ""))
 
@@ -105,7 +107,7 @@ func (r *CodeEditorReconciler) reconcileCheckDeployment(ctx context.Context, ins
 
 		portSynced := reflect.DeepEqual(desiredPort, actualPort)
 
-		if !reflect.DeepEqual(desiredImage, actualImage) ||
+		if !imageSynced ||
 			!remoteConfigSynced ||
 			!volumeMountsSynced ||
 			!portSynced ||
@@ -236,12 +238,6 @@ func (r *CodeEditorReconciler) reconcileCheckService(ctx context.Context, instan
 
 			}
 
-		}
-
-		if codeEditorURL, ok := urls[internal.CODE_EDITOR_PORT_NAME]; ok {
-			if lastCodeEditorURL, ok := instance.Status.ServiceStatus.URLs[internal.CODE_EDITOR_PORT_NAME]; (ok && !reflect.DeepEqual(lastCodeEditorURL, codeEditorURL)) || !ok {
-				r.Recorder.Event(instance, "Normal", "Ready", "CodeEditor is accessible over the URL '"+codeEditorURL+"'.")
-			}
 		}
 
 		instance.Status.ServiceStatus.URLs = urls
