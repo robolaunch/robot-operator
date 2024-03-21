@@ -1510,6 +1510,9 @@ spec:
                       - name
                     type: object
                   type: array
+                ingress:
+                  description: CodeEditor will create an Ingress resource if `true`.
+                  type: boolean
                 port:
                   default: 9000
                   description: Port that code editor will use inside the container.
@@ -1524,6 +1527,9 @@ spec:
                   enum:
                     - ClusterIP
                     - NodePort
+                  type: string
+                tlsSecretName:
+                  description: Name of the TLS secret for ingress resource.
                   type: string
                 version:
                   default: 4.22.0
@@ -1927,6 +1933,44 @@ spec:
                         type: string
                     type: object
                   type: array
+                ingressStatus:
+                  description: Status of CodeEditor Ingress.
+                  properties:
+                    created:
+                      description: Shows if the owned resource is created.
+                      type: boolean
+                    phase:
+                      description: Phase of the owned resource.
+                      type: string
+                    reference:
+                      description: Reference to the owned resource.
+                      properties:
+                        apiVersion:
+                          description: API version of the referent.
+                          type: string
+                        fieldPath:
+                          description: 'If referring to a piece of an object instead of an entire object, this string should contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2]. For example, if the object reference is to a container within a pod, this would take on a value like: "spec.containers{name}" (where "name" refers to the name of the container that triggered the event) or if no container name is specified "spec.containers[2]" (container with index 2 in this pod). This syntax is chosen only to have some well-defined way of referencing a part of an object. TODO: this design is not final and this field is subject to change in the future.'
+                          type: string
+                        kind:
+                          description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                          type: string
+                        name:
+                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                          type: string
+                        namespace:
+                          description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                          type: string
+                        resourceVersion:
+                          description: 'Specific resourceVersion to which this reference is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                          type: string
+                        uid:
+                          description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                          type: string
+                      type: object
+                      x-kubernetes-map-type: atomic
+                  required:
+                    - created
+                  type: object
                 phase:
                   description: Phase of CodeEditor. It sums the general status of code editor.
                   type: string
@@ -2083,6 +2127,9 @@ spec:
                       description: Connection URL.
                       type: object
                   type: object
+                workloadUpdateNeeded:
+                  description: Field to indicate if the workload should be restarted.
+                  type: boolean
               type: object
           type: object
       served: true
@@ -2373,6 +2420,47 @@ spec:
                   required:
                     - created
                   type: object
+              type: object
+          type: object
+      served: true
+      storage: true
+      subresources:
+        status: {}
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.9.2
+  creationTimestamp: null
+  name: edgeproxies.robot.roboscale.io
+spec:
+  group: robot.roboscale.io
+  names:
+    kind: EdgeProxy
+    listKind: EdgeProxyList
+    plural: edgeproxies
+    singular: edgeproxy
+  scope: Namespaced
+  versions:
+    - name: v1alpha2
+      schema:
+        openAPIV3Schema:
+          description: EdgeProxy is the Schema for the edgeproxies API.
+          properties:
+            apiVersion:
+              description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+              type: string
+            kind:
+              description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+              type: string
+            metadata:
+              type: object
+            spec:
+              description: EdgeProxySpec defines the desired state of EdgeProxy.
+              type: object
+            status:
+              description: EdgeProxyStatus defines the observed state of EdgeProxy.
               type: object
           type: object
       served: true
@@ -10599,6 +10687,18 @@ rules:
   - apiGroups:
       - ""
     resources:
+      - events
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - ""
+    resources:
       - nodes
     verbs:
       - create
@@ -10790,6 +10890,32 @@ rules:
       - robot.roboscale.io
     resources:
       - discoveryservers/status
+    verbs:
+      - get
+      - patch
+      - update
+  - apiGroups:
+      - robot.roboscale.io
+    resources:
+      - edgeproxies
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - robot.roboscale.io
+    resources:
+      - edgeproxies/finalizers
+    verbs:
+      - update
+  - apiGroups:
+      - robot.roboscale.io
+    resources:
+      - edgeproxies/status
     verbs:
       - get
       - patch
@@ -11323,7 +11449,7 @@ spec:
             - --leader-elect
           command:
             - /manager
-          image: robolaunchio/robot-controller-manager:v0.2.7-alpha.6.3
+          image: robolaunchio/robot-controller-manager:v0.2.7-alpha.6.4
           livenessProbe:
             httpGet:
               path: /healthz
@@ -11663,6 +11789,26 @@ webhooks:
         resources:
           - codeeditors
     sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: robot-webhook-service
+        namespace: robot-system
+        path: /mutate-robot-roboscale-io-v1alpha2-edgeproxy
+    failurePolicy: Fail
+    name: medgeproxy.kb.io
+    rules:
+      - apiGroups:
+          - robot.roboscale.io
+        apiVersions:
+          - v1alpha2
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - edgeproxies
+    sideEffects: None
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
@@ -11917,4 +12063,24 @@ webhooks:
           - UPDATE
         resources:
           - codeeditors
+    sideEffects: None
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: robot-webhook-service
+        namespace: robot-system
+        path: /validate-robot-roboscale-io-v1alpha2-edgeproxy
+    failurePolicy: Fail
+    name: vedgeproxy.kb.io
+    rules:
+      - apiGroups:
+          - robot.roboscale.io
+        apiVersions:
+          - v1alpha2
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - edgeproxies
     sideEffects: None

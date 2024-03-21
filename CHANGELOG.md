@@ -1,6 +1,15 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+### Feat
+- **code-editor:** :rocket: implement code editor (robotide in v1alpha1)
+
+### Fix
+- **update:** remove already exists condition from update to prevent redundant reconciles
+
+
+<a name="v0.2.7-alpha.6.3"></a>
+## [v0.2.7-alpha.6.3] - 2024-03-18
 
 <a name="v0.2.7-alpha.6.2"></a>
 ## [v0.2.7-alpha.6.2] - 2024-03-18
@@ -440,7 +449,8 @@
 - Merge pull request [#24](https://github.com/robolaunch/robot-operator/issues/24) from robolaunch/23-allow-multiple-launches
 
 
-[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.6.2...HEAD
+[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.6.3...HEAD
+[v0.2.7-alpha.6.3]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.6.2...v0.2.7-alpha.6.3
 [v0.2.7-alpha.6.2]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.6...v0.2.7-alpha.6.2
 [v0.2.7-alpha.6]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.4...v0.2.7-alpha.6
 [v0.2.7-alpha.4]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.1...v0.2.7-alpha.4
