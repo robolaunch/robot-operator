@@ -17,19 +17,25 @@ limitations under the License.
 package edge_proxy
 
 import (
+	"context"
 	"path/filepath"
 	"testing"
+	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
+	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
+	"github.com/robolaunch/robot-operator/internal/test"
 	robotv1alpha2 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha2"
 	//+kubebuilder:scaffold:imports
 )
@@ -37,9 +43,13 @@ import (
 // These tests use Ginkgo (BDD-style Go testing framework). Refer to
 // http://onsi.github.io/ginkgo/ to learn more about Ginkgo.
 
-var cfg *rest.Config
-var k8sClient client.Client
-var testEnv *envtest.Environment
+var (
+	cfg       *rest.Config
+	k8sClient client.Client // You'll be using this client in your tests.
+	testEnv   *envtest.Environment
+	ctx       context.Context
+	cancel    context.CancelFunc
+)
 
 func TestAPIs(t *testing.T) {
 	RegisterFailHandler(Fail)
@@ -50,9 +60,11 @@ func TestAPIs(t *testing.T) {
 var _ = BeforeSuite(func() {
 	logf.SetLogger(zap.New(zap.WriteTo(GinkgoWriter), zap.UseDevMode(true)))
 
+	ctx := context.Background()
+
 	By("bootstrapping test environment")
 	testEnv = &envtest.Environment{
-		CRDDirectoryPaths:     []string{filepath.Join("..", "config", "crd", "bases")},
+		CRDDirectoryPaths:     []string{filepath.Join("..", "..", "..", "..", "..", "config", "crd", "bases")},
 		ErrorIfCRDPathMissing: true,
 	}
 
@@ -71,10 +83,71 @@ var _ = BeforeSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 	Expect(k8sClient).NotTo(BeNil())
 
+	k8sManager, err := ctrl.NewManager(cfg, ctrl.Options{
+		Scheme: scheme.Scheme,
+	})
+	Expect(err).ToNot(HaveOccurred())
+
+	err = (&EdgeProxyReconciler{
+		Client: k8sManager.GetClient(),
+		Scheme: k8sManager.GetScheme(),
+	}).SetupWithManager(k8sManager)
+	Expect(err).ToNot(HaveOccurred())
+
+	go func() {
+		defer GinkgoRecover()
+		err = k8sManager.Start(ctx)
+		Expect(err).ToNot(HaveOccurred(), "failed to run manager")
+	}()
+})
+
+var _ = Describe("EdgeProxy controller", func() {
+	const (
+		EdgeProxyName      = "test-edgeproxy"
+		EdgeProxyNamespace = "test"
+
+		timeout  = time.Second * 10
+		duration = time.Second * 10
+		interval = time.Millisecond * 250
+	)
+
+	namespace := &corev1.Namespace{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: EdgeProxyNamespace,
+		},
+	}
+
+	Context("When creating an EdgeProxy resource", func() {
+		It("should create an EdgeProxy resource", func() {
+			By("creating a new EdgeProxy")
+			ctx := context.Background()
+			edgeProxy := &robotv1alpha2.EdgeProxy{
+				TypeMeta: metav1.TypeMeta{
+					APIVersion: "robot.roboscale.io/v1alpha2",
+					Kind:       "EdgeProxy",
+				},
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      EdgeProxyName,
+					Namespace: EdgeProxyNamespace,
+				},
+				Spec: robotv1alpha2.EdgeProxySpec{
+					Hostname:      "test",
+					Subdomain:     "test",
+					Instance:      "test-instance",
+					RemotePort:    9000,
+					ServiceType:   corev1.ServiceTypeNodePort,
+					Ingress:       true,
+					TLSSecretName: "prod-tls",
+				},
+			}
+			Expect(k8sClient.Create(ctx, namespace)).Should(Succeed())
+			Expect(k8sClient.Create(ctx, edgeProxy)).Should(Succeed())
+		})
+	})
 })
 
 var _ = AfterSuite(func() {
 	By("tearing down the test environment")
-	err := testEnv.Stop()
+	err := test.StopTestEnv(testEnv)
 	Expect(err).NotTo(HaveOccurred())
 })
