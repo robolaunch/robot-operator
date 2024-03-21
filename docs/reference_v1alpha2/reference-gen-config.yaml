@@ -3,6 +3,8 @@ processor:
     - "List$"
   sortKinds:
     - "ROS2Workload"
+    - "CodeEditor"
+    - "EdgeProxy"
     - "ROS2Bridge"
   ignoreFields:
     - "TypeMeta$"
