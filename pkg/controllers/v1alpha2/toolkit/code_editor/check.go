@@ -120,7 +120,7 @@ func (r *CodeEditorReconciler) reconcileCheckDeployment(ctx context.Context, ins
 		}
 
 		// update container statuses
-		newReq, err := labels.NewRequirement(internal.CODE_EDITOR_CONTAINER_SELECTOR_LABEL_KEY, selection.In, []string{instance.Name})
+		newReq, err := labels.NewRequirement(internal.CODE_EDITOR_SELECTOR_LABEL_KEY, selection.In, []string{instance.Name})
 		if err != nil {
 			return err
 		}

@@ -20,8 +20,9 @@ const (
 
 // Selector labels
 const (
-	ROS2_WORKLOAD_CONTAINER_SELECTOR_LABEL_KEY = "robolaunch.io/ros2-workload-container"
-	CODE_EDITOR_CONTAINER_SELECTOR_LABEL_KEY   = "robolaunch.io/code-editor-container"
+	ROS2_WORKLOAD_SELECTOR_LABEL_KEY = "robolaunch.io/ros2-workload-container"
+	CODE_EDITOR_SELECTOR_LABEL_KEY   = "robolaunch.io/code-editor-container"
+	EDGE_PROXY_SELECTOR_LABEL_KEY    = "robolaunch.io/code-editor-container"
 )
 
 // Timezone labels
@@ -62,10 +63,14 @@ const (
 )
 
 // CodeEditor
-
 const (
 	CODE_EDITOR_APP_NAME  = "code-editor"
 	CODE_EDITOR_PORT_NAME = "code-editor"
+)
+
+// EdgeProxy
+const (
+	EDGE_PROXY_APP_NAME = "edge-proxy"
 )
 
 // Robot owned resources' postfixes (v1alpha1)

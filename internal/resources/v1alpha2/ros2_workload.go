@@ -90,13 +90,13 @@ func GetROS2WorkloadStatefulSet(ros2Workload *robotv1alpha2.ROS2Workload, ssName
 			Replicas: ros2Workload.Spec.LaunchContainers[key].Replicas,
 			Selector: &metav1.LabelSelector{
 				MatchLabels: map[string]string{
-					internal.ROS2_WORKLOAD_CONTAINER_SELECTOR_LABEL_KEY: container.Container.Name,
+					internal.ROS2_WORKLOAD_SELECTOR_LABEL_KEY: container.Container.Name,
 				},
 			},
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: map[string]string{
-						internal.ROS2_WORKLOAD_CONTAINER_SELECTOR_LABEL_KEY: container.Container.Name,
+						internal.ROS2_WORKLOAD_SELECTOR_LABEL_KEY: container.Container.Name,
 					},
 				},
 				Spec: podSpec,

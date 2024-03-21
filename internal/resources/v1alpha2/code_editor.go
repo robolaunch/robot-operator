@@ -23,7 +23,7 @@ import (
 
 func getCodeEditorSelector(codeEditor robotv1alpha2.CodeEditor) map[string]string {
 	return map[string]string{
-		internal.CODE_EDITOR_CONTAINER_SELECTOR_LABEL_KEY: codeEditor.Name,
+		internal.CODE_EDITOR_SELECTOR_LABEL_KEY: codeEditor.Name,
 	}
 }
 
