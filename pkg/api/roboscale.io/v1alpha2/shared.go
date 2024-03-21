@@ -2,6 +2,7 @@ package v1alpha2
 
 import (
 	"github.com/robolaunch/robot-operator/internal/label"
+	"github.com/robolaunch/robot-operator/internal/platform"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -94,4 +95,15 @@ func GetServicePath(obj metav1.Object, postfix string) string {
 	}
 
 	return connectionStr
+}
+
+func validateVersion(obj metav1.Object, app string, appVersion string) error {
+	platformMeta := label.GetPlatformMeta(obj)
+
+	_, err := platform.GetToolsImage(obj, platformMeta.Version, app, appVersion)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

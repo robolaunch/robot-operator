@@ -202,6 +202,7 @@ type CodeEditorStatus struct {
 // EdgeProxySpec defines the desired state of EdgeProxy.
 type EdgeProxySpec struct {
 	// App version of the edge proxy server.
+	// +kubebuilder:default="1.7.4.1-3ubuntu4"
 	Version string `json:"version"`
 	// Hostname of the remote pod.
 	// +kubebuilder:validation:Required

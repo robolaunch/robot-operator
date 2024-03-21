@@ -21,8 +21,6 @@ import (
 	"reflect"
 
 	"github.com/robolaunch/robot-operator/internal"
-	"github.com/robolaunch/robot-operator/internal/label"
-	"github.com/robolaunch/robot-operator/internal/platform"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
@@ -109,7 +107,7 @@ var _ webhook.Validator = &CodeEditor{}
 func (r *CodeEditor) ValidateCreate() error {
 	codeeditorlog.Info("validate create", "name", r.Name)
 
-	err := r.validateVersion()
+	err := validateVersion(r, internal.CODE_EDITOR_APP_NAME, r.Spec.Version)
 	if err != nil {
 		return err
 	}
@@ -121,7 +119,7 @@ func (r *CodeEditor) ValidateCreate() error {
 func (r *CodeEditor) ValidateUpdate(old runtime.Object) error {
 	codeeditorlog.Info("validate update", "name", r.Name)
 
-	err := r.validateVersion()
+	err := validateVersion(r, internal.CODE_EDITOR_APP_NAME, r.Spec.Version)
 	if err != nil {
 		return err
 	}
@@ -132,17 +130,6 @@ func (r *CodeEditor) ValidateUpdate(old runtime.Object) error {
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
 func (r *CodeEditor) ValidateDelete() error {
 	codeeditorlog.Info("validate delete", "name", r.Name)
-	return nil
-}
-
-func (r *CodeEditor) validateVersion() error {
-	platformMeta := label.GetPlatformMeta(r)
-
-	_, err := platform.GetToolsImage(r, platformMeta.Version, internal.CODE_EDITOR_APP_NAME, r.Spec.Version)
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 
@@ -175,12 +162,24 @@ var _ webhook.Validator = &EdgeProxy{}
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
 func (r *EdgeProxy) ValidateCreate() error {
 	edgeproxylog.Info("validate create", "name", r.Name)
+
+	err := validateVersion(r, internal.EDGE_PROXY_APP_NAME, r.Spec.Version)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
 func (r *EdgeProxy) ValidateUpdate(old runtime.Object) error {
 	edgeproxylog.Info("validate update", "name", r.Name)
+
+	err := validateVersion(r, internal.EDGE_PROXY_APP_NAME, r.Spec.Version)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
