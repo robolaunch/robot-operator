@@ -380,8 +380,9 @@ func startToolkitCRDsAndWebhooks(mgr manager.Manager) {
 
 	// EdgeProxy controller & webhook
 	if err := (&edgeProxy.EdgeProxyReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
+		Client:   mgr.GetClient(),
+		Scheme:   mgr.GetScheme(),
+		Recorder: mgr.GetEventRecorderFor("edge-proxy"),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "EdgeProxy")
 		os.Exit(1)
