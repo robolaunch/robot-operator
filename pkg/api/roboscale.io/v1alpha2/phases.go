@@ -27,3 +27,10 @@ const (
 	CodeEditorPhaseConfiguringResources CodeEditorPhase = "ConfiguringResources"
 	CodeEditorPhaseReady                CodeEditorPhase = "Ready"
 )
+
+type EdgeProxyPhase string
+
+const (
+	EdgeProxyPhaseConfiguringResources EdgeProxyPhase = "ConfiguringResources"
+	EdgeProxyPhaseReady                EdgeProxyPhase = "Ready"
+)

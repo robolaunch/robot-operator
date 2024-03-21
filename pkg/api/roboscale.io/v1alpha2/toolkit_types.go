@@ -201,8 +201,36 @@ type CodeEditorStatus struct {
 
 // EdgeProxySpec defines the desired state of EdgeProxy.
 type EdgeProxySpec struct {
+	// Hostname of the remote pod.
+	// +kubebuilder:validation:Required
+	Hostname string `json:"hostname"`
+	// Subdomain of the remote pod. It's also same with remote service's name.
+	// +kubebuilder:validation:Required
+	Subdomain string `json:"subdomain"`
+	// Remote instance name.
+	// +kubebuilder:validation:Required
+	Instance string `json:"instance"`
+	// Remote port.
+	// +kubebuilder:validation:Required
+	RemotePort int `json:"remotePort"`
+	// Service type of CodeEditor. `ClusterIP` and `NodePort` is supported.
+	// +kubebuilder:validation:Enum=ClusterIP;NodePort
+	// +kubebuilder:default="ClusterIP"
+	ServiceType corev1.ServiceType `json:"serviceType,omitempty"`
+	// EdgeProxy will create an Ingress resource if `true`.
+	Ingress bool `json:"ingress,omitempty"`
+	// Name of the TLS secret for ingress resource.
+	TLSSecretName string `json:"tlsSecretName,omitempty"`
 }
 
 // EdgeProxyStatus defines the observed state of EdgeProxy.
 type EdgeProxyStatus struct {
+	// Phase of EdgeProxy.
+	Phase EdgeProxyPhase `json:"phase,omitempty"`
+	// Status of EdgeProxy deployment.
+	DeploymentStatus OwnedDeploymentStatus `json:"deploymentStatus,omitempty"`
+	// Status of EdgeProxy service.
+	ServiceStatus OwnedServiceStatus `json:"serviceStatus,omitempty"`
+	// Status of EdgeProxy Ingress.
+	IngressStatus OwnedResourceStatus `json:"ingressStatus,omitempty"`
 }
