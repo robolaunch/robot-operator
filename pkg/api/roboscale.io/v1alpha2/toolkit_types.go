@@ -201,6 +201,8 @@ type CodeEditorStatus struct {
 
 // EdgeProxySpec defines the desired state of EdgeProxy.
 type EdgeProxySpec struct {
+	// App version of the edge proxy server.
+	Version string `json:"version"`
 	// Hostname of the remote pod.
 	// +kubebuilder:validation:Required
 	Hostname string `json:"hostname"`
@@ -212,7 +214,7 @@ type EdgeProxySpec struct {
 	Instance string `json:"instance"`
 	// Remote port.
 	// +kubebuilder:validation:Required
-	RemotePort int `json:"remotePort"`
+	RemotePort int32 `json:"remotePort"`
 	// Service type of CodeEditor. `ClusterIP` and `NodePort` is supported.
 	// +kubebuilder:validation:Enum=ClusterIP;NodePort
 	// +kubebuilder:default="ClusterIP"
