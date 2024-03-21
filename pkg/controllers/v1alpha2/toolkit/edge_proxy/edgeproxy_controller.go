@@ -19,6 +19,8 @@ package edge_proxy
 import (
 	"context"
 
+	"github.com/robolaunch/robot-operator/internal"
+	robotErr "github.com/robolaunch/robot-operator/internal/error"
 	appsv1 "k8s.io/api/apps/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -97,12 +99,23 @@ func (r *EdgeProxyReconciler) reconcileRegisterResources(ctx context.Context, in
 }
 
 func (r *EdgeProxyReconciler) reconcileCheckStatus(ctx context.Context, instance *robotv1alpha2.EdgeProxy, result *ctrl.Result) error {
+
+	err := r.reconcileHandleDeployment(ctx, instance)
+	if err != nil {
+		return robotErr.CheckCreatingOrWaitingError(result, err)
+	}
+
 	return nil
 }
 
 func (r *EdgeProxyReconciler) reconcileCheckResources(ctx context.Context, instance *robotv1alpha2.EdgeProxy) error {
 
-	err := r.reconcileCalculatePhase(ctx, instance)
+	err := r.reconcileCheckDeployment(ctx, instance)
+	if err != nil {
+		return err
+	}
+
+	err = r.reconcileCalculatePhase(ctx, instance)
 	if err != nil {
 		return err
 	}
@@ -111,6 +124,25 @@ func (r *EdgeProxyReconciler) reconcileCheckResources(ctx context.Context, insta
 }
 
 func (r *EdgeProxyReconciler) reconcileCalculatePhase(ctx context.Context, instance *robotv1alpha2.EdgeProxy) error {
+
+	containersReady := true
+	if len(instance.Status.DeploymentStatus.ContainerStatuses) > 0 {
+		for _, cStatus := range instance.Status.DeploymentStatus.ContainerStatuses {
+			containersReady = containersReady && cStatus.Ready
+		}
+	} else {
+		containersReady = false
+	}
+
+	if containersReady && instance.Status.ServiceStatus.Resource.Created && (instance.Spec.Ingress == instance.Status.IngressStatus.Created) {
+		if edgeProxyURL, ok := instance.Status.ServiceStatus.URLs[internal.EDGE_PROXY_APP_NAME]; ok && instance.Status.Phase != robotv1alpha2.EdgeProxyPhaseReady {
+			r.Recorder.Event(instance, "Normal", "Ready", "EdgeProxy service is accessible over the URL '"+edgeProxyURL+"'.")
+		}
+		instance.Status.Phase = robotv1alpha2.EdgeProxyPhaseReady
+	} else {
+		instance.Status.Phase = robotv1alpha2.EdgeProxyPhaseConfiguringResources
+	}
+
 	return nil
 }
 
