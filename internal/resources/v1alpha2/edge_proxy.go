@@ -15,6 +15,22 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 )
 
+const (
+	EDGE_PROXY_HOSTNAME_LABEL_KEY    = "robolaunch.io/edge-proxy-hostname"
+	EDGE_PROXY_SUBDOMAIN_LABEL_KEY   = "robolaunch.io/edge-proxy-subdomain"
+	EDGE_PROXY_INSTANCE_LABEL_KEY    = "robolaunch.io/edge-proxy-instance"
+	EDGE_PROXY_REMOTE_PORT_LABEL_KEY = "robolaunch.io/edge-proxy-remote-port"
+)
+
+func getEdgeProxyExtraLabels(edgeProxy robotv1alpha2.EdgeProxy) map[string]string {
+	return map[string]string{
+		EDGE_PROXY_HOSTNAME_LABEL_KEY:    edgeProxy.Spec.Hostname,
+		EDGE_PROXY_SUBDOMAIN_LABEL_KEY:   edgeProxy.Spec.Subdomain,
+		EDGE_PROXY_INSTANCE_LABEL_KEY:    edgeProxy.Spec.Instance,
+		EDGE_PROXY_REMOTE_PORT_LABEL_KEY: strconv.Itoa(int(edgeProxy.Spec.RemotePort)),
+	}
+}
+
 func getEdgeProxySelector(edgeProxy robotv1alpha2.EdgeProxy) map[string]string {
 	return map[string]string{
 		internal.EDGE_PROXY_SELECTOR_LABEL_KEY: edgeProxy.Name,
@@ -62,11 +78,15 @@ func GetEdgeProxyDeployment(edgeProxy *robotv1alpha2.EdgeProxy, deploymentNamesp
 	cfg.InjectImagePullPolicy(&podSpec)
 	cfg.SchedulePod(&podSpec, edgeProxy)
 
+	selectorLabels := getEdgeProxySelector(*edgeProxy)
+	extraLabels := getEdgeProxyExtraLabels(*edgeProxy)
+	labels := mergeMaps(selectorLabels, extraLabels)
+
 	deployment := appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      deploymentNamespacedName.Name,
 			Namespace: deploymentNamespacedName.Namespace,
-			Labels:    getEdgeProxySelector(*edgeProxy),
+			Labels:    labels,
 		},
 		Spec: appsv1.DeploymentSpec{
 			Selector: &metav1.LabelSelector{
@@ -82,4 +102,15 @@ func GetEdgeProxyDeployment(edgeProxy *robotv1alpha2.EdgeProxy, deploymentNamesp
 	}
 
 	return &deployment
+}
+
+func mergeMaps(m1 map[string]string, m2 map[string]string) map[string]string {
+	merged := make(map[string]string)
+	for k, v := range m1 {
+		merged[k] = v
+	}
+	for k, v := range m2 {
+		merged[k] = v
+	}
+	return merged
 }
