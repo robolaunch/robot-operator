@@ -19,6 +19,7 @@ package edge_proxy
 import (
 	"context"
 
+	appsv1 "k8s.io/api/apps/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/tools/record"
@@ -40,6 +41,8 @@ type EdgeProxyReconciler struct {
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=edgeproxies,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=edgeproxies/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=robot.roboscale.io,resources=edgeproxies/finalizers,verbs=update
+
+//+kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete
 
 var logger logr.Logger
 
@@ -98,6 +101,12 @@ func (r *EdgeProxyReconciler) reconcileCheckStatus(ctx context.Context, instance
 }
 
 func (r *EdgeProxyReconciler) reconcileCheckResources(ctx context.Context, instance *robotv1alpha2.EdgeProxy) error {
+
+	err := r.reconcileCalculatePhase(ctx, instance)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -109,5 +118,6 @@ func (r *EdgeProxyReconciler) reconcileCalculatePhase(ctx context.Context, insta
 func (r *EdgeProxyReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&robotv1alpha2.EdgeProxy{}).
+		Owns(&appsv1.Deployment{}).
 		Complete(r)
 }

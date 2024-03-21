@@ -63,3 +63,28 @@ func (codeEditor *CodeEditor) GetIngressMetadata() *types.NamespacedName {
 		Namespace: codeEditor.Namespace,
 	}
 }
+
+// ********************************
+// EdgeProxy helpers
+// *******************************
+
+func (edgeProxy *EdgeProxy) GetDeploymentMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Name:      edgeProxy.Name + internal.DEPLOYMENT_POSTFIX,
+		Namespace: edgeProxy.Namespace,
+	}
+}
+
+func (edgeProxy *EdgeProxy) GetServiceMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Name:      edgeProxy.Name + internal.SERVICE_POSTFIX,
+		Namespace: edgeProxy.Namespace,
+	}
+}
+
+func (edgeProxy *EdgeProxy) GetIngressMetadata() *types.NamespacedName {
+	return &types.NamespacedName{
+		Name:      edgeProxy.Name + internal.INGRESS_POSTFIX,
+		Namespace: edgeProxy.Namespace,
+	}
+}
