@@ -50,7 +50,7 @@ func GetEdgeProxyDeployment(edgeProxy *robotv1alpha2.EdgeProxy, deploymentNamesp
 				Command: internal.Bash(cmdBuilder.String()),
 				Ports: []corev1.ContainerPort{
 					{
-						Name:          "tcp",
+						Name:          internal.EDGE_PROXY_APP_NAME,
 						Protocol:      corev1.ProtocolTCP,
 						ContainerPort: edgeProxy.Spec.RemotePort,
 					},
