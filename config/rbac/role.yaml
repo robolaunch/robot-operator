@@ -266,6 +266,32 @@ rules:
 - apiGroups:
   - robot.roboscale.io
   resources:
+  - edgeproxies
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - edgeproxies/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - robot.roboscale.io
+  resources:
+  - edgeproxies/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - robot.roboscale.io
+  resources:
   - launchmanagers
   verbs:
   - create

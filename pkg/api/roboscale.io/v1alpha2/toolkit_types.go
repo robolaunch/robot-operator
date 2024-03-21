@@ -25,6 +25,7 @@ import (
 func init() {
 	SchemeBuilder.Register(&ROS2Bridge{}, &ROS2BridgeList{})
 	SchemeBuilder.Register(&CodeEditor{}, &CodeEditorList{})
+	SchemeBuilder.Register(&EdgeProxy{}, &EdgeProxyList{})
 }
 
 //+genclient
@@ -71,6 +72,28 @@ type CodeEditorList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []CodeEditor `json:"items"`
+}
+
+//+genclient
+//+kubebuilder:object:root=true
+//+kubebuilder:subresource:status
+
+// EdgeProxy is the Schema for the edgeproxies API.
+type EdgeProxy struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   EdgeProxySpec   `json:"spec,omitempty"`
+	Status EdgeProxyStatus `json:"status,omitempty"`
+}
+
+//+kubebuilder:object:root=true
+
+// EdgeProxyList contains a list of EdgeProxy.
+type EdgeProxyList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []EdgeProxy `json:"items"`
 }
 
 // ********************************
@@ -170,4 +193,16 @@ type CodeEditorStatus struct {
 	IngressStatus OwnedResourceStatus `json:"ingressStatus,omitempty"`
 	// Field to indicate if the workload should be restarted.
 	WorkloadUpdateNeeded bool `json:"workloadUpdateNeeded,omitempty"`
+}
+
+// ********************************
+// EdgeProxy types
+// ********************************
+
+// EdgeProxySpec defines the desired state of EdgeProxy.
+type EdgeProxySpec struct {
+}
+
+// EdgeProxyStatus defines the observed state of EdgeProxy.
+type EdgeProxyStatus struct {
 }

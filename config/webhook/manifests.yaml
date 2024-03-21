@@ -245,6 +245,26 @@ webhooks:
     resources:
     - codeeditors
   sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /mutate-robot-roboscale-io-v1alpha2-edgeproxy
+  failurePolicy: Fail
+  name: medgeproxy.kb.io
+  rules:
+  - apiGroups:
+    - robot.roboscale.io
+    apiVersions:
+    - v1alpha2
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - edgeproxies
+  sideEffects: None
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
@@ -491,4 +511,24 @@ webhooks:
     - UPDATE
     resources:
     - codeeditors
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /validate-robot-roboscale-io-v1alpha2-edgeproxy
+  failurePolicy: Fail
+  name: vedgeproxy.kb.io
+  rules:
+  - apiGroups:
+    - robot.roboscale.io
+    apiVersions:
+    - v1alpha2
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - edgeproxies
   sideEffects: None
