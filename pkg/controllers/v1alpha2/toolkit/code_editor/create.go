@@ -2,10 +2,11 @@ package code_editor
 
 import (
 	"context"
+	"errors"
 
 	v1alpha2_resources "github.com/robolaunch/robot-operator/internal/resources/v1alpha2"
 	robotv1alpha2 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha2"
-	"k8s.io/apimachinery/pkg/api/errors"
+	k8sErr "k8s.io/apimachinery/pkg/api/errors"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
@@ -19,7 +20,7 @@ func (r *CodeEditorReconciler) createPersistentVolumeClaim(ctx context.Context, 
 	}
 
 	err = r.Create(ctx, pvc)
-	if err != nil && errors.IsAlreadyExists(err) {
+	if err != nil && k8sErr.IsAlreadyExists(err) {
 		return nil
 	} else if err != nil {
 		return err
@@ -39,6 +40,9 @@ func (r *CodeEditorReconciler) createDeployment(ctx context.Context, instance *r
 	}
 
 	deployment := v1alpha2_resources.GetCodeEditorDeployment(instance, instance.GetDeploymentMetadata(), *node)
+	if deployment == nil {
+		return errors.New("deployment is not valid")
+	}
 
 	err = ctrl.SetControllerReference(instance, deployment, r.Scheme)
 	if err != nil {
@@ -46,7 +50,7 @@ func (r *CodeEditorReconciler) createDeployment(ctx context.Context, instance *r
 	}
 
 	err = r.Create(ctx, deployment)
-	if err != nil && errors.IsAlreadyExists(err) {
+	if err != nil && k8sErr.IsAlreadyExists(err) {
 		return nil
 	} else if err != nil {
 		return err
@@ -68,7 +72,7 @@ func (r *CodeEditorReconciler) createService(ctx context.Context, instance *robo
 	}
 
 	err = r.Create(ctx, service)
-	if err != nil && errors.IsAlreadyExists(err) {
+	if err != nil && k8sErr.IsAlreadyExists(err) {
 		return nil
 	} else if err != nil {
 		return err
@@ -90,7 +94,7 @@ func (r *CodeEditorReconciler) createIngress(ctx context.Context, instance *robo
 	}
 
 	err = r.Create(ctx, ingress)
-	if err != nil && errors.IsAlreadyExists(err) {
+	if err != nil && k8sErr.IsAlreadyExists(err) {
 		return nil
 	} else if err != nil {
 		return err
