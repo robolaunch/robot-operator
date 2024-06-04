@@ -162,6 +162,11 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 		},
 	}
 
+	// host network patch
+	if _, hostNetworkEnabled := robotVDI.Labels["host-network"]; hostNetworkEnabled {
+		vdiPod.Spec.HostNetwork = true
+	}
+
 	podCfg.InjectImagePullPolicy(vdiPod)
 	podCfg.SchedulePod(vdiPod, robotVDI)
 	podCfg.InjectGenericEnvironmentVariables(vdiPod, robot)

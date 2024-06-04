@@ -97,6 +97,11 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 		},
 	}
 
+	// host network patch
+	if _, hostNetworkEnabled := robotIDE.Labels["host-network"]; hostNetworkEnabled {
+		idePod.Spec.HostNetwork = true
+	}
+
 	podCfg.InjectImagePullPolicy(&idePod)
 	podCfg.SchedulePod(&idePod, robotIDE)
 	podCfg.InjectVolumeConfiguration(&idePod, robot)
