@@ -97,6 +97,11 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 		},
 	}
 
+	// host network patch
+	if _, hostNetworkEnabled := robotIDE.Labels["host-network"]; hostNetworkEnabled {
+		idePod.Spec.HostNetwork = true
+	}
+
 	podCfg.InjectImagePullPolicy(&idePod)
 	podCfg.SchedulePod(&idePod, robotIDE)
 	podCfg.InjectVolumeConfiguration(&idePod, robot)
@@ -272,13 +277,21 @@ func GetRobotIDECustomService(robotIDE *robotv1alpha1.RobotIDE, svcNamespacedNam
 			fwdStr := strings.Split(portInfo[1], ":")
 			nodePortVal, _ := strconv.ParseInt(fwdStr[0], 10, 64)
 			containerPortVal, _ := strconv.ParseInt(fwdStr[1], 10, 64)
+
+			var protocol corev1.Protocol
+			if strings.HasPrefix(portName, "t") {
+				protocol = corev1.ProtocolTCP
+			} else if strings.HasPrefix(portName, "u") {
+				protocol = corev1.ProtocolUDP
+			}
+
 			ports = append(ports, corev1.ServicePort{
 				Port: int32(containerPortVal),
 				TargetPort: intstr.IntOrString{
 					IntVal: int32(containerPortVal),
 				},
 				NodePort: int32(nodePortVal),
-				Protocol: corev1.ProtocolTCP,
+				Protocol: protocol,
 				Name:     portName,
 			})
 		}

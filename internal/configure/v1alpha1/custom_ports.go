@@ -18,9 +18,18 @@ func (cfg *ContainerConfigInjector) InjectCustomPortConfiguration(container *cor
 		fwdStr := strings.Split(portInfo[1], ":")
 		// nodePortVal, _ := strconv.ParseInt(fwdStr[0], 10, 64)
 		containerPortVal, _ := strconv.ParseInt(fwdStr[1], 10, 64)
+
+		var protocol corev1.Protocol
+		if strings.HasPrefix(portName, "t") {
+			protocol = corev1.ProtocolTCP
+		} else if strings.HasPrefix(portName, "u") {
+			protocol = corev1.ProtocolUDP
+		}
+
 		container.Ports = append(container.Ports, corev1.ContainerPort{
 			Name:          portName,
 			ContainerPort: int32(containerPortVal),
+			Protocol:      protocol,
 		})
 	}
 
