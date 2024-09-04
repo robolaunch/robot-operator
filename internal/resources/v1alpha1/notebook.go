@@ -82,6 +82,13 @@ func GetNotebookPod(notebook *robotv1alpha1.Notebook, podNamespacedName *types.N
 	if ports, ok := robot.Spec.AdditionalConfigs[internal.NOTEBOOK_CUSTOM_PORT_RANGE_KEY]; ok {
 		containerCfg.InjectCustomPortConfiguration(&nbContainer, ports)
 	}
+	// apply host network selection
+	useHostNetwork := false
+	if hostNetwork, ok := robot.Spec.AdditionalConfigs[internal.HOST_NETWORK_SELECTION_KEY]; ok {
+		if hostNetwork.Value == "true" {
+			useHostNetwork = true
+		}
+	}
 
 	nbPod := corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
@@ -90,7 +97,7 @@ func GetNotebookPod(notebook *robotv1alpha1.Notebook, podNamespacedName *types.N
 			Labels:    labels,
 		},
 		Spec: corev1.PodSpec{
-			// HostNetwork: notebook.Spec.Privileged,
+			HostNetwork: useHostNetwork,
 			Containers: []corev1.Container{
 				nbContainer,
 			},
