@@ -280,6 +280,16 @@ func (r *Robot) checkAdditionalConfigs() error {
 		}
 	}
 
+	if val, ok := r.Spec.AdditionalConfigs[internal.HOST_NETWORK_SELECTION_KEY]; ok && val.ConfigType == AdditionalConfigTypeOperator {
+		matched, err := regexp.MatchString(internal.HOST_NETWORK_SELECTION_REGEX, val.Value)
+		if !matched {
+			return errors.New("cannot set host network, use this pattern " + internal.HOST_NETWORK_SELECTION_REGEX)
+		}
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 

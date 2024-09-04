@@ -82,6 +82,14 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 		containerCfg.InjectCustomPortConfiguration(&ideContainer, ports)
 	}
 
+	// apply host network selection
+	useHostNetwork := false
+	if hostNetwork, ok := robot.Spec.AdditionalConfigs[internal.HOST_NETWORK_SELECTION_KEY]; ok {
+		if hostNetwork.Value == "true" {
+			useHostNetwork = true
+		}
+	}
+
 	idePod := corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      podNamespacedName.Name,
@@ -89,7 +97,7 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 			Labels:    labels,
 		},
 		Spec: corev1.PodSpec{
-			// HostNetwork: robotIDE.Spec.Privileged,
+			HostNetwork: useHostNetwork,
 			Containers: []corev1.Container{
 				ideContainer,
 			},

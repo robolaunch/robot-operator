@@ -141,6 +141,13 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 	if ports, ok := robot.Spec.AdditionalConfigs[internal.VDI_CUSTOM_PORT_RANGE_KEY]; ok {
 		containerCfg.InjectCustomPortConfiguration(&vdiContainer, ports)
 	}
+	// apply host network selection
+	useHostNetwork := false
+	if hostNetwork, ok := robot.Spec.AdditionalConfigs[internal.HOST_NETWORK_SELECTION_KEY]; ok {
+		if hostNetwork.Value == "true" {
+			useHostNetwork = true
+		}
+	}
 
 	vdiPod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
@@ -149,7 +156,7 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 			Labels:    labels,
 		},
 		Spec: corev1.PodSpec{
-			// HostNetwork: robotVDI.Spec.Privileged,
+			HostNetwork: useHostNetwork,
 			Containers: []corev1.Container{
 				vdiContainer,
 			},
