@@ -19,7 +19,6 @@ func (cfg *PodConfigInjector) InjectVolumeConfiguration(pod *corev1.Pod, robot r
 
 	pod.Spec.Volumes = append(pod.Spec.Volumes, getVolumesForPersistentDirs(robot)...)
 	pod.Spec.Volumes = append(pod.Spec.Volumes, getVolumesForHostDirs(robot)...)
-	pod.Spec.Volumes = append(pod.Spec.Volumes, getVolumeForSharedMemory("4Gi"))
 
 	return pod
 }
@@ -102,24 +101,6 @@ func getVolumeForHostDir(hDir robotv1alpha1.HostDirectory) corev1.Volume {
 	return volume
 }
 
-func getVolumeForSharedMemory(shmSize string) corev1.Volume {
-
-	sizeLimit := resource.MustParse(shmSize)
-
-	volume := corev1.Volume{
-
-		Name: "cache-volume",
-		VolumeSource: corev1.VolumeSource{
-			EmptyDir: &corev1.EmptyDirVolumeSource{
-				Medium:    corev1.StorageMediumMemory,
-				SizeLimit: &sizeLimit,
-			},
-		},
-	}
-
-	return volume
-}
-
 func getVolumeMountForPersistentDir(
 	mountPrefix string,
 	pDir robotv1alpha1.PersistentDirectory,
@@ -145,7 +126,25 @@ func getVolumeMountForHostDir(
 	return volumeMount
 }
 
-func getVolumeMountForSharedMemory() corev1.VolumeMount {
+func GetVolumeForSharedMemory(shmSize string) corev1.Volume {
+
+	sizeLimit := resource.MustParse(shmSize)
+
+	volume := corev1.Volume{
+
+		Name: "cache-volume",
+		VolumeSource: corev1.VolumeSource{
+			EmptyDir: &corev1.EmptyDirVolumeSource{
+				Medium:    corev1.StorageMediumMemory,
+				SizeLimit: &sizeLimit,
+			},
+		},
+	}
+
+	return volume
+}
+
+func GetVolumeMountForSharedMemory() corev1.VolumeMount {
 
 	volumeMount := corev1.VolumeMount{
 		Name:      "cache-volume",
@@ -176,20 +175,6 @@ func GetVolumeWorkspace(robot *robotv1alpha1.Robot) corev1.Volume {
 		VolumeSource: corev1.VolumeSource{
 			PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
 				ClaimName: robot.GetPVCWorkspaceMetadata().Name,
-			},
-		},
-	}
-
-	return volume
-}
-
-func GetVolumeDshm() corev1.Volume {
-
-	volume := corev1.Volume{
-		Name: "dshm",
-		VolumeSource: corev1.VolumeSource{
-			EmptyDir: &corev1.EmptyDirVolumeSource{
-				Medium: corev1.StorageMediumMemory,
 			},
 		},
 	}
