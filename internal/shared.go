@@ -176,15 +176,17 @@ const (
 	VDI_CUSTOM_PORT_RANGE_KEY      = "VDI_CUSTOM_PORT_RANGE"
 	NOTEBOOK_CUSTOM_PORT_RANGE_KEY = "NOTEBOOK_CUSTOM_PORT_RANGE"
 	SHARED_MEMORY_SIZE_KEY         = "SHARED_MEMORY_SIZE"
+	HOST_NETWORK_SELECTION_KEY     = "USE_HOST_NETWORK"
 )
 
 // regex
 const (
-	GRANT_PERMISSION_REGEX   = "^(/([A-Za-z0-9./_-])+:)*(/[A-Za-z0-9./_-]+)$"
-	PERSISTENT_DIRS_REGEX    = "^(/([A-Za-z0-9./_-])+:)*(/[A-Za-z0-9./_-]+)$"
-	HOST_DIRS_REGEX          = "^(((/[A-Za-z0-9./_-]+):(/[A-Za-z0-9./_-]+))+,)*(((/[A-Za-z0-9./_-]+):(/[A-Za-z0-9./_-]+))+)$"
-	CUSTOM_PORT_RANGE_REGEX  = "^([a-z0-9]{4}-[0-9]{5}:[0-9]{2,5}/)*([a-z0-9]{4}-[0-9]{5}:[0-9]{2,5})$"
-	SHARED_MEMORY_SIZE_REGEX = "^([0-9]{1,2}Gi)$"
+	GRANT_PERMISSION_REGEX       = "^(/([A-Za-z0-9./_-])+:)*(/[A-Za-z0-9./_-]+)$"
+	PERSISTENT_DIRS_REGEX        = "^(/([A-Za-z0-9./_-])+:)*(/[A-Za-z0-9./_-]+)$"
+	HOST_DIRS_REGEX              = "^(((/[A-Za-z0-9./_-]+):(/[A-Za-z0-9./_-]+))+,)*(((/[A-Za-z0-9./_-]+):(/[A-Za-z0-9./_-]+))+)$"
+	CUSTOM_PORT_RANGE_REGEX      = "^([a-z0-9]{4}-[0-9]{5}:[0-9]{2,5}/)*([a-z0-9]{4}-[0-9]{5}:[0-9]{2,5})$"
+	SHARED_MEMORY_SIZE_REGEX     = "^([0-9]{1,2}Gi)$"
+	HOST_NETWORK_SELECTION_REGEX = "^(true|false)$"
 )
 
 // file browser ports
