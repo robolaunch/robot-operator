@@ -270,6 +270,16 @@ func (r *Robot) checkAdditionalConfigs() error {
 		}
 	}
 
+	if val, ok := r.Spec.AdditionalConfigs[internal.SHARED_MEMORY_SIZE_KEY]; ok && val.ConfigType == AdditionalConfigTypeOperator {
+		matched, err := regexp.MatchString(internal.SHARED_MEMORY_SIZE_REGEX, val.Value)
+		if !matched {
+			return errors.New("cannot set shared memory size, use this pattern " + internal.SHARED_MEMORY_SIZE_REGEX)
+		}
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 

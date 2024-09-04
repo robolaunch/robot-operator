@@ -166,7 +166,7 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 	}
 
 	podCfg.InjectImagePullPolicy(vdiPod)
-	podCfg.InjectSharedMemoryConfiguration(vdiPod)
+	podCfg.InjectSharedMemoryConfiguration(vdiPod, robot)
 	podCfg.SchedulePod(vdiPod, robotVDI)
 	podCfg.InjectGenericEnvironmentVariables(vdiPod, robot)
 	podCfg.InjectDisplayConfiguration(vdiPod, *robotVDI)

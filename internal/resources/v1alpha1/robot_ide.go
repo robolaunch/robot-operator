@@ -103,7 +103,7 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 	}
 
 	podCfg.InjectImagePullPolicy(&idePod)
-	podCfg.InjectSharedMemoryConfiguration(&idePod)
+	podCfg.InjectSharedMemoryConfiguration(&idePod, robot)
 	podCfg.SchedulePod(&idePod, robotIDE)
 	podCfg.InjectVolumeConfiguration(&idePod, robot)
 	podCfg.InjectBackgroundConfigFiles(&idePod, cm)
