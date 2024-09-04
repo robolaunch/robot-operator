@@ -4,6 +4,7 @@ import (
 	robotv1alpha1 "github.com/robolaunch/robot-operator/pkg/api/roboscale.io/v1alpha1"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 )
 
 func (cfg *ContainerConfigInjector) InjectVolumeMountConfiguration(container *corev1.Container, robot robotv1alpha1.Robot, mountPrefix string) *corev1.Container {
@@ -125,6 +126,34 @@ func getVolumeMountForHostDir(
 	return volumeMount
 }
 
+func GetVolumeForSharedMemory(shmSize string) corev1.Volume {
+
+	sizeLimit := resource.MustParse(shmSize)
+
+	volume := corev1.Volume{
+
+		Name: "cache-volume",
+		VolumeSource: corev1.VolumeSource{
+			EmptyDir: &corev1.EmptyDirVolumeSource{
+				Medium:    corev1.StorageMediumMemory,
+				SizeLimit: &sizeLimit,
+			},
+		},
+	}
+
+	return volume
+}
+
+func GetVolumeMountForSharedMemory() corev1.VolumeMount {
+
+	volumeMount := corev1.VolumeMount{
+		Name:      "cache-volume",
+		MountPath: "/dev/shm",
+	}
+
+	return volumeMount
+}
+
 func GetVolumeX11Unix(robotVDI *robotv1alpha1.RobotVDI) corev1.Volume {
 
 	volume := corev1.Volume{
@@ -146,20 +175,6 @@ func GetVolumeWorkspace(robot *robotv1alpha1.Robot) corev1.Volume {
 		VolumeSource: corev1.VolumeSource{
 			PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
 				ClaimName: robot.GetPVCWorkspaceMetadata().Name,
-			},
-		},
-	}
-
-	return volume
-}
-
-func GetVolumeDshm() corev1.Volume {
-
-	volume := corev1.Volume{
-		Name: "dshm",
-		VolumeSource: corev1.VolumeSource{
-			EmptyDir: &corev1.EmptyDirVolumeSource{
-				Medium: corev1.StorageMediumMemory,
 			},
 		},
 	}

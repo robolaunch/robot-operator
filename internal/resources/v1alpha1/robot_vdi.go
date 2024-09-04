@@ -123,7 +123,6 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 		TTY:   true,
 		Ports: ports,
 		VolumeMounts: []corev1.VolumeMount{
-			configure.GetExternalVolumeMount("/dev/shm", configure.GetVolumeDshm()),
 			configure.GetExternalVolumeMount("/cache", configure.GetVolumeXglCache()),
 		},
 		Resources: corev1.ResourceRequirements{
@@ -155,7 +154,6 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 				vdiContainer,
 			},
 			Volumes: []corev1.Volume{
-				configure.GetVolumeDshm(),
 				configure.GetVolumeXglCache(),
 			},
 			RestartPolicy: corev1.RestartPolicyNever,
@@ -168,6 +166,7 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 	}
 
 	podCfg.InjectImagePullPolicy(vdiPod)
+	podCfg.InjectSharedMemoryConfiguration(vdiPod, robot)
 	podCfg.SchedulePod(vdiPod, robotVDI)
 	podCfg.InjectGenericEnvironmentVariables(vdiPod, robot)
 	podCfg.InjectDisplayConfiguration(vdiPod, *robotVDI)

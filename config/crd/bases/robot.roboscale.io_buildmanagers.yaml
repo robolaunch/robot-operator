@@ -3,8 +3,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.9.2
-  creationTimestamp: null
+    controller-gen.kubebuilder.io/version: v0.14.0
   name: buildmanagers.robot.roboscale.io
 spec:
   group: robot.roboscale.io
@@ -28,14 +27,19 @@ spec:
         description: BuildManager is the Schema for the buildmanagers API
         properties:
           apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation
-              of an object. Servers should convert recognized schemas to the latest
-              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
             type: string
           kind:
-            description: 'Kind is a string value representing the REST resource this
-              object represents. Servers may infer this from the endpoint the client
-              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
             type: string
           metadata:
             type: object
@@ -45,14 +49,15 @@ spec:
               steps:
                 description: Defines the building steps.
                 items:
-                  description: Step is a command or script to execute when building
-                    a robot. Either `command` or `script` should be specified for
-                    each step.
+                  description: |-
+                    Step is a command or script to execute when building a robot. Either `command` or `script` should be specified
+                    for each step.
                   properties:
                     command:
-                      description: Bash command to run. Assume that your command will
-                        be `/bin/bash -c <COMMAND>`. Use logical operators (eg. `&&`)
-                        and pipes if the multiple dependent commands will be executed.
+                      description: |-
+                        Bash command to run.
+                        Assume that your command will be `/bin/bash -c <COMMAND>`.
+                        Use logical operators (eg. `&&`) and pipes if the multiple dependent commands will be executed.
                       type: string
                     env:
                       description: Environment variables for step.
@@ -65,16 +70,16 @@ spec:
                               a C_IDENTIFIER.
                             type: string
                           value:
-                            description: 'Variable references $(VAR_NAME) are expanded
-                              using the previously defined environment variables in
-                              the container and any service environment variables.
-                              If a variable cannot be resolved, the reference in the
-                              input string will be unchanged. Double $$ are reduced
-                              to a single $, which allows for escaping the $(VAR_NAME)
-                              syntax: i.e. "$$(VAR_NAME)" will produce the string
-                              literal "$(VAR_NAME)". Escaped references will never
-                              be expanded, regardless of whether the variable exists
-                              or not. Defaults to "".'
+                            description: |-
+                              Variable references $(VAR_NAME) are expanded
+                              using the previously defined environment variables in the container and
+                              any service environment variables. If a variable cannot be resolved,
+                              the reference in the input string will be unchanged. Double $$ are reduced
+                              to a single $, which allows for escaping the $(VAR_NAME) syntax: i.e.
+                              "$$(VAR_NAME)" will produce the string literal "$(VAR_NAME)".
+                              Escaped references will never be expanded, regardless of whether the variable
+                              exists or not.
+                              Defaults to "".
                             type: string
                           valueFrom:
                             description: Source for the environment variable's value.
@@ -87,10 +92,10 @@ spec:
                                     description: The key to select.
                                     type: string
                                   name:
-                                    description: 'Name of the referent. More info:
-                                      https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                      TODO: Add other useful fields. apiVersion, kind,
-                                      uid?'
+                                    description: |-
+                                      Name of the referent.
+                                      More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                      TODO: Add other useful fields. apiVersion, kind, uid?
                                     type: string
                                   optional:
                                     description: Specify whether the ConfigMap or
@@ -101,11 +106,9 @@ spec:
                                 type: object
                                 x-kubernetes-map-type: atomic
                               fieldRef:
-                                description: 'Selects a field of the pod: supports
-                                  metadata.name, metadata.namespace, `metadata.labels[''<KEY>'']`,
-                                  `metadata.annotations[''<KEY>'']`, spec.nodeName,
-                                  spec.serviceAccountName, status.hostIP, status.podIP,
-                                  status.podIPs.'
+                                description: |-
+                                  Selects a field of the pod: supports metadata.name, metadata.namespace, `metadata.labels['<KEY>']`, `metadata.annotations['<KEY>']`,
+                                  spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP, status.podIPs.
                                 properties:
                                   apiVersion:
                                     description: Version of the schema the FieldPath
@@ -120,11 +123,9 @@ spec:
                                 type: object
                                 x-kubernetes-map-type: atomic
                               resourceFieldRef:
-                                description: 'Selects a resource of the container:
-                                  only resources limits and requests (limits.cpu,
-                                  limits.memory, limits.ephemeral-storage, requests.cpu,
-                                  requests.memory and requests.ephemeral-storage)
-                                  are currently supported.'
+                                description: |-
+                                  Selects a resource of the container: only resources limits and requests
+                                  (limits.cpu, limits.memory, limits.ephemeral-storage, requests.cpu, requests.memory and requests.ephemeral-storage) are currently supported.
                                 properties:
                                   containerName:
                                     description: 'Container name: required for volumes,
@@ -154,10 +155,10 @@ spec:
                                       be a valid secret key.
                                     type: string
                                   name:
-                                    description: 'Name of the referent. More info:
-                                      https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                      TODO: Add other useful fields. apiVersion, kind,
-                                      uid?'
+                                    description: |-
+                                      Name of the referent.
+                                      More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                      TODO: Add other useful fields. apiVersion, kind, uid?
                                     type: string
                                   optional:
                                     description: Specify whether the Secret or its
@@ -173,8 +174,9 @@ spec:
                         type: object
                       type: array
                     instances:
-                      description: Cluster selector. If the current instance name
-                        is on the list, BuildManager creates building jobs.
+                      description: |-
+                        Cluster selector.
+                        If the current instance name is on the list, BuildManager creates building jobs.
                       items:
                         type: string
                       type: array
@@ -185,19 +187,22 @@ spec:
                       description: Selects the scope for BuildManager step.
                       properties:
                         path:
-                          description: Absolute path of the directory. It's being
-                            applied if the scope type is `Path`.
+                          description: |-
+                            Absolute path of the directory.
+                            It's being applied if the scope type is `Path`.
                           type: string
                         scopeType:
-                          description: Type of the scope. Allowed scopes are `Workspace`
-                            and `Path`.
+                          description: |-
+                            Type of the scope.
+                            Allowed scopes are `Workspace` and `Path`.
                           enum:
                           - Workspace
                           - Path
                           type: string
                         workspace:
-                          description: Name of the workspace. Should be selected among
-                            the existing workspaces in WorkspaceManager's manifests.
+                          description: |-
+                            Name of the workspace.
+                            Should be selected among the existing workspaces in WorkspaceManager's manifests.
                             It's being applied if the scope type is `Workspace`.
                           type: string
                       required:
@@ -223,9 +228,9 @@ spec:
                 description: Phase of BuildManager.
                 type: string
               scriptConfigMapStatus:
-                description: Status of the ConfigMap that holds scripts. If a script
-                  is specified inside `.spec.steps[k]`, they are mounted to the step
-                  jobs via this ConfigMap.
+                description: |-
+                  Status of the ConfigMap that holds scripts.
+                  If a script is specified inside `.spec.steps[k]`, they are mounted to the step jobs via this ConfigMap.
                 properties:
                   created:
                     description: Shows if the owned resource is created.
@@ -240,33 +245,40 @@ spec:
                         description: API version of the referent.
                         type: string
                       fieldPath:
-                        description: 'If referring to a piece of an object instead
-                          of an entire object, this string should contain a valid
-                          JSON/Go field access statement, such as desiredState.manifest.containers[2].
-                          For example, if the object reference is to a container within
-                          a pod, this would take on a value like: "spec.containers{name}"
-                          (where "name" refers to the name of the container that triggered
-                          the event) or if no container name is specified "spec.containers[2]"
-                          (container with index 2 in this pod). This syntax is chosen
-                          only to have some well-defined way of referencing a part
-                          of an object. TODO: this design is not final and this field
-                          is subject to change in the future.'
+                        description: |-
+                          If referring to a piece of an object instead of an entire object, this string
+                          should contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2].
+                          For example, if the object reference is to a container within a pod, this would take on a value like:
+                          "spec.containers{name}" (where "name" refers to the name of the container that triggered
+                          the event) or if no container name is specified "spec.containers[2]" (container with
+                          index 2 in this pod). This syntax is chosen only to have some well-defined way of
+                          referencing a part of an object.
+                          TODO: this design is not final and this field is subject to change in the future.
                         type: string
                       kind:
-                        description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                        description: |-
+                          Kind of the referent.
+                          More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
                         type: string
                       name:
-                        description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                        description: |-
+                          Name of the referent.
+                          More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                         type: string
                       namespace:
-                        description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                        description: |-
+                          Namespace of the referent.
+                          More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/
                         type: string
                       resourceVersion:
-                        description: 'Specific resourceVersion to which this reference
-                          is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                        description: |-
+                          Specific resourceVersion to which this reference is made, if any.
+                          More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
                         type: string
                       uid:
-                        description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                        description: |-
+                          UID of the referent.
+                          More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids
                         type: string
                     type: object
                     x-kubernetes-map-type: atomic
@@ -293,35 +305,40 @@ spec:
                               description: API version of the referent.
                               type: string
                             fieldPath:
-                              description: 'If referring to a piece of an object instead
-                                of an entire object, this string should contain a
-                                valid JSON/Go field access statement, such as desiredState.manifest.containers[2].
-                                For example, if the object reference is to a container
-                                within a pod, this would take on a value like: "spec.containers{name}"
-                                (where "name" refers to the name of the container
-                                that triggered the event) or if no container name
-                                is specified "spec.containers[2]" (container with
-                                index 2 in this pod). This syntax is chosen only to
-                                have some well-defined way of referencing a part of
-                                an object. TODO: this design is not final and this
-                                field is subject to change in the future.'
+                              description: |-
+                                If referring to a piece of an object instead of an entire object, this string
+                                should contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2].
+                                For example, if the object reference is to a container within a pod, this would take on a value like:
+                                "spec.containers{name}" (where "name" refers to the name of the container that triggered
+                                the event) or if no container name is specified "spec.containers[2]" (container with
+                                index 2 in this pod). This syntax is chosen only to have some well-defined way of
+                                referencing a part of an object.
+                                TODO: this design is not final and this field is subject to change in the future.
                               type: string
                             kind:
-                              description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                              description: |-
+                                Kind of the referent.
+                                More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
                               type: string
                             name:
-                              description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                              description: |-
+                                Name of the referent.
+                                More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                               type: string
                             namespace:
-                              description: 'Namespace of the referent. More info:
-                                https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                              description: |-
+                                Namespace of the referent.
+                                More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/
                               type: string
                             resourceVersion:
-                              description: 'Specific resourceVersion to which this
-                                reference is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                              description: |-
+                                Specific resourceVersion to which this reference is made, if any.
+                                More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
                               type: string
                             uid:
-                              description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                              description: |-
+                                UID of the referent.
+                                More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids
                               type: string
                           type: object
                           x-kubernetes-map-type: atomic
@@ -332,10 +349,10 @@ spec:
                       description: Status of the step.
                       properties:
                         command:
-                          description: Bash command to run. Assume that your command
-                            will be `/bin/bash -c <COMMAND>`. Use logical operators
-                            (eg. `&&`) and pipes if the multiple dependent commands
-                            will be executed.
+                          description: |-
+                            Bash command to run.
+                            Assume that your command will be `/bin/bash -c <COMMAND>`.
+                            Use logical operators (eg. `&&`) and pipes if the multiple dependent commands will be executed.
                           type: string
                         env:
                           description: Environment variables for step.
@@ -348,17 +365,16 @@ spec:
                                   be a C_IDENTIFIER.
                                 type: string
                               value:
-                                description: 'Variable references $(VAR_NAME) are
-                                  expanded using the previously defined environment
-                                  variables in the container and any service environment
-                                  variables. If a variable cannot be resolved, the
-                                  reference in the input string will be unchanged.
-                                  Double $$ are reduced to a single $, which allows
-                                  for escaping the $(VAR_NAME) syntax: i.e. "$$(VAR_NAME)"
-                                  will produce the string literal "$(VAR_NAME)". Escaped
-                                  references will never be expanded, regardless of
-                                  whether the variable exists or not. Defaults to
-                                  "".'
+                                description: |-
+                                  Variable references $(VAR_NAME) are expanded
+                                  using the previously defined environment variables in the container and
+                                  any service environment variables. If a variable cannot be resolved,
+                                  the reference in the input string will be unchanged. Double $$ are reduced
+                                  to a single $, which allows for escaping the $(VAR_NAME) syntax: i.e.
+                                  "$$(VAR_NAME)" will produce the string literal "$(VAR_NAME)".
+                                  Escaped references will never be expanded, regardless of whether the variable
+                                  exists or not.
+                                  Defaults to "".
                                 type: string
                               valueFrom:
                                 description: Source for the environment variable's
@@ -371,10 +387,10 @@ spec:
                                         description: The key to select.
                                         type: string
                                       name:
-                                        description: 'Name of the referent. More info:
-                                          https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                          TODO: Add other useful fields. apiVersion,
-                                          kind, uid?'
+                                        description: |-
+                                          Name of the referent.
+                                          More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                          TODO: Add other useful fields. apiVersion, kind, uid?
                                         type: string
                                       optional:
                                         description: Specify whether the ConfigMap
@@ -385,11 +401,9 @@ spec:
                                     type: object
                                     x-kubernetes-map-type: atomic
                                   fieldRef:
-                                    description: 'Selects a field of the pod: supports
-                                      metadata.name, metadata.namespace, `metadata.labels[''<KEY>'']`,
-                                      `metadata.annotations[''<KEY>'']`, spec.nodeName,
-                                      spec.serviceAccountName, status.hostIP, status.podIP,
-                                      status.podIPs.'
+                                    description: |-
+                                      Selects a field of the pod: supports metadata.name, metadata.namespace, `metadata.labels['<KEY>']`, `metadata.annotations['<KEY>']`,
+                                      spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP, status.podIPs.
                                     properties:
                                       apiVersion:
                                         description: Version of the schema the FieldPath
@@ -404,11 +418,9 @@ spec:
                                     type: object
                                     x-kubernetes-map-type: atomic
                                   resourceFieldRef:
-                                    description: 'Selects a resource of the container:
-                                      only resources limits and requests (limits.cpu,
-                                      limits.memory, limits.ephemeral-storage, requests.cpu,
-                                      requests.memory and requests.ephemeral-storage)
-                                      are currently supported.'
+                                    description: |-
+                                      Selects a resource of the container: only resources limits and requests
+                                      (limits.cpu, limits.memory, limits.ephemeral-storage, requests.cpu, requests.memory and requests.ephemeral-storage) are currently supported.
                                     properties:
                                       containerName:
                                         description: 'Container name: required for
@@ -438,10 +450,10 @@ spec:
                                           from.  Must be a valid secret key.
                                         type: string
                                       name:
-                                        description: 'Name of the referent. More info:
-                                          https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                          TODO: Add other useful fields. apiVersion,
-                                          kind, uid?'
+                                        description: |-
+                                          Name of the referent.
+                                          More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                          TODO: Add other useful fields. apiVersion, kind, uid?
                                         type: string
                                       optional:
                                         description: Specify whether the Secret or
@@ -457,8 +469,9 @@ spec:
                             type: object
                           type: array
                         instances:
-                          description: Cluster selector. If the current instance name
-                            is on the list, BuildManager creates building jobs.
+                          description: |-
+                            Cluster selector.
+                            If the current instance name is on the list, BuildManager creates building jobs.
                           items:
                             type: string
                           type: array
@@ -469,21 +482,23 @@ spec:
                           description: Selects the scope for BuildManager step.
                           properties:
                             path:
-                              description: Absolute path of the directory. It's being
-                                applied if the scope type is `Path`.
+                              description: |-
+                                Absolute path of the directory.
+                                It's being applied if the scope type is `Path`.
                               type: string
                             scopeType:
-                              description: Type of the scope. Allowed scopes are `Workspace`
-                                and `Path`.
+                              description: |-
+                                Type of the scope.
+                                Allowed scopes are `Workspace` and `Path`.
                               enum:
                               - Workspace
                               - Path
                               type: string
                             workspace:
-                              description: Name of the workspace. Should be selected
-                                among the existing workspaces in WorkspaceManager's
-                                manifests. It's being applied if the scope type is
-                                `Workspace`.
+                              description: |-
+                                Name of the workspace.
+                                Should be selected among the existing workspaces in WorkspaceManager's manifests.
+                                It's being applied if the scope type is `Workspace`.
                               type: string
                           required:
                           - scopeType
