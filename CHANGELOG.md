@@ -1,6 +1,13 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+### Feat
+- **host-network:** :rocket: enable host network on request
+- **shm-size:** :rocket: make shared mem size selectable
+
+
+<a name="v0.2.7-alpha.6.4-we-patch-v1"></a>
+## [v0.2.7-alpha.6.4-we-patch-v1] - 2024-06-04
 
 <a name="v0.2.7-alpha.6.4"></a>
 ## [v0.2.7-alpha.6.4] - 2024-03-21
@@ -461,7 +468,8 @@
 - Merge pull request [#24](https://github.com/robolaunch/robot-operator/issues/24) from robolaunch/23-allow-multiple-launches
 
 
-[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.6.4...HEAD
+[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.6.4-we-patch-v1...HEAD
+[v0.2.7-alpha.6.4-we-patch-v1]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.6.4...v0.2.7-alpha.6.4-we-patch-v1
 [v0.2.7-alpha.6.4]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.6.3...v0.2.7-alpha.6.4
 [v0.2.7-alpha.6.3]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.6.2...v0.2.7-alpha.6.3
 [v0.2.7-alpha.6.2]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.6.1...v0.2.7-alpha.6.2

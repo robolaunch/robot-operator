@@ -13,6 +13,66 @@ webhooks:
     service:
       name: '{{ include "robot-operator.fullname" . }}-webhook-service'
       namespace: '{{ .Release.Namespace }}'
+      path: /mutate-robot-roboscale-io-v1alpha1-buildmanager
+  failurePolicy: Fail
+  name: mbuildmanager.kb.io
+  rules:
+  - apiGroups:
+    - robot.roboscale.io
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - buildmanagers
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: '{{ include "robot-operator.fullname" . }}-webhook-service'
+      namespace: '{{ .Release.Namespace }}'
+      path: /mutate-robot-roboscale-io-v1alpha1-discoveryserver
+  failurePolicy: Fail
+  name: mdiscoveryserver.kb.io
+  rules:
+  - apiGroups:
+    - robot.roboscale.io
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - discoveryservers
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: '{{ include "robot-operator.fullname" . }}-webhook-service'
+      namespace: '{{ .Release.Namespace }}'
+      path: /mutate-robot-roboscale-io-v1alpha1-launchmanager
+  failurePolicy: Fail
+  name: mlaunchmanager.kb.io
+  rules:
+  - apiGroups:
+    - robot.roboscale.io
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - launchmanagers
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: '{{ include "robot-operator.fullname" . }}-webhook-service'
+      namespace: '{{ .Release.Namespace }}'
       path: /mutate-robot-roboscale-io-v1alpha1-notebook
   failurePolicy: Fail
   name: mnotebook.kb.io
@@ -26,6 +86,46 @@ webhooks:
     - UPDATE
     resources:
     - notebooks
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: '{{ include "robot-operator.fullname" . }}-webhook-service'
+      namespace: '{{ .Release.Namespace }}'
+      path: /mutate-robot-roboscale-io-v1alpha1-robot
+  failurePolicy: Fail
+  name: mrobot.kb.io
+  rules:
+  - apiGroups:
+    - robot.roboscale.io
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - robots
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: '{{ include "robot-operator.fullname" . }}-webhook-service'
+      namespace: '{{ .Release.Namespace }}'
+      path: /mutate-robot-roboscale-io-v1alpha1-robotdevsuite
+  failurePolicy: Fail
+  name: mrobotdevsuite.kb.io
+  rules:
+  - apiGroups:
+    - robot.roboscale.io
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - robotdevsuites
   sideEffects: None
 - admissionReviewVersions:
   - v1
@@ -73,26 +173,6 @@ webhooks:
     service:
       name: '{{ include "robot-operator.fullname" . }}-webhook-service'
       namespace: '{{ .Release.Namespace }}'
-      path: /mutate-robot-roboscale-io-v1alpha1-robotdevsuite
-  failurePolicy: Fail
-  name: mrobotdevsuite.kb.io
-  rules:
-  - apiGroups:
-    - robot.roboscale.io
-    apiVersions:
-    - v1alpha1
-    operations:
-    - CREATE
-    - UPDATE
-    resources:
-    - robotdevsuites
-  sideEffects: None
-- admissionReviewVersions:
-  - v1
-  clientConfig:
-    service:
-      name: '{{ include "robot-operator.fullname" . }}-webhook-service'
-      namespace: '{{ .Release.Namespace }}'
       path: /mutate-robot-roboscale-io-v1alpha1-workspacemanager
   failurePolicy: Fail
   name: mworkspacemanager.kb.io
@@ -106,126 +186,6 @@ webhooks:
     - UPDATE
     resources:
     - workspacemanagers
-  sideEffects: None
-- admissionReviewVersions:
-  - v1
-  clientConfig:
-    service:
-      name: '{{ include "robot-operator.fullname" . }}-webhook-service'
-      namespace: '{{ .Release.Namespace }}'
-      path: /mutate-robot-roboscale-io-v1alpha1-buildmanager
-  failurePolicy: Fail
-  name: mbuildmanager.kb.io
-  rules:
-  - apiGroups:
-    - robot.roboscale.io
-    apiVersions:
-    - v1alpha1
-    operations:
-    - CREATE
-    - UPDATE
-    resources:
-    - buildmanagers
-  sideEffects: None
-- admissionReviewVersions:
-  - v1
-  clientConfig:
-    service:
-      name: '{{ include "robot-operator.fullname" . }}-webhook-service'
-      namespace: '{{ .Release.Namespace }}'
-      path: /mutate-robot-roboscale-io-v1alpha1-launchmanager
-  failurePolicy: Fail
-  name: mlaunchmanager.kb.io
-  rules:
-  - apiGroups:
-    - robot.roboscale.io
-    apiVersions:
-    - v1alpha1
-    operations:
-    - CREATE
-    - UPDATE
-    resources:
-    - launchmanagers
-  sideEffects: None
-- admissionReviewVersions:
-  - v1
-  clientConfig:
-    service:
-      name: '{{ include "robot-operator.fullname" . }}-webhook-service'
-      namespace: '{{ .Release.Namespace }}'
-      path: /mutate-robot-roboscale-io-v1alpha1-robot
-  failurePolicy: Fail
-  name: mrobot.kb.io
-  rules:
-  - apiGroups:
-    - robot.roboscale.io
-    apiVersions:
-    - v1alpha1
-    operations:
-    - CREATE
-    - UPDATE
-    resources:
-    - robots
-  sideEffects: None
-- admissionReviewVersions:
-  - v1
-  clientConfig:
-    service:
-      name: '{{ include "robot-operator.fullname" . }}-webhook-service'
-      namespace: '{{ .Release.Namespace }}'
-      path: /mutate-robot-roboscale-io-v1alpha1-discoveryserver
-  failurePolicy: Fail
-  name: mdiscoveryserver.kb.io
-  rules:
-  - apiGroups:
-    - robot.roboscale.io
-    apiVersions:
-    - v1alpha1
-    operations:
-    - CREATE
-    - UPDATE
-    resources:
-    - discoveryservers
-  sideEffects: None
-- admissionReviewVersions:
-  - v1
-  clientConfig:
-    service:
-      name: '{{ include "robot-operator.fullname" . }}-webhook-service'
-      namespace: '{{ .Release.Namespace }}'
-      path: /mutate-robot-roboscale-io-v1alpha2-ros2workload
-  failurePolicy: Fail
-  name: mros2workload.kb.io
-  rules:
-  - apiGroups:
-    - robot.roboscale.io
-    apiVersions:
-    - v1alpha2
-    operations:
-    - CREATE
-    - UPDATE
-    resources:
-    - ros2workloads
-  sideEffects: None
-- admissionReviewVersions:
-  - v1
-  clientConfig:
-    service:
-      name: '{{ include "robot-operator.fullname" . }}-webhook-service'
-      namespace: '{{ .Release.Namespace }}'
-      path: /mutate-robot-roboscale-io-v1alpha2-ros2bridge
-  failurePolicy: Fail
-  name: mros2bridge.kb.io
-  rules:
-  - apiGroups:
-    - robot.roboscale.io
-    apiVersions:
-    - v1alpha2
-    operations:
-    - CREATE
-    - UPDATE
-    resources:
-    - ros2bridges
   sideEffects: None
 - admissionReviewVersions:
   - v1
@@ -266,4 +226,44 @@ webhooks:
     - UPDATE
     resources:
     - edgeproxies
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: '{{ include "robot-operator.fullname" . }}-webhook-service'
+      namespace: '{{ .Release.Namespace }}'
+      path: /mutate-robot-roboscale-io-v1alpha2-ros2bridge
+  failurePolicy: Fail
+  name: mros2bridge.kb.io
+  rules:
+  - apiGroups:
+    - robot.roboscale.io
+    apiVersions:
+    - v1alpha2
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - ros2bridges
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: '{{ include "robot-operator.fullname" . }}-webhook-service'
+      namespace: '{{ .Release.Namespace }}'
+      path: /mutate-robot-roboscale-io-v1alpha2-ros2workload
+  failurePolicy: Fail
+  name: mros2workload.kb.io
+  rules:
+  - apiGroups:
+    - robot.roboscale.io
+    apiVersions:
+    - v1alpha2
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - ros2workloads
   sideEffects: None

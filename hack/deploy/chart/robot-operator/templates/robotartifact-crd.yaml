@@ -3,7 +3,7 @@ kind: CustomResourceDefinition
 metadata:
   name: robotartifacts.robot.roboscale.io
   annotations:
-    controller-gen.kubebuilder.io/version: v0.9.2
+    controller-gen.kubebuilder.io/version: v0.14.0
   labels:
   {{- include "robot-operator.labels" . | nindent 4 }}
 spec:
@@ -18,18 +18,24 @@ spec:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: RobotArtifact is a non-functional resource that holds Robot's specifications.
+        description: |-
+          RobotArtifact is a non-functional resource that holds Robot's specifications.
           It is used to define Robot templates.
         properties:
           apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation
-              of an object. Servers should convert recognized schemas to the latest
-              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
             type: string
           kind:
-            description: 'Kind is a string value representing the REST resource this
-              object represents. Servers may infer this from the endpoint the client
-              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
             type: string
           metadata:
             type: object
@@ -51,8 +57,9 @@ spec:
                 description: Key value pairs that operator uses to extend configuration.
                 type: object
               environment:
-                description: Holds environment's configuration. Applied if `.spec.type`
-                  is `Environment` and must be `nil` otherwise.
+                description: |-
+                  Holds environment's configuration.
+                  Applied if `.spec.type` is `Environment` and must be `nil` otherwise.
                 properties:
                   application:
                     description: Application properties.
@@ -93,8 +100,9 @@ spec:
                 - domain
                 type: object
               robot:
-                description: Holds robot's configuration. Applied if `.spec.type` is
-                  `Robot` and must be `nil` otherwise.
+                description: |-
+                  Holds robot's configuration.
+                  Applied if `.spec.type` is `Robot` and must be `nil` otherwise.
                 properties:
                   bridgeEnabled:
                     description: If enabled, ROSBridge object will be created.
@@ -103,9 +111,9 @@ spec:
                     description: Discovery server configurational parameters.
                     properties:
                       cluster:
-                        description: Cloud instance name that holds DiscoveryServer
-                          instance with `Server` type. Should be empty if the type is
-                          `Server` since it takes cloud instance's name automatically.
+                        description: |-
+                          Cloud instance name that holds DiscoveryServer instance with `Server` type.
+                          Should be empty if the type is `Server` since it takes cloud instance's name automatically.
                           Should be set if the type is `Client`.
                         type: string
                       domainID:
@@ -114,10 +122,10 @@ spec:
                         minimum: 0
                         type: integer
                       hostname:
-                        description: If instance type is `Server`, it can be an arbitrary
-                          value. If instance type is `Client`, it should be the same
-                          with Server's hostname. Used for getting Server's IP over
-                          DNS.
+                        description: |-
+                          If instance type is `Server`, it can be an arbitrary value.
+                          If instance type is `Client`, it should be the same with Server's hostname.
+                          Used for getting Server's IP over DNS.
                         type: string
                       protocol:
                         enum:
@@ -125,67 +133,73 @@ spec:
                         - UDP
                         type: string
                       reference:
-                        description: Reference to the `Server` instance. It is used
-                          if `.spec.type` is `Client`. Referenced object can be previously
-                          provisioned in another cluster. In that case, cluster's name
-                          can be specified in `.spec.cluster` field.
+                        description: |-
+                          Reference to the `Server` instance.
+                          It is used if `.spec.type` is `Client`.
+                          Referenced object can be previously provisioned in another cluster.
+                          In that case, cluster's name can be specified in `.spec.cluster` field.
                         properties:
                           apiVersion:
                             description: API version of the referent.
                             type: string
                           fieldPath:
-                            description: 'If referring to a piece of an object instead
-                              of an entire object, this string should contain a valid
-                              JSON/Go field access statement, such as desiredState.manifest.containers[2].
-                              For example, if the object reference is to a container
-                              within a pod, this would take on a value like: "spec.containers{name}"
-                              (where "name" refers to the name of the container that
-                              triggered the event) or if no container name is specified
-                              "spec.containers[2]" (container with index 2 in this pod).
-                              This syntax is chosen only to have some well-defined way
-                              of referencing a part of an object. TODO: this design
-                              is not final and this field is subject to change in the
-                              future.'
+                            description: |-
+                              If referring to a piece of an object instead of an entire object, this string
+                              should contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2].
+                              For example, if the object reference is to a container within a pod, this would take on a value like:
+                              "spec.containers{name}" (where "name" refers to the name of the container that triggered
+                              the event) or if no container name is specified "spec.containers[2]" (container with
+                              index 2 in this pod). This syntax is chosen only to have some well-defined way of
+                              referencing a part of an object.
+                              TODO: this design is not final and this field is subject to change in the future.
                             type: string
                           kind:
-                            description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                            description: |-
+                              Kind of the referent.
+                              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
                             type: string
                           name:
-                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                            description: |-
+                              Name of the referent.
+                              More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
                             type: string
                           namespace:
-                            description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                            description: |-
+                              Namespace of the referent.
+                              More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/
                             type: string
                           resourceVersion:
-                            description: 'Specific resourceVersion to which this reference
-                              is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                            description: |-
+                              Specific resourceVersion to which this reference is made, if any.
+                              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
                             type: string
                           uid:
-                            description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                            description: |-
+                              UID of the referent.
+                              More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids
                             type: string
                         type: object
                         x-kubernetes-map-type: atomic
                       subdomain:
-                        description: If instance type is `Server`, it can be an arbitrary
-                          value. If instance type is `Client`, it should be the same
-                          with Server's subdomain. Used for getting Server's IP over
-                          DNS.
+                        description: |-
+                          If instance type is `Server`, it can be an arbitrary value.
+                          If instance type is `Client`, it should be the same with Server's subdomain.
+                          Used for getting Server's IP over DNS.
                         type: string
                       type:
-                        description: Instance type can be either `Server` or `Client`.
-                          If `Server`, instance creates discovery server resources and
-                          workloads. Other `Client` instances can connect to the `Server`
-                          instance. If `Client`, instance tries to connect a `Server`
-                          instance and hold `Server` configuration in a ConfigMap.
+                        description: |-
+                          Instance type can be either `Server` or `Client`.
+                          If `Server`, instance creates discovery server resources and workloads.
+                          Other `Client` instances can connect to the `Server` instance.
+                          If `Client`, instance tries to connect a `Server` instance and hold `Server` configuration in a ConfigMap.
                         type: string
                     required:
                     - domainID
                     type: object
                   distributions:
-                    description: ROS 2 distributions to be used. You can select multiple
-                      distributions if they are supported in the same underlying OS.
-                      (eg. `foxy` and `galactic` are supported in Ubuntu Focal, so they
-                      can be used together but both cannot be used with `humble`)
+                    description: |-
+                      ROS 2 distributions to be used. You can select multiple distributions if they are supported in the same underlying OS.
+                      (eg. `foxy` and `galactic` are supported in Ubuntu Focal, so they can be used together but both cannot be used with `humble`)
                     items:
                       description: ROS 2 distribution selection. Currently supported
                         distributions are Humble, Foxy, Galactic.
@@ -249,20 +263,20 @@ spec:
                       `.spec.notebookEnabled` is set to `true`.
                     properties:
                       display:
-                        description: Notebook connects an X11 socket if it's set to
-                          `true` and a target Notebook resource is set in labels with
-                          key `robolaunch.io/target-vdi`. Applications that requires
-                          GUI can be executed such as VLC.
+                        description: |-
+                          Notebook connects an X11 socket if it's set to `true` and a target Notebook resource is set in labels with key `robolaunch.io/target-vdi`.
+                          Applications that requires GUI can be executed such as VLC.
                         type: boolean
                       ingress:
                         description: '[*alpha*] Notebook will create an Ingress resource
                           if `true`.'
                         type: boolean
                       privileged:
-                        description: If `true`, containers of Notebook will be privileged
-                          containers. It can be used in physical instances where it's
-                          necessary to access I/O devices on the host machine. Not recommended
-                          to activate this field on cloud instances.
+                        description: |-
+                          If `true`, containers of Notebook will be privileged containers.
+                          It can be used in physical instances where it's necessary to access
+                          I/O devices on the host machine.
+                          Not recommended to activate this field on cloud instances.
                         type: boolean
                       resources:
                         description: Resource limitations of Notebook.
@@ -345,20 +359,20 @@ spec:
                       `.spec.ideEnabled` is set to `true`.
                     properties:
                       display:
-                        description: Cloud IDE connects an X11 socket if it's set to
-                          `true` and a target RobotVDI resource is set in labels with
-                          key `robolaunch.io/target-vdi`. Applications that requires
-                          GUI can be executed such as rViz.
+                        description: |-
+                          Cloud IDE connects an X11 socket if it's set to `true` and a target RobotVDI resource is set in labels with key `robolaunch.io/target-vdi`.
+                          Applications that requires GUI can be executed such as rViz.
                         type: boolean
                       ingress:
                         description: '[*alpha*] RobotIDE will create an Ingress resource
                           if `true`.'
                         type: boolean
                       privileged:
-                        description: If `true`, containers of RobotIDE will be privileged
-                          containers. It can be used in physical instances where it's
-                          necessary to access I/O devices on the host machine. Not recommended
-                          to activate this field on cloud instances.
+                        description: |-
+                          If `true`, containers of RobotIDE will be privileged containers.
+                          It can be used in physical instances where it's necessary to access
+                          I/O devices on the host machine.
+                          Not recommended to activate this field on cloud instances.
                         type: boolean
                       resources:
                         description: Resource limitations of Cloud IDE.
@@ -404,10 +418,11 @@ spec:
                         description: NAT1TO1 option for Cloud VDI.
                         type: string
                       privileged:
-                        description: If `true`, containers of RobotIDE will be privileged
-                          containers. It can be used in physical instances where it's
-                          necessary to access I/O devices on the host machine. Not recommended
-                          to activate this field on cloud instances.
+                        description: |-
+                          If `true`, containers of RobotIDE will be privileged containers.
+                          It can be used in physical instances where it's necessary to access
+                          I/O devices on the host machine.
+                          Not recommended to activate this field on cloud instances.
                         type: boolean
                       resolution:
                         default: 2048x1152
@@ -465,9 +480,9 @@ spec:
                 - host
                 type: object
               storage:
-                description: Total storage amount to persist via Robot. Unit of measurement
-                  is MB. (eg. `10240` corresponds 10 GB) This amount is being shared
-                  between different components.
+                description: |-
+                  Total storage amount to persist via Robot. Unit of measurement is MB. (eg. `10240` corresponds 10 GB)
+                  This amount is being shared between different components.
                 properties:
                   amount:
                     default: 10000
@@ -500,27 +515,28 @@ spec:
                 - namespace
                 type: object
               type:
-                description: Determines the object type. If "Environment", operator
-                  will provision an environment according to the specifications. (`.spec.environment`)
-                  If "Robot", operator will provision an environment specialized for
-                  ROS 2 according to the specifications. (`.spec.robot`)
+                description: |-
+                  Determines the object type.
+                  If "Environment", operator will provision an environment according to the specifications. (`.spec.environment`)
+                  If "Robot", operator will provision an environment specialized for ROS 2 according to the specifications. (`.spec.robot`)
                 type: string
               workspaceManagerTemplate:
                 description: Workspace manager template to configure ROS 2 workspaces.
                 properties:
                   updateNeeded:
-                    description: WorkspaceManager is triggered if this field is set
-                      to `true`. Then the workspaces are being configured again while
-                      backing up the old configurations. This field is often used by
-                      operator.
+                    description: |-
+                      WorkspaceManager is triggered if this field is set to `true`.
+                      Then the workspaces are being configured again while backing up the old configurations.
+                      This field is often used by operator.
                     type: boolean
                   workspaces:
-                    description: Workspace definitions of robot. Multiple ROS 2 workspaces
-                      can be configured over this field.
+                    description: |-
+                      Workspace definitions of robot.
+                      Multiple ROS 2 workspaces can be configured over this field.
                     items:
-                      description: Workspace description. Each robot should contain
-                        at least one workspace. A workspace should contain at least
-                        one repository in it.
+                      description: |-
+                        Workspace description. Each robot should contain at least one workspace. A workspace should contain at least one
+                        repository in it.
                       properties:
                         distro:
                           description: ROS 2 distribution selection. Currently supported
