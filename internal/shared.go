@@ -52,6 +52,17 @@ const (
 // Special escape labels
 const (
 	ROBOT_DEV_SUITE_OWNED = "robolaunch.io/dev-suite-owned"
+	ROBOT_IDE_PORT_KEY    = "robolaunch.io/ide-port"
+	ROBOT_VDI_PORT_KEY    = "robolaunch.io/vdi-port"
+	NOTEBOOK_PORT_KEY     = "robolaunch.io/notebook-port"
+	ROBOT_IDE_FB_PORT_KEY = "robolaunch.io/ide-fb-port"
+	ROBOT_VDI_FB_PORT_KEY = "robolaunch.io/vdi-fb-port"
+	NOTEBOOK_FB_PORT_KEY  = "robolaunch.io/notebook-fb-port"
+)
+
+// Special escape label regex
+const (
+	INTERNAL_APP_PORT_REGEX = "^[0-9]{4,5}$"
 )
 
 // Platform server

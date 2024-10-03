@@ -19,14 +19,30 @@ import (
 )
 
 const (
-	ROBOT_IDE_PORT_NAME = "code-server"
-	ROBOT_IDE_PORT      = 9000
+	ROBOT_IDE_PORT_NAME    = "code-server"
+	DEFAULT_ROBOT_IDE_PORT = 9000
 )
 
 func getRobotIDESelector(robotIDE robotv1alpha1.RobotIDE) map[string]string {
 	return map[string]string{
 		"robotIDE": robotIDE.Name,
 	}
+}
+
+func getRobotIDEInternalAppPort(robotIDE robotv1alpha1.RobotIDE) int {
+	if val, ok := robotIDE.Labels[internal.ROBOT_IDE_PORT_KEY]; ok {
+		portInt, _ := strconv.Atoi(val)
+		return portInt
+	}
+	return DEFAULT_ROBOT_IDE_PORT
+}
+
+func getRobotIDEFBInternalAppPort(robotIDE robotv1alpha1.RobotIDE) int {
+	if val, ok := robotIDE.Labels[internal.ROBOT_IDE_FB_PORT_KEY]; ok {
+		portInt, _ := strconv.Atoi(val)
+		return portInt
+	}
+	return internal.FILE_BROWSER_PORT
 }
 
 func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot, robotVDI robotv1alpha1.RobotVDI, node corev1.Node, cm corev1.ConfigMap) *corev1.Pod {
@@ -48,8 +64,8 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 		Image:   robot.Status.Image,
 		Command: internal.Bash(cmdBuilder.String()),
 		Env: []corev1.EnvVar{
-			internal.Env("CODE_SERVER_PORT", strconv.Itoa(ROBOT_IDE_PORT)),
-			internal.Env("FILE_BROWSER_PORT", strconv.Itoa(internal.FILE_BROWSER_PORT)),
+			internal.Env("CODE_SERVER_PORT", strconv.Itoa(getRobotIDEInternalAppPort(*robotIDE))),
+			internal.Env("FILE_BROWSER_PORT", strconv.Itoa(getRobotIDEFBInternalAppPort(*robotIDE))),
 			internal.Env("FILE_BROWSER_SERVICE", "code-server"),
 			internal.Env("FILE_BROWSER_BASE_URL", robotv1alpha1.GetRobotServicePath(robot, "/file-browser/ide")),
 			internal.Env("ROBOT_NAMESPACE", robot.Namespace),
@@ -60,11 +76,11 @@ func GetRobotIDEPod(robotIDE *robotv1alpha1.RobotIDE, podNamespacedName *types.N
 		Ports: []corev1.ContainerPort{
 			{
 				Name:          ROBOT_IDE_PORT_NAME,
-				ContainerPort: ROBOT_IDE_PORT,
+				ContainerPort: int32(getRobotIDEInternalAppPort(*robotIDE)),
 			},
 			{
 				Name:          internal.FILE_BROWSER_PORT_NAME,
-				ContainerPort: internal.FILE_BROWSER_PORT,
+				ContainerPort: int32(getRobotIDEFBInternalAppPort(*robotIDE)),
 			},
 		},
 		Resources: corev1.ResourceRequirements{
@@ -147,17 +163,17 @@ func GetRobotIDEService(robotIDE *robotv1alpha1.RobotIDE, svcNamespacedName *typ
 		Selector: getRobotIDESelector(*robotIDE),
 		Ports: []corev1.ServicePort{
 			{
-				Port: ROBOT_IDE_PORT,
+				Port: int32(getRobotIDEInternalAppPort(*robotIDE)),
 				TargetPort: intstr.IntOrString{
-					IntVal: ROBOT_IDE_PORT,
+					IntVal: int32(getRobotIDEInternalAppPort(*robotIDE)),
 				},
 				Protocol: corev1.ProtocolTCP,
 				Name:     ROBOT_IDE_PORT_NAME,
 			},
 			{
-				Port: internal.FILE_BROWSER_PORT,
+				Port: int32(getRobotIDEFBInternalAppPort(*robotIDE)),
 				TargetPort: intstr.IntOrString{
-					IntVal: internal.FILE_BROWSER_PORT,
+					IntVal: int32(getRobotIDEFBInternalAppPort(*robotIDE)),
 				},
 				Protocol: corev1.ProtocolTCP,
 				Name:     internal.FILE_BROWSER_PORT_NAME,
@@ -225,7 +241,7 @@ func GetRobotIDEIngress(robotIDE *robotv1alpha1.RobotIDE, ingressNamespacedName 
 									Service: &networkingv1.IngressServiceBackend{
 										Name: robotIDE.GetRobotIDEServiceMetadata().Name,
 										Port: networkingv1.ServiceBackendPort{
-											Number: ROBOT_IDE_PORT,
+											Number: int32(getRobotIDEInternalAppPort(*robotIDE)),
 										},
 									},
 								},
@@ -237,7 +253,7 @@ func GetRobotIDEIngress(robotIDE *robotv1alpha1.RobotIDE, ingressNamespacedName 
 									Service: &networkingv1.IngressServiceBackend{
 										Name: robotIDE.GetRobotIDEServiceMetadata().Name,
 										Port: networkingv1.ServiceBackendPort{
-											Number: internal.FILE_BROWSER_PORT,
+											Number: int32(getRobotIDEFBInternalAppPort(*robotIDE)),
 										},
 									},
 								},

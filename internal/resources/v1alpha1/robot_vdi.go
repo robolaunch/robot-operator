@@ -19,14 +19,30 @@ import (
 )
 
 const (
-	ROBOT_VDI_PORT_NAME = "http"
-	ROBOT_VDI_PORT      = 8055
+	ROBOT_VDI_PORT_NAME    = "http"
+	DEFAULT_ROBOT_VDI_PORT = 8055
 )
 
 func getRobotVDISelector(robotVDI robotv1alpha1.RobotVDI) map[string]string {
 	return map[string]string{
 		"robotVDI": robotVDI.Name,
 	}
+}
+
+func getRobotVDIInternalAppPort(robotVDI robotv1alpha1.RobotVDI) int {
+	if val, ok := robotVDI.Labels[internal.ROBOT_VDI_PORT_KEY]; ok {
+		portInt, _ := strconv.Atoi(val)
+		return portInt
+	}
+	return DEFAULT_ROBOT_VDI_PORT
+}
+
+func getRobotVDIFBInternalAppPort(robotVDI robotv1alpha1.RobotVDI) int {
+	if val, ok := robotVDI.Labels[internal.ROBOT_VDI_FB_PORT_KEY]; ok {
+		portInt, _ := strconv.Atoi(val)
+		return portInt
+	}
+	return internal.FILE_BROWSER_PORT
 }
 
 func GetRobotVDIPVC(robotVDI *robotv1alpha1.RobotVDI, pvcNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot) *corev1.PersistentVolumeClaim {
@@ -64,12 +80,12 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 	ports := []corev1.ContainerPort{
 		{
 			Name:          ROBOT_VDI_PORT_NAME,
-			ContainerPort: ROBOT_VDI_PORT,
+			ContainerPort: int32(getRobotVDIInternalAppPort(*robotVDI)),
 			Protocol:      corev1.ProtocolTCP,
 		},
 		{
 			Name:          internal.FILE_BROWSER_PORT_NAME,
-			ContainerPort: internal.FILE_BROWSER_PORT,
+			ContainerPort: int32(getRobotVDIFBInternalAppPort(*robotVDI)),
 			Protocol:      corev1.ProtocolTCP,
 		},
 	}
@@ -110,12 +126,12 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 		Command: internal.Bash(cmdBuilder.String()),
 		Env: []corev1.EnvVar{
 			internal.Env("VIDEO_PORT", "DFP"),
-			internal.Env("NEKO_BIND", ":8055"),
+			internal.Env("NEKO_BIND", ":"+strconv.Itoa(getRobotVDIInternalAppPort(*robotVDI))),
 			internal.Env("NEKO_EPR", robotVDI.Spec.WebRTCPortRange),
 			internal.Env("NEKO_ICELITE", icelite),
 			internal.Env("NEKO_NAT1TO1", robotVDI.Spec.NAT1TO1),
 			internal.Env("RESOLUTION", robotVDI.Spec.Resolution),
-			internal.Env("FILE_BROWSER_PORT", strconv.Itoa(internal.FILE_BROWSER_PORT)),
+			internal.Env("FILE_BROWSER_PORT", strconv.Itoa(getRobotVDIFBInternalAppPort(*robotVDI))),
 			internal.Env("FILE_BROWSER_SERVICE", "vdi"),
 			internal.Env("FILE_BROWSER_BASE_URL", robotv1alpha1.GetRobotServicePath(robot, "/file-browser/vdi")),
 		},
@@ -199,17 +215,17 @@ func GetRobotVDIServiceTCP(robotVDI *robotv1alpha1.RobotVDI, svcNamespacedName *
 
 	ports := []corev1.ServicePort{
 		{
-			Port: ROBOT_VDI_PORT,
+			Port: int32(getRobotVDIInternalAppPort(*robotVDI)),
 			TargetPort: intstr.IntOrString{
-				IntVal: int32(ROBOT_VDI_PORT),
+				IntVal: int32(getRobotVDIInternalAppPort(*robotVDI)),
 			},
 			Protocol: corev1.ProtocolTCP,
 			Name:     ROBOT_VDI_PORT_NAME,
 		},
 		{
-			Port: internal.FILE_BROWSER_PORT,
+			Port: int32(getRobotVDIFBInternalAppPort(*robotVDI)),
 			TargetPort: intstr.IntOrString{
-				IntVal: int32(internal.FILE_BROWSER_PORT),
+				IntVal: int32(getRobotVDIFBInternalAppPort(*robotVDI)),
 			},
 			Protocol: corev1.ProtocolTCP,
 			Name:     internal.FILE_BROWSER_PORT_NAME,
@@ -319,7 +335,7 @@ func GetRobotVDIIngress(robotVDI *robotv1alpha1.RobotVDI, ingressNamespacedName 
 									Service: &networkingv1.IngressServiceBackend{
 										Name: robotVDI.GetRobotVDIServiceTCPMetadata().Name,
 										Port: networkingv1.ServiceBackendPort{
-											Number: int32(ROBOT_VDI_PORT),
+											Number: int32(getRobotVDIInternalAppPort(*robotVDI)),
 										},
 									},
 								},
@@ -331,7 +347,7 @@ func GetRobotVDIIngress(robotVDI *robotv1alpha1.RobotVDI, ingressNamespacedName 
 									Service: &networkingv1.IngressServiceBackend{
 										Name: robotVDI.GetRobotVDIServiceTCPMetadata().Name,
 										Port: networkingv1.ServiceBackendPort{
-											Number: int32(internal.FILE_BROWSER_PORT),
+											Number: int32(getRobotVDIFBInternalAppPort(*robotVDI)),
 										},
 									},
 								},
