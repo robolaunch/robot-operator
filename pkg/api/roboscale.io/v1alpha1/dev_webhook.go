@@ -3,6 +3,7 @@ package v1alpha1
 import (
 	"errors"
 	"reflect"
+	"regexp"
 
 	"github.com/robolaunch/robot-operator/internal"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -24,8 +25,6 @@ func (r *Notebook) SetupWebhookWithManager(mgr ctrl.Manager) error {
 		Complete()
 }
 
-// TODO(user): EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-
 //+kubebuilder:webhook:path=/mutate-robot-roboscale-io-v1alpha1-notebook,mutating=true,failurePolicy=fail,sideEffects=None,groups=robot.roboscale.io,resources=notebooks,verbs=create;update,versions=v1alpha1,name=mnotebook.kb.io,admissionReviewVersions=v1
 
 var _ webhook.Defaulter = &Notebook{}
@@ -33,11 +32,8 @@ var _ webhook.Defaulter = &Notebook{}
 // Default implements webhook.Defaulter so a webhook will be registered for the type
 func (r *Notebook) Default() {
 	notebooklog.Info("default", "name", r.Name)
-
-	// TODO(user): fill in your defaulting logic.
 }
 
-// TODO(user): change verbs to "verbs=create;update;delete" if you want to enable deletion validation.
 //+kubebuilder:webhook:path=/validate-robot-roboscale-io-v1alpha1-notebook,mutating=false,failurePolicy=fail,sideEffects=None,groups=robot.roboscale.io,resources=notebooks,verbs=create;update,versions=v1alpha1,name=vnotebook.kb.io,admissionReviewVersions=v1
 
 var _ webhook.Validator = &Notebook{}
@@ -46,7 +42,11 @@ var _ webhook.Validator = &Notebook{}
 func (r *Notebook) ValidateCreate() error {
 	notebooklog.Info("validate create", "name", r.Name)
 
-	// TODO(user): fill in your validation logic upon object creation.
+	err := r.checkPortLabels()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -54,15 +54,43 @@ func (r *Notebook) ValidateCreate() error {
 func (r *Notebook) ValidateUpdate(old runtime.Object) error {
 	notebooklog.Info("validate update", "name", r.Name)
 
-	// TODO(user): fill in your validation logic upon object update.
+	err := r.checkPortLabels()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
 func (r *Notebook) ValidateDelete() error {
 	notebooklog.Info("validate delete", "name", r.Name)
+	return nil
+}
 
-	// TODO(user): fill in your validation logic upon object deletion.
+func (r *Notebook) checkPortLabels() error {
+	labels := r.GetLabels()
+
+	if val, ok := labels[internal.NOTEBOOK_PORT_KEY]; !ok {
+		matched, err := regexp.MatchString(internal.INTERNAL_APP_PORT_REGEX, val)
+		if !matched {
+			return errors.New("cannot set application port for Notebook, use this pattern " + internal.INTERNAL_APP_PORT_REGEX)
+		}
+		if err != nil {
+			return err
+		}
+	}
+
+	if val, ok := labels[internal.NOTEBOOK_FB_PORT_KEY]; !ok {
+		matched, err := regexp.MatchString(internal.INTERNAL_APP_PORT_REGEX, val)
+		if !matched {
+			return errors.New("cannot set application port for file browser (Notebook), use this pattern " + internal.INTERNAL_APP_PORT_REGEX)
+		}
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -106,6 +134,11 @@ func (r *RobotIDE) ValidateCreate() error {
 		return err
 	}
 
+	err = r.checkPortLabels()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -119,6 +152,11 @@ func (r *RobotIDE) ValidateUpdate(old runtime.Object) error {
 	}
 
 	err = r.checkTargetRobotVDILabel()
+	if err != nil {
+		return err
+	}
+
+	err = r.checkPortLabels()
 	if err != nil {
 		return err
 	}
@@ -148,6 +186,32 @@ func (r *RobotIDE) checkTargetRobotVDILabel() error {
 	if r.Spec.Display {
 		if _, ok := labels[internal.TARGET_VDI_LABEL_KEY]; !ok {
 			return errors.New("target robot vdi label should be added with key " + internal.TARGET_VDI_LABEL_KEY)
+		}
+	}
+
+	return nil
+}
+
+func (r *RobotIDE) checkPortLabels() error {
+	labels := r.GetLabels()
+
+	if val, ok := labels[internal.ROBOT_IDE_PORT_KEY]; !ok {
+		matched, err := regexp.MatchString(internal.INTERNAL_APP_PORT_REGEX, val)
+		if !matched {
+			return errors.New("cannot set application port for IDE, use this pattern " + internal.INTERNAL_APP_PORT_REGEX)
+		}
+		if err != nil {
+			return err
+		}
+	}
+
+	if val, ok := labels[internal.ROBOT_IDE_FB_PORT_KEY]; !ok {
+		matched, err := regexp.MatchString(internal.INTERNAL_APP_PORT_REGEX, val)
+		if !matched {
+			return errors.New("cannot set application port for file browser (IDE), use this pattern " + internal.INTERNAL_APP_PORT_REGEX)
+		}
+		if err != nil {
+			return err
 		}
 	}
 
@@ -189,6 +253,11 @@ func (r *RobotVDI) ValidateCreate() error {
 		return err
 	}
 
+	err = r.checkPortLabels()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -197,6 +266,11 @@ func (r *RobotVDI) ValidateUpdate(old runtime.Object) error {
 	robotvdilog.Info("validate update", "name", r.Name)
 
 	err := r.checkTargetRobotLabel()
+	if err != nil {
+		return err
+	}
+
+	err = r.checkPortLabels()
 	if err != nil {
 		return err
 	}
@@ -215,6 +289,32 @@ func (r *RobotVDI) checkTargetRobotLabel() error {
 
 	if _, ok := labels[internal.TARGET_ROBOT_LABEL_KEY]; !ok {
 		return errors.New("target robot label should be added with key " + internal.TARGET_VDI_LABEL_KEY)
+	}
+
+	return nil
+}
+
+func (r *RobotVDI) checkPortLabels() error {
+	labels := r.GetLabels()
+
+	if val, ok := labels[internal.ROBOT_VDI_PORT_KEY]; !ok {
+		matched, err := regexp.MatchString(internal.INTERNAL_APP_PORT_REGEX, val)
+		if !matched {
+			return errors.New("cannot set application port for VDI, use this pattern " + internal.INTERNAL_APP_PORT_REGEX)
+		}
+		if err != nil {
+			return err
+		}
+	}
+
+	if val, ok := labels[internal.ROBOT_VDI_FB_PORT_KEY]; !ok {
+		matched, err := regexp.MatchString(internal.INTERNAL_APP_PORT_REGEX, val)
+		if !matched {
+			return errors.New("cannot set application port for file browser (VDI), use this pattern " + internal.INTERNAL_APP_PORT_REGEX)
+		}
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
