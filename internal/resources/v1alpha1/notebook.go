@@ -29,6 +29,14 @@ func getNotebookSelector(notebook robotv1alpha1.Notebook) map[string]string {
 	}
 }
 
+func getNotebookInternalAppPort(notebook robotv1alpha1.Notebook) int {
+	if val, ok := notebook.Labels[internal.NOTEBOOK_PORT_KEY]; ok {
+		portInt, _ := strconv.Atoi(val)
+		return portInt
+	}
+	return DEFAULT_NOTEBOOK_PORT
+}
+
 func GetNotebookPod(notebook *robotv1alpha1.Notebook, podNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot, robotVDI robotv1alpha1.RobotVDI, node corev1.Node, cm corev1.ConfigMap) *corev1.Pod {
 
 	podCfg := configure.PodConfigInjector{}
@@ -48,7 +56,7 @@ func GetNotebookPod(notebook *robotv1alpha1.Notebook, podNamespacedName *types.N
 		Image:   robot.Status.Image,
 		Command: internal.Bash(cmdBuilder.String()),
 		Env: []corev1.EnvVar{
-			internal.Env("NOTEBOOK_PORT", strconv.Itoa(DEFAULT_NOTEBOOK_PORT)),
+			internal.Env("NOTEBOOK_PORT", strconv.Itoa(getNotebookInternalAppPort(*notebook))),
 			internal.Env("NOTEBOOK_BASE_URL", robotv1alpha1.GetRobotServicePath(robot, "/notebook")),
 			internal.Env("FILE_BROWSER_PORT", strconv.Itoa(internal.FILE_BROWSER_PORT)),
 			internal.Env("FILE_BROWSER_SERVICE", "notebook"),
@@ -61,7 +69,7 @@ func GetNotebookPod(notebook *robotv1alpha1.Notebook, podNamespacedName *types.N
 		Ports: []corev1.ContainerPort{
 			{
 				Name:          NOTEBOOK_PORT_NAME,
-				ContainerPort: DEFAULT_NOTEBOOK_PORT,
+				ContainerPort: int32(getNotebookInternalAppPort(*notebook)),
 			},
 			{
 				Name:          internal.FILE_BROWSER_PORT_NAME,
@@ -136,9 +144,9 @@ func GetNotebookService(notebook *robotv1alpha1.Notebook, svcNamespacedName *typ
 		Selector: getNotebookSelector(*notebook),
 		Ports: []corev1.ServicePort{
 			{
-				Port: DEFAULT_NOTEBOOK_PORT,
+				Port: int32(getNotebookInternalAppPort(*notebook)),
 				TargetPort: intstr.IntOrString{
-					IntVal: DEFAULT_NOTEBOOK_PORT,
+					IntVal: int32(getNotebookInternalAppPort(*notebook)),
 				},
 				Protocol: corev1.ProtocolTCP,
 				Name:     NOTEBOOK_PORT_NAME,
@@ -212,7 +220,7 @@ func GetNotebookIngress(notebook *robotv1alpha1.Notebook, ingressNamespacedName 
 									Service: &networkingv1.IngressServiceBackend{
 										Name: notebook.GetNotebookServiceMetadata().Name,
 										Port: networkingv1.ServiceBackendPort{
-											Number: DEFAULT_NOTEBOOK_PORT,
+											Number: int32(getNotebookInternalAppPort(*notebook)),
 										},
 									},
 								},

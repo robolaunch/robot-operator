@@ -29,6 +29,14 @@ func getRobotVDISelector(robotVDI robotv1alpha1.RobotVDI) map[string]string {
 	}
 }
 
+func getRobotVDIInternalAppPort(robotVDI robotv1alpha1.RobotVDI) int {
+	if val, ok := robotVDI.Labels[internal.ROBOT_VDI_PORT_KEY]; ok {
+		portInt, _ := strconv.Atoi(val)
+		return portInt
+	}
+	return DEFAULT_ROBOT_VDI_PORT
+}
+
 func GetRobotVDIPVC(robotVDI *robotv1alpha1.RobotVDI, pvcNamespacedName *types.NamespacedName, robot robotv1alpha1.Robot) *corev1.PersistentVolumeClaim {
 
 	pvc := corev1.PersistentVolumeClaim{
@@ -64,7 +72,7 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 	ports := []corev1.ContainerPort{
 		{
 			Name:          ROBOT_VDI_PORT_NAME,
-			ContainerPort: DEFAULT_ROBOT_VDI_PORT,
+			ContainerPort: int32(getRobotVDIInternalAppPort(*robotVDI)),
 			Protocol:      corev1.ProtocolTCP,
 		},
 		{
@@ -110,7 +118,7 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 		Command: internal.Bash(cmdBuilder.String()),
 		Env: []corev1.EnvVar{
 			internal.Env("VIDEO_PORT", "DFP"),
-			internal.Env("NEKO_BIND", ":8055"),
+			internal.Env("NEKO_BIND", ":"+strconv.Itoa(getRobotVDIInternalAppPort(*robotVDI))),
 			internal.Env("NEKO_EPR", robotVDI.Spec.WebRTCPortRange),
 			internal.Env("NEKO_ICELITE", icelite),
 			internal.Env("NEKO_NAT1TO1", robotVDI.Spec.NAT1TO1),
@@ -199,9 +207,9 @@ func GetRobotVDIServiceTCP(robotVDI *robotv1alpha1.RobotVDI, svcNamespacedName *
 
 	ports := []corev1.ServicePort{
 		{
-			Port: DEFAULT_ROBOT_VDI_PORT,
+			Port: int32(getRobotVDIInternalAppPort(*robotVDI)),
 			TargetPort: intstr.IntOrString{
-				IntVal: int32(DEFAULT_ROBOT_VDI_PORT),
+				IntVal: int32(getRobotVDIInternalAppPort(*robotVDI)),
 			},
 			Protocol: corev1.ProtocolTCP,
 			Name:     ROBOT_VDI_PORT_NAME,
@@ -319,7 +327,7 @@ func GetRobotVDIIngress(robotVDI *robotv1alpha1.RobotVDI, ingressNamespacedName 
 									Service: &networkingv1.IngressServiceBackend{
 										Name: robotVDI.GetRobotVDIServiceTCPMetadata().Name,
 										Port: networkingv1.ServiceBackendPort{
-											Number: int32(DEFAULT_ROBOT_VDI_PORT),
+											Number: int32(getRobotVDIInternalAppPort(*robotVDI)),
 										},
 									},
 								},
