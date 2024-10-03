@@ -71,7 +71,7 @@ func (r *Notebook) ValidateDelete() error {
 func (r *Notebook) checkPortLabels() error {
 	labels := r.GetLabels()
 
-	if val, ok := labels[internal.NOTEBOOK_PORT_KEY]; !ok {
+	if val, ok := labels[internal.NOTEBOOK_PORT_KEY]; ok {
 		matched, err := regexp.MatchString(internal.INTERNAL_APP_PORT_REGEX, val)
 		if !matched {
 			return errors.New("cannot set application port for Notebook, use this pattern " + internal.INTERNAL_APP_PORT_REGEX)
@@ -81,7 +81,7 @@ func (r *Notebook) checkPortLabels() error {
 		}
 	}
 
-	if val, ok := labels[internal.NOTEBOOK_FB_PORT_KEY]; !ok {
+	if val, ok := labels[internal.NOTEBOOK_FB_PORT_KEY]; ok {
 		matched, err := regexp.MatchString(internal.INTERNAL_APP_PORT_REGEX, val)
 		if !matched {
 			return errors.New("cannot set application port for file browser (Notebook), use this pattern " + internal.INTERNAL_APP_PORT_REGEX)
@@ -195,7 +195,7 @@ func (r *RobotIDE) checkTargetRobotVDILabel() error {
 func (r *RobotIDE) checkPortLabels() error {
 	labels := r.GetLabels()
 
-	if val, ok := labels[internal.ROBOT_IDE_PORT_KEY]; !ok {
+	if val, ok := labels[internal.ROBOT_IDE_PORT_KEY]; ok {
 		matched, err := regexp.MatchString(internal.INTERNAL_APP_PORT_REGEX, val)
 		if !matched {
 			return errors.New("cannot set application port for IDE, use this pattern " + internal.INTERNAL_APP_PORT_REGEX)
@@ -205,7 +205,7 @@ func (r *RobotIDE) checkPortLabels() error {
 		}
 	}
 
-	if val, ok := labels[internal.ROBOT_IDE_FB_PORT_KEY]; !ok {
+	if val, ok := labels[internal.ROBOT_IDE_FB_PORT_KEY]; ok {
 		matched, err := regexp.MatchString(internal.INTERNAL_APP_PORT_REGEX, val)
 		if !matched {
 			return errors.New("cannot set application port for file browser (IDE), use this pattern " + internal.INTERNAL_APP_PORT_REGEX)
@@ -297,7 +297,7 @@ func (r *RobotVDI) checkTargetRobotLabel() error {
 func (r *RobotVDI) checkPortLabels() error {
 	labels := r.GetLabels()
 
-	if val, ok := labels[internal.ROBOT_VDI_PORT_KEY]; !ok {
+	if val, ok := labels[internal.ROBOT_VDI_PORT_KEY]; ok {
 		matched, err := regexp.MatchString(internal.INTERNAL_APP_PORT_REGEX, val)
 		if !matched {
 			return errors.New("cannot set application port for VDI, use this pattern " + internal.INTERNAL_APP_PORT_REGEX)
@@ -307,7 +307,7 @@ func (r *RobotVDI) checkPortLabels() error {
 		}
 	}
 
-	if val, ok := labels[internal.ROBOT_VDI_FB_PORT_KEY]; !ok {
+	if val, ok := labels[internal.ROBOT_VDI_FB_PORT_KEY]; ok {
 		matched, err := regexp.MatchString(internal.INTERNAL_APP_PORT_REGEX, val)
 		if !matched {
 			return errors.New("cannot set application port for file browser (VDI), use this pattern " + internal.INTERNAL_APP_PORT_REGEX)
