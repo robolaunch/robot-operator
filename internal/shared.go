@@ -52,6 +52,12 @@ const (
 // Special escape labels
 const (
 	ROBOT_DEV_SUITE_OWNED = "robolaunch.io/dev-suite-owned"
+	ROBOT_IDE_PORT_KEY    = "robolaunch.io/ide-port"
+	ROBOT_VDI_PORT_KEY    = "robolaunch.io/vdi-port"
+	NOTEBOOK_PORT_KEY     = "robolaunch.io/notebook-port"
+	ROBOT_IDE_FB_PORT_KEY = "robolaunch.io/ide-port"
+	ROBOT_VDI_FB_PORT_KEY = "robolaunch.io/vdi-port"
+	NOTEBOOK_FB_PORT_KEY  = "robolaunch.io/notebook-port"
 )
 
 // Platform server
