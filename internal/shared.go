@@ -55,9 +55,9 @@ const (
 	ROBOT_IDE_PORT_KEY    = "robolaunch.io/ide-port"
 	ROBOT_VDI_PORT_KEY    = "robolaunch.io/vdi-port"
 	NOTEBOOK_PORT_KEY     = "robolaunch.io/notebook-port"
-	ROBOT_IDE_FB_PORT_KEY = "robolaunch.io/ide-port"
-	ROBOT_VDI_FB_PORT_KEY = "robolaunch.io/vdi-port"
-	NOTEBOOK_FB_PORT_KEY  = "robolaunch.io/notebook-port"
+	ROBOT_IDE_FB_PORT_KEY = "robolaunch.io/ide-fb-port"
+	ROBOT_VDI_FB_PORT_KEY = "robolaunch.io/vdi-fb-port"
+	NOTEBOOK_FB_PORT_KEY  = "robolaunch.io/notebook-fb-port"
 )
 
 // Special escape label regex
