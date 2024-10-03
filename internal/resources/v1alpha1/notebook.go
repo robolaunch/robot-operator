@@ -19,8 +19,8 @@ import (
 )
 
 const (
-	NOTEBOOK_PORT_NAME = "notebook"
-	NOTEBOOK_PORT      = 8888
+	NOTEBOOK_PORT_NAME    = "notebook"
+	DEFAULT_NOTEBOOK_PORT = 8888
 )
 
 func getNotebookSelector(notebook robotv1alpha1.Notebook) map[string]string {
@@ -48,7 +48,7 @@ func GetNotebookPod(notebook *robotv1alpha1.Notebook, podNamespacedName *types.N
 		Image:   robot.Status.Image,
 		Command: internal.Bash(cmdBuilder.String()),
 		Env: []corev1.EnvVar{
-			internal.Env("NOTEBOOK_PORT", strconv.Itoa(NOTEBOOK_PORT)),
+			internal.Env("NOTEBOOK_PORT", strconv.Itoa(DEFAULT_NOTEBOOK_PORT)),
 			internal.Env("NOTEBOOK_BASE_URL", robotv1alpha1.GetRobotServicePath(robot, "/notebook")),
 			internal.Env("FILE_BROWSER_PORT", strconv.Itoa(internal.FILE_BROWSER_PORT)),
 			internal.Env("FILE_BROWSER_SERVICE", "notebook"),
@@ -61,7 +61,7 @@ func GetNotebookPod(notebook *robotv1alpha1.Notebook, podNamespacedName *types.N
 		Ports: []corev1.ContainerPort{
 			{
 				Name:          NOTEBOOK_PORT_NAME,
-				ContainerPort: NOTEBOOK_PORT,
+				ContainerPort: DEFAULT_NOTEBOOK_PORT,
 			},
 			{
 				Name:          internal.FILE_BROWSER_PORT_NAME,
@@ -136,9 +136,9 @@ func GetNotebookService(notebook *robotv1alpha1.Notebook, svcNamespacedName *typ
 		Selector: getNotebookSelector(*notebook),
 		Ports: []corev1.ServicePort{
 			{
-				Port: NOTEBOOK_PORT,
+				Port: DEFAULT_NOTEBOOK_PORT,
 				TargetPort: intstr.IntOrString{
-					IntVal: NOTEBOOK_PORT,
+					IntVal: DEFAULT_NOTEBOOK_PORT,
 				},
 				Protocol: corev1.ProtocolTCP,
 				Name:     NOTEBOOK_PORT_NAME,
@@ -212,7 +212,7 @@ func GetNotebookIngress(notebook *robotv1alpha1.Notebook, ingressNamespacedName 
 									Service: &networkingv1.IngressServiceBackend{
 										Name: notebook.GetNotebookServiceMetadata().Name,
 										Port: networkingv1.ServiceBackendPort{
-											Number: NOTEBOOK_PORT,
+											Number: DEFAULT_NOTEBOOK_PORT,
 										},
 									},
 								},

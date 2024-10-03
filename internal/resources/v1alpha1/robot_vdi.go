@@ -19,8 +19,8 @@ import (
 )
 
 const (
-	ROBOT_VDI_PORT_NAME = "http"
-	ROBOT_VDI_PORT      = 8055
+	ROBOT_VDI_PORT_NAME    = "http"
+	DEFAULT_ROBOT_VDI_PORT = 8055
 )
 
 func getRobotVDISelector(robotVDI robotv1alpha1.RobotVDI) map[string]string {
@@ -64,7 +64,7 @@ func GetRobotVDIPod(robotVDI *robotv1alpha1.RobotVDI, podNamespacedName *types.N
 	ports := []corev1.ContainerPort{
 		{
 			Name:          ROBOT_VDI_PORT_NAME,
-			ContainerPort: ROBOT_VDI_PORT,
+			ContainerPort: DEFAULT_ROBOT_VDI_PORT,
 			Protocol:      corev1.ProtocolTCP,
 		},
 		{
@@ -199,9 +199,9 @@ func GetRobotVDIServiceTCP(robotVDI *robotv1alpha1.RobotVDI, svcNamespacedName *
 
 	ports := []corev1.ServicePort{
 		{
-			Port: ROBOT_VDI_PORT,
+			Port: DEFAULT_ROBOT_VDI_PORT,
 			TargetPort: intstr.IntOrString{
-				IntVal: int32(ROBOT_VDI_PORT),
+				IntVal: int32(DEFAULT_ROBOT_VDI_PORT),
 			},
 			Protocol: corev1.ProtocolTCP,
 			Name:     ROBOT_VDI_PORT_NAME,
@@ -319,7 +319,7 @@ func GetRobotVDIIngress(robotVDI *robotv1alpha1.RobotVDI, ingressNamespacedName 
 									Service: &networkingv1.IngressServiceBackend{
 										Name: robotVDI.GetRobotVDIServiceTCPMetadata().Name,
 										Port: networkingv1.ServiceBackendPort{
-											Number: int32(ROBOT_VDI_PORT),
+											Number: int32(DEFAULT_ROBOT_VDI_PORT),
 										},
 									},
 								},
