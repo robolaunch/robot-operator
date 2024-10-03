@@ -60,6 +60,11 @@ const (
 	NOTEBOOK_FB_PORT_KEY  = "robolaunch.io/notebook-port"
 )
 
+// Special escape label regex
+const (
+	INTERNAL_APP_PORT_REGEX = "^[0-9]{4,5}$"
+)
+
 // Platform server
 const (
 	DEFAULT_PLATFORM_URL           = "https://raw.githubusercontent.com/robolaunch/platform/main/platforms/industry-cloud-platform/platform.yaml"
