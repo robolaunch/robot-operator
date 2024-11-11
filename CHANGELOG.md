@@ -1,6 +1,9 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+
+<a name="v0.2.7-alpha.7.2"></a>
+## [v0.2.7-alpha.7.2] - 2024-10-03
 ### Fix
 - **validation:** fix label existence conditions in dev webhooks
 
@@ -480,7 +483,8 @@
 - Merge pull request [#24](https://github.com/robolaunch/robot-operator/issues/24) from robolaunch/23-allow-multiple-launches
 
 
-[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.7.1...HEAD
+[Unreleased]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.7.2...HEAD
+[v0.2.7-alpha.7.2]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.7.1...v0.2.7-alpha.7.2
 [v0.2.7-alpha.7.1]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.7...v0.2.7-alpha.7.1
 [v0.2.7-alpha.7]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.6.4-we-patch-v1...v0.2.7-alpha.7
 [v0.2.7-alpha.6.4-we-patch-v1]: https://github.com/robolaunch/robot-operator/compare/v0.2.7-alpha.6.4...v0.2.7-alpha.6.4-we-patch-v1
