@@ -47,6 +47,7 @@ type RobotReconciler struct {
 
 var logger logr.Logger
 
+// reconciler of Robot resources
 func (r *RobotReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	logger = log.FromContext(ctx)
 
