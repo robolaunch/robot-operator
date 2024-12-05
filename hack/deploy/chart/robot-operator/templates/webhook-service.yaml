@@ -11,6 +11,6 @@ spec:
   type: {{ .Values.webhookService.type }}
   selector:
     control-plane: controller-manager
-  {{- include "robot-operator.selectorLabels" . | nindent 4 }}
+    {{- include "robot-operator.selectorLabels" . | nindent 4 }}
   ports:
-	{{- .Values.webhookService.ports | toYaml | nindent 2 }}
+  {{- .Values.webhookService.ports | toYaml | nindent 2 }}
